@@ -56,7 +56,13 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   逐位、KV digest 一致、handoff 0.23 ms/32KiB 机内；E1b2z 现役 NCCL 机制 +
   staged D2D unpack）。双机跨机管线亦逐位通过（E0qf：跨机集合实测
   bitwise 决定性，no-GDR/GDR 双配置 264/264 步逐位，handoff 0.24 ms/32KiB）。
-  下一步：**43+1 层满配 PP4 + embed/head/MTP + E2E golden-token 对拍 D0
-  oracle**（同时是 fused HC 的最终数值门）→ 性能收敛验证。
+  **E2E 收官达成**：43 层满配 PP4×TP4（双机 16 卡）+ embed/head 完整模型
+  decode 对 D0 golden tokens 匹配 **468/482 = 97.1%**，全部 14 处分歧均为近平局
+  翻转（golden deficit ≤0.94，vs 正常判决余量中位 6.67），语义等价成立；
+  **fused HC 边界融合放行**（与 eager 同分率，482 中仅 5 处近平局互异）；
+  ratio-4 层低位置路径已补齐（带实权重预门）。报告性时延 B=1 无 graph：
+  eager 85 ms/步、fused 55–57 ms/步。下一步（性能阶段）：满配 stateful graph
+  化 + B 扫描 → closed-loop 吞吐对照修正后预估（~14k）与 8K/1K 单池目标
+  （3.2–4.2k）；随后 MTP、chunked prefill、serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
