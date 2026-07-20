@@ -52,7 +52,9 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   （默认 eager 不变；per-layer gate PASS，stage 级发散在 1-ulp 路由敏感度包络内；
   成对计时实测 6 层 stage −2.59 ms/步@bl=128、−6.4 ms/步@bl=512，11 层 stage 按
   C1F 工作点回收 ~4.7 ms → decode 预估修正为 **~14k**，fused 放行与否由模型级
-  canary 裁决）。下一步：单机 TP4×PP2 → 双机 PP4 → **E2E golden-token 对拍
+  canary 裁决）。单机 TP4×PP2 缩尺管线亦通过（E0pf：8 卡两 stage 出口 264/264 步
+  逐位、KV digest 一致、handoff 0.23 ms/32KiB 机内；E1b2z 现役 NCCL 机制 +
+  staged D2D unpack）。下一步：双机 PP4（IB/GDR）→ **E2E golden-token 对拍
   D0 oracle**（同时是 fused 的最终数值门）→ 性能收敛验证。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
