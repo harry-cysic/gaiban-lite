@@ -44,8 +44,13 @@ DeepSeek-V4-Flash（284B/13B，FP4+FP8）的高吞吐推理系统，达到
   flashinfer==0.6.12、tokenspeed-mla==0.1.6、llguidance<0.8 为 sglang 钉住版本；
   vllm 0.22.1 仅作 Marlin kernel 库使用，pip 对此的依赖警告是预期内的，不要"修复"它。
   需要新依赖时优先另建 venv。
-- **机器边界**：实验只在 titan064/065 上跑；earth（权重源）只读；不触碰 dsv4exp
-  （titan052，Pro 实验机）。权重本地副本在 `~/Workspace/DeepSeek-V4-Flash/`。
+- **机器边界**：实验只在 titan064/065 上跑；earth（权重源）只读。
+  **严禁以任何方式连接或使用 dsv4exp**（别名 dsv4exp / titan052 /
+  47.242.44.169）——该机正在跑 Pro 实验，任何负载、文件改动甚至只读的重 IO
+  都可能污染双方实验。特别注意：`../gaiban` 的大量脚本默认
+  `REMOTE=dsv4exp`（如各实验的 `run_remote*.sh`、`build_fast_hadamard_sm89.sh`），
+  复用任何 gaiban 脚本前必须确认远程目标已显式覆盖为 titan064/065。
+  权重本地副本在 `~/Workspace/DeepSeek-V4-Flash/`。
 - **环境事实**以 `docs/feasibility-v4-flash-2x8x4090.md` 附录 B 为准（pip 走
   huaweicloud 镜像、titan 未装 ping、GitHub 经本地工作站中转等），遇到与之矛盾的现象
   先核实再改文档，不要在 goal 文档里累积临时结论。

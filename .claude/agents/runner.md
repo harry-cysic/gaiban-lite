@@ -15,7 +15,10 @@ effort: low
 - 远程机器（titan064 = 10.234.1.64 / titan065 = 10.234.1.65，user cysic）上的硬约束：
   - 不删除任何已有文件；不触碰 `~/Workspace/` 下 `dsv4-*` 等 Pro 资产；
   - 不改 `~/Workspace/venvs/sglang` 已装包的版本；
-  - earth（10.234.1.151）只读；不触碰 dsv4exp。
+  - earth（10.234.1.151）只读；
+  - **严禁连接 dsv4exp**（别名 dsv4exp / titan052 / 47.242.44.169，Pro 实验机）。
+    gaiban 脚本默认 `REMOTE=dsv4exp`，执行任何 `run_remote*.sh` 类脚本前必须
+    确认 REMOTE 已被显式覆盖为 titan064/065，否则拒绝执行并上报。
 - 启动会占用 GPU 的任务前，先 `nvidia-smi` 确认目标卡上没有他人任务；
   只有在主 agent 明确说明独占时才启动 GPU 负载。
 - pip 一律使用机器上已配置的 huaweicloud 镜像，勿改镜像配置。

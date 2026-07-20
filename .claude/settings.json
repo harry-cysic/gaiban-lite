@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(ssh dsv4exp)",
+      "Bash(ssh dsv4exp *)",
+      "Bash(ssh 47.242.44.169)",
+      "Bash(ssh 47.242.44.169 *)",
+      "Bash(ssh cysic@47.242.44.169)",
+      "Bash(ssh cysic@47.242.44.169 *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command // \"\"' | grep -qiE 'dsv4exp|47\\.242\\.44\\.169' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"dsv4exp is the Pro experiment machine and is off-limits (CLAUDE_GOAL.md)\"}}' || true",
+            "statusMessage": "Checking dsv4exp guard"
+          }
+        ]
+      }
+    ]
+  }
+}
