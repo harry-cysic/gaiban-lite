@@ -1,0 +1,75 @@
+W0720 14:48:41.095000 141062 torch/distributed/run.py:851] 
+W0720 14:48:41.095000 141062 torch/distributed/run.py:851] *****************************************
+W0720 14:48:41.095000 141062 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 14:48:41.095000 141062 torch/distributed/run.py:851] *****************************************
+[E1IF] layer=22 rank=0 experts=256/256
+[E1IF] stage 2 layer 22 material loaded
+[E1IF] layer=33 rank=0 experts=256/256
+[E1IF] stage 3 layer 33 material loaded
+[E1IF] layer=23 rank=0 experts=256/256
+[E1IF] stage 2 layer 23 material loaded
+[E1IF] layer=34 rank=0 experts=256/256
+[E1IF] stage 3 layer 34 material loaded
+[E1IF] layer=24 rank=0 experts=256/256
+[E1IF] stage 2 layer 24 material loaded
+[E1IF] layer=35 rank=0 experts=256/256
+[E1IF] stage 3 layer 35 material loaded
+[E1IF] layer=25 rank=0 experts=256/256
+[E1IF] stage 2 layer 25 material loaded
+[E1IF] layer=36 rank=0 experts=256/256
+[E1IF] stage 3 layer 36 material loaded
+[E1IF] layer=26 rank=0 experts=256/256
+[E1IF] stage 2 layer 26 material loaded
+[E1IF] layer=37 rank=0 experts=256/256
+[E1IF] stage 3 layer 37 material loaded
+[E1IF] layer=27 rank=0 experts=256/256
+[E1IF] stage 2 layer 27 material loaded
+[E1IF] layer=38 rank=0 experts=256/256
+[E1IF] stage 3 layer 38 material loaded
+[E1IF] layer=28 rank=0 experts=256/256
+[E1IF] stage 2 layer 28 material loaded
+[E1IF] layer=39 rank=0 experts=256/256
+[E1IF] stage 3 layer 39 material loaded
+[E1IF] layer=29 rank=0 experts=256/256
+[E1IF] stage 2 layer 29 material loaded
+[E1IF] layer=40 rank=0 experts=256/256
+[E1IF] stage 3 layer 40 material loaded
+[E1IF] layer=30 rank=0 experts=256/256
+[E1IF] stage 2 layer 30 material loaded
+[E1IF] layer=41 rank=0 experts=256/256
+[E1IF] stage 3 layer 41 material loaded
+[E1IF] layer=31 rank=0 experts=256/256
+[E1IF] stage 2 layer 31 material loaded
+[E1IF] layer=42 rank=0 experts=256/256
+[E1IF] layer=32 rank=0 experts=256/256
+[E1IF] stage 3 layer 42 material loaded
+[E1IF] stage 2 layer 32 material loaded
+[E1IF] stage 2 loaded (11 layers, free 7.37 GiB, 13s)
+[E1IF] stage 3 loaded (10 layers, free 5.80 GiB, 13s)
+[E1IF] stage 3 lane mb0 built
+[E1IF] stage 3 lane mb1 built
+[E1IF] stage 3 lane mb2 built
+[E1IF] stage 3 lane mb3 built
+[E1IF] stage 2 4 lanes built, free 5.03 GiB
+[E1IF] stage 3 4 lanes built, free 4.74 GiB
+[E1IF] stage 3 mb0 warm done
+[E1IF] stage 3 mb1 warm done
+[E1IF] stage 3 mb2 warm done
+[E1IF] stage 3 mb3 warm done
+[E1IF] stage 3 warmup done (76s, free 5.06 GiB)
+[E1IF] stage 2 warmup done (76s, free 5.42 GiB)
+[E1IF] stage 3 settle captured mb0/normal at position 2048 (0.1s)
+[E1IF] stage 3 settle captured mb1/normal at position 2048 (0.1s)
+[E1IF] stage 3 settle captured mb2/normal at position 2048 (0.1s)
+[E1IF] stage 3 settle captured mb3/normal at position 2048 (0.1s)
+[E1IF] stage 3 settle captured mb0/ratio4_boundary at position 2051 (0.1s)
+[E1IF] stage 3 settle captured mb1/ratio4_boundary at position 2051 (0.1s)
+[E1IF] stage 3 settle captured mb2/ratio4_boundary at position 2051 (0.1s)
+[E1IF] stage 3 settle captured mb3/ratio4_boundary at position 2051 (0.1s)
+[E1IF] stage 3 settle captured mb0/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] stage 3 settle captured mb1/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] stage 3 settle captured mb2/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] stage 3 settle captured mb3/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] stage 3 round 0: iter_wall p50 26.56 ms, aggregate 7182 tok/s (wall), 7228 tok/s (iter p50), replay busy 78.5%
+[E1IF] stage 3 round 1: iter_wall p50 26.16 ms, aggregate 7297 tok/s (wall), 7341 tok/s (iter p50), replay busy 79.0%
+[E1IF] stage 3 round 2: iter_wall p50 25.88 ms, aggregate 7368 tok/s (wall), 7418 tok/s (iter p50), replay busy 79.1%

@@ -60,3 +60,37 @@ DP+满流水换算(4B / max-stage-replay,含 ~2 ms/跳 handoff 摊销):
 
 Artifacts:`results/`(每 B 的 rank JSON + result.json、ctx-8192 点、logs、
 sweep-table.json);驱动 `run_sweep.sh`、汇总 `aggregate_results.py`。
+
+## 交织流水与吞吐-容量前沿(2026-07-20 追加,E1IF)
+
+4-microbatch 轮转交织(`runtime/e1if_interleaved_bench.py`,无串扰 gate:交织轨迹与
+各 lane 单跑逐位相同;瓶颈 stage busy 93.7%,气泡 ~6%)。实测前沿(DP 口径,
+graph+fused HC,聚合 tok/s,best round):
+
+| ctx | bl_mb=32 | 40 | 48 | 64 | 96/128 | 实测天花板 |
+|---|---:|---:|---:|---:|---|---|
+| 2048 | 5885 | — | 7368 | **8570** | OOM | 8.6k(B_total=1024,显存限) |
+| 8192 | 5693 | **6392** | OOM | — | — | **6.4k(B_total=640,显存限)** |
+
+replay 次线性:bl 32→48→64 为 20.3→23.7→26.2 ms(权重流固定成本主导);
+2K 下外推 bl128 ≈14k 但 bf16 KV+工作区在 bl96 即 OOM——**约束是容量,不是算力**。
+
+## 容量模型修正(goal 条款触发:假设被实测证伪)
+
+原 §5.2 "decode ≈ 512/t_stage ≈ 19–21k(带 15–25k)@8K" 依赖两个假设,均不成立:
+
+1. **t_stage 线性缩放**:实测强次线性(bl=32 时 20.3 ms,是 bl=128 的 36.6 ms
+   的 55% 而非 25%)——流水交织把大 batch 拆小 mb 时吞吐显著低于线性换算。
+2. **管线填充的 KV 同驻**:满流水需 4 mb 的 KV 同驻(×4);"B_global=512 全局"
+   吞吐点实际需要 2048 条在飞,8K bf16 KV 下不可行(实测 8K 上限 B_total=640)。
+
+**修正后的 decode-only 实测结论:8K/bf16-KV ≈ 6.4k output tok/s**(全链路
+graph 化、fused HC、DP、94% busy——不是工程未完成,是容量边界)。证据链:
+E1F(t_stage-bl 曲线)→ E1IF(交织无串扰+busy 占比)→ 前沿扫描(OOM 判界),
+全部 3 轮重复、绑定 checkpoint/env/拓扑。
+
+**回收杠杆(可行性自列,待验证)**:FP8 KV(×2 行数,须按 §5.4-5 在 Flash
+h=16 几何重验速度/质量)→ 8K 投影 bl≈80/mb ≈ 10–11k;MTP(~1.5×)→
+**~15–16k,带下沿在两杠杆齐备时可及**;短 ctx 运营(4K/2K)另有余量
+(2K 实测 8.6k,FP8 KV 后投影 ~14k)。head 入 graph(2.9 ms,13% of s3)
+与计算/传输 overlap 为小杠杆。

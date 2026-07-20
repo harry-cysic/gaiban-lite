@@ -1,0 +1,210 @@
+W0720 15:33:46.439000 161518 torch/distributed/run.py:851] 
+W0720 15:33:46.439000 161518 torch/distributed/run.py:851] *****************************************
+W0720 15:33:46.439000 161518 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 15:33:46.439000 161518 torch/distributed/run.py:851] *****************************************
+[E1IF] placement {0: ['titan064'], 1: ['titan064'], 2: ['titan065'], 3: ['titan065']}
+[E1IF] layer=0 rank=0 experts=256/256
+[E1IF] layer=11 rank=0 experts=256/256
+[E1IF] stage 1 layer 11 material loaded
+[E1IF] stage 0 layer 0 material loaded
+[E1IF] layer=1 rank=0 experts=256/256
+[E1IF] layer=12 rank=0 experts=256/256
+[E1IF] stage 0 layer 1 material loaded
+[E1IF] stage 1 layer 12 material loaded
+[E1IF] layer=2 rank=0 experts=256/256
+[E1IF] stage 0 layer 2 material loaded
+[E1IF] layer=13 rank=0 experts=256/256
+[E1IF] stage 1 layer 13 material loaded
+[E1IF] layer=3 rank=0 experts=256/256
+[E1IF] stage 0 layer 3 material loaded
+[E1IF] layer=14 rank=0 experts=256/256
+[E1IF] stage 1 layer 14 material loaded
+[E1IF] layer=4 rank=0 experts=256/256
+[E1IF] stage 0 layer 4 material loaded
+[E1IF] layer=15 rank=0 experts=256/256
+[E1IF] stage 1 layer 15 material loaded
+[E1IF] layer=5 rank=0 experts=256/256
+[E1IF] stage 0 layer 5 material loaded
+[E1IF] layer=16 rank=0 experts=256/256
+[E1IF] stage 1 layer 16 material loaded
+[E1IF] layer=6 rank=0 experts=256/256
+[E1IF] stage 0 layer 6 material loaded
+[E1IF] layer=17 rank=0 experts=256/256
+[E1IF] stage 1 layer 17 material loaded
+[E1IF] layer=7 rank=0 experts=256/256
+[E1IF] stage 0 layer 7 material loaded
+[E1IF] layer=18 rank=0 experts=256/256
+[E1IF] stage 1 layer 18 material loaded
+[E1IF] layer=8 rank=0 experts=256/256
+[E1IF] stage 0 layer 8 material loaded
+[E1IF] layer=19 rank=0 experts=256/256
+[E1IF] stage 1 layer 19 material loaded
+[E1IF] layer=9 rank=0 experts=256/256
+[E1IF] stage 0 layer 9 material loaded
+[E1IF] layer=20 rank=0 experts=256/256
+[E1IF] stage 1 layer 20 material loaded
+[E1IF] layer=10 rank=0 experts=256/256
+[E1IF] stage 0 layer 10 material loaded
+[E1IF] layer=21 rank=0 experts=256/256
+[E1IF] stage 1 layer 21 material loaded
+[E1IF] stage 1 loaded (11 layers, free 7.39 GiB, 13s)
+[E1IF] stage 0 loaded (11 layers, free 6.48 GiB, 13s)
+[E1IF] stage 0 lane mb0 built
+[E1IF] stage 0 lane mb1 built
+[E1IF] stage 0 lane mb2 built
+[E1IF] stage 0 lane mb3 built
+[E1IF] stage 1 4 lanes built, free 2.66 GiB
+[E1IF] stage 0 4 lanes built, free 1.90 GiB
+[E1F][rank 3] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 595, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 241, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 89, in __init__
+    self.indexer_kv = torch.zeros(
+                      ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 28.00 MiB. GPU 3 has a total capacity of 23.52 GiB of which 17.88 MiB is free. Including non-PyTorch memory, this process has 23.49 GiB memory in use. Of the allocated memory 22.72 GiB is allocated by PyTorch, and 24.36 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 0] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 595, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 241, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 82, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 118.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 115.88 MiB is free. Including non-PyTorch memory, this process has 23.40 GiB memory in use. Of the allocated memory 22.61 GiB is allocated by PyTorch, and 24.36 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 1] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 595, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 241, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 82, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 118.00 MiB. GPU 1 has a total capacity of 23.52 GiB of which 115.88 MiB is free. Including non-PyTorch memory, this process has 23.40 GiB memory in use. Of the allocated memory 22.61 GiB is allocated by PyTorch, and 24.36 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 2] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 595, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 241, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 82, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 118.00 MiB. GPU 2 has a total capacity of 23.52 GiB of which 115.88 MiB is free. Including non-PyTorch memory, this process has 23.40 GiB memory in use. Of the allocated memory 22.61 GiB is allocated by PyTorch, and 24.36 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1IF] overall: FAIL
+W0720 15:43:26.082000 161518 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 161610 closing signal SIGTERM
+W0720 15:43:26.084000 161518 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 161611 closing signal SIGTERM
+W0720 15:43:26.084000 161518 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 161612 closing signal SIGTERM
+W0720 15:43:26.084000 161518 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 161613 closing signal SIGTERM
+W0720 15:43:26.084000 161518 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 161615 closing signal SIGTERM
+W0720 15:43:26.084000 161518 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 161616 closing signal SIGTERM
+W0720 15:43:26.084000 161518 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 161617 closing signal SIGTERM
+E0720 15:43:26.890000 161518 torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: 1) local_rank: 4 (pid: 161614) of binary: /home/cysic/Workspace/venvs/sglang/bin/python3
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+e1if_interleaved_bench.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-07-20_15:43:26
+  host      : titan064
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 161610)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-07-20_15:43:26
+  host      : titan064
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 161611)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2026-07-20_15:43:26
+  host      : titan064
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 161612)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[4]:
+  time      : 2026-07-20_15:43:26
+  host      : titan064
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 161613)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[5]:
+  time      : 2026-07-20_15:43:26
+  host      : titan064
+  rank      : 5 (local_rank: 5)
+  exitcode  : 1 (pid: 161615)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[6]:
+  time      : 2026-07-20_15:43:26
+  host      : titan064
+  rank      : 6 (local_rank: 6)
+  exitcode  : 1 (pid: 161616)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[7]:
+  time      : 2026-07-20_15:43:26
+  host      : titan064
+  rank      : 7 (local_rank: 7)
+  exitcode  : 1 (pid: 161617)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-20_15:43:26
+  host      : titan064
+  rank      : 4 (local_rank: 4)
+  exitcode  : 1 (pid: 161614)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
