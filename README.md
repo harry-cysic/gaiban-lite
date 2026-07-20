@@ -24,5 +24,12 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   原生可跑（无需 topk-block 修复），h=64 单 launch 撞 sm89 smem 墙 → DP-attention 须
   head-loop（4×h16）；DP 口径折算 11 层 stage 非 MoE 部分 ~13 ms 量级，高于 §5.2 的
   6–7 ms 假设，decode 预估收敛至 **~15–17k tok/s**（区间下沿），待 C1F 实测修订。
-  下一步：**C1F 集成 block bench**（移植 gaiban C1' `--attn-mode dp`，Marlin MoE +
-  head-loop attention + HC + NCCL 整层 decode 定数）；随后 fused indexer 接入。
+  [`C1F`](experiments/C1F-integrated-block/README.md) 集成整层 bench 完成并给出两组
+  causal A/B：**DP-attention 胜 head-shard（B=512 −23%）、intermediate-TP 胜 EP**，
+  既定形态全部通过检验；B=512/8K 整层加权 3712 µs → **reference-op 基线组件
+  roofline ≈ 12.5k output tok/s**（低于预估带下沿 ~20%，归因：HC fp32 sinkhorn
+  7.8 ms/stage、allgather 6.0 ms/stage 未入模型、attention 未用 W8A16）。
+- 下一阶段（Phase 2 前置）：接入三项已验证 gaiban 资产回收差额——**fused MHC**
+  （c2f_fused_hc，bitwise 等价）、**fused Triton indexer**（D0b，topk 1024→512）、
+  **attention W8A16**（E1b2q，Pro 1.74×）；随后 dsv4_direct 移植 Flash 层表
+  （单机 TP4×PP2 → 双机 PP4）。12.5k 为未优化基线，暂不构成对 15–25k 的证伪。
