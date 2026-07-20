@@ -1,0 +1,113 @@
+W0720 11:06:56.872000 149941 torch/distributed/run.py:851] 
+W0720 11:06:56.872000 149941 torch/distributed/run.py:851] *****************************************
+W0720 11:06:56.872000 149941 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 11:06:56.872000 149941 torch/distributed/run.py:851] *****************************************
+[E0pf] layer=6 rank=0 experts=64/256
+[E0pf] layer=6 rank=0 experts=128/256
+[E0pf] layer=6 rank=0 experts=192/256
+[E0pf] layer=0 rank=0 experts=64/256
+[E0pf] layer=6 rank=0 experts=256/256
+[E0pf] layer=0 rank=0 experts=128/256
+[E0pf] stage 1 layer 6 material loaded
+[E0pf] layer=0 rank=0 experts=192/256
+[E0pf] layer=0 rank=0 experts=256/256
+[E0pf] layer=7 rank=0 experts=64/256
+[E0pf] layer=7 rank=0 experts=128/256
+[E0pf] stage 0 layer 0 material loaded
+[E0pf] layer=7 rank=0 experts=192/256
+[E0pf] layer=7 rank=0 experts=256/256
+[E0pf] layer=1 rank=0 experts=64/256
+[E0pf] stage 1 layer 7 material loaded
+[E0pf] layer=1 rank=0 experts=128/256
+[E0pf] layer=1 rank=0 experts=192/256
+[E0pf] layer=8 rank=0 experts=64/256
+[E0pf] layer=1 rank=0 experts=256/256
+[E0pf] layer=8 rank=0 experts=128/256
+[E0pf] stage 0 layer 1 material loaded
+[E0pf] layer=8 rank=0 experts=192/256
+[E0pf] layer=8 rank=0 experts=256/256
+[E0pf] layer=2 rank=0 experts=64/256
+[E0pf] stage 1 layer 8 material loaded
+[E0pf] layer=2 rank=0 experts=128/256
+[E0pf] layer=2 rank=0 experts=192/256
+[E0pf] layer=9 rank=0 experts=64/256
+[E0pf] layer=2 rank=0 experts=256/256
+[E0pf] layer=9 rank=0 experts=128/256
+[E0pf] stage 0 layer 2 material loaded
+[E0pf] layer=9 rank=0 experts=192/256
+[E0pf] layer=9 rank=0 experts=256/256
+[E0pf] layer=3 rank=0 experts=64/256
+[E0pf] stage 1 layer 9 material loaded
+[E0pf] layer=3 rank=0 experts=128/256
+[E0pf] layer=3 rank=0 experts=192/256
+[E0pf] layer=10 rank=0 experts=64/256
+[E0pf] layer=3 rank=0 experts=256/256
+[E0pf] stage 0 layer 3 material loaded
+[E0pf] layer=10 rank=0 experts=128/256
+[E0pf] layer=10 rank=0 experts=192/256
+[E0pf] layer=4 rank=0 experts=64/256
+[E0pf] layer=10 rank=0 experts=256/256
+[E0pf] stage 1 layer 10 material loaded
+[E0pf] layer=4 rank=0 experts=128/256
+[E0pf] layer=4 rank=0 experts=192/256
+[E0pf] layer=11 rank=0 experts=64/256
+[E0pf] layer=4 rank=0 experts=256/256
+[E0pf] stage 0 layer 4 material loaded
+[E0pf] layer=11 rank=0 experts=128/256
+[E0pf] layer=11 rank=0 experts=192/256
+[E0pf] layer=5 rank=0 experts=64/256
+[E0pf] layer=11 rank=0 experts=256/256
+[E0pf] stage 1 layer 11 material loaded
+[E0pf] layer=5 rank=0 experts=128/256
+[E0pf] layer=5 rank=0 experts=192/256
+[E0pf] layer=5 rank=0 experts=256/256
+[E0pf] stage 0 layer 5 material loaded
+[E0pf] layer=6 rank=0 experts=64/256
+[E0pf] layer=6 rank=0 experts=128/256
+[E0pf] layer=6 rank=0 experts=192/256
+[E0pf] layer=6 rank=0 experts=256/256
+[E0pf] stage 0 layer 6 material loaded
+[E0pf] layer=7 rank=0 experts=64/256
+[E0pf] layer=7 rank=0 experts=128/256
+[E0pf] layer=7 rank=0 experts=192/256
+[E0pf] layer=7 rank=0 experts=256/256
+[E0pf] stage 0 layer 7 material loaded
+[E0pf] layer=8 rank=0 experts=64/256
+[E0pf] layer=8 rank=0 experts=128/256
+[E0pf] layer=8 rank=0 experts=192/256
+[E0pf] layer=8 rank=0 experts=256/256
+[E0pf] stage 0 layer 8 material loaded
+[E0pf] layer=9 rank=0 experts=64/256
+[E0pf] layer=9 rank=0 experts=128/256
+[E0pf] layer=9 rank=0 experts=192/256
+[E0pf] layer=9 rank=0 experts=256/256
+[E0pf] stage 0 layer 9 material loaded
+[E0pf] layer=10 rank=0 experts=64/256
+[E0pf] layer=10 rank=0 experts=128/256
+[E0pf] layer=10 rank=0 experts=192/256
+[E0pf] layer=10 rank=0 experts=256/256
+[E0pf] stage 0 layer 10 material loaded
+[E0pf] layer=11 rank=0 experts=64/256
+[E0pf] layer=11 rank=0 experts=128/256
+[E0pf] layer=11 rank=0 experts=192/256
+[E0pf] layer=11 rank=0 experts=256/256
+[E0pf] stage 0 layer 11 material loaded
+[E0pf] stage 0 materials loaded, free 8.39 GiB
+[E0pf] stage 1 materials loaded, free 15.35 GiB
+[E0pf] cross-group collective probe bitwise=True
+[E0pf] part (d) fragment parity: PASS
+[E0pf] lanes built, free 15.34 GiB[E0pf] lanes built, free 8.35 GiB
+
+[E0pf] chain phase complete
+[E0pf] stage0 pipeline step 0 pos 8192 family normal
+[E0pf] stage1 pipeline step 0 pos 8192 family normal
+[E0pf] stage0 pipeline step 32 pos 8224 family normal
+[E0pf] stage1 pipeline step 32 pos 8224 family normal
+[E0pf] stage0 pipeline step 64 pos 8256 family normal
+[E0pf] stage1 pipeline step 64 pos 8256 family normal
+[E0pf] stage0 pipeline step 96 pos 8288 family normal
+[E0pf] stage1 pipeline step 96 pos 8288 family normal
+[E0pf] stage0 pipeline step 128 pos 8320 family normal
+[E0pf] stage1 pipeline step 128 pos 8320 family normal
+[E0pf] pipeline phase complete
+[E0pf] overall: PASS

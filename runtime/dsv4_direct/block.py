@@ -21,11 +21,16 @@ Deliberate scope reductions for this port vertical (deferred, not dropped by
 accident):
 
 - ``forward_stateful_decode_tensor`` (cursor-driven graph-family forward) is
-  ported for the CUDA-graph vertical as a direct composition of the stateful
-  attention half + ``prepare_ffn`` + MoE tail.  The gaiban
-  ``StatefulPreMoEBundle`` / ``prepare_stateful_decode_pre_moe`` /
-  ``DirectPreMoEBlockFragment`` indirection is a PP fragment-split surface
-  and stays deferred with the rest of PP.
+  ported for the CUDA-graph vertical.  Since the E0pf PP vertical it is the
+  gaiban composition ``prepare_stateful_decode_pre_moe`` ->
+  ``finish_stateful_decode_from_pre_moe`` over a validated
+  ``StatefulPreMoEBundle`` (gaiban block.py:1146/:1232/:1365); the composed
+  math is identical to the pre-E0pf direct composition, the bundle adds only
+  host-side ABI validation.  ``DirectPreMoEBlockFragment`` (gaiban :1392,
+  producer-only pre-MoE PP fragment) is ported with the Flash three-way
+  attention dispatch; the bundle geometry is the Flash residual contract
+  (``[b, s, 4, 4096]`` bf16 + ``[b, s, 4096]`` bf16 + fp32 HC post/comb)
+  instead of Pro's 7168.
 - The gaiban ``attention_pre_backend`` / ``ffn_post_pre_backend`` injection
   hooks are replaced by one optional ``hc_boundary_backend`` (E0hf, C2g/A5F
   lineage): when set, the intra-layer boundary (attention ``hc_post`` + FFN
@@ -42,6 +47,7 @@ accident):
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Any, Callable
 
 import torch
@@ -94,6 +100,412 @@ _ATTENTION_DISPATCH: dict[int, tuple[type, type, type]] = {
         Ratio128StatefulDecodePlan,
     ),
 }
+
+
+@dataclass(frozen=True, slots=True, eq=False)
+class StatefulPreMoEBundle:
+    """Owned tensor ABI between a stateful block's prepare and MoE tail.
+
+    Port of gaiban ``StatefulPreMoEBundle`` (block.py:44) with the Flash
+    geometry (``hc_mult`` 4, ``hidden_size`` 4096 via the frozen block
+    constants).  The material identity is portable across distinct producer
+    and consumer block instances; ``producer_owner_id`` is evidence only,
+    compatibility is decided from layer/rank/world/checkpoint identity and
+    the tensor ABI.
+    """
+
+    after_attention: torch.Tensor
+    ffn_hidden: torch.Tensor
+    ffn_post: torch.Tensor
+    ffn_comb: torch.Tensor
+    layer_id: int
+    rank: int
+    world_size: int
+    checkpoint_id: str
+    producer_owner_id: int
+    _transport_storage: torch.Tensor | None = field(
+        default=None,
+        repr=False,
+        compare=False,
+    )
+    _tensor_snapshot: tuple[tuple[object, ...], ...] = field(
+        init=False,
+        repr=False,
+        compare=False,
+    )
+    _transport_snapshot: tuple[object, ...] | None = field(
+        init=False,
+        repr=False,
+        compare=False,
+    )
+
+    def __post_init__(self) -> None:
+        self._validate_identity()
+        snapshot = self._validate_and_snapshot_tensors()
+        object.__setattr__(self, "_tensor_snapshot", snapshot)
+        transport_snapshot = self._validate_transport_storage()
+        object.__setattr__(self, "_transport_snapshot", transport_snapshot)
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        after_attention: torch.Tensor,
+        ffn_hidden: torch.Tensor,
+        ffn_post: torch.Tensor,
+        ffn_comb: torch.Tensor,
+        layer_id: int,
+        rank: int,
+        world_size: int,
+        checkpoint_id: str,
+        producer_owner_id: int,
+    ) -> StatefulPreMoEBundle:
+        """Construct and validate a producer or receiver-owned bundle."""
+
+        return cls(
+            after_attention=after_attention,
+            ffn_hidden=ffn_hidden,
+            ffn_post=ffn_post,
+            ffn_comb=ffn_comb,
+            layer_id=layer_id,
+            rank=rank,
+            world_size=world_size,
+            checkpoint_id=checkpoint_id,
+            producer_owner_id=producer_owner_id,
+        )
+
+    @property
+    def material_identity(self) -> tuple[int, int, int, str]:
+        return (self.layer_id, self.rank, self.world_size, self.checkpoint_id)
+
+    @property
+    def transport_storage(self) -> torch.Tensor | None:
+        return self._transport_storage
+
+    @property
+    def transport_offsets(self) -> tuple[int, int, int, int] | None:
+        if self._transport_storage is None:
+            return None
+        batch, sequence = self.after_attention.shape[:2]
+        offsets, _ = self._transport_layout(batch, sequence)
+        return offsets
+
+    @staticmethod
+    def required_transport_nbytes(local_batch: int, sequence: int) -> int:
+        for name, value in (("local_batch", local_batch), ("sequence", sequence)):
+            if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+                raise ValueError(f"{name} must be a positive integer")
+        _, total_nbytes = StatefulPreMoEBundle._transport_layout(
+            local_batch, sequence
+        )
+        return total_nbytes
+
+    @staticmethod
+    def _transport_layout(
+        local_batch: int,
+        sequence: int,
+    ) -> tuple[tuple[int, int, int, int], int]:
+        sizes = (
+            local_batch * sequence * BLOCK_HC_MULT * BLOCK_HIDDEN_SIZE * 2,
+            local_batch * sequence * BLOCK_HIDDEN_SIZE * 2,
+            local_batch * sequence * BLOCK_HC_MULT * 4,
+            local_batch * sequence * BLOCK_HC_MULT * BLOCK_HC_MULT * 4,
+        )
+        offsets = (0, sizes[0], sizes[0] + sizes[1], sum(sizes[:3]))
+        return offsets, sum(sizes)
+
+    @classmethod
+    def allocate_transport(
+        cls,
+        *,
+        local_batch: int,
+        sequence: int,
+        device: torch.device | str | int | None,
+        layer_id: int,
+        rank: int,
+        world_size: int,
+        checkpoint_id: str,
+        producer_owner_id: int,
+    ) -> StatefulPreMoEBundle:
+        """Allocate the exact owning byte buffer used by the transport ABI."""
+
+        total_nbytes = cls.required_transport_nbytes(local_batch, sequence)
+        storage = torch.empty(total_nbytes, dtype=torch.uint8, device=device)
+        return cls.create_from_storage(
+            storage,
+            local_batch=local_batch,
+            sequence=sequence,
+            layer_id=layer_id,
+            rank=rank,
+            world_size=world_size,
+            checkpoint_id=checkpoint_id,
+            producer_owner_id=producer_owner_id,
+        )
+
+    @classmethod
+    def create_from_storage(
+        cls,
+        storage: torch.Tensor,
+        *,
+        local_batch: int,
+        sequence: int,
+        layer_id: int,
+        rank: int,
+        world_size: int,
+        checkpoint_id: str,
+        producer_owner_id: int,
+    ) -> StatefulPreMoEBundle:
+        """Create four exact typed views over one preallocated byte buffer."""
+
+        total_nbytes = cls.required_transport_nbytes(local_batch, sequence)
+        if not isinstance(storage, torch.Tensor):
+            raise TypeError("stateful pre-MoE transport storage must be a tensor")
+        if (
+            storage.dtype != torch.uint8
+            or storage.ndim != 1
+            or not storage.is_contiguous()
+        ):
+            raise ValueError(
+                "stateful pre-MoE transport storage must be contiguous 1D uint8"
+            )
+        if (
+            storage.numel() != total_nbytes
+            or storage.storage_offset() != 0
+            or storage.data_ptr() != storage.untyped_storage().data_ptr()
+            or storage.untyped_storage().nbytes() != total_nbytes
+        ):
+            raise ValueError(
+                "stateful pre-MoE transport storage must own and exactly cover "
+                f"{total_nbytes} bytes"
+            )
+        offsets, _ = cls._transport_layout(local_batch, sequence)
+
+        def typed_view(
+            index: int,
+            end: int,
+            dtype: torch.dtype,
+            shape: tuple[int, ...],
+        ) -> torch.Tensor:
+            byte_view = storage.narrow(0, offsets[index], end - offsets[index])
+            return byte_view.view(dtype).view(shape)
+
+        after_attention = typed_view(
+            0,
+            offsets[1],
+            torch.bfloat16,
+            (local_batch, sequence, BLOCK_HC_MULT, BLOCK_HIDDEN_SIZE),
+        )
+        ffn_hidden = typed_view(
+            1,
+            offsets[2],
+            torch.bfloat16,
+            (local_batch, sequence, BLOCK_HIDDEN_SIZE),
+        )
+        ffn_post = typed_view(
+            2,
+            offsets[3],
+            torch.float32,
+            (local_batch, sequence, BLOCK_HC_MULT),
+        )
+        ffn_comb = typed_view(
+            3,
+            total_nbytes,
+            torch.float32,
+            (local_batch, sequence, BLOCK_HC_MULT, BLOCK_HC_MULT),
+        )
+        return cls(
+            after_attention=after_attention,
+            ffn_hidden=ffn_hidden,
+            ffn_post=ffn_post,
+            ffn_comb=ffn_comb,
+            layer_id=layer_id,
+            rank=rank,
+            world_size=world_size,
+            checkpoint_id=checkpoint_id,
+            producer_owner_id=producer_owner_id,
+            _transport_storage=storage,
+        )
+
+    def validate(self) -> None:
+        """Fail if identity or any tensor binding changed after construction."""
+
+        self._validate_identity()
+        if self._validate_and_snapshot_tensors() != self._tensor_snapshot:
+            raise ValueError("stateful pre-MoE bundle tensor bindings are not stable")
+        if self._validate_transport_storage() != self._transport_snapshot:
+            raise ValueError("stateful pre-MoE transport storage is not stable")
+
+    def _validate_identity(self) -> None:
+        if (
+            not isinstance(self.layer_id, int)
+            or isinstance(self.layer_id, bool)
+            or self.layer_id not in SUPPORTED_LAYER_SPECS
+        ):
+            raise ValueError("stateful pre-MoE bundle has an invalid layer_id")
+        for name, value in (("rank", self.rank), ("world_size", self.world_size)):
+            if not isinstance(value, int) or isinstance(value, bool):
+                raise TypeError(f"stateful pre-MoE bundle {name} must be an integer")
+        if self.world_size <= 0 or self.rank < 0 or self.rank >= self.world_size:
+            raise ValueError("stateful pre-MoE bundle rank/world_size are invalid")
+        if (
+            not isinstance(self.checkpoint_id, str)
+            or len(self.checkpoint_id) != 64
+            or any(
+                character not in "0123456789abcdef"
+                for character in self.checkpoint_id
+            )
+        ):
+            raise ValueError(
+                "stateful pre-MoE bundle checkpoint_id must be lowercase SHA-256"
+            )
+        if (
+            not isinstance(self.producer_owner_id, int)
+            or isinstance(self.producer_owner_id, bool)
+            or self.producer_owner_id <= 0
+        ):
+            raise ValueError(
+                "stateful pre-MoE bundle producer_owner_id must be a positive integer"
+            )
+
+    def _validate_and_snapshot_tensors(
+        self,
+    ) -> tuple[tuple[object, ...], ...]:
+        tensors = (
+            ("after_attention", self.after_attention),
+            ("ffn_hidden", self.ffn_hidden),
+            ("ffn_post", self.ffn_post),
+            ("ffn_comb", self.ffn_comb),
+        )
+        if any(not isinstance(value, torch.Tensor) for _, value in tensors):
+            raise TypeError("stateful pre-MoE bundle values must all be tensors")
+        if self.after_attention.ndim != 4 or self.after_attention.shape[2:] != (
+            BLOCK_HC_MULT,
+            BLOCK_HIDDEN_SIZE,
+        ):
+            raise ValueError(
+                "stateful pre-MoE bundle after_attention must have shape "
+                f"[local_batch, sequence, {BLOCK_HC_MULT}, {BLOCK_HIDDEN_SIZE}]"
+            )
+        batch, sequence = self.after_attention.shape[:2]
+        expected = {
+            "after_attention": (
+                (batch, sequence, BLOCK_HC_MULT, BLOCK_HIDDEN_SIZE),
+                torch.bfloat16,
+            ),
+            "ffn_hidden": ((batch, sequence, BLOCK_HIDDEN_SIZE), torch.bfloat16),
+            "ffn_post": ((batch, sequence, BLOCK_HC_MULT), torch.float32),
+            "ffn_comb": (
+                (batch, sequence, BLOCK_HC_MULT, BLOCK_HC_MULT),
+                torch.float32,
+            ),
+        }
+        device = self.after_attention.device
+        snapshot: list[tuple[object, ...]] = []
+        byte_ranges: list[tuple[str, torch.device, int, int]] = []
+        for name, value in tensors:
+            expected_shape, expected_dtype = expected[name]
+            if tuple(value.shape) != expected_shape:
+                raise ValueError(
+                    f"stateful pre-MoE bundle {name} shape {tuple(value.shape)} "
+                    f"!= {expected_shape}"
+                )
+            if value.dtype != expected_dtype:
+                raise TypeError(
+                    f"stateful pre-MoE bundle {name} dtype {value.dtype} "
+                    f"!= {expected_dtype}"
+                )
+            if value.device != device:
+                raise ValueError(
+                    "stateful pre-MoE bundle tensors must share one device"
+                )
+            if not value.is_contiguous():
+                raise ValueError(
+                    f"stateful pre-MoE bundle {name} must be contiguous"
+                )
+            storage = value.untyped_storage()
+            byte_start = (
+                storage.data_ptr()
+                + value.storage_offset() * value.element_size()
+            )
+            byte_end = byte_start + value.numel() * value.element_size()
+            byte_ranges.append((name, value.device, byte_start, byte_end))
+            snapshot.append(
+                (
+                    id(value),
+                    tuple(value.shape),
+                    value.dtype,
+                    value.device,
+                    tuple(value.stride()),
+                    value.storage_offset(),
+                    storage.data_ptr(),
+                    storage.nbytes(),
+                )
+            )
+        for index, (left_name, left_device, left_start, left_end) in enumerate(
+            byte_ranges
+        ):
+            for right_name, right_device, right_start, right_end in byte_ranges[
+                index + 1 :
+            ]:
+                if left_device == right_device and max(left_start, right_start) < min(
+                    left_end, right_end
+                ):
+                    raise ValueError(
+                        "stateful pre-MoE bundle tensor byte ranges must not overlap: "
+                        f"{left_name}/{right_name}"
+                    )
+        return tuple(snapshot)
+
+    def _validate_transport_storage(self) -> tuple[object, ...] | None:
+        storage = self._transport_storage
+        if storage is None:
+            return None
+        batch, sequence = self.after_attention.shape[:2]
+        offsets, total_nbytes = self._transport_layout(batch, sequence)
+        if (
+            not isinstance(storage, torch.Tensor)
+            or storage.dtype != torch.uint8
+            or storage.ndim != 1
+            or not storage.is_contiguous()
+            or storage.device != self.after_attention.device
+            or storage.numel() != total_nbytes
+            or storage.storage_offset() != 0
+            or storage.data_ptr() != storage.untyped_storage().data_ptr()
+            or storage.untyped_storage().nbytes() != total_nbytes
+        ):
+            raise ValueError(
+                "stateful pre-MoE transport storage no longer exactly owns its ABI"
+            )
+        base_pointer = storage.data_ptr()
+        tensors = (
+            self.after_attention,
+            self.ffn_hidden,
+            self.ffn_post,
+            self.ffn_comb,
+        )
+        observed_offsets = tuple(value.data_ptr() - base_pointer for value in tensors)
+        if observed_offsets != offsets or any(
+            value.untyped_storage().data_ptr() != base_pointer for value in tensors
+        ):
+            raise ValueError(
+                "stateful pre-MoE transport views do not exactly cover their offsets"
+            )
+        final_end = (
+            observed_offsets[-1]
+            + self.ffn_comb.numel() * self.ffn_comb.element_size()
+        )
+        if offsets[0] != 0 or final_end != total_nbytes:
+            raise ValueError(
+                "stateful pre-MoE transport views do not fully cover storage"
+            )
+        return (
+            id(storage),
+            storage.device,
+            storage.data_ptr(),
+            storage.untyped_storage().nbytes(),
+            offsets,
+            total_nbytes,
+        )
 
 
 class DirectDecodeBlock:
@@ -505,6 +917,142 @@ class DirectDecodeBlock:
         elif input_ids_local is not None:
             raise ValueError("learned routing forbids input_ids_local")
 
+    def validate_stateful_pre_moe_bundle(
+        self,
+        bundle: StatefulPreMoEBundle,
+    ) -> StatefulPreMoEBundle:
+        """Validate one portable bundle against this block's material."""
+
+        if type(bundle) is not StatefulPreMoEBundle:
+            raise TypeError("stateful pre-MoE bundle has the wrong type")
+        bundle.validate()
+        expected_identity = (
+            self.layer_id,
+            self.weights.rank,
+            self.weights.world_size,
+            self.weights.checkpoint_id,
+        )
+        if bundle.material_identity != expected_identity:
+            raise ValueError(
+                "stateful pre-MoE bundle material identity "
+                f"{bundle.material_identity} != {expected_identity}"
+            )
+        return bundle
+
+    @staticmethod
+    def _validate_bundle_owns_producer_outputs(
+        bundle: StatefulPreMoEBundle,
+        residual: torch.Tensor,
+    ) -> None:
+        residual_start = residual.data_ptr()
+        residual_end = residual_start + residual.numel() * residual.element_size()
+        for name in ("after_attention", "ffn_hidden", "ffn_post", "ffn_comb"):
+            value = getattr(bundle, name)
+            value_start = value.data_ptr()
+            value_end = value_start + value.numel() * value.element_size()
+            if value.device == residual.device and max(
+                value_start, residual_start
+            ) < min(value_end, residual_end):
+                raise ValueError(
+                    f"stateful pre-MoE bundle {name} must not alias its residual input"
+                )
+
+    def prepare_stateful_decode_pre_moe(
+        self,
+        residual: torch.Tensor,
+        *,
+        input_ids_local: torch.Tensor | None = None,
+        attention_plan: BlockStatefulDecodePlan,
+        graph_family: DecodeGraphFamily,
+        stage_marker: Callable[[str], None] | None = None,
+    ) -> StatefulPreMoEBundle:
+        """Run stateful attention and FFN preparation without the MoE tail.
+
+        Port of gaiban block.py:1146.  The op sequence is byte-identical to
+        the pre-E0pf ``forward_stateful_decode_tensor`` prefix; the bundle
+        adds only host-side ABI validation on the produced tensors.
+        """
+
+        self.validate_residual(residual)
+        self._validate_route_input(input_ids_local, residual)
+        if not isinstance(attention_plan, self._stateful_attention_plan_type):
+            raise TypeError(
+                f"layer-{self.layer_id} compression ratio {self.compression_ratio} "
+                f"requires {self._stateful_attention_plan_type.__name__}"
+            )
+        boundary_flags = family_boundary_flags(graph_family)
+        if stage_marker is not None:
+            stage_marker("block_start")
+        if self.hc_boundary_backend is None:
+            after_attention = self.attention_half_stateful_decode(
+                residual,
+                attention_plan=attention_plan,
+                boundary_flags=boundary_flags,
+                stage_marker=stage_marker,
+            )
+            if stage_marker is not None:
+                stage_marker("attention_done")
+            ffn_hidden, ffn_post, ffn_comb = self.prepare_ffn(after_attention)
+        else:
+            attention_output, attention_post, attention_comb = (
+                self._attention_branch_stateful_decode(
+                    residual,
+                    attention_plan=attention_plan,
+                    boundary_flags=boundary_flags,
+                    stage_marker=stage_marker,
+                )
+            )
+            if stage_marker is not None:
+                stage_marker("attention_done")
+            after_attention, ffn_hidden, ffn_post, ffn_comb = self.ffn_boundary(
+                attention_output, residual, attention_post, attention_comb
+            )
+        bundle = StatefulPreMoEBundle.create(
+            after_attention=after_attention,
+            ffn_hidden=ffn_hidden,
+            ffn_post=ffn_post,
+            ffn_comb=ffn_comb,
+            layer_id=self.layer_id,
+            rank=self.weights.rank,
+            world_size=self.weights.world_size,
+            checkpoint_id=self.weights.checkpoint_id,
+            producer_owner_id=id(self),
+        )
+        self._validate_bundle_owns_producer_outputs(bundle, residual)
+        if stage_marker is not None:
+            stage_marker("ffn_prepare_done")
+        return bundle
+
+    def finish_stateful_decode_from_pre_moe(
+        self,
+        bundle: StatefulPreMoEBundle,
+        *,
+        input_ids_local: torch.Tensor | None = None,
+        moe_slot: int = 0,
+        stage_marker: Callable[[str], None] | None = None,
+    ) -> torch.Tensor:
+        """Run the stateful MoE tail from a validated portable bundle."""
+
+        bundle = self.validate_stateful_pre_moe_bundle(bundle)
+        self._validate_route_input(input_ids_local, bundle.after_attention)
+        moe_arguments: dict[str, Any] = {"slot": moe_slot}
+        if self.route_kind == "hash":
+            if input_ids_local is None:
+                raise AssertionError("validated hash routing lost input IDs")
+            moe_arguments["input_ids_local"] = input_ids_local
+        if stage_marker is not None:
+            moe_arguments["stage_marker"] = stage_marker
+        moe_output = self.moe.forward_tensor(bundle.ffn_hidden, **moe_arguments)
+        output = hc_post(
+            moe_output,
+            bundle.after_attention,
+            bundle.ffn_post,
+            bundle.ffn_comb,
+        )
+        if stage_marker is not None:
+            stage_marker("block_done")
+        return output
+
     def forward_decode_tensor(
         self,
         residual: torch.Tensor,
@@ -602,66 +1150,160 @@ class DirectDecodeBlock:
     ) -> torch.Tensor:
         """Run one cursor-driven block without advancing the shared cursor.
 
-        Direct composition of the stateful attention half, FFN preparation,
-        and MoE tail (gaiban block.py:1365 via :1146/:1232).  The gaiban
-        ``StatefulPreMoEBundle`` / ``DirectPreMoEBlockFragment`` indirection
-        exists for the PP fragment split and is deliberately not carried into
-        this vertical; the composed math is identical.
+        Gaiban composition (block.py:1365): ``prepare_stateful_decode_pre_moe``
+        followed by ``finish_stateful_decode_from_pre_moe`` over a validated
+        portable bundle.  The composed math is byte-identical to the pre-E0pf
+        direct composition (E0sf-verified); the bundle indirection is the PP
+        fragment-split surface exercised by the E0pf vertical.
         """
 
-        self.validate_residual(residual)
-        self._validate_route_input(input_ids_local, residual)
-        if not isinstance(attention_plan, self._stateful_attention_plan_type):
-            raise TypeError(
-                f"layer-{self.layer_id} compression ratio {self.compression_ratio} "
-                f"requires {self._stateful_attention_plan_type.__name__}"
-            )
-        boundary_flags = family_boundary_flags(graph_family)
-        if stage_marker is not None:
-            stage_marker("block_start")
-        if self.hc_boundary_backend is None:
-            after_attention = self.attention_half_stateful_decode(
-                residual,
-                attention_plan=attention_plan,
-                boundary_flags=boundary_flags,
-                stage_marker=stage_marker,
-            )
-            if stage_marker is not None:
-                stage_marker("attention_done")
-            ffn_hidden, ffn_post, ffn_comb = self.prepare_ffn(after_attention)
-        else:
-            attention_output, attention_post, attention_comb = (
-                self._attention_branch_stateful_decode(
-                    residual,
-                    attention_plan=attention_plan,
-                    boundary_flags=boundary_flags,
-                    stage_marker=stage_marker,
-                )
-            )
-            if stage_marker is not None:
-                stage_marker("attention_done")
-            after_attention, ffn_hidden, ffn_post, ffn_comb = self.ffn_boundary(
-                attention_output, residual, attention_post, attention_comb
-            )
-        if stage_marker is not None:
-            stage_marker("ffn_prepare_done")
-        moe_arguments: dict[str, Any] = {"slot": moe_slot}
-        if self.route_kind == "hash":
-            if input_ids_local is None:
-                raise AssertionError("validated hash routing lost input IDs")
-            moe_arguments["input_ids_local"] = input_ids_local
-        if stage_marker is not None:
-            moe_arguments["stage_marker"] = stage_marker
-        moe_output = self.moe.forward_tensor(ffn_hidden, **moe_arguments)
-        output = hc_post(
-            moe_output,
-            after_attention,
-            ffn_post,
-            ffn_comb,
+        bundle = self.prepare_stateful_decode_pre_moe(
+            residual,
+            input_ids_local=input_ids_local,
+            attention_plan=attention_plan,
+            graph_family=graph_family,
+            stage_marker=stage_marker,
         )
-        if stage_marker is not None:
-            stage_marker("block_done")
-        return output
+        return self.finish_stateful_decode_from_pre_moe(
+            bundle,
+            input_ids_local=input_ids_local,
+            moe_slot=moe_slot,
+            stage_marker=stage_marker,
+        )
+
+
+class DirectPreMoEBlockFragment:
+    """Producer-only stateful block fragment with no MoE runtime surface.
+
+    Port of gaiban ``DirectPreMoEBlockFragment`` (block.py:1392) with the
+    Flash three-way attention dispatch (window/ratio-4/ratio-128) instead of
+    Pro's two-way dispatch, and the single optional ``hc_boundary_backend``
+    instead of the Pro ``attention_pre_backend``/``ffn_post_pre_backend``
+    pair (the same substitution the E0hf vertical made on the full block).
+    A fragment produces a portable ``StatefulPreMoEBundle`` that any full
+    ``DirectDecodeBlock`` with the same layer/rank/world/checkpoint material
+    can finish; this is the PP fragment-split (pre-MoE stage boundary)
+    producer surface.
+    """
+
+    __slots__ = (
+        "layer_id",
+        "compression_ratio",
+        "route_kind",
+        "_attention_plan_type",
+        "_stateful_attention_plan_type",
+        "weights",
+        "attention",
+        "hc_boundary_backend",
+        "norm_eps",
+        "sinkhorn_iters",
+        "hc_eps",
+    )
+
+    def __init__(
+        self,
+        *,
+        weights: ResidentBlockWeights,
+        attention: BlockAttention,
+        norm_eps: float = 1e-6,
+        sinkhorn_iters: int = 20,
+        hc_eps: float = 1e-6,
+        hc_boundary_backend: Any | None = None,
+    ) -> None:
+        layer_id = weights.layer_id
+        if (
+            not isinstance(layer_id, int)
+            or isinstance(layer_id, bool)
+            or layer_id not in SUPPORTED_LAYER_SPECS
+        ):
+            raise ValueError(
+                f"DirectPreMoEBlockFragment supports layers "
+                f"{tuple(SUPPORTED_LAYER_SPECS)}, got {layer_id!r}"
+            )
+        specification = SUPPORTED_LAYER_SPECS[layer_id]
+        if bool(specification["is_mtp"]):
+            raise ValueError(
+                "DirectPreMoEBlockFragment does not compose the MTP block"
+            )
+        compression_ratio = int(specification["compress_ratio"])
+        route_kind = str(specification["route_kind"])
+        if compression_ratio not in _ATTENTION_DISPATCH:
+            raise ValueError(
+                f"layer-{layer_id} compression ratio {compression_ratio} has no "
+                "attention dispatch"
+            )
+        (
+            expected_attention_type,
+            expected_plan_type,
+            expected_stateful_plan_type,
+        ) = _ATTENTION_DISPATCH[compression_ratio]
+        if not isinstance(attention, expected_attention_type):
+            raise TypeError(
+                f"layer-{layer_id} compression ratio {compression_ratio} requires "
+                f"{expected_attention_type.__name__}"
+            )
+        identity = (weights.layer_id, weights.rank, weights.world_size)
+        attention_identity = (
+            attention.weights.layer_id,
+            attention.weights.rank,
+            attention.weights.world_size,
+        )
+        if attention_identity != identity or attention.state.layer_id != layer_id:
+            raise ValueError(
+                "attention and fragment layer/rank/world identities differ"
+            )
+        checkpoint_ids = {
+            weights.checkpoint_id,
+            weights.gate.checkpoint_id,
+            attention.weights.checkpoint_id,
+        }
+        if None in checkpoint_ids or len(checkpoint_ids) != 1:
+            raise ValueError(
+                "pre-MoE fragment components require one non-null checkpoint identity"
+            )
+        if weights.gate.route_kind != route_kind:
+            raise ValueError(
+                f"layer-{layer_id} fragment requires checkpoint {route_kind} "
+                f"routing, got gate {weights.gate.route_kind}"
+            )
+        if norm_eps != 1e-6 or sinkhorn_iters != 20 or hc_eps != 1e-6:
+            raise ValueError("direct fragment numerical contract must be 1e-6/20/1e-6")
+        if hc_boundary_backend is not None and not callable(
+            getattr(hc_boundary_backend, "post_pre_norm", None)
+        ):
+            raise TypeError(
+                "hc_boundary_backend must expose a post_pre_norm operator"
+            )
+        self.layer_id = layer_id
+        self.compression_ratio = compression_ratio
+        self.route_kind = route_kind
+        self._attention_plan_type = expected_plan_type
+        self._stateful_attention_plan_type = expected_stateful_plan_type
+        self.weights = weights
+        self.attention = attention
+        self.hc_boundary_backend = hc_boundary_backend
+        self.norm_eps = norm_eps
+        self.sinkhorn_iters = sinkhorn_iters
+        self.hc_eps = hc_eps
+
+    validate_residual = staticmethod(DirectDecodeBlock.validate_residual)
+    validate_input_ids = staticmethod(DirectDecodeBlock.validate_input_ids)
+    _hc_pre = DirectDecodeBlock._hc_pre
+    prepare_attention = DirectDecodeBlock.prepare_attention
+    _attention_branch_stateful_decode = (
+        DirectDecodeBlock._attention_branch_stateful_decode
+    )
+    run_stateful_attention = DirectDecodeBlock.run_stateful_attention
+    attention_half_stateful_decode = DirectDecodeBlock.attention_half_stateful_decode
+    prepare_ffn = DirectDecodeBlock.prepare_ffn
+    ffn_boundary = DirectDecodeBlock.ffn_boundary
+    _validate_route_input = DirectDecodeBlock._validate_route_input
+    _validate_bundle_owns_producer_outputs = staticmethod(
+        DirectDecodeBlock._validate_bundle_owns_producer_outputs
+    )
+    prepare_stateful_decode_pre_moe = (
+        DirectDecodeBlock.prepare_stateful_decode_pre_moe
+    )
 
 
 __all__ = [
@@ -670,4 +1312,6 @@ __all__ = [
     "BlockDecodePlan",
     "BlockStatefulDecodePlan",
     "DirectDecodeBlock",
+    "DirectPreMoEBlockFragment",
+    "StatefulPreMoEBundle",
 ]

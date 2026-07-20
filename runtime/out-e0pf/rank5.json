@@ -1,0 +1,263 @@
+{
+  "accepted": true,
+  "checkpoint_id": "b6c6b8892cdab54b07bdd610a99773fd29d2ad2cb13a168caac0bf0ea6c89634",
+  "comparison": {
+    "handoff_accepted": true,
+    "judgment": "bitwise (deterministic decode path both sides)",
+    "pipeline_terminals_accepted": true
+  },
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "build": 0.23076962493360043,
+    "chain": 24.306721254019067,
+    "fragment": 2.1530557910446078,
+    "load": 13.383867294993252,
+    "pipeline": 14.810409619938582,
+    "process": 56.0975280709099
+  },
+  "errors": [],
+  "experiment": "E0pf-tp4-pp2-serial-pipeline",
+  "fragment_parity": {
+    "accepted": true,
+    "skipped_on_stage1": true
+  },
+  "group_probe": {
+    "cross_group_bitwise": true,
+    "judgment": "diagnostic_evidence_only_not_an_acceptance_gate",
+    "pairs": [
+      {
+        "all_gather_equal": true,
+        "reduce_scatter_equal": true,
+        "tp_rank": 0
+      },
+      {
+        "all_gather_equal": true,
+        "reduce_scatter_equal": true,
+        "tp_rank": 1
+      },
+      {
+        "all_gather_equal": true,
+        "reduce_scatter_equal": true,
+        "tp_rank": 2
+      },
+      {
+        "all_gather_equal": true,
+        "reduce_scatter_equal": true,
+        "tp_rank": 3
+      }
+    ]
+  },
+  "host": "titan064",
+  "local_rank": 5,
+  "measurement_class": "semantic_correctness_gate_plus_reportonly_timing",
+  "memory_after_build": {
+    "free_bytes": 16475095040,
+    "total_bytes": 25252724736
+  },
+  "memory_after_load": {
+    "free_bytes": 16485580800,
+    "total_bytes": 25252724736
+  },
+  "microbatches": 2,
+  "pipeline": {
+    "handoff_records": [
+      {
+        "accepted": true,
+        "endpoint_dtype": "torch.bfloat16",
+        "endpoint_pointer_stable": true,
+        "endpoint_shape": [
+          1,
+          1,
+          4,
+          4096
+        ],
+        "expected_steps": 132,
+        "payload_nbytes": 32768,
+        "role": "receive",
+        "stage_id": 1,
+        "steps_transferred": 132
+      },
+      {
+        "accepted": true,
+        "endpoint_dtype": "torch.bfloat16",
+        "endpoint_pointer_stable": true,
+        "endpoint_shape": [
+          1,
+          1,
+          4,
+          4096
+        ],
+        "expected_steps": 132,
+        "payload_nbytes": 32768,
+        "role": "receive",
+        "stage_id": 1,
+        "steps_transferred": 132
+      }
+    ],
+    "terminals": [
+      {
+        "accepted": true,
+        "device_position": 8324,
+        "dispatch_error": 0,
+        "expected_position": 8324,
+        "host_position": 8324,
+        "state_positions": [
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ]
+        ],
+        "stop_position": 8324
+      },
+      {
+        "accepted": true,
+        "device_position": 8324,
+        "dispatch_error": 0,
+        "expected_position": 8324,
+        "host_position": 8324,
+        "state_positions": [
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ]
+        ],
+        "stop_position": 8324
+      }
+    ],
+    "timing": {
+      "stage0_compute": {},
+      "stage0_send_wall": {},
+      "stage1_compute": {
+        "count": 264.0,
+        "max_ms": 2781.569876940921,
+        "mean_ms": 54.837976486217514,
+        "min_ms": 42.18883905559778,
+        "p50_ms": 43.377086985856295
+      },
+      "stage1_recv_wall": {
+        "count": 132.0,
+        "max_ms": 83.55577080510557,
+        "mean_ms": 0.8399807336514421,
+        "min_ms": 0.197873217985034,
+        "p50_ms": 0.20366394892334938
+      }
+    },
+    "timing_first8": {
+      "stage0_compute": [],
+      "stage0_send_wall": [],
+      "stage1_compute": [
+        2781.5699,
+        43.2543,
+        43.4199,
+        42.8955,
+        43.0795,
+        42.9431,
+        47.9822,
+        47.6885,
+        43.1801,
+        43.1276,
+        43.2205,
+        43.0194,
+        43.4506,
+        43.2967,
+        48.421,
+        47.5452
+      ],
+      "stage1_recv_wall": [
+        83.5558,
+        0.2538,
+        0.2042,
+        0.2121,
+        0.2153,
+        0.2018,
+        0.1989,
+        0.1979,
+        0.1997,
+        0.1981,
+        0.2012,
+        0.199,
+        0.2126,
+        0.2103,
+        0.1996,
+        0.1993
+      ]
+    }
+  },
+  "pipeline_form": "stateful_eager_serial_handoff (overlap deferred; one payload in flight; microbatches interleave serially)",
+  "rank": 5,
+  "schedule": {
+    "family_counts": {
+      "normal": 99,
+      "ratio4_boundary": 32,
+      "ratio4_ratio128_boundary": 1
+    },
+    "start_position": 8192,
+    "step_count": 132,
+    "stop_position": 8324
+  },
+  "schema_version": 1,
+  "seed": 20260720,
+  "stage_id": 1,
+  "stage_layer_ids": {
+    "stage0": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "stage1": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ]
+  },
+  "torch": "2.11.0+cu130",
+  "tp_group_binding": {
+    "backend": "nccl",
+    "global_rank": 5,
+    "global_ranks": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "local_rank": 1,
+    "validated_live": true,
+    "world_size": 4
+  },
+  "tp_rank": 1,
+  "world": 8
+}
