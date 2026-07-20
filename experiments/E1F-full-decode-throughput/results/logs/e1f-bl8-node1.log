@@ -1,0 +1,90 @@
+W0720 12:20:45.780000 134529 torch/distributed/run.py:851] 
+W0720 12:20:45.780000 134529 torch/distributed/run.py:851] *****************************************
+W0720 12:20:45.780000 134529 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 12:20:45.780000 134529 torch/distributed/run.py:851] *****************************************
+[E1F] layer=22 rank=0 experts=256/256
+[E1F] stage 2 layer 22 material loaded
+[E1F] layer=33 rank=0 experts=256/256
+[E1F] stage 3 layer 33 material loaded
+[E1F] layer=23 rank=0 experts=256/256
+[E1F] stage 2 layer 23 material loaded
+[E1F] layer=34 rank=0 experts=256/256
+[E1F] stage 3 layer 34 material loaded
+[E1F] layer=24 rank=0 experts=256/256
+[E1F] stage 2 layer 24 material loaded
+[E1F] layer=35 rank=0 experts=256/256
+[E1F] stage 3 layer 35 material loaded
+[E1F] layer=25 rank=0 experts=256/256
+[E1F] stage 2 layer 25 material loaded
+[E1F] layer=36 rank=0 experts=256/256
+[E1F] stage 3 layer 36 material loaded
+[E1F] layer=26 rank=0 experts=256/256
+[E1F] stage 2 layer 26 material loaded
+[E1F] layer=37 rank=0 experts=256/256
+[E1F] stage 3 layer 37 material loaded
+[E1F] layer=27 rank=0 experts=256/256
+[E1F] stage 2 layer 27 material loaded
+[E1F] layer=38 rank=0 experts=256/256
+[E1F] stage 3 layer 38 material loaded
+[E1F] layer=28 rank=0 experts=256/256
+[E1F] stage 2 layer 28 material loaded
+[E1F] layer=39 rank=0 experts=256/256
+[E1F] stage 3 layer 39 material loaded
+[E1F] layer=29 rank=0 experts=256/256
+[E1F] stage 2 layer 29 material loaded
+[E1F] layer=40 rank=0 experts=256/256
+[E1F] stage 3 layer 40 material loaded
+[E1F] layer=30 rank=0 experts=256/256
+[E1F] stage 2 layer 30 material loaded
+[E1F] layer=41 rank=0 experts=256/256
+[E1F] stage 3 layer 41 material loaded
+[E1F] layer=31 rank=0 experts=256/256
+[E1F] stage 2 layer 31 material loaded
+[E1F] layer=42 rank=0 experts=256/256
+[E1F] stage 3 layer 42 material loaded
+[E1F] layer=32 rank=0 experts=256/256
+[E1F] stage 2 layer 32 material loaded
+[E1F] stage 2 loaded (11 layers, free 9.42 GiB, 13s)
+[E1F] stage 3 loaded (10 layers, free 7.60 GiB, 13s)
+[E1F] stage 3 lanes built, free 7.57 GiB
+[E1F] stage 2 lanes built, free 9.39 GiB
+2026-07-20 12:21:06  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_fused_tilelang` with `out_idx=None`
+2026-07-20 12:21:06  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_fused_tilelang` with `out_idx=None`
+2026-07-20 12:21:06  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_fused_tilelang` with `out_idx=None`
+2026-07-20 12:21:06  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_fused_tilelang` with `out_idx=None`
+2026-07-20 12:21:06  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_fused_tilelang` with `out_idx=None`
+2026-07-20 12:21:06  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_fused_tilelang` with `out_idx=None`
+2026-07-20 12:21:07  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_fused_tilelang` with `out_idx=None`
+2026-07-20 12:21:07  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_fused_tilelang` with `out_idx=None`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_fused_tilelang`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_fused_tilelang`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_fused_tilelang`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_fused_tilelang`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_fused_tilelang`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_fused_tilelang`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_fused_tilelang`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_fused_tilelang`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_pre_big_fuse_tilelang` with `out_idx=None`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_pre_big_fuse_tilelang` with `out_idx=None`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_pre_big_fuse_tilelang` with `out_idx=None`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_pre_big_fuse_tilelang` with `out_idx=None`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_pre_big_fuse_tilelang` with `out_idx=None`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_pre_big_fuse_tilelang` with `out_idx=None`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_pre_big_fuse_tilelang` with `out_idx=None`
+2026-07-20 12:21:10  [TileLang:tilelang.jit.kernel:INFO]: TileLang begins to compile kernel `mhc_pre_big_fuse_tilelang` with `out_idx=None`
+2026-07-20 12:21:15  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_pre_big_fuse_tilelang`
+2026-07-20 12:21:15  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_pre_big_fuse_tilelang`
+2026-07-20 12:21:15  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_pre_big_fuse_tilelang`
+2026-07-20 12:21:15  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_pre_big_fuse_tilelang`
+2026-07-20 12:21:15  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_pre_big_fuse_tilelang`
+2026-07-20 12:21:15  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_pre_big_fuse_tilelang`
+2026-07-20 12:21:15  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_pre_big_fuse_tilelang`
+2026-07-20 12:21:15  [TileLang:tilelang.jit.kernel:INFO]: TileLang completes to compile kernel `mhc_pre_big_fuse_tilelang`
+[E1F] stage 2 warmup done (28s, free 9.37 GiB)
+[E1F] stage 3 warmup done (28s, free 8.66 GiB)
+[E1F] stage 3 captured normal at position 2048 (0.3s)
+[E1F] stage 3 captured ratio4_boundary at position 2051 (0.4s)
+[E1F] stage 3 captured ratio4_ratio128_boundary at position 2175 (0.4s)
+[E1F] stage 3 round 0: step_wall p50 56.74 ms p95 59.85 ms -> 141.0 tok/s (replicated B)
+[E1F] stage 3 round 1: step_wall p50 56.51 ms p95 59.72 ms -> 141.6 tok/s (replicated B)
+[E1F] stage 3 round 2: step_wall p50 56.34 ms p95 59.44 ms -> 142.0 tok/s (replicated B)

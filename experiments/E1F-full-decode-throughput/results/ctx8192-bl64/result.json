@@ -1,0 +1,3011 @@
+{
+  "accepted": true,
+  "check_mode": "off",
+  "experiment": "E1F-full-decode-throughput",
+  "local_batch": 64,
+  "stage_representatives": [
+    {
+      "accepted": true,
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 8192 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=9472",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "off",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 4.740097288042307,
+        "load": 12.99597025802359,
+        "process": 160.95592868002132,
+        "settle": 16.467727517010644,
+        "warmup": 20.231476566987112
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "handoff_records": {
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            64,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 2097152,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan064",
+      "initial_tokens_first8": [
+        121569,
+        115605,
+        65338,
+        34320,
+        50957,
+        107117,
+        89386,
+        83389
+      ],
+      "local_batch": 64,
+      "local_rank": 0,
+      "max_seq_len": 9472,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 4875747328,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 8308785152,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 5284691968,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 5284691968,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 5284691968,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 5284691968,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 6184370176,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 6098386944,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 9037408,
+      "rank": 0,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 2187.953059371822,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 35.10309352213517,
+          "steps": 300,
+          "throughput_tok_s_mean": 546.9882648429555,
+          "throughput_tok_s_p50": 550.2959579861532,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.16960292123258114,
+              "mean_ms": 0.10236760368570685,
+              "min_ms": 0.08812802843749523,
+              "p50_ms": 0.09924895130097866,
+              "p95_ms": 0.1256689429283142
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 31.89523587934673,
+              "mean_ms": 27.825727452679228,
+              "min_ms": 27.341335080564022,
+              "p50_ms": 27.640694985166192,
+              "p95_ms": 28.434128034859896
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 2.039473969489336,
+              "mean_ms": 1.809379685825358,
+              "min_ms": 1.1135400272905827,
+              "p50_ms": 1.799877965822816,
+              "p95_ms": 1.9688298925757408
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 122.98958888277411,
+              "mean_ms": 117.00433832593262,
+              "min_ms": 115.13061099685729,
+              "p50_ms": 116.30105413496494,
+              "p95_ms": 119.77199208922684
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 91.93177009001374,
+              "mean_ms": 87.26686358374234,
+              "min_ms": 85.72672004811466,
+              "p50_ms": 86.78917214274406,
+              "p95_ms": 89.40521813929081
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 2203.962133898423,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 34.84824520489201,
+          "steps": 300,
+          "throughput_tok_s_mean": 550.9905334746057,
+          "throughput_tok_s_p50": 554.1156154989076,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.42614201083779335,
+              "mean_ms": 0.10578276822343469,
+              "min_ms": 0.0887489877641201,
+              "p50_ms": 0.10139308869838715,
+              "p95_ms": 0.12954720295965672
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 29.060045024380088,
+              "mean_ms": 27.679674908674013,
+              "min_ms": 27.261999901384115,
+              "p50_ms": 27.526644989848137,
+              "p95_ms": 28.288480127230287
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 2.015087055042386,
+              "mean_ms": 1.8099891099457939,
+              "min_ms": 1.6711619682610035,
+              "p50_ms": 1.804596045985818,
+              "p95_ms": 1.8394519574940205
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 122.18164512887597,
+              "mean_ms": 116.15444569693257,
+              "min_ms": 114.35870686545968,
+              "p50_ms": 115.4993618838489,
+              "p95_ms": 118.89414978213608
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 91.17848007008433,
+              "mean_ms": 86.55899891008933,
+              "min_ms": 85.06104187108576,
+              "p50_ms": 86.07576717622578,
+              "p95_ms": 88.73528614640236
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 2213.3686498448087,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 34.700059931958094,
+          "steps": 300,
+          "throughput_tok_s_mean": 553.3421624612022,
+          "throughput_tok_s_p50": 556.533682895622,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.23732217960059643,
+              "mean_ms": 0.10538112449770172,
+              "min_ms": 0.08824793621897697,
+              "p50_ms": 0.10215397924184799,
+              "p95_ms": 0.13331393711268902
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 28.917064890265465,
+              "mean_ms": 27.658847765997052,
+              "min_ms": 27.225018944591284,
+              "p50_ms": 27.50888094305992,
+              "p95_ms": 28.235057136043906
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 2.021739026531577,
+              "mean_ms": 1.8167166970670223,
+              "min_ms": 1.7793967854231596,
+              "p50_ms": 1.8039839342236519,
+              "p95_ms": 1.9747698679566383
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 121.73179094679654,
+              "mean_ms": 115.66080508908878,
+              "min_ms": 113.8878318015486,
+              "p50_ms": 114.99753198586404,
+              "p95_ms": 118.4229338541627
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 90.99537297151983,
+              "mean_ms": 86.079859501527,
+              "min_ms": 84.63525399565697,
+              "p50_ms": 85.55767801590264,
+              "p95_ms": 88.35620898753405
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 0,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "judgment": "no per-step compare (check off)",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 0,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 8192,
+      "steps_per_round": 300,
+      "stop_position": 9224,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3357,
+        "global_rows": 256,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 9224,
+        "dispatch_error": 0,
+        "expected_position": 9224,
+        "host_position": 9224,
+        "stop_position": 9224
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 0,
+        "global_ranks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 8192 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=9472",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "off",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 5.104001960949972,
+        "load": 12.618204755010083,
+        "process": 160.95923448796384,
+        "settle": 16.404320466099307,
+        "warmup": 20.23177886311896
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            64,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 2097152,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        },
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            64,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 2097152,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan064",
+      "local_batch": 64,
+      "local_rank": 4,
+      "max_seq_len": 9472,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 5892866048,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 9265086464,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 6159204352,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 6159204352,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 6159204352,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 6159204352,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 7144865792,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 7056785408,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 9375328,
+      "rank": 4,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 2191.7773554139053,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 35.04203930706717,
+          "steps": 300,
+          "throughput_tok_s_mean": 547.9443388534763,
+          "throughput_tok_s_p50": 546.4273304898567,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 93.33936986513436,
+              "mean_ms": 89.38380188774318,
+              "min_ms": 29.494117945432663,
+              "p50_ms": 89.40544491633773,
+              "p95_ms": 90.98023385740817
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 27.993012918159366,
+              "mean_ms": 26.3607957555602,
+              "min_ms": 25.810714811086655,
+              "p50_ms": 26.206095004454255,
+              "p95_ms": 27.037553023546934
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 1.5899580903351307,
+              "mean_ms": 1.0555870869817834,
+              "min_ms": 0.8847159333527088,
+              "p50_ms": 1.0335391853004694,
+              "p95_ms": 1.2653989251703024
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 121.29763094708323,
+              "mean_ms": 116.80018473028515,
+              "min_ms": 56.506187887862325,
+              "p50_ms": 117.12444899603724,
+              "p95_ms": 118.38066601194441
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 2207.780365726171,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 34.787742043146864,
+          "steps": 300,
+          "throughput_tok_s_mean": 551.9450914315428,
+          "throughput_tok_s_p50": 550.6235834405363,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 91.67367802001536,
+              "mean_ms": 88.72507233638316,
+              "min_ms": 29.468958033248782,
+              "p50_ms": 88.73512502759695,
+              "p95_ms": 90.25056986138225
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 27.96326717361808,
+              "mean_ms": 26.165986268315464,
+              "min_ms": 25.642673019319773,
+              "p50_ms": 26.01419109851122,
+              "p95_ms": 26.87250799499452
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 1.5401830896735191,
+              "mean_ms": 1.062504518777132,
+              "min_ms": 0.8010249584913254,
+              "p50_ms": 1.0617508087307215,
+              "p95_ms": 1.2363840360194445
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 119.14488207548857,
+              "mean_ms": 115.95356312347576,
+              "min_ms": 56.47386307828128,
+              "p50_ms": 116.23185407370329,
+              "p95_ms": 117.51346103847027
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 2217.1795103405007,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 34.64028347493149,
+          "steps": 300,
+          "throughput_tok_s_mean": 554.2948775851252,
+          "throughput_tok_s_p50": 553.7816135021592,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 91.34988812729716,
+              "mean_ms": 88.34903333336115,
+              "min_ms": 29.326996067538857,
+              "p50_ms": 88.32565299235284,
+              "p95_ms": 89.97856895439327
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 27.6566450484097,
+              "mean_ms": 26.061396958927315,
+              "min_ms": 25.493738939985633,
+              "p50_ms": 25.903573958203197,
+              "p95_ms": 26.81894600391388
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 1.4965389855206013,
+              "mean_ms": 1.0515784472227097,
+              "min_ms": 0.7467109244316816,
+              "p50_ms": 1.046862918883562,
+              "p95_ms": 1.2215960305184126
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 118.54465189389884,
+              "mean_ms": 115.46200873951118,
+              "min_ms": 56.040436029434204,
+              "p50_ms": 115.569022949785,
+              "p95_ms": 116.86669895425439
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 0,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "judgment": "no per-step compare (check off)",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 1,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 8192,
+      "steps_per_round": 300,
+      "stop_position": 9224,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 386,
+        "global_rows": 256,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 9224,
+        "dispatch_error": 0,
+        "expected_position": 9224,
+        "host_position": 9224,
+        "stop_position": 9224
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 4,
+        "global_ranks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 8192 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=9472",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "off",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 5.102918291930109,
+        "load": 12.617063173092902,
+        "process": 160.96327807102352,
+        "settle": 16.436336773913354,
+        "warmup": 20.23120536119677
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            64,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 2097152,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        },
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            64,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 2097152,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan065",
+      "local_batch": 64,
+      "local_rank": 0,
+      "max_seq_len": 9472,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 4672323584,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 9256697856,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 5366480896,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 5366480896,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 5366480896,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 5366480896,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 6220021760,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 6129844224,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 9749104,
+      "rank": 8,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 2189.7492553011944,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 35.074440612923354,
+          "steps": 300,
+          "throughput_tok_s_mean": 547.4373138252986,
+          "throughput_tok_s_p50": 548.8189645485845,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 91.88837418332696,
+              "mean_ms": 87.39185165070619,
+              "min_ms": 59.07354597002268,
+              "p50_ms": 87.28843391872942,
+              "p95_ms": 88.74159003607929
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 29.38170707784593,
+              "mean_ms": 27.727714905049652,
+              "min_ms": 27.075750986114144,
+              "p50_ms": 27.544450014829636,
+              "p95_ms": 28.57316005975008
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 1.8197949975728989,
+              "mean_ms": 1.7887960708079238,
+              "min_ms": 1.7619661521166563,
+              "p50_ms": 1.7879849765449762,
+              "p95_ms": 1.8006791360676289
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 122.08160408772528,
+              "mean_ms": 116.90836262656376,
+              "min_ms": 88.75970402732491,
+              "p50_ms": 116.6140460409224,
+              "p95_ms": 119.00504189543426
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 2205.7346779396194,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 34.819910334888846,
+          "steps": 300,
+          "throughput_tok_s_mean": 551.4336694849048,
+          "throughput_tok_s_p50": 552.8027743316723,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 90.14566498808563,
+              "mean_ms": 86.88934210377435,
+              "min_ms": 58.6572450120002,
+              "p50_ms": 86.83023392222822,
+              "p95_ms": 88.16599985584617
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 28.95663888193667,
+              "mean_ms": 27.382253902809072,
+              "min_ms": 26.718569919466972,
+              "p50_ms": 27.192630106583238,
+              "p95_ms": 28.22171989828348
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 1.8832930363714695,
+              "mean_ms": 1.7895071534439921,
+              "min_ms": 1.7734980210661888,
+              "p50_ms": 1.7877139616757631,
+              "p95_ms": 1.804404892027378
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 120.89566886425018,
+              "mean_ms": 116.06110316002741,
+              "min_ms": 87.6166089437902,
+              "p50_ms": 115.77365919947624,
+              "p95_ms": 118.11454989947379
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 2214.9177913768476,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 34.67548669199459,
+          "steps": 300,
+          "throughput_tok_s_mean": 553.7294478442119,
+          "throughput_tok_s_p50": 555.1737971677688,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 89.79167812503874,
+              "mean_ms": 86.57406067320456,
+              "min_ms": 58.66044107824564,
+              "p50_ms": 86.53884194791317,
+              "p95_ms": 87.83179917372763
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 28.719467809423804,
+              "mean_ms": 27.21661624653886,
+              "min_ms": 26.581955840811133,
+              "p50_ms": 27.038239873945713,
+              "p95_ms": 28.080844087526202
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 1.8480850849300623,
+              "mean_ms": 1.7892335386325915,
+              "min_ms": 1.7749860417097807,
+              "p50_ms": 1.787554007023573,
+              "p95_ms": 1.8059471622109413
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 120.30755006708205,
+              "mean_ms": 115.579910458376,
+              "min_ms": 87.55549509078264,
+              "p50_ms": 115.2792158536613,
+              "p95_ms": 117.63701797463
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 0,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "judgment": "no per-step compare (check off)",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 2,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 8192,
+      "steps_per_round": 300,
+      "stop_position": 9224,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3357,
+        "global_rows": 256,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 9224,
+        "dispatch_error": 0,
+        "expected_position": 9224,
+        "host_position": 9224,
+        "stop_position": 9224
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 8,
+        "global_ranks": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 8192 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=9472",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "off",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 4.841562375891954,
+        "load": 12.882018131902441,
+        "process": 160.96290548495017,
+        "settle": 16.466998493066058,
+        "warmup": 20.23130330396816
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            64,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 2097152,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan065",
+      "local_batch": 64,
+      "local_rank": 4,
+      "max_seq_len": 9472,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 4500357120,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 7432175616,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 4923981824,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 4923981824,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 4923981824,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 4923981824,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 5907546112,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 5823660032,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 9074272,
+      "rank": 12,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 2188.040684818973,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 35.102619523881,
+          "steps": 300,
+          "throughput_tok_s_mean": 547.0101712047433,
+          "throughput_tok_s_p50": 550.3020536118521,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 3.330168081447482,
+              "mean_ms": 3.132834135709951,
+              "min_ms": 3.092362079769373,
+              "p50_ms": 3.125393996015191,
+              "p95_ms": 3.1951451674103737
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 94.33852205984294,
+              "mean_ms": 89.17555248520027,
+              "min_ms": 87.7664799336344,
+              "p50_ms": 88.64660188555717,
+              "p95_ms": 91.25081892125309
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 25.87084984406829,
+              "mean_ms": 24.532543250049155,
+              "min_ms": 23.963741958141327,
+              "p50_ms": 24.42997694015503,
+              "p95_ms": 25.248412042856216
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 122.96912004239857,
+              "mean_ms": 116.99965260069196,
+              "min_ms": 115.12508196756244,
+              "p50_ms": 116.2997658830136,
+              "p95_ms": 119.75908698514104
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.27418392710387707,
+              "mean_ms": 0.1587227297325929,
+              "min_ms": 0.1414951402693987,
+              "p50_ms": 0.15373784117400646,
+              "p95_ms": 0.1872209832072258
+            }
+          },
+          "tokens_first8": [
+            905,
+            10759,
+            76713,
+            223,
+            245,
+            944,
+            5,
+            1234
+          ]
+        },
+        {
+          "dp_equivalent_tok_s_mean": 2204.0358639899387,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 34.84776315302588,
+          "steps": 300,
+          "throughput_tok_s_mean": 551.0089659974847,
+          "throughput_tok_s_p50": 554.1551641799083,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 3.4041169565171003,
+              "mean_ms": 3.1353142329802117,
+              "min_ms": 3.0911900103092194,
+              "p50_ms": 3.1289998441934586,
+              "p95_ms": 3.1838940922170877
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 93.48184405826032,
+              "mean_ms": 88.74109287125368,
+              "min_ms": 87.3083311598748,
+              "p50_ms": 88.2413717918098,
+              "p95_ms": 90.84542794153094
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 25.457884883508086,
+              "mean_ms": 24.113002594094723,
+              "min_ms": 23.596663028001785,
+              "p50_ms": 23.97854905575514,
+              "p95_ms": 24.783971020951867
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 122.17940716072917,
+              "mean_ms": 116.15056006237864,
+              "min_ms": 114.35274314135313,
+              "p50_ms": 115.49111898057163,
+              "p95_ms": 118.88766195625067
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.2656979486346245,
+              "mean_ms": 0.16115036405002078,
+              "min_ms": 0.14246697537600994,
+              "p50_ms": 0.1565439160913229,
+              "p95_ms": 0.1902270596474409
+            }
+          },
+          "tokens_first8": [
+            905,
+            10759,
+            76713,
+            223,
+            5,
+            944,
+            5,
+            3737
+          ]
+        },
+        {
+          "dp_equivalent_tok_s_mean": 2213.208137772723,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 34.70314337988384,
+          "steps": 300,
+          "throughput_tok_s_mean": 553.3020344431808,
+          "throughput_tok_s_p50": 556.5334361286708,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 3.2614630181342363,
+              "mean_ms": 3.1405544948453703,
+              "min_ms": 3.1049868557602167,
+              "p50_ms": 3.1339959241449833,
+              "p95_ms": 3.1997410114854574
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 93.14027382060885,
+              "mean_ms": 88.45563594562311,
+              "min_ms": 87.03423710539937,
+              "p50_ms": 87.96210796572268,
+              "p95_ms": 90.5922029633075
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 25.25296900421381,
+              "mean_ms": 23.913053784053773,
+              "min_ms": 23.479320108890533,
+              "p50_ms": 23.749290965497494,
+              "p95_ms": 24.60408816114068
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 121.72808195464313,
+              "mean_ms": 115.66919334465638,
+              "min_ms": 113.89735713601112,
+              "p50_ms": 114.997582975775,
+              "p95_ms": 118.43233811669052
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.46344310976564884,
+              "mean_ms": 0.15994912013411522,
+              "min_ms": 0.1408399548381567,
+              "p50_ms": 0.15435717068612576,
+              "p95_ms": 0.18929596990346909
+            }
+          },
+          "tokens_first8": [
+            905,
+            10759,
+            76713,
+            223,
+            5,
+            944,
+            5,
+            344
+          ]
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 0,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "judgment": "no per-step compare (check off)",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 3,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 8192,
+      "steps_per_round": 300,
+      "stop_position": 9224,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3357,
+        "global_rows": 256,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 9224,
+        "dispatch_error": 0,
+        "expected_position": 9224,
+        "host_position": 9224,
+        "stop_position": 9224
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 12,
+        "global_ranks": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    }
+  ]
+}
