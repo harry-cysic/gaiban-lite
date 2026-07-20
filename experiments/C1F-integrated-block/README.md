@@ -66,7 +66,27 @@ tok/s(16 卡聚合)**,即 ~785 tok/s/GPU。低于可行性预估带 15–25k 的
    属 dsv4_direct 运行时结构改动,归入 Phase 2 移植。
 2. **fused Triton indexer(D0b)重新定位**:该 kernel 的收益是 prefill 的
    O(s²) score 物化(`_FUSE_MIN_SEQLEN=1024` 才启用);decode(s=1)不在
-   收益面。从 decode 回收清单移除,归入 prefill(C2 级)工作。
+   收益面(D0b 实测 chunk=512 已是 0.70× 亏损,head-loop launch 开销主导)。
+   从 decode 回收清单移除,归入 prefill(C2 级)工作。
+3. **W8A16 attention 投影(E1b2q,`--attn-linear w8a16`)**:接入 gaiban
+   `weight_only_linear` Triton GEMM 替换 reference act_quant+fp8_gemm。
+   B=512 整层 3973 vs 3937 µs、B=128 2252 vs 2231——**±1% 内,中性**。
+   Flash decode 的 attention 半层由 sparse kernel/compressor/indexer 及
+   eager op 链主导,投影 GEMM(~115 MB 权重读/层@bl=128)不是瓶颈。
+
+## 修订后的 decode 回收路径
+
+三个"已验证 gaiban 资产"在 Flash decode 侧全部收益甚微或改判。12.5k→15k+
+的候选路径改为:
+- **C2g tilelang HC 边界融合**(hc_post+hc_pre+norm 单 kernel,vllm
+  `mhc_fused_post_pre_tilelang`)——HC 仍占 ~7.7 ms/stage,是最大单项;
+  需要 dsv4_direct 运行时结构(跨 attn/ffn 边界融合),归 Phase 2 移植。
+- **decode 形状的 fused index score**(新小 kernel,s=1 GEMV 型;L2−L3 的
+  attn_local 差 611 µs@bl=128 提示 indexer score 物化是 ratio-4 层的
+  显著分项)——候选 D 系列实验。
+- **全 stage(11 层)单 graph**:本 bench 是逐层 graph+barrier 口径,
+  stage 级 graph 可回收层间空隙(Pro E1a27 经验)。
+- **MTP 投机解码**(Phase 4,decode ~1.5×)不计入本口径。
 
 ## 容量注记
 

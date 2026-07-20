@@ -29,7 +29,12 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   既定形态全部通过检验；B=512/8K 整层加权 3712 µs → **reference-op 基线组件
   roofline ≈ 12.5k output tok/s**（低于预估带下沿 ~20%，归因：HC fp32 sinkhorn
   7.8 ms/stage、allgather 6.0 ms/stage 未入模型、attention 未用 W8A16）。
-- 下一阶段（Phase 2 前置）：接入三项已验证 gaiban 资产回收差额——**fused MHC**
-  （c2f_fused_hc，bitwise 等价）、**fused Triton indexer**（D0b，topk 1024→512）、
-  **attention W8A16**（E1b2q，Pro 1.74×）；随后 dsv4_direct 移植 Flash 层表
-  （单机 TP4×PP2 → 双机 PP4）。12.5k 为未优化基线，暂不构成对 15–25k 的证伪。
+- 资产接入 A/B 已完成（见 C1F README 追加节）：**三项 gaiban 资产在 decode 侧
+  全部收益甚微或改判**——eager fused MHC −3%、W8A16 投影中性、fused indexer 属
+  prefill 杠杆。decode 回收路径修订为：C2g tilelang HC 边界融合（Phase 2 运行时）、
+  decode 形状 fused index score（候选新 kernel）、全 stage 单 graph；MTP（Phase 4）
+  另计 ~1.5×。
+- 下一阶段（Phase 2）：**dsv4_direct 移植 Flash 层表**（单机 TP4×PP2 → 双机 PP4），
+  含 stage 级 CUDA graph 与 C2g HC 边界融合；D5 式逐层 canary 对拍 D0 oracle。
+  12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
+  显著低于 15k，须按目标文档修正容量模型。

@@ -1,0 +1,12 @@
+W0720 07:16:33.611000 141404 torch/distributed/run.py:851] *****************************************
+W0720 07:16:33.611000 141404 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 07:16:33.611000 141404 torch/distributed/run.py:851] *****************************************
+C1F integrated TP block | world=4 | attn=dp | moe=itp | hc=fused | lin=w8a16 | gpu=NVIDIA GeForce RTX 4090
+heads/rank=64 | attn_launches=4 | rotate=fht | allreduce_dtype=bf16 | inter/rank=512 | experts/rank=256
+layer ratio     B   bl   eager_us   graph_us  tok/s_layer  tok/s/GPU  mem_GiB
+/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+    2     4   128   32     5719.1     2252.2      56832.8      322.9     1.47
+/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+    2     4   512  128     5639.1     3972.5     128884.8      732.3     1.55
