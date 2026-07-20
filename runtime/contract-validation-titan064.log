@@ -1,0 +1,392 @@
+E0f Flash checkpoint contract validation -- titan064
+============================================================
+host: titan064
+date: 2026-07-20T07:25:45Z
+Python 3.12.3
+command: cd ~/e0f-contract && ~/Workspace/venvs/sglang/bin/python \
+  e0f_checkpoint_contract.py --stage-root ~/Workspace/DeepSeek-V4-Flash \
+  --layers 0,1,2,3,4,42,mtp --tp-size 4
+exit code: 0
+
+overall ok: True   total errors: 0
+checkpoint_id: 49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31
+config_sha256: b628e63398a645abc711d92207f8737dd8140f7a4ef1e0a5b3616019e0ddd818
+index sha256:  7e975ba3bef8947a94e7da0abd60888375b232b4dfad883d59653e65c6ba522a (69187 keys)
+
+per-layer results:
+  layers.0   id=0   kind=window   route=hash    ratio=0   tensors=1565/1565 shards=model-00002-of-00046.safetensors model_config_ok=True -> PASS
+  layers.1   id=1   kind=window   route=hash    ratio=0   tensors=1565/1565 shards=model-00003-of-00046.safetensors model_config_ok=True -> PASS
+  layers.2   id=2   kind=ratio4   route=hash    ratio=4   tensors=1576/1576 shards=model-00004-of-00046.safetensors model_config_ok=True -> PASS
+  layers.3   id=3   kind=ratio128 route=learned ratio=128 tensors=1569/1569 shards=model-00005-of-00046.safetensors model_config_ok=True -> PASS
+  layers.4   id=4   kind=ratio4   route=learned ratio=4   tensors=1576/1576 shards=model-00006-of-00046.safetensors model_config_ok=True -> PASS
+  layers.42  id=42  kind=ratio4   route=learned ratio=4   tensors=1576/1576 shards=model-00044-of-00046.safetensors model_config_ok=True -> PASS
+  mtp.0      id=43  kind=window   route=learned ratio=0   tensors=1575/1575 shards=model-00046-of-00046.safetensors model_config_ok=True -> PASS
+  top-level  -> PASS (embed/head/norm/hc_head_*)
+
+negative controls (validator teeth check): 4/4 fail as required
+  1) dropped layers.2.attn.indexer.wq_b.scale -> missing tensor
+  2) injected layers.2.ffn.gate.bias on hash layer -> unexpected tensor
+  3) hidden_size=7168 (Pro geometry) -> bad shape
+  4) tp_intermediate_slices(2048, 3) -> CheckpointContractError
+
+full JSON output:
+{
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "config_contract": {
+    "errors": [],
+    "ok": true,
+    "tp_slices": [
+      {
+        "logical_intermediate": [
+          0,
+          512
+        ],
+        "rank": 0,
+        "routed": {
+          "w1_w3_rows": [
+            0,
+            512
+          ],
+          "w2_packed_bytes": [
+            0,
+            256
+          ],
+          "w2_scale_columns": [
+            0,
+            16
+          ]
+        },
+        "shared": {
+          "w1_w3_rows": [
+            0,
+            512
+          ],
+          "w1_w3_scale_rows": [
+            0,
+            4
+          ],
+          "w2_columns": [
+            0,
+            512
+          ],
+          "w2_scale_columns": [
+            0,
+            4
+          ]
+        }
+      },
+      {
+        "logical_intermediate": [
+          512,
+          1024
+        ],
+        "rank": 1,
+        "routed": {
+          "w1_w3_rows": [
+            512,
+            1024
+          ],
+          "w2_packed_bytes": [
+            256,
+            512
+          ],
+          "w2_scale_columns": [
+            16,
+            32
+          ]
+        },
+        "shared": {
+          "w1_w3_rows": [
+            512,
+            1024
+          ],
+          "w1_w3_scale_rows": [
+            4,
+            8
+          ],
+          "w2_columns": [
+            512,
+            1024
+          ],
+          "w2_scale_columns": [
+            4,
+            8
+          ]
+        }
+      },
+      {
+        "logical_intermediate": [
+          1024,
+          1536
+        ],
+        "rank": 2,
+        "routed": {
+          "w1_w3_rows": [
+            1024,
+            1536
+          ],
+          "w2_packed_bytes": [
+            512,
+            768
+          ],
+          "w2_scale_columns": [
+            32,
+            48
+          ]
+        },
+        "shared": {
+          "w1_w3_rows": [
+            1024,
+            1536
+          ],
+          "w1_w3_scale_rows": [
+            8,
+            12
+          ],
+          "w2_columns": [
+            1024,
+            1536
+          ],
+          "w2_scale_columns": [
+            8,
+            12
+          ]
+        }
+      },
+      {
+        "logical_intermediate": [
+          1536,
+          2048
+        ],
+        "rank": 3,
+        "routed": {
+          "w1_w3_rows": [
+            1536,
+            2048
+          ],
+          "w2_packed_bytes": [
+            768,
+            1024
+          ],
+          "w2_scale_columns": [
+            48,
+            64
+          ]
+        },
+        "shared": {
+          "w1_w3_rows": [
+            1536,
+            2048
+          ],
+          "w1_w3_scale_rows": [
+            12,
+            16
+          ],
+          "w2_columns": [
+            1536,
+            2048
+          ],
+          "w2_scale_columns": [
+            12,
+            16
+          ]
+        }
+      }
+    ]
+  },
+  "config_sha256": "b628e63398a645abc711d92207f8737dd8140f7a4ef1e0a5b3616019e0ddd818",
+  "errors": [],
+  "experiment": "e0f-flash-checkpoint-contract",
+  "files": [
+    {
+      "file_size": 3566321192,
+      "header_bytes": 172232,
+      "header_sha256": "adbe0338649aec4a8099bd12e7f99b18b3497f73b38345f84ecb1c46eca9d992",
+      "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model-00002-of-00046.safetensors",
+      "tensor_count": 1565
+    },
+    {
+      "file_size": 3566321192,
+      "header_bytes": 172232,
+      "header_sha256": "066ac29abaa9071fd8af1166d76c411844336d778eea985781354b0a651bfd5f",
+      "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model-00003-of-00046.safetensors",
+      "tensor_count": 1565
+    },
+    {
+      "file_size": 3596229272,
+      "header_bytes": 173624,
+      "header_sha256": "739266275c9abeafe21fcf8def381588c2a556bae0206d42659789ab603c997e",
+      "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model-00004-of-00046.safetensors",
+      "tensor_count": 1576
+    },
+    {
+      "file_size": 3568768976,
+      "header_bytes": 172656,
+      "header_sha256": "00bf95ba015a6cb4f02c3bd6bab53b2bf12def11ed1201ac8e6b4e8e380299bb",
+      "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model-00005-of-00046.safetensors",
+      "tensor_count": 1569
+    },
+    {
+      "file_size": 3590024776,
+      "header_bytes": 173544,
+      "header_sha256": "c3fdf86122ab5d53a8c4d08eba13aaf8063e87cc475dc67072cb7a88106c6eac",
+      "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model-00006-of-00046.safetensors",
+      "tensor_count": 1576
+    },
+    {
+      "file_size": 3590026352,
+      "header_bytes": 175120,
+      "header_sha256": "a95f8067ab7db45ecb0118b4207aa68ed1b270c41e23849b48244c1d78799396",
+      "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model-00044-of-00046.safetensors",
+      "tensor_count": 1576
+    },
+    {
+      "file_size": 3593956092,
+      "header_bytes": 168328,
+      "header_sha256": "10f90b036e608fabcf2c781dd5274a0fbc262f7aeaf959218ff1ccb829903981",
+      "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model-00046-of-00046.safetensors",
+      "tensor_count": 1575
+    },
+    {
+      "file_size": 1059061856,
+      "header_bytes": 88,
+      "header_sha256": "7bdd252c75d1e8975a69b8399b226f0129ce119b23da7bd68deac4ba4b1a4a40",
+      "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model-00001-of-00046.safetensors",
+      "tensor_count": 1
+    },
+    {
+      "file_size": 1059332516,
+      "header_bytes": 392,
+      "header_sha256": "76d10bb3b022bad26446539ebaf16c9245fdcf835b28fd55a75052e0b0bb60b8",
+      "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model-00045-of-00046.safetensors",
+      "tensor_count": 5
+    }
+  ],
+  "index": {
+    "index_sha256": "7e975ba3bef8947a94e7da0abd60888375b232b4dfad883d59653e65c6ba522a",
+    "path": "/home/cysic/Workspace/DeepSeek-V4-Flash/model.safetensors.index.json",
+    "weight_map_keys": 69187
+  },
+  "layers": [
+    {
+      "attn_kind": "window",
+      "compress_ratio": 0,
+      "errors": [],
+      "expected_tensor_count": 1565,
+      "is_mtp": false,
+      "layer_id": 0,
+      "model_config_ok": true,
+      "observed_tensor_count": 1565,
+      "ok": true,
+      "prefix": "layers.0",
+      "route_kind": "hash",
+      "shards": [
+        "model-00002-of-00046.safetensors"
+      ]
+    },
+    {
+      "attn_kind": "window",
+      "compress_ratio": 0,
+      "errors": [],
+      "expected_tensor_count": 1565,
+      "is_mtp": false,
+      "layer_id": 1,
+      "model_config_ok": true,
+      "observed_tensor_count": 1565,
+      "ok": true,
+      "prefix": "layers.1",
+      "route_kind": "hash",
+      "shards": [
+        "model-00003-of-00046.safetensors"
+      ]
+    },
+    {
+      "attn_kind": "ratio4",
+      "compress_ratio": 4,
+      "errors": [],
+      "expected_tensor_count": 1576,
+      "is_mtp": false,
+      "layer_id": 2,
+      "model_config_ok": true,
+      "observed_tensor_count": 1576,
+      "ok": true,
+      "prefix": "layers.2",
+      "route_kind": "hash",
+      "shards": [
+        "model-00004-of-00046.safetensors"
+      ]
+    },
+    {
+      "attn_kind": "ratio128",
+      "compress_ratio": 128,
+      "errors": [],
+      "expected_tensor_count": 1569,
+      "is_mtp": false,
+      "layer_id": 3,
+      "model_config_ok": true,
+      "observed_tensor_count": 1569,
+      "ok": true,
+      "prefix": "layers.3",
+      "route_kind": "learned",
+      "shards": [
+        "model-00005-of-00046.safetensors"
+      ]
+    },
+    {
+      "attn_kind": "ratio4",
+      "compress_ratio": 4,
+      "errors": [],
+      "expected_tensor_count": 1576,
+      "is_mtp": false,
+      "layer_id": 4,
+      "model_config_ok": true,
+      "observed_tensor_count": 1576,
+      "ok": true,
+      "prefix": "layers.4",
+      "route_kind": "learned",
+      "shards": [
+        "model-00006-of-00046.safetensors"
+      ]
+    },
+    {
+      "attn_kind": "ratio4",
+      "compress_ratio": 4,
+      "errors": [],
+      "expected_tensor_count": 1576,
+      "is_mtp": false,
+      "layer_id": 42,
+      "model_config_ok": true,
+      "observed_tensor_count": 1576,
+      "ok": true,
+      "prefix": "layers.42",
+      "route_kind": "learned",
+      "shards": [
+        "model-00044-of-00046.safetensors"
+      ]
+    },
+    {
+      "attn_kind": "window",
+      "compress_ratio": 0,
+      "errors": [],
+      "expected_tensor_count": 1575,
+      "is_mtp": true,
+      "layer_id": 43,
+      "model_config_ok": true,
+      "observed_tensor_count": 1575,
+      "ok": true,
+      "prefix": "mtp.0",
+      "route_kind": "learned",
+      "shards": [
+        "model-00046-of-00046.safetensors"
+      ]
+    }
+  ],
+  "ok": true,
+  "schema_version": 1,
+  "stage_root": "/home/cysic/Workspace/DeepSeek-V4-Flash",
+  "top_level": {
+    "errors": [],
+    "ok": true
+  },
+  "tp_size": 4
+}
