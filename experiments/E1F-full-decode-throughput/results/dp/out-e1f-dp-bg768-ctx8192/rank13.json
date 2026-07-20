@@ -1,0 +1,148 @@
+{
+  "accepted": false,
+  "b_semantics": "dp",
+  "caliber": {
+    "b_semantics": "dp: true DP-attention sequence split; TP rank r serves its own 192 sequences (global rows [r*bl,(r+1)*bl) of B_global=768); full 64 heads and bl KV per GPU; MoE all_gathers 4 distinct row blocks and reduce_scatters each rank's own rows; throughput = B_global / step_wall (measured, no conversion)",
+    "dp_equivalent_note": "n/a in dp semantics: throughput is directly measured at B_global; no model-derived conversion is emitted",
+    "hc_backend": "fused",
+    "kv": "seeded decode residency at position 8192 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=9472",
+    "microbatches": 1,
+    "pipeline_form": "serial closed-loop, one token batch in flight",
+    "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+    "transport": "NCCL P2P fixed endpoints, no-GDR"
+  },
+  "check_mode": "off",
+  "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+  "config_tag": "nogdr-dp",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "load": 12.793536449084058,
+    "process": 591.0922542409971
+  },
+  "errors": [
+    "Traceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 903, in main\n    lanes = synchronized_local_step(\n            ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 225, in synchronized_local_step\n    raise RuntimeError(f\"{name} failed before the next collective:\\n{details}\")\nRuntimeError: build lanes failed before the next collective:\nrank 0:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 213.88 MiB is free. Including non-PyTorch memory, this process has 23.30 GiB memory in use. Of the allocated memory 22.32 GiB is allocated by PyTorch, and 223.29 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 1:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 1 has a total capacity of 23.52 GiB of which 213.88 MiB is free. Including non-PyTorch memory, this process has 23.30 GiB memory in use. Of the allocated memory 22.32 GiB is allocated by PyTorch, and 223.29 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 2:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 2 has a total capacity of 23.52 GiB of which 213.88 MiB is free. Including non-PyTorch memory, this process has 23.30 GiB memory in use. Of the allocated memory 22.32 GiB is allocated by PyTorch, and 223.29 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 3:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 3 has a total capacity of 23.52 GiB of which 139.88 MiB is free. Including non-PyTorch memory, this process has 23.37 GiB memory in use. Of the allocated memory 22.60 GiB is allocated by PyTorch, and 22.94 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 4:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 4 has a total capacity of 23.52 GiB of which 39.88 MiB is free. Including non-PyTorch memory, this process has 23.47 GiB memory in use. Of the allocated memory 22.69 GiB is allocated by PyTorch, and 2.61 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 5:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 5 has a total capacity of 23.52 GiB of which 35.88 MiB is free. Including non-PyTorch memory, this process has 23.47 GiB memory in use. Of the allocated memory 22.69 GiB is allocated by PyTorch, and 2.61 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 6:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 6 has a total capacity of 23.52 GiB of which 35.88 MiB is free. Including non-PyTorch memory, this process has 23.47 GiB memory in use. Of the allocated memory 22.69 GiB is allocated by PyTorch, and 2.61 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 7:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 7 has a total capacity of 23.52 GiB of which 35.88 MiB is free. Including non-PyTorch memory, this process has 23.47 GiB memory in use. Of the allocated memory 22.69 GiB is allocated by PyTorch, and 2.61 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 8:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 53.88 MiB is free. Including non-PyTorch memory, this process has 23.46 GiB memory in use. Of the allocated memory 22.66 GiB is allocated by PyTorch, and 31.19 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 9:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 1 has a total capacity of 23.52 GiB of which 53.88 MiB is free. Including non-PyTorch memory, this process has 23.46 GiB memory in use. Of the allocated memory 22.66 GiB is allocated by PyTorch, and 31.19 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 10:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 2 has a total capacity of 23.52 GiB of which 53.88 MiB is free. Including non-PyTorch memory, this process has 23.46 GiB memory in use. Of the allocated memory 22.66 GiB is allocated by PyTorch, and 31.19 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 11:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 3 has a total capacity of 23.52 GiB of which 73.88 MiB is free. Including non-PyTorch memory, this process has 23.44 GiB memory in use. Of the allocated memory 22.66 GiB is allocated by PyTorch, and 31.19 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 12:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 4 has a total capacity of 23.52 GiB of which 183.88 MiB is free. Including non-PyTorch memory, this process has 23.33 GiB memory in use. Of the allocated memory 22.53 GiB is allocated by PyTorch, and 23.19 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 13:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 5 has a total capacity of 23.52 GiB of which 179.88 MiB is free. Including non-PyTorch memory, this process has 23.33 GiB memory in use. Of the allocated memory 22.53 GiB is allocated by PyTorch, and 23.19 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 14:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 6 has a total capacity of 23.52 GiB of which 179.88 MiB is free. Including non-PyTorch memory, this process has 23.33 GiB memory in use. Of the allocated memory 22.53 GiB is allocated by PyTorch, and 23.19 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 15:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 879, in build_lanes\n    \"graph\": StageLane(\n             ^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 481, in __init__\n    seed_state(\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 450, in seed_state\n    state.seed_decode_payload(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py\", line 416, in seed_decode_payload\n    if not bool(torch.isfinite(payload[name][0]).all().item()):\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 222.00 MiB. GPU 7 has a total capacity of 23.52 GiB of which 179.88 MiB is free. Including non-PyTorch memory, this process has 23.33 GiB memory in use. Of the allocated memory 22.53 GiB is allocated by PyTorch, and 23.19 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\n"
+  ],
+  "experiment": "E1F-full-decode-throughput",
+  "family_counts": {
+    "normal": 774,
+    "ratio4_boundary": 250,
+    "ratio4_ratio128_boundary": 8
+  },
+  "global_batch": 768,
+  "host": "titan065",
+  "local_batch": 192,
+  "local_rank": 5,
+  "max_seq_len": 9472,
+  "measurement_class": "closed_loop_decode_throughput",
+  "memory": {
+    "after_load": {
+      "free_bytes": 5773328384,
+      "total_bytes": 25252724736
+    }
+  },
+  "nccl_env": {
+    "NCCL_IB_DISABLE": "0",
+    "NCCL_NET_GDR_LEVEL": null,
+    "NCCL_P2P_LEVEL": "SYS",
+    "NCCL_SOCKET_IFNAME": "enp33s0f0"
+  },
+  "placement": {
+    "accepted": true,
+    "stage_hosts": {
+      "0": [
+        "titan064"
+      ],
+      "1": [
+        "titan064"
+      ],
+      "2": [
+        "titan065"
+      ],
+      "3": [
+        "titan065"
+      ]
+    }
+  },
+  "rank": 13,
+  "round_results": [],
+  "rounds": 3,
+  "schema_version": 1,
+  "seed": 20260720,
+  "settle": null,
+  "settle_steps": 132,
+  "stage": 3,
+  "stage_layer_ids": {
+    "0": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "1": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "2": [
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "3": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42
+    ]
+  },
+  "start_position": 8192,
+  "steps_per_round": 300,
+  "stop_position": 9224,
+  "teardown": null,
+  "terminals": null,
+  "torch": "2.11.0+cu130",
+  "tp_group_binding": {
+    "backend": "nccl",
+    "global_rank": 13,
+    "global_ranks": [
+      12,
+      13,
+      14,
+      15
+    ],
+    "local_rank": 1,
+    "validated_live": true,
+    "world_size": 4
+  },
+  "tp_rank": 1,
+  "world": 16
+}

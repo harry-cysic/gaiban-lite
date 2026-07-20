@@ -1,0 +1,70 @@
+W0720 13:20:51.346000 156879 torch/distributed/run.py:851] 
+W0720 13:20:51.346000 156879 torch/distributed/run.py:851] *****************************************
+W0720 13:20:51.346000 156879 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 13:20:51.346000 156879 torch/distributed/run.py:851] *****************************************
+[E1F] placement {0: ['titan064'], 1: ['titan064'], 2: ['titan065'], 3: ['titan065']}
+[E1F] layer=11 rank=0 experts=256/256
+[E1F] stage 1 layer 11 material loaded
+[E1F] layer=0 rank=0 experts=256/256
+[E1F] stage 0 layer 0 material loaded
+[E1F] layer=12 rank=0 experts=256/256
+[E1F] stage 1 layer 12 material loaded
+[E1F] layer=1 rank=0 experts=256/256
+[E1F] stage 0 layer 1 material loaded
+[E1F] layer=13 rank=0 experts=256/256
+[E1F] stage 1 layer 13 material loaded
+[E1F] layer=2 rank=0 experts=256/256
+[E1F] stage 0 layer 2 material loaded
+[E1F] layer=14 rank=0 experts=256/256
+[E1F] stage 1 layer 14 material loaded
+[E1F] layer=3 rank=0 experts=256/256
+[E1F] stage 0 layer 3 material loaded
+[E1F] layer=15 rank=0 experts=256/256
+[E1F] stage 1 layer 15 material loaded
+[E1F] layer=4 rank=0 experts=256/256
+[E1F] stage 0 layer 4 material loaded
+[E1F] layer=16 rank=0 experts=256/256
+[E1F] layer=5 rank=0 experts=256/256
+[E1F] stage 1 layer 16 material loaded
+[E1F] stage 0 layer 5 material loaded
+[E1F] layer=6 rank=0 experts=256/256
+[E1F] layer=17 rank=0 experts=256/256
+[E1F] stage 0 layer 6 material loaded
+[E1F] stage 1 layer 17 material loaded
+[E1F] layer=7 rank=0 experts=256/256
+[E1F] layer=18 rank=0 experts=256/256
+[E1F] stage 0 layer 7 material loaded
+[E1F] stage 1 layer 18 material loaded
+[E1F] layer=8 rank=0 experts=256/256
+[E1F] stage 0 layer 8 material loaded
+[E1F] layer=19 rank=0 experts=256/256
+[E1F] stage 1 layer 19 material loaded
+[E1F] layer=9 rank=0 experts=256/256
+[E1F] stage 0 layer 9 material loaded
+[E1F] layer=20 rank=0 experts=256/256
+[E1F] stage 1 layer 20 material loaded
+[E1F] layer=10 rank=0 experts=256/256
+[E1F] stage 0 layer 10 material loaded
+[E1F] layer=21 rank=0 experts=256/256
+[E1F] stage 1 layer 21 material loaded
+[E1F] stage 1 loaded (11 layers, free 7.79 GiB, 13s)
+[E1F] stage 0 loaded (11 layers, free 6.88 GiB, 13s)
+[E1F] stage 1 lanes built, free 4.22 GiB
+[E1F] stage 0 lanes built, free 3.49 GiB
+[E1F] stage 0 warmup done (53s, free 4.67 GiB)
+[E1F] stage 1 warmup done (53s, free 5.20 GiB)
+[E1F] stage 0 captured normal at position 2048 (0.4s)
+[E1F] settle step 0 pos 2048 family normal captured=True
+[E1F] stage 0 captured ratio4_boundary at position 2051 (0.5s)
+[E1F] settle step 3 pos 2051 family ratio4_boundary captured=True
+[E1F] settle step 32 pos 2080 family normal captured=False
+[E1F] settle step 64 pos 2112 family normal captured=False
+[E1F] settle step 96 pos 2144 family normal captured=False
+[E1F] stage 0 captured ratio4_ratio128_boundary at position 2175 (0.5s)
+[E1F] settle step 127 pos 2175 family ratio4_ratio128_boundary captured=True
+[E1F] settle step 128 pos 2176 family normal captured=False
+[E1F] settle done: capture_order=['normal', 'ratio4_boundary', 'ratio4_ratio128_boundary'] bitwise=132/132 (check=bitwise)
+[E1F] stage 0 round 0: step_wall p50 158.12 ms p95 162.07 ms -> 3238.1 tok/s (DP B_global=512)
+[E1F] stage 0 round 1: step_wall p50 157.10 ms p95 160.75 ms -> 3259.1 tok/s (DP B_global=512)
+[E1F] stage 0 round 2: step_wall p50 156.11 ms p95 159.88 ms -> 3279.8 tok/s (DP B_global=512)
+[E1F] overall: PASS

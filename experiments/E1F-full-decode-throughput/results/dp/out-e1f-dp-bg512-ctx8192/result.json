@@ -1,0 +1,3023 @@
+{
+  "accepted": true,
+  "check_mode": "off",
+  "experiment": "E1F-full-decode-throughput",
+  "local_batch": 128,
+  "stage_representatives": [
+    {
+      "accepted": true,
+      "b_semantics": "dp",
+      "caliber": {
+        "b_semantics": "dp: true DP-attention sequence split; TP rank r serves its own 128 sequences (global rows [r*bl,(r+1)*bl) of B_global=512); full 64 heads and bl KV per GPU; MoE all_gathers 4 distinct row blocks and reduce_scatters each rank's own rows; throughput = B_global / step_wall (measured, no conversion)",
+        "dp_equivalent_note": "n/a in dp semantics: throughput is directly measured at B_global; no model-derived conversion is emitted",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 8192 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=9472",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "off",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr-dp",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 376.93185689789243,
+        "load": 12.939104063203558,
+        "process": 608.93203756609,
+        "settle": 24.14901933213696,
+        "warmup": 36.73729392513633
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 512,
+      "handoff_records": {
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            128,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 4194304,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan064",
+      "initial_tokens_first8": [
+        121569,
+        115605,
+        65338,
+        34320,
+        50957,
+        107117,
+        89386,
+        83389
+      ],
+      "local_batch": 128,
+      "local_rank": 0,
+      "max_seq_len": 9472,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 1679687680,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 7383941120,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 3269328896,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 3269328896,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 3269328896,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 3269328896,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 4919787520,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 4833804288,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 17975392,
+      "rank": 0,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 52.29427002905868,
+          "steps": 300,
+          "throughput_tok_s_mean": 2937.335165442903,
+          "throughput_tok_s_p50": 2949.5914631028677,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.1601248513907194,
+              "mean_ms": 0.11535815040891369,
+              "min_ms": 0.09222608059644699,
+              "p50_ms": 0.11199410073459148,
+              "p95_ms": 0.14119991101324558
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 42.15945489704609,
+              "mean_ms": 40.4922290557685,
+              "min_ms": 40.05355201661587,
+              "p50_ms": 40.323379915207624,
+              "p95_ms": 41.14285297691822
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 3.7663900293409824,
+              "mean_ms": 3.6939787150671086,
+              "min_ms": 3.481537103652954,
+              "p50_ms": 3.69030493311584,
+              "p95_ms": 3.7312230560928583
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 182.43837007321417,
+              "mean_ms": 174.30765342122564,
+              "min_ms": 172.35279502347112,
+              "p50_ms": 173.58336108736694,
+              "p95_ms": 177.11443500593305
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 136.5695809945464,
+              "mean_ms": 130.00608749998113,
+              "min_ms": 128.39763890951872,
+              "p50_ms": 129.47853398509324,
+              "p95_ms": 132.21686682663858
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 52.05125555512495,
+          "steps": 300,
+          "throughput_tok_s_mean": 2951.050211433402,
+          "throughput_tok_s_p50": 2963.6149912928795,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.3919871523976326,
+              "mean_ms": 0.11977469005311529,
+              "min_ms": 0.0947809312492609,
+              "p50_ms": 0.11442787945270538,
+              "p95_ms": 0.1502570230513811
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 42.14423894882202,
+              "mean_ms": 40.414652946249895,
+              "min_ms": 40.01307697035372,
+              "p50_ms": 40.23134405724704,
+              "p95_ms": 41.07791115529835
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 3.885256126523018,
+              "mean_ms": 3.692968889760474,
+              "min_ms": 3.4851529635488987,
+              "p50_ms": 3.6898429971188307,
+              "p95_ms": 3.7262630648911
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 181.36781500652432,
+              "mean_ms": 173.4975562314503,
+              "min_ms": 171.3087880052626,
+              "p50_ms": 172.7619820740074,
+              "p95_ms": 176.3581749983132
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 135.42336295358837,
+              "mean_ms": 129.27015970538682,
+              "min_ms": 127.29571806266904,
+              "p50_ms": 128.71402292512357,
+              "p95_ms": 131.51942798867822
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 51.87389632500708,
+          "steps": 300,
+          "throughput_tok_s_mean": 2961.141845141011,
+          "throughput_tok_s_p50": 2975.8566546822335,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.4759870935231447,
+              "mean_ms": 0.11910294570649664,
+              "min_ms": 0.09623286314308643,
+              "p50_ms": 0.11317501775920391,
+              "p95_ms": 0.15070801600813866
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 42.13506798259914,
+              "mean_ms": 40.39953474731495,
+              "min_ms": 39.924010168761015,
+              "p50_ms": 40.19581992179155,
+              "p95_ms": 41.04148899205029
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 3.770156065002084,
+              "mean_ms": 3.687887884055575,
+              "min_ms": 3.488468937575817,
+              "p50_ms": 3.6849728785455227,
+              "p95_ms": 3.7231361493468285
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 180.5937960743904,
+              "mean_ms": 172.906272909604,
+              "min_ms": 170.9257059264928,
+              "p50_ms": 172.05129796639085,
+              "p95_ms": 175.79970113001764
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 134.6632142085582,
+              "mean_ms": 128.69974733252698,
+              "min_ms": 126.97689607739449,
+              "p50_ms": 128.05403908714652,
+              "p95_ms": 130.94581104815006
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 0,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "judgment": "no per-step compare (check off)",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": false,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 0,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 8192,
+      "steps_per_round": 300,
+      "stop_position": 9224,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3355,
+        "global_rows": 512,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 9224,
+        "dispatch_error": 0,
+        "expected_position": 9224,
+        "host_position": 9224,
+        "stop_position": 9224
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 0,
+        "global_ranks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "b_semantics": "dp",
+      "caliber": {
+        "b_semantics": "dp: true DP-attention sequence split; TP rank r serves its own 128 sequences (global rows [r*bl,(r+1)*bl) of B_global=512); full 64 heads and bl KV per GPU; MoE all_gathers 4 distinct row blocks and reduce_scatters each rank's own rows; throughput = B_global / step_wall (measured, no conversion)",
+        "dp_equivalent_note": "n/a in dp semantics: throughput is directly measured at B_global; no model-derived conversion is emitted",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 8192 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=9472",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "off",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr-dp",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 377.3390673880931,
+        "load": 12.518082543974742,
+        "process": 608.9293511358555,
+        "settle": 24.03372735111043,
+        "warmup": 36.73732451302931
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 512,
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            128,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 4194304,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        },
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            128,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 4194304,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan064",
+      "local_batch": 128,
+      "local_rank": 4,
+      "max_seq_len": 9472,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 2589851648,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 8359116800,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 3957194752,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 3957194752,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 3957194752,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 3957194752,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 5750259712,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 5662179328,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 18653280,
+      "rank": 4,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 52.20673827896826,
+          "steps": 300,
+          "throughput_tok_s_mean": 2942.2438731065977,
+          "throughput_tok_s_p50": 2937.0608219623045,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 134.84308985061944,
+              "mean_ms": 130.45229809824377,
+              "min_ms": 43.85489295236766,
+              "p50_ms": 130.57170109823346,
+              "p95_ms": 132.2408460546285
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 41.80063400417566,
+              "mean_ms": 39.60711867626136,
+              "min_ms": 39.04269286431372,
+              "p50_ms": 39.438560139387846,
+              "p95_ms": 40.33314902335405
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 5.400595022365451,
+              "mean_ms": 3.9574295786830285,
+              "min_ms": 3.257500007748604,
+              "p50_ms": 3.94780607894063,
+              "p95_ms": 4.451646003872156
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 178.53084090165794,
+              "mean_ms": 174.01684635318816,
+              "min_ms": 87.16169209219515,
+              "p50_ms": 174.3239350616932,
+              "p95_ms": 175.87985191494226
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 51.9629777490627,
+          "steps": 300,
+          "throughput_tok_s_mean": 2956.0457650428575,
+          "throughput_tok_s_p50": 2952.931268270473,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 133.8899398688227,
+              "mean_ms": 129.77443927433342,
+              "min_ms": 43.781546177342534,
+              "p50_ms": 129.87104593776166,
+              "p95_ms": 131.4918310381472
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 41.53020097874105,
+              "mean_ms": 39.455181773131095,
+              "min_ms": 38.928779074922204,
+              "p50_ms": 39.27011485211551,
+              "p95_ms": 40.215604938566685
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 4.848391050472856,
+              "mean_ms": 3.974733923872312,
+              "min_ms": 3.073568921536207,
+              "p50_ms": 3.9646669756621122,
+              "p95_ms": 4.389567067846656
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 177.42620198987424,
+              "mean_ms": 173.2043549713368,
+              "min_ms": 87.12699916213751,
+              "p50_ms": 173.38703596033156,
+              "p95_ms": 175.03029201179743
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 51.78738157288171,
+          "steps": 300,
+          "throughput_tok_s_mean": 2966.0642686206565,
+          "throughput_tok_s_p50": 2962.6002145535767,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 134.11035714671016,
+              "mean_ms": 129.32571675783643,
+              "min_ms": 43.74074004590511,
+              "p50_ms": 129.34196600690484,
+              "p95_ms": 131.17903214879334
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 41.61815997213125,
+              "mean_ms": 39.33199942965681,
+              "min_ms": 38.72486809268594,
+              "p50_ms": 39.139446802437305,
+              "p95_ms": 40.09008104912937
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 4.629953997209668,
+              "mean_ms": 3.9616047816040614,
+              "min_ms": 3.293266985565424,
+              "p50_ms": 3.964375937357545,
+              "p95_ms": 4.364438122138381
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 177.22984100691974,
+              "mean_ms": 172.61932096909732,
+              "min_ms": 86.93551807664335,
+              "p50_ms": 172.82115807756782,
+              "p95_ms": 174.47577300481498
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 0,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "judgment": "no per-step compare (check off)",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": false,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 1,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 8192,
+      "steps_per_round": 300,
+      "stop_position": 9224,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 355,
+        "global_rows": 512,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 9224,
+        "dispatch_error": 0,
+        "expected_position": 9224,
+        "host_position": 9224,
+        "stop_position": 9224
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 4,
+        "global_ranks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "b_semantics": "dp",
+      "caliber": {
+        "b_semantics": "dp: true DP-attention sequence split; TP rank r serves its own 128 sequences (global rows [r*bl,(r+1)*bl) of B_global=512); full 64 heads and bl KV per GPU; MoE all_gathers 4 distinct row blocks and reduce_scatters each rank's own rows; throughput = B_global / step_wall (measured, no conversion)",
+        "dp_equivalent_note": "n/a in dp semantics: throughput is directly measured at B_global; no model-derived conversion is emitted",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 8192 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=9472",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "off",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr-dp",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 377.32375284610316,
+        "load": 12.51777545711957,
+        "process": 608.9085572110489,
+        "settle": 24.087096613133326,
+        "warmup": 36.736260899109766
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 512,
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            128,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 4194304,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        },
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            128,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 4194304,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan065",
+      "local_batch": 128,
+      "local_rank": 0,
+      "max_seq_len": 9472,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 1807613952,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 8354922496,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 3925737472,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 3925737472,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 3925737472,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 3925737472,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 5452464128,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 5362286592,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 19381360,
+      "rank": 8,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 52.25147571391426,
+          "steps": 300,
+          "throughput_tok_s_mean": 2939.732659988753,
+          "throughput_tok_s_p50": 2942.8294650795556,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 135.53445902653039,
+              "mean_ms": 131.41037911642343,
+              "min_ms": 89.96611088514328,
+              "p50_ms": 131.48270710371435,
+              "p95_ms": 132.92880496010184
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 43.86595683172345,
+              "mean_ms": 41.81033864384517,
+              "min_ms": 41.1786159966141,
+              "p50_ms": 41.61398601718247,
+              "p95_ms": 42.66728810034692
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.9650620631873608,
+              "mean_ms": 0.9447793165842692,
+              "min_ms": 0.8165740873664618,
+              "p50_ms": 0.9451250080019236,
+              "p95_ms": 0.9558440651744604
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 180.342563893646,
+              "mean_ms": 174.16549707685286,
+              "min_ms": 132.75025389157236,
+              "p50_ms": 173.98221883922815,
+              "p95_ms": 176.40807712450624
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 52.00882659992203,
+          "steps": 300,
+          "throughput_tok_s_mean": 2953.4355283256887,
+          "throughput_tok_s_p50": 2958.1529892064664,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 134.89264203235507,
+              "mean_ms": 130.85547785895565,
+              "min_ms": 89.39777687191963,
+              "p50_ms": 130.7992811780423,
+              "p95_ms": 132.3607349768281
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 43.54573506861925,
+              "mean_ms": 41.55060386362796,
+              "min_ms": 40.84431496448815,
+              "p50_ms": 41.34209593757987,
+              "p95_ms": 42.42563503794372
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 3.4673481713980436,
+              "mean_ms": 0.9513506945222616,
+              "min_ms": 0.7406738586723804,
+              "p50_ms": 0.9438530541956425,
+              "p95_ms": 0.9543430060148239
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 179.39430195838213,
+              "mean_ms": 173.35743241710588,
+              "min_ms": 131.65316288359463,
+              "p50_ms": 173.08097379282117,
+              "p95_ms": 175.65458407625556
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 51.831950953928754,
+          "steps": 300,
+          "throughput_tok_s_mean": 2963.5106950148006,
+          "throughput_tok_s_p50": 2969.8859779264553,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 134.3390280380845,
+              "mean_ms": 130.45431769996262,
+              "min_ms": 89.65889899991453,
+              "p50_ms": 130.3857620805502,
+              "p95_ms": 131.95263897068799
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 43.326009064912796,
+              "mean_ms": 41.31427322126304,
+              "min_ms": 40.65735102631152,
+              "p50_ms": 41.089246049523354,
+              "p95_ms": 42.17956494539976
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 3.486664965748787,
+              "mean_ms": 0.999471249524504,
+              "min_ms": 0.4815401043742895,
+              "p50_ms": 0.9429629426449537,
+              "p95_ms": 0.954443821683526
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 178.52194514125586,
+              "mean_ms": 172.76806217075014,
+              "min_ms": 131.46440801210701,
+              "p50_ms": 172.3971909377724,
+              "p95_ms": 175.0028261449188
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 0,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "judgment": "no per-step compare (check off)",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": false,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 2,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 8192,
+      "steps_per_round": 300,
+      "stop_position": 9224,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 2115,
+        "global_rows": 512,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 9224,
+        "dispatch_error": 0,
+        "expected_position": 9224,
+        "host_position": 9224,
+        "stop_position": 9224
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 8,
+        "global_ranks": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "b_semantics": "dp",
+      "caliber": {
+        "b_semantics": "dp: true DP-attention sequence split; TP rank r serves its own 128 sequences (global rows [r*bl,(r+1)*bl) of B_global=512); full 64 heads and bl KV per GPU; MoE all_gathers 4 distinct row blocks and reduce_scatters each rank's own rows; throughput = B_global / step_wall (measured, no conversion)",
+        "dp_equivalent_note": "n/a in dp semantics: throughput is directly measured at B_global; no model-derived conversion is emitted",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 8192 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=9472",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "off",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr-dp",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 377.01197883090936,
+        "load": 12.83239396288991,
+        "process": 608.9099320939276,
+        "settle": 24.12793720094487,
+        "warmup": 36.73631147388369
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 512,
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            128,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 4194304,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan065",
+      "local_batch": 128,
+      "local_rank": 4,
+      "max_seq_len": 9472,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 1904082944,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 6624772096,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 3252551680,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 3252551680,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 3252551680,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 3252551680,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 5175640064,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 5026742272,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 18051168,
+      "rank": 12,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 52.29289429797791,
+          "steps": 300,
+          "throughput_tok_s_mean": 2937.4355768954406,
+          "throughput_tok_s_p50": 2949.7124213747143,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 4.039627965539694,
+              "mean_ms": 3.7614674501431486,
+              "min_ms": 3.702298039570451,
+              "p50_ms": 3.7590130232274532,
+              "p95_ms": 3.8055621553212404
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 139.60915291681886,
+              "mean_ms": 133.41031181858853,
+              "min_ms": 131.7629620898515,
+              "p50_ms": 132.86193693056703,
+              "p95_ms": 135.59798197820783
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 38.88499108143151,
+              "mean_ms": 36.9979655649513,
+              "min_ms": 36.45546990446746,
+              "p50_ms": 36.85817704536021,
+              "p95_ms": 37.68521384336054
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 182.42683401331306,
+              "mean_ms": 174.30169499789676,
+              "min_ms": 172.34171507880092,
+              "p50_ms": 173.57624298892915,
+              "p95_ms": 177.10894509218633
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.2847409341484308,
+              "mean_ms": 0.1319501642137766,
+              "min_ms": 0.12035411782562733,
+              "p50_ms": 0.12862100265920162,
+              "p95_ms": 0.14801602810621262
+            }
+          },
+          "tokens_first8": [
+            300,
+            223,
+            43,
+            223,
+            223,
+            1004,
+            193,
+            40792
+          ]
+        },
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 52.049951198045164,
+          "steps": 300,
+          "throughput_tok_s_mean": 2951.1460145607866,
+          "throughput_tok_s_p50": 2963.6865784208107,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 3.9844000712037086,
+              "mean_ms": 3.776252102882912,
+              "min_ms": 3.712231991812587,
+              "p50_ms": 3.77295701764524,
+              "p95_ms": 3.8239441346377134
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 138.9065699186176,
+              "mean_ms": 132.96356067449474,
+              "min_ms": 131.12282985821366,
+              "p50_ms": 132.38941691815853,
+              "p95_ms": 135.17415104433894
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 38.499658927321434,
+              "mean_ms": 36.616494498836495,
+              "min_ms": 36.14127496257424,
+              "p50_ms": 36.46915499120951,
+              "p95_ms": 37.2897491324693
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 181.35937303304672,
+              "mean_ms": 173.49192397591347,
+              "min_ms": 171.29409685730934,
+              "p50_ms": 172.75780905038118,
+              "p95_ms": 176.35203897953033
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.28455210849642754,
+              "mean_ms": 0.13561669969931245,
+              "min_ms": 0.11832104064524174,
+              "p50_ms": 0.13180612586438656,
+              "p95_ms": 0.15225401148200035
+            }
+          },
+          "tokens_first8": [
+            300,
+            223,
+            260,
+            223,
+            223,
+            1004,
+            223,
+            40792
+          ]
+        },
+        {
+          "dp_equivalent_tok_s_mean": null,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 51.8727028821595,
+          "steps": 300,
+          "throughput_tok_s_mean": 2961.225838974159,
+          "throughput_tok_s_p50": 2975.988492208329,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 3.998702857643366,
+              "mean_ms": 3.781358261282245,
+              "min_ms": 3.708990989252925,
+              "p50_ms": 3.779115155339241,
+              "p95_ms": 3.829528810456395
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 138.44141201116145,
+              "mean_ms": 132.62865614534044,
+              "min_ms": 131.13698409870267,
+              "p50_ms": 131.9768000394106,
+              "p95_ms": 134.8397450055927
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 38.262384943664074,
+              "mean_ms": 36.35652250765512,
+              "min_ms": 35.813604947179556,
+              "p50_ms": 36.19669796898961,
+              "p95_ms": 37.04086085781455
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 180.5859620217234,
+              "mean_ms": 172.9013685012857,
+              "min_ms": 170.92744703404605,
+              "p50_ms": 172.0436760224402,
+              "p95_ms": 175.79462891444564
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.22455002181231976,
+              "mean_ms": 0.13483158700789014,
+              "min_ms": 0.11890195310115814,
+              "p50_ms": 0.13105501420795918,
+              "p95_ms": 0.15604100190103054
+            }
+          },
+          "tokens_first8": [
+            300,
+            10759,
+            223,
+            223,
+            223,
+            1004,
+            193,
+            40792
+          ]
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 0,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "judgment": "no per-step compare (check off)",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": false,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 3,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 8192,
+      "steps_per_round": 300,
+      "stop_position": 9224,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3389,
+        "global_rows": 512,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 9224,
+        "dispatch_error": 0,
+        "expected_position": 9224,
+        "host_position": 9224,
+        "stop_position": 9224
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 12,
+        "global_ranks": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    }
+  ]
+}

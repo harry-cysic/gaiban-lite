@@ -22,14 +22,27 @@ First performance vertical.  Composition of three verified mechanisms:
 embedding), so tokens really flow around the ring.  Embedding and head stay
 eager (outside the graphs).
 
-**B semantics (full replication -- must not be compared with C1F or
-DP-attention numbers)**: the same B sequences are replicated on all four TP
-ranks of every stage.  Each GPU holds B sequences of KV (bl = B); the MoE
-gathers 4B global rows that are four identical copies, so the *distinct*
-global batch is B and throughput = B / step_wall.  Per-rank compute at
-bl=B is identical to a DP-attention deployment at global batch 4B, so a
-DP-caliber throughput estimate is 4x the replicated number (model-derived,
-reported separately, never mixed).
+**B semantics** (``--b-semantics``):
+
+- ``replicated`` (original E1F caliber -- must not be compared with C1F or
+  DP-attention numbers): the same B sequences are replicated on all four TP
+  ranks of every stage.  Each GPU holds B sequences of KV (bl = B); the MoE
+  gathers 4B global rows that are four identical copies, so the *distinct*
+  global batch is B and throughput = B / step_wall.  Per-rank compute at
+  bl=B is identical to a DP-attention deployment at global batch 4B, so a
+  DP-caliber throughput estimate is 4x the replicated number (model-derived,
+  reported separately, never mixed).
+- ``dp`` (twelfth vertical, E0dpf-gated): true DP-attention sequence split.
+  TP rank r of every stage serves its **own** ``local_batch`` sequences
+  (global rows ``[r*bl, (r+1)*bl)`` of ``B_global = 4*bl``), full 64 heads,
+  KV bl per GPU.  The MoE path is unchanged -- the in-package ``TP4MoE``
+  all_gathers the four distinct row blocks into ``B_global`` rows, computes
+  the itp partial, and reduce_scatters each rank's own rows back -- so the
+  gathered rows are now all distinct and throughput = B_global / step_wall
+  is a *measured* DP number (no 4x conversion).  KV seeds, initial tokens,
+  and warm inputs are global-batch tensors sliced per rank, so the served
+  sequence set equals the replicated caliber's at local_batch = B_global.
+  Cross-lane output digests are expected to differ (distinct sequences).
 
 **KV caliber**: seeded decode residency (E1a27
 deterministic-seeded-KV-not-real-prefix) at ``--start-position`` (default
@@ -73,6 +86,11 @@ import torch
 import torch.distributed as dist
 
 from dsv4_direct.checkpoint import inspect_stage_checkpoint
+from dsv4_direct.dp_caliber import (
+    dp_row_slice,
+    dp_slice_ratio4_oracle_state,
+    oracle_state_to_device,
+)
 from dsv4_direct.hc_boundary_backend import resolve_hc_boundary_backend
 from dsv4_direct.head_stage import (
     EmbedHeadMaterial,
@@ -331,8 +349,11 @@ def run_placement_check(*, stage: int, world: int) -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------
-# seeding (E0qf layer-type seeders; replication caliber: identical across
-# TP ranks and lanes, keyed by layer only)
+# seeding (E0qf layer-type seeders, keyed by layer only).  Replicated
+# caliber: the payload batch is local_batch and identical across TP ranks
+# and lanes.  DP caliber: the payload is generated at the *global* batch and
+# each rank keeps its own rows, so rank r's sequences are byte-identical to
+# rows [r*bl, (r+1)*bl) of a replicated run at local_batch = 4*bl.
 
 
 def build_seed_payload(
@@ -342,41 +363,67 @@ def build_seed_payload(
     local_batch: int,
     start_position: int,
     device: torch.device,
+    dp_tp_rank: int | None = None,
 ) -> dict[str, Any]:
     layer_seed = (seed * 9_176_501 + material.layer_id * 15_485_863) & ((1 << 62) - 1)
+    seed_batch = (
+        local_batch if dp_tp_rank is None else local_batch * EXPECTED_TP_SIZE
+    )
+    # DP: generate at the global batch on the **CPU** (the generator lives
+    # there anyway, so values are bitwise identical), slice this rank's
+    # rows, and move only the slice -- the global ratio-4 oracle's qdq
+    # temporaries at B_global do not fit next to the resident weights.
+    build_device = torch.device("cpu") if dp_tp_rank is not None else device
+
+    def rows(value: torch.Tensor) -> torch.Tensor:
+        if dp_tp_rank is None:
+            return value
+        return dp_row_slice(value, dp_tp_rank, local_batch).to(device)
+
     if material.kind == "window":
         return {
-            "raw": deterministic_tensor(
-                seed=layer_seed,
-                shape=(local_batch, 128, 512),
-                device=device,
-                scale=0.03,
+            "raw": rows(
+                deterministic_tensor(
+                    seed=layer_seed,
+                    shape=(seed_batch, 128, 512),
+                    device=build_device,
+                    scale=0.03,
+                )
             )
         }
     if material.kind == "ratio128":
         return {
-            "raw": deterministic_tensor(
-                seed=layer_seed,
-                shape=(local_batch, 128, 512),
-                device=device,
-                scale=0.03,
+            "raw": rows(
+                deterministic_tensor(
+                    seed=layer_seed,
+                    shape=(seed_batch, 128, 512),
+                    device=build_device,
+                    scale=0.03,
+                )
             ),
-            "compressed": deterministic_tensor(
-                seed=layer_seed + 1,
-                shape=(local_batch, start_position // 128, 512),
-                device=device,
-                scale=0.025,
+            "compressed": rows(
+                deterministic_tensor(
+                    seed=layer_seed + 1,
+                    shape=(seed_batch, start_position // 128, 512),
+                    device=build_device,
+                    scale=0.025,
+                )
             ),
         }
     oracle_state = seed_nonzero_ratio4_state(
         material.attention_config,
-        batch_size=local_batch,
+        batch_size=seed_batch,
         start_pos=start_position,
-        main_ape=material.prepared.compressor_ape,
-        index_ape=material.prepared.index_compressor_ape,
+        main_ape=material.prepared.compressor_ape.to(build_device),
+        index_ape=material.prepared.index_compressor_ape.to(build_device),
         seed=layer_seed,
-        device=device,
+        device=build_device,
     )
+    if dp_tp_rank is not None:
+        oracle_state = oracle_state_to_device(
+            dp_slice_ratio4_oracle_state(oracle_state, dp_tp_rank, local_batch),
+            device,
+        )
     return {"oracle": oracle_state}
 
 
@@ -548,6 +595,17 @@ def main() -> int:
         "--check-mode", type=str, default="off", choices=("off", "bitwise")
     )
     parser.add_argument(
+        "--b-semantics",
+        type=str,
+        default="replicated",
+        choices=("replicated", "dp"),
+        help=(
+            "replicated: same B sequences on all 4 TP ranks (original E1F). "
+            "dp: true DP-attention split, rank r serves its own local_batch "
+            "sequences of B_global = 4*local_batch (E0dpf-gated)."
+        ),
+    )
+    parser.add_argument(
         "--hc-backend", type=str, default="fused", choices=("fused", "eager", "default")
     )
     parser.add_argument("--progress-every", type=int, default=256)
@@ -565,6 +623,9 @@ def main() -> int:
     torch.set_float32_matmul_precision("highest")
 
     local_batch = int(args.local_batch)
+    dp = args.b_semantics == "dp"
+    # distinct sequences served by the whole pipeline per step
+    distinct_batch = local_batch * EXPECTED_TP_SIZE if dp else local_batch
     start_position = int(args.start_position)
     settle_steps = int(args.settle_steps)
     rounds = int(args.rounds)
@@ -590,13 +651,23 @@ def main() -> int:
         "measurement_class": "closed_loop_decode_throughput",
         "caliber": {
             "b_semantics": (
-                "full replication: identical B sequences on all 4 TP ranks per "
-                "stage; bl per GPU = B; distinct global batch = B; MoE runs 4B "
-                "gathered rows (4 identical copies); NOT comparable with C1F "
+                "dp: true DP-attention sequence split; TP rank r serves its own "
+                f"{local_batch} sequences (global rows [r*bl,(r+1)*bl) of "
+                f"B_global={distinct_batch}); full 64 heads and bl KV per GPU; "
+                "MoE all_gathers 4 distinct row blocks and reduce_scatters each "
+                "rank's own rows; throughput = B_global / step_wall (measured, "
+                "no conversion)"
+                if dp
+                else "full replication: identical B sequences on all 4 TP ranks "
+                "per stage; bl per GPU = B; distinct global batch = B; MoE runs "
+                "4B gathered rows (4 identical copies); NOT comparable with C1F "
                 "or DP-attention numbers"
             ),
             "dp_equivalent_note": (
-                "per-rank compute at replicated bl=B equals a DP-attention "
+                "n/a in dp semantics: throughput is directly measured at "
+                "B_global; no model-derived conversion is emitted"
+                if dp
+                else "per-rank compute at replicated bl=B equals a DP-attention "
                 "deployment at global batch 4B; the dp_equivalent_tok_s field "
                 "is 4x the measured replicated throughput (model-derived)"
             ),
@@ -632,6 +703,8 @@ def main() -> int:
         "torch": torch.__version__,
         "seed": args.seed,
         "local_batch": local_batch,
+        "b_semantics": args.b_semantics,
+        "global_batch": distinct_batch,
         "start_position": start_position,
         "stop_position": stop_position,
         "max_seq_len": max_seq_len,
@@ -798,6 +871,7 @@ def main() -> int:
                     local_batch=local_batch,
                     start_position=start_position,
                     device=device,
+                    dp_tp_rank=(tp_rank if dp else None),
                 )
                 for material in stage_material.materials
             }
@@ -864,9 +938,11 @@ def main() -> int:
         def warm_inputs(position: int) -> tuple[torch.Tensor, torch.Tensor]:
             residual = deterministic_tensor(
                 seed=(args.seed * 1_000_003 + position * 7_919) & ((1 << 62) - 1),
-                shape=(local_batch, 1, HC_MULT, HIDDEN),
+                shape=(distinct_batch, 1, HC_MULT, HIDDEN),
                 device=device,
             )
+            if dp:
+                residual = dp_row_slice(residual, tp_rank, local_batch)
             mixed = (args.seed * 2654435761 + position * 7919) & ((1 << 63) - 1)
             ids = torch.full(
                 (local_batch, 1),
@@ -964,9 +1040,11 @@ def main() -> int:
         if stage == 0:
             generator = torch.Generator(device="cpu").manual_seed(args.seed + 77)
             initial = torch.randint(
-                0, EXPECTED_VOCAB, (local_batch, 1), generator=generator
-            )
-            token_buffer.copy_(initial.to(device))
+                0, EXPECTED_VOCAB, (distinct_batch, 1), generator=generator
+            ).to(device)
+            if dp:
+                initial = dp_row_slice(initial, tp_rank, local_batch)
+            token_buffer.copy_(initial)
             result["initial_tokens_first8"] = [
                 int(v) for v in token_buffer.view(-1)[:8].cpu().tolist()
             ]
@@ -1211,6 +1289,9 @@ def main() -> int:
         digests: list[Any] = [None] * EXPECTED_TP_SIZE
         dist.all_gather_object(digests, digest, group=topo["tp_group"])
         settle_record["output_lanes_bitwise"] = len(set(digests)) == 1
+        # dp semantics: lanes hold distinct sequences, so this is expected
+        # False and stays a diagnostic, never a gate.
+        settle_record["output_lanes_bitwise_expected"] = not dp
         result["settle"] = settle_record
         result["diagnostic_seconds"]["settle"] = time.perf_counter() - phase_started
         if rank == 0:
@@ -1285,13 +1366,15 @@ def main() -> int:
                     for key, values in timing.items()
                     if values
                 },
-                "throughput_tok_s_mean": local_batch
+                "throughput_tok_s_mean": distinct_batch
                 / (statistics.fmean(step_walls) / 1e3),
-                "throughput_tok_s_p50": local_batch
+                "throughput_tok_s_p50": distinct_batch
                 / (sorted(step_walls)[len(step_walls) // 2] / 1e3),
-                "dp_equivalent_tok_s_mean": 4
-                * local_batch
-                / (statistics.fmean(step_walls) / 1e3),
+                "dp_equivalent_tok_s_mean": (
+                    None
+                    if dp
+                    else 4 * local_batch / (statistics.fmean(step_walls) / 1e3)
+                ),
                 "output_lanes_bitwise": len(set(digests)) == 1,
                 "logits_finite": finite,
                 "tokens_first8": tokens_first8,
@@ -1305,7 +1388,8 @@ def main() -> int:
                     f"[E1F] stage {stage} round {round_index}: step_wall "
                     f"p50 {summary.get('p50_ms', 0):.2f} ms p95 "
                     f"{summary.get('p95_ms', 0):.2f} ms -> "
-                    f"{record['throughput_tok_s_p50']:.1f} tok/s (replicated B)",
+                    f"{record['throughput_tok_s_p50']:.1f} tok/s "
+                    f"({'DP B_global=' + str(distinct_batch) if dp else 'replicated B'})",
                     flush=True,
                 )
             memory_snapshot(f"after_round_{round_index}")

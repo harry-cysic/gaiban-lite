@@ -1,0 +1,3554 @@
+{
+  "accepted": true,
+  "experiment": "E0dpf-dp-attention-caliber-gate",
+  "ranks": [
+    {
+      "accepted": true,
+      "caliber": {
+        "dp_lanes": "DP split: rank r serves global rows [r*2, (r+1)*2) of the same sequences, full 64 heads, num_local_sequences=2; MoE collectives unchanged (in-package all_gather -> itp partial -> reduce_scatter)",
+        "hc_backend": "eager (E0sf frame); fused-vs-fused DP graph parity is re-checked at full config by the E1F dp settle gate",
+        "isolated_limits": {
+          "after_attention": [
+            0.001,
+            0.001
+          ],
+          "attention_branch": [
+            0.015625,
+            0.02
+          ],
+          "attention_comb": [
+            1e-06,
+            1e-06
+          ],
+          "attention_hidden": [
+            0.001,
+            0.001
+          ],
+          "attention_post": [
+            1e-06,
+            1e-06
+          ],
+          "block_output": [
+            0.0625,
+            0.02
+          ],
+          "ffn_hidden": [
+            0.001,
+            0.001
+          ],
+          "moe_output": [
+            0.0625,
+            0.02
+          ]
+        },
+        "rep_lane": "full replication: 8 identical sequences on every rank (E1F B semantics), num_local_sequences=8",
+        "schedule": "[8192, 8324) all three families",
+        "trajectory_soft_rms_rel_limit": 0.75
+      },
+      "checkpoint_id": "f8ae78fd4ac3ff86caef651581a560aded8d56083cedb86a376fccaa3c82cb88",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.34195128199644387,
+        "isolated": 0.11418361682444811,
+        "load": 10.261330919107422,
+        "process": 50.87609537993558,
+        "steps": 13.611451113130897,
+        "warmup": 25.628927395911887
+      },
+      "dp_graph_vs_eager": {
+        "accepted": true,
+        "bitwise_all": true,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "final_state_digests_equal": true,
+        "judgment": "bitwise per step (E0sf part-b class, DP shapes)",
+        "mismatched_positions": []
+      },
+      "dp_local_batch": 2,
+      "dp_vs_rep": {
+        "accepted": true,
+        "bitwise_all": false,
+        "judgment": "(g3) diagnostic trajectory: per-layer bf16 MoE reduction-order noise compounds over 6 layers x 132 KV-feedback steps (near-tie router flips), same class as the replicated caliber's own cross-lane divergence; soft gate rms_rel <= 0.75 and finite",
+        "max_abs": 0.349609375,
+        "max_rms_rel": 0.47746500775945316,
+        "mean_rms_rel": 0.1671254473652923,
+        "mismatched_count": 132,
+        "mismatched_positions": [
+          8192,
+          8193,
+          8194,
+          8195,
+          8196,
+          8197,
+          8198,
+          8199,
+          8200,
+          8201,
+          8202,
+          8203,
+          8204,
+          8205,
+          8206,
+          8207
+        ],
+        "mode": "numeric",
+        "rep_cross_lane_baseline": {
+          "max_rms_rel": 0.0,
+          "mean_rms_rel": 0.0,
+          "note": "replicated rank r vs rank 0 on identical sequences (zero on rank 0 by definition)"
+        },
+        "soft_gate_pass": true
+      },
+      "errors": [],
+      "experiment": "E0dpf-dp-attention-caliber-gate",
+      "family_counts": {
+        "normal": 99,
+        "ratio4_boundary": 32,
+        "ratio4_ratio128_boundary": 1
+      },
+      "final_state_slices": {
+        "all_bitwise": false,
+        "layers": "see per-rank artifacts",
+        "max_abs": 1.375
+      },
+      "global_batch": 8,
+      "host": "titan064",
+      "isolated": {
+        "accepted": true,
+        "judgment": "aligned-input per-layer isolation at position 8192: bitwise reported per sub-stage; every sub-stage bounded by the fp reduction-order limits in ISOLATED_LIMITS (kernel selection differs with the M dimension between the two calibers; the residue class is fp LSB, not semantic)",
+        "layers": {
+          "0": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.03426245227456093,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.37327712774276733,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.4645889699459076,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.030151359736919403,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.07981062680482864,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.06655799597501755,
+              "rms_abs": 0.00021918250422459096,
+              "rms_rel": 0.003293105524193679
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.23283781111240387,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.09020284563302994,
+              "rms_abs": 0.00032311066752299666,
+              "rms_rel": 0.003582045170032662
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "1": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06195490434765816,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.2310234010219574,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.46848663687705994,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.039715059101581573,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.039864636957645416,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.06340853124856949,
+              "rms_abs": 0.00014164415188133717,
+              "rms_rel": 0.0022338342978813707
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.2565595805644989,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.0813494473695755,
+              "rms_abs": 0.00034148883423767984,
+              "rms_rel": 0.004197801525144667
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "2": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06114893779158592,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0009765625,
+              "reference_rms": 0.3398171663284302,
+              "rms_abs": 2.6265994165441953e-05,
+              "rms_rel": 7.729448882537061e-05
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.4288471043109894,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.05184938386082649,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.04057076573371887,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.06306270509958267,
+              "rms_abs": 0.00013992420281283557,
+              "rms_rel": 0.0022188106677612464
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.3179274797439575,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.11814001947641373,
+              "rms_abs": 0.00047530801384709775,
+              "rms_rel": 0.004023259992283914
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": false,
+            "state_rows_max_abs": 3.5762786865234375e-07,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "3": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06117124482989311,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.044113919138908386,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 3.725290298461914e-09,
+              "reference_rms": 0.48378607630729675,
+              "rms_abs": 7.614475716621882e-10,
+              "rms_rel": 1.5739344494456332e-09
+            },
+            "attention_hidden": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0001220703125,
+              "reference_rms": 0.045478999614715576,
+              "rms_abs": 1.3486991292666062e-06,
+              "rms_rel": 2.9655426475788386e-05
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 1.0244548320770264e-08,
+              "reference_rms": 0.06667293608188629,
+              "rms_abs": 3.728926500912166e-09,
+              "rms_rel": 5.592863791587606e-08
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0029296875,
+              "reference_rms": 0.06742245703935623,
+              "rms_abs": 0.00021411836496554315,
+              "rms_rel": 0.003175772203622848
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.2657029330730438,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.09326548129320145,
+              "rms_abs": 0.00043341697892174125,
+              "rms_rel": 0.004647131745980011
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "4": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06522833555936813,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0006103515625,
+              "reference_rms": 0.016650037840008736,
+              "rms_abs": 0.00010866002412512898,
+              "rms_rel": 0.006526112743361307
+            },
+            "attention_comb": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 7.450580596923828e-09,
+              "reference_rms": 0.48226597905158997,
+              "rms_abs": 1.8327706019505285e-09,
+              "rms_rel": 3.800331521528433e-09
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06404934078454971,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 9.313225746154785e-10,
+              "reference_rms": 0.10515395551919937,
+              "rms_abs": 3.29272248356105e-10,
+              "rms_rel": 3.1313348768509747e-09
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.06662897765636444,
+              "rms_abs": 0.0001767165813362226,
+              "rms_rel": 0.0026522481291492922
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.24815349280834198,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00244140625,
+              "reference_rms": 0.08333918452262878,
+              "rms_abs": 0.0003731965261977166,
+              "rms_rel": 0.004478043891782789
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": false,
+            "state_rows_max_abs": 1.0728836059570312e-06,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "5": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.0647781565785408,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08794298768043518,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.47316795587539673,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.030137399211525917,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06427247822284698,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.07208240032196045,
+              "rms_abs": 0.00017527327872812748,
+              "rms_rel": 0.0024315682877548285
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.2770736813545227,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.0855993777513504,
+              "rms_abs": 0.00036900665145367384,
+              "rms_rel": 0.004310856704187344
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          }
+        },
+        "limits": {
+          "after_attention": [
+            0.001,
+            0.001
+          ],
+          "attention_branch": [
+            0.015625,
+            0.02
+          ],
+          "attention_comb": [
+            1e-06,
+            1e-06
+          ],
+          "attention_hidden": [
+            0.001,
+            0.001
+          ],
+          "attention_post": [
+            1e-06,
+            1e-06
+          ],
+          "block_output": [
+            0.0625,
+            0.02
+          ],
+          "ffn_hidden": [
+            0.001,
+            0.001
+          ],
+          "moe_output": [
+            0.0625,
+            0.02
+          ]
+        },
+        "state_max_abs_limit": 0.01
+      },
+      "layer_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "local_rank": 0,
+      "measurement_class": "semantic_correctness_gate",
+      "memory_after_build": {
+        "free_bytes": 16592601088,
+        "total_bytes": 25252724736
+      },
+      "memory_at_end": {
+        "free_bytes": 16607281152,
+        "total_bytes": 25252724736
+      },
+      "rank": 0,
+      "schema_version": 1,
+      "seed": 20260720,
+      "steps": "see per-rank artifacts",
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3364,
+        "global_rows": 8,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "dp": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        },
+        "dp_graph": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        },
+        "rep": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        }
+      },
+      "torch": "2.11.0+cu130",
+      "world": 4
+    },
+    {
+      "accepted": true,
+      "caliber": {
+        "dp_lanes": "DP split: rank r serves global rows [r*2, (r+1)*2) of the same sequences, full 64 heads, num_local_sequences=2; MoE collectives unchanged (in-package all_gather -> itp partial -> reduce_scatter)",
+        "hc_backend": "eager (E0sf frame); fused-vs-fused DP graph parity is re-checked at full config by the E1F dp settle gate",
+        "isolated_limits": {
+          "after_attention": [
+            0.001,
+            0.001
+          ],
+          "attention_branch": [
+            0.015625,
+            0.02
+          ],
+          "attention_comb": [
+            1e-06,
+            1e-06
+          ],
+          "attention_hidden": [
+            0.001,
+            0.001
+          ],
+          "attention_post": [
+            1e-06,
+            1e-06
+          ],
+          "block_output": [
+            0.0625,
+            0.02
+          ],
+          "ffn_hidden": [
+            0.001,
+            0.001
+          ],
+          "moe_output": [
+            0.0625,
+            0.02
+          ]
+        },
+        "rep_lane": "full replication: 8 identical sequences on every rank (E1F B semantics), num_local_sequences=8",
+        "schedule": "[8192, 8324) all three families",
+        "trajectory_soft_rms_rel_limit": 0.75
+      },
+      "checkpoint_id": "f8ae78fd4ac3ff86caef651581a560aded8d56083cedb86a376fccaa3c82cb88",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.3420211349148303,
+        "isolated": 0.11419939692132175,
+        "load": 10.230599145172164,
+        "process": 50.87636174215004,
+        "steps": 13.611970419995487,
+        "warmup": 25.628944789990783
+      },
+      "dp_graph_vs_eager": {
+        "accepted": true,
+        "bitwise_all": true,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "final_state_digests_equal": true,
+        "judgment": "bitwise per step (E0sf part-b class, DP shapes)",
+        "mismatched_positions": []
+      },
+      "dp_local_batch": 2,
+      "dp_vs_rep": {
+        "accepted": true,
+        "bitwise_all": false,
+        "judgment": "(g3) diagnostic trajectory: per-layer bf16 MoE reduction-order noise compounds over 6 layers x 132 KV-feedback steps (near-tie router flips), same class as the replicated caliber's own cross-lane divergence; soft gate rms_rel <= 0.75 and finite",
+        "max_abs": 0.67138671875,
+        "max_rms_rel": 0.47545883117693244,
+        "mean_rms_rel": 0.13242821075715297,
+        "mismatched_count": 132,
+        "mismatched_positions": [
+          8192,
+          8193,
+          8194,
+          8195,
+          8196,
+          8197,
+          8198,
+          8199,
+          8200,
+          8201,
+          8202,
+          8203,
+          8204,
+          8205,
+          8206,
+          8207
+        ],
+        "mode": "numeric",
+        "rep_cross_lane_baseline": {
+          "max_rms_rel": 0.3340622019454199,
+          "mean_rms_rel": 0.1436730212293044,
+          "note": "replicated rank r vs rank 0 on identical sequences (zero on rank 0 by definition)"
+        },
+        "soft_gate_pass": true
+      },
+      "errors": [],
+      "experiment": "E0dpf-dp-attention-caliber-gate",
+      "family_counts": {
+        "normal": 99,
+        "ratio4_boundary": 32,
+        "ratio4_ratio128_boundary": 1
+      },
+      "final_state_slices": {
+        "all_bitwise": false,
+        "layers": "see per-rank artifacts",
+        "max_abs": 1.40625
+      },
+      "global_batch": 8,
+      "host": "titan064",
+      "isolated": {
+        "accepted": true,
+        "judgment": "aligned-input per-layer isolation at position 8192: bitwise reported per sub-stage; every sub-stage bounded by the fp reduction-order limits in ISOLATED_LIMITS (kernel selection differs with the M dimension between the two calibers; the residue class is fp LSB, not semantic)",
+        "layers": {
+          "0": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.036108825355768204,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.39404603838920593,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.46377506852149963,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.0300750732421875,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08096996694803238,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.08223629742860794,
+              "rms_abs": 0.00027660169871523976,
+              "rms_rel": 0.0033634989337326
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.23612093925476074,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.09391413629055023,
+              "rms_abs": 0.0003400735731702298,
+              "rms_rel": 0.0036211116515847516
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "1": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.07838862389326096,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.2656819224357605,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.4738684296607971,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.03971776366233826,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.0371299609541893,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.07716166973114014,
+              "rms_abs": 0.00015283552056644112,
+              "rms_rel": 0.0019807181609596673
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.256195992231369,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0029296875,
+              "reference_rms": 0.07255762815475464,
+              "rms_abs": 0.00030285853426903486,
+              "rms_rel": 0.0041740412685911206
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "2": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.07481163740158081,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.40244388580322266,
+              "rms_abs": 2.86856393358903e-05,
+              "rms_rel": 7.127860640406478e-05
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.45466649532318115,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00048828125,
+              "reference_rms": 0.05298676714301109,
+              "rms_abs": 6.040982952981722e-06,
+              "rms_rel": 0.00011400927587593956
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.05324931442737579,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.002197265625,
+              "reference_rms": 0.08194982260465622,
+              "rms_abs": 0.00022198782244231552,
+              "rms_rel": 0.0027088261497920877
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.31796249747276306,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.12913772463798523,
+              "rms_abs": 0.0005496741505339742,
+              "rms_rel": 0.004256495552131559
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": false,
+            "state_rows_max_abs": 2.384185791015625e-07,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "3": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08025547116994858,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06235029920935631,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.48637399077415466,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.04531899467110634,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06644322723150253,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.08366033434867859,
+              "rms_abs": 0.0002416516945231706,
+              "rms_rel": 0.002888485880489282
+            },
+            "ffn_hidden": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 7.62939453125e-06,
+              "reference_rms": 0.2659308612346649,
+              "rms_abs": 8.429369557916289e-08,
+              "rms_rel": 3.1697598085383457e-07
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.09598732739686966,
+              "rms_abs": 0.00043846157495863736,
+              "rms_rel": 0.004567911065444838
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "4": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.0812358409166336,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0009765625,
+              "reference_rms": 0.05412575602531433,
+              "rms_abs": 0.00014080623805057257,
+              "rms_rel": 0.0026014645963507326
+            },
+            "attention_comb": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 9.313225746154785e-10,
+              "reference_rms": 0.4694446921348572,
+              "rms_abs": 2.338975679805344e-10,
+              "rms_rel": 4.982430771915997e-10
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06142451614141464,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 2.9802322387695312e-08,
+              "reference_rms": 0.10608811676502228,
+              "rms_abs": 1.053671194739536e-08,
+              "rms_rel": 9.932037883878585e-08
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.08198827505111694,
+              "rms_abs": 0.00021609297255054116,
+              "rms_rel": 0.0026356570182238183
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.24817581474781036,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.08606355637311935,
+              "rms_abs": 0.0004126356798224151,
+              "rms_rel": 0.004794545998465102
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": false,
+            "state_rows_max_abs": 9.5367431640625e-07,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "5": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08083770424127579,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.2537718415260315,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.48315611481666565,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.03016146644949913,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06416728347539902,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.09250631928443909,
+              "rms_abs": 0.00024640842457301915,
+              "rms_rel": 0.002663692885838002
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.2771693468093872,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0029296875,
+              "reference_rms": 0.09729140996932983,
+              "rms_abs": 0.00041135118226520717,
+              "rms_rel": 0.00422803187244261
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          }
+        },
+        "limits": {
+          "after_attention": [
+            0.001,
+            0.001
+          ],
+          "attention_branch": [
+            0.015625,
+            0.02
+          ],
+          "attention_comb": [
+            1e-06,
+            1e-06
+          ],
+          "attention_hidden": [
+            0.001,
+            0.001
+          ],
+          "attention_post": [
+            1e-06,
+            1e-06
+          ],
+          "block_output": [
+            0.0625,
+            0.02
+          ],
+          "ffn_hidden": [
+            0.001,
+            0.001
+          ],
+          "moe_output": [
+            0.0625,
+            0.02
+          ]
+        },
+        "state_max_abs_limit": 0.01
+      },
+      "layer_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "local_rank": 1,
+      "measurement_class": "semantic_correctness_gate",
+      "memory_after_build": {
+        "free_bytes": 16592601088,
+        "total_bytes": 25252724736
+      },
+      "memory_at_end": {
+        "free_bytes": 16607281152,
+        "total_bytes": 25252724736
+      },
+      "rank": 1,
+      "schema_version": 1,
+      "seed": 20260720,
+      "steps": "see per-rank artifacts",
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3348,
+        "global_rows": 8,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "dp": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        },
+        "dp_graph": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        },
+        "rep": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        }
+      },
+      "torch": "2.11.0+cu130",
+      "world": 4
+    },
+    {
+      "accepted": true,
+      "caliber": {
+        "dp_lanes": "DP split: rank r serves global rows [r*2, (r+1)*2) of the same sequences, full 64 heads, num_local_sequences=2; MoE collectives unchanged (in-package all_gather -> itp partial -> reduce_scatter)",
+        "hc_backend": "eager (E0sf frame); fused-vs-fused DP graph parity is re-checked at full config by the E1F dp settle gate",
+        "isolated_limits": {
+          "after_attention": [
+            0.001,
+            0.001
+          ],
+          "attention_branch": [
+            0.015625,
+            0.02
+          ],
+          "attention_comb": [
+            1e-06,
+            1e-06
+          ],
+          "attention_hidden": [
+            0.001,
+            0.001
+          ],
+          "attention_post": [
+            1e-06,
+            1e-06
+          ],
+          "block_output": [
+            0.0625,
+            0.02
+          ],
+          "ffn_hidden": [
+            0.001,
+            0.001
+          ],
+          "moe_output": [
+            0.0625,
+            0.02
+          ]
+        },
+        "rep_lane": "full replication: 8 identical sequences on every rank (E1F B semantics), num_local_sequences=8",
+        "schedule": "[8192, 8324) all three families",
+        "trajectory_soft_rms_rel_limit": 0.75
+      },
+      "checkpoint_id": "f8ae78fd4ac3ff86caef651581a560aded8d56083cedb86a376fccaa3c82cb88",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.3420142629183829,
+        "isolated": 0.11417420790530741,
+        "load": 10.230628640856594,
+        "process": 50.87634114199318,
+        "steps": 13.611447926145047,
+        "warmup": 25.628972682869062
+      },
+      "dp_graph_vs_eager": {
+        "accepted": true,
+        "bitwise_all": true,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "final_state_digests_equal": true,
+        "judgment": "bitwise per step (E0sf part-b class, DP shapes)",
+        "mismatched_positions": []
+      },
+      "dp_local_batch": 2,
+      "dp_vs_rep": {
+        "accepted": true,
+        "bitwise_all": false,
+        "judgment": "(g3) diagnostic trajectory: per-layer bf16 MoE reduction-order noise compounds over 6 layers x 132 KV-feedback steps (near-tie router flips), same class as the replicated caliber's own cross-lane divergence; soft gate rms_rel <= 0.75 and finite",
+        "max_abs": 0.4052734375,
+        "max_rms_rel": 0.4789199133617078,
+        "mean_rms_rel": 0.17219264193813866,
+        "mismatched_count": 132,
+        "mismatched_positions": [
+          8192,
+          8193,
+          8194,
+          8195,
+          8196,
+          8197,
+          8198,
+          8199,
+          8200,
+          8201,
+          8202,
+          8203,
+          8204,
+          8205,
+          8206,
+          8207
+        ],
+        "mode": "numeric",
+        "rep_cross_lane_baseline": {
+          "max_rms_rel": 0.3228620638854622,
+          "mean_rms_rel": 0.1492796772263747,
+          "note": "replicated rank r vs rank 0 on identical sequences (zero on rank 0 by definition)"
+        },
+        "soft_gate_pass": true
+      },
+      "errors": [],
+      "experiment": "E0dpf-dp-attention-caliber-gate",
+      "family_counts": {
+        "normal": 99,
+        "ratio4_boundary": 32,
+        "ratio4_ratio128_boundary": 1
+      },
+      "final_state_slices": {
+        "all_bitwise": false,
+        "layers": "see per-rank artifacts",
+        "max_abs": 1.40625
+      },
+      "global_batch": 8,
+      "host": "titan064",
+      "isolated": {
+        "accepted": true,
+        "judgment": "aligned-input per-layer isolation at position 8192: bitwise reported per sub-stage; every sub-stage bounded by the fp reduction-order limits in ISOLATED_LIMITS (kernel selection differs with the M dimension between the two calibers; the residue class is fp LSB, not semantic)",
+        "layers": {
+          "0": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.03176771476864815,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.3352840542793274,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.46235227584838867,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.03018387220799923,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.07973659038543701,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.07188168913125992,
+              "rms_abs": 0.00022812216775491834,
+              "rms_rel": 0.003173578285540212
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.23683547973632812,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.10110336542129517,
+              "rms_abs": 0.0003289605665486306,
+              "rms_rel": 0.003253705405135232
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "1": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06659890711307526,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.29377228021621704,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.4507589638233185,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.03964489698410034,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.04088914021849632,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.0739004835486412,
+              "rms_abs": 0.0001739773288136348,
+              "rms_rel": 0.002354210966686343
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.25629812479019165,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0029296875,
+              "reference_rms": 0.09698612987995148,
+              "rms_abs": 0.00038120103999972343,
+              "rms_rel": 0.003930469650367228
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "2": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.06869827955961227,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0078125,
+              "reference_rms": 0.3749520778656006,
+              "rms_abs": 0.0006596359889954329,
+              "rms_rel": 0.0017592541232212496
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.41833674907684326,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.05093231424689293,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.053453002125024796,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.08083556592464447,
+              "rms_abs": 0.00020899732771795243,
+              "rms_rel": 0.00258546254148553
+            },
+            "ffn_hidden": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0001220703125,
+              "reference_rms": 0.318001389503479,
+              "rms_abs": 1.3486991292666062e-06,
+              "rms_rel": 4.241173698556594e-06
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0078125,
+              "reference_rms": 0.1723889857530594,
+              "rms_abs": 0.0006381782004609704,
+              "rms_rel": 0.0037019662113166336
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": false,
+            "state_rows_max_abs": 2.384185791015625e-07,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "3": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.07946303486824036,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.095579132437706,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.48214274644851685,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.04537263885140419,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08562938868999481,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.0833204835653305,
+              "rms_abs": 0.00023893435718491673,
+              "rms_rel": 0.002867654470554908
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.26568177342414856,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0029296875,
+              "reference_rms": 0.0988868847489357,
+              "rms_abs": 0.0004462537181098014,
+              "rms_rel": 0.004512769506722724
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "4": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08054745942354202,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00048828125,
+              "reference_rms": 0.03800290822982788,
+              "rms_abs": 2.6162237190874293e-05,
+              "rms_rel": 0.0006884272391116627
+            },
+            "attention_comb": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 3.725290298461914e-09,
+              "reference_rms": 0.47147414088249207,
+              "rms_abs": 6.803859142756608e-10,
+              "rms_rel": 1.4431033545172457e-09
+            },
+            "attention_hidden": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 4.76837158203125e-07,
+              "reference_rms": 0.07469064742326736,
+              "rms_abs": 5.430496941016827e-09,
+              "rms_rel": 7.270651853159781e-08
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 6.402842700481415e-10,
+              "reference_rms": 0.12140225619077682,
+              "rms_abs": 2.2637466901009873e-10,
+              "rms_rel": 1.864666078811284e-09
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.0830131396651268,
+              "rms_abs": 0.0002552549703978002,
+              "rms_rel": 0.0030748743081817314
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.24775640666484833,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.08722695708274841,
+              "rms_abs": 0.00042749368003569543,
+              "rms_rel": 0.004900935379760534
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": false,
+            "state_rows_max_abs": 1.430511474609375e-06,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "5": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08126084506511688,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08664905279874802,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.481015145778656,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.030132366344332695,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08376273512840271,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.0912923738360405,
+              "rms_abs": 0.0002189735823776573,
+              "rms_rel": 0.00239859665354885
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.2770404815673828,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0029296875,
+              "reference_rms": 0.08948388695716858,
+              "rms_abs": 0.0003803695144597441,
+              "rms_rel": 0.004250703980279799
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          }
+        },
+        "limits": {
+          "after_attention": [
+            0.001,
+            0.001
+          ],
+          "attention_branch": [
+            0.015625,
+            0.02
+          ],
+          "attention_comb": [
+            1e-06,
+            1e-06
+          ],
+          "attention_hidden": [
+            0.001,
+            0.001
+          ],
+          "attention_post": [
+            1e-06,
+            1e-06
+          ],
+          "block_output": [
+            0.0625,
+            0.02
+          ],
+          "ffn_hidden": [
+            0.001,
+            0.001
+          ],
+          "moe_output": [
+            0.0625,
+            0.02
+          ]
+        },
+        "state_max_abs_limit": 0.01
+      },
+      "layer_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "local_rank": 2,
+      "measurement_class": "semantic_correctness_gate",
+      "memory_after_build": {
+        "free_bytes": 16592601088,
+        "total_bytes": 25252724736
+      },
+      "memory_at_end": {
+        "free_bytes": 16607281152,
+        "total_bytes": 25252724736
+      },
+      "rank": 2,
+      "schema_version": 1,
+      "seed": 20260720,
+      "steps": "see per-rank artifacts",
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3348,
+        "global_rows": 8,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "dp": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        },
+        "dp_graph": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        },
+        "rep": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        }
+      },
+      "torch": "2.11.0+cu130",
+      "world": 4
+    },
+    {
+      "accepted": true,
+      "caliber": {
+        "dp_lanes": "DP split: rank r serves global rows [r*2, (r+1)*2) of the same sequences, full 64 heads, num_local_sequences=2; MoE collectives unchanged (in-package all_gather -> itp partial -> reduce_scatter)",
+        "hc_backend": "eager (E0sf frame); fused-vs-fused DP graph parity is re-checked at full config by the E1F dp settle gate",
+        "isolated_limits": {
+          "after_attention": [
+            0.001,
+            0.001
+          ],
+          "attention_branch": [
+            0.015625,
+            0.02
+          ],
+          "attention_comb": [
+            1e-06,
+            1e-06
+          ],
+          "attention_hidden": [
+            0.001,
+            0.001
+          ],
+          "attention_post": [
+            1e-06,
+            1e-06
+          ],
+          "block_output": [
+            0.0625,
+            0.02
+          ],
+          "ffn_hidden": [
+            0.001,
+            0.001
+          ],
+          "moe_output": [
+            0.0625,
+            0.02
+          ]
+        },
+        "rep_lane": "full replication: 8 identical sequences on every rank (E1F B semantics), num_local_sequences=8",
+        "schedule": "[8192, 8324) all three families",
+        "trajectory_soft_rms_rel_limit": 0.75
+      },
+      "checkpoint_id": "f8ae78fd4ac3ff86caef651581a560aded8d56083cedb86a376fccaa3c82cb88",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.34204979077912867,
+        "isolated": 0.11411719000898302,
+        "load": 10.230100457090884,
+        "process": 50.87649842398241,
+        "steps": 13.611348826205358,
+        "warmup": 25.62899381411262
+      },
+      "dp_graph_vs_eager": {
+        "accepted": true,
+        "bitwise_all": true,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "final_state_digests_equal": true,
+        "judgment": "bitwise per step (E0sf part-b class, DP shapes)",
+        "mismatched_positions": []
+      },
+      "dp_local_batch": 2,
+      "dp_vs_rep": {
+        "accepted": true,
+        "bitwise_all": false,
+        "judgment": "(g3) diagnostic trajectory: per-layer bf16 MoE reduction-order noise compounds over 6 layers x 132 KV-feedback steps (near-tie router flips), same class as the replicated caliber's own cross-lane divergence; soft gate rms_rel <= 0.75 and finite",
+        "max_abs": 0.4140625,
+        "max_rms_rel": 0.4824250256906007,
+        "mean_rms_rel": 0.14592091919478636,
+        "mismatched_count": 132,
+        "mismatched_positions": [
+          8192,
+          8193,
+          8194,
+          8195,
+          8196,
+          8197,
+          8198,
+          8199,
+          8200,
+          8201,
+          8202,
+          8203,
+          8204,
+          8205,
+          8206,
+          8207
+        ],
+        "mode": "numeric",
+        "rep_cross_lane_baseline": {
+          "max_rms_rel": 0.2934544942920819,
+          "mean_rms_rel": 0.14515779511488844,
+          "note": "replicated rank r vs rank 0 on identical sequences (zero on rank 0 by definition)"
+        },
+        "soft_gate_pass": true
+      },
+      "errors": [],
+      "experiment": "E0dpf-dp-attention-caliber-gate",
+      "family_counts": {
+        "normal": 99,
+        "ratio4_boundary": 32,
+        "ratio4_ratio128_boundary": 1
+      },
+      "final_state_slices": {
+        "all_bitwise": false,
+        "layers": "see per-rank artifacts",
+        "max_abs": 1.3125
+      },
+      "global_batch": 8,
+      "host": "titan064",
+      "isolated": {
+        "accepted": true,
+        "judgment": "aligned-input per-layer isolation at position 8192: bitwise reported per sub-stage; every sub-stage bounded by the fp reduction-order limits in ISOLATED_LIMITS (kernel selection differs with the M dimension between the two calibers; the residue class is fp LSB, not semantic)",
+        "layers": {
+          "0": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.03290105611085892,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.35879644751548767,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.4646020829677582,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.030190356075763702,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.07847875356674194,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0078125,
+              "reference_rms": 0.07632565498352051,
+              "rms_abs": 0.0005763493245467544,
+              "rms_rel": 0.007551187404434251
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.23561353981494904,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0078125,
+              "reference_rms": 0.12833252549171448,
+              "rms_abs": 0.0010979982325807214,
+              "rms_rel": 0.008555884241922843
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "1": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.069208525121212,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.6581724882125854,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.4094110131263733,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.039663635194301605,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.03826126828789711,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0078125,
+              "reference_rms": 0.12721510231494904,
+              "rms_abs": 0.0005214969860389829,
+              "rms_rel": 0.0040993323634477144
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.25622478127479553,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0078125,
+              "reference_rms": 0.20459453761577606,
+              "rms_abs": 0.0009005635511130095,
+              "rms_rel": 0.004401698899724525
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "2": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.1244926005601883,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.2197202742099762,
+              "rms_abs": 0.0003220847574993968,
+              "rms_rel": 0.0014658854703212129
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.4808310270309448,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.0623098686337471,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.08099222928285599,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.015625,
+              "reference_rms": 0.14457404613494873,
+              "rms_abs": 0.00032228956115432084,
+              "rms_rel": 0.0022292352588201645
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.31733354926109314,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.0078125,
+              "reference_rms": 0.19220824539661407,
+              "rms_abs": 0.0006003666785545647,
+              "rms_rel": 0.003123521976467409
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": false,
+            "state_rows_max_abs": 7.152557373046875e-07,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "3": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.14822076261043549,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.28442877531051636,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.4838995635509491,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.0453907810151577,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.1458059549331665,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.15025267004966736,
+              "rms_abs": 0.00034460751339793205,
+              "rms_rel": 0.002293520063796663
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.2655092477798462,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.001953125,
+              "reference_rms": 0.09086159616708755,
+              "rms_abs": 0.0004376806609798223,
+              "rms_rel": 0.004817003876697927
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "4": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.14630170166492462,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.000244140625,
+              "reference_rms": 0.05153603106737137,
+              "rms_abs": 5.513467840501107e-06,
+              "rms_rel": 0.00010698277935476893
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.460421621799469,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.068668894469738,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": false,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.17741809785366058,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.1477222591638565,
+              "rms_abs": 0.000319867191137746,
+              "rms_rel": 0.0021653283191596932
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.24782991409301758,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.12286441028118134,
+              "rms_abs": 0.000510905752889812,
+              "rms_rel": 0.004158289220780685
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": false,
+            "state_rows_max_abs": 1.430511474609375e-06,
+            "state_rows_nonfinite_mismatch": false
+          },
+          "5": {
+            "accepted": true,
+            "after_attention": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.14391058683395386,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_branch": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.0830659419298172,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_comb": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.47497275471687317,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.03012961521744728,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "attention_path_bitwise": true,
+            "attention_post": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.11913888156414032,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "block_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00390625,
+              "reference_rms": 0.14597372710704803,
+              "rms_abs": 0.0002374836476519704,
+              "rms_rel": 0.001626893087944618
+            },
+            "ffn_hidden": {
+              "bitwise_exact": true,
+              "finite": true,
+              "max_abs": 0.0,
+              "reference_rms": 0.27629783749580383,
+              "rms_abs": 0.0,
+              "rms_rel": 0.0
+            },
+            "moe_output": {
+              "bitwise_exact": false,
+              "finite": true,
+              "max_abs": 0.00244140625,
+              "reference_rms": 0.08700215816497803,
+              "rms_abs": 0.0003933905391022563,
+              "rms_rel": 0.004521618169014712
+            },
+            "out_of_bounds": [],
+            "state_rows_bitwise_after_step": true,
+            "state_rows_max_abs": 0.0,
+            "state_rows_nonfinite_mismatch": false
+          }
+        },
+        "limits": {
+          "after_attention": [
+            0.001,
+            0.001
+          ],
+          "attention_branch": [
+            0.015625,
+            0.02
+          ],
+          "attention_comb": [
+            1e-06,
+            1e-06
+          ],
+          "attention_hidden": [
+            0.001,
+            0.001
+          ],
+          "attention_post": [
+            1e-06,
+            1e-06
+          ],
+          "block_output": [
+            0.0625,
+            0.02
+          ],
+          "ffn_hidden": [
+            0.001,
+            0.001
+          ],
+          "moe_output": [
+            0.0625,
+            0.02
+          ]
+        },
+        "state_max_abs_limit": 0.01
+      },
+      "layer_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "local_rank": 3,
+      "measurement_class": "semantic_correctness_gate",
+      "memory_after_build": {
+        "free_bytes": 16592601088,
+        "total_bytes": 25252724736
+      },
+      "memory_at_end": {
+        "free_bytes": 16607281152,
+        "total_bytes": 25252724736
+      },
+      "rank": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "steps": "see per-rank artifacts",
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3348,
+        "global_rows": 8,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "dp": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        },
+        "dp_graph": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        },
+        "rep": {
+          "accepted": true,
+          "device_position": 8324,
+          "dispatch_error": 0,
+          "expected_position": 8324,
+          "host_position": 8324,
+          "stop_position": 8324
+        }
+      },
+      "torch": "2.11.0+cu130",
+      "world": 4
+    }
+  ]
+}
