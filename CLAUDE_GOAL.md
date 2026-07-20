@@ -29,6 +29,11 @@ DeepSeek-V4-Flash（284B/13B，FP4+FP8）的高吞吐推理系统，达到
 - **性能归因**：同条件、可重复的 causal A/B。结果必须绑定 source、kernel、checkpoint、
   环境、拓扑和 workload；失败、不完整或无法独立重建的 artifact 不产生性能结论。
   严格区分 roofline/proxy/open-loop 与完整模型 closed-loop E2E，表述不得混用。
+  性能结果**无论多小**都必须把原始输出落盘为 artifact（README 只引用与解读，
+  不充当唯一载体）；测量须独占目标 GPU 并在实验记录中留痕（前后 nvidia-smi 快照）；
+  实验的标题数字被后续实验取代时，回标 superseded 并指向新结论。
+  A/B 中的语义变更臂即使未被采用，引用其性能数字前也须记录数值对照，
+  或明确标注 perf-only。
 - **实验组织**：沿用 gaiban 惯例——每个实验一个 `experiments/<ID>-<name>/` 目录，
   README 记录动机、方法、结论与 artifact 路径；有效进展及时更新根 `README.md` 顶部
   状态段并做范围清晰的 Git commit；大型结果 artifact 不进 Git。机械执行/收集与

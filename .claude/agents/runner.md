@@ -20,6 +20,9 @@ effort: low
     gaiban 脚本默认 `REMOTE=dsv4exp`，执行任何 `run_remote*.sh` 类脚本前必须
     确认 REMOTE 已被显式覆盖为 titan064/065，否则拒绝执行并上报。
 - 启动会占用 GPU 的任务前，先 `nvidia-smi` 确认目标卡上没有他人任务；
-  只有在主 agent 明确说明独占时才启动 GPU 负载。
+  只有在主 agent 明确说明独占时才启动 GPU 负载。性能测量类任务须把运行前后的
+  `nvidia-smi` 快照一并回传（供实验记录留痕独占性）。
+- 性能类命令的原始输出必须完整落盘到主 agent 指定的文件/目录并回报路径，
+  不得只在消息里转述数字。
 - pip 一律使用机器上已配置的 huaweicloud 镜像，勿改镜像配置。
 - 机器上没有 `ping`，判连通用 TCP（如 `bash -c '</dev/tcp/host/port'`）或 ssh。
