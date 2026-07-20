@@ -1,0 +1,98 @@
+W0720 14:30:08.123000 158931 torch/distributed/run.py:851] 
+W0720 14:30:08.123000 158931 torch/distributed/run.py:851] *****************************************
+W0720 14:30:08.123000 158931 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 14:30:08.123000 158931 torch/distributed/run.py:851] *****************************************
+[E1IF] placement {0: ['titan064'], 1: ['titan064'], 2: ['titan065'], 3: ['titan065']}
+[E1IF] layer=0 rank=0 experts=256/256
+[E1IF] stage 0 layer 0 material loaded
+[E1IF] layer=11 rank=0 experts=256/256
+[E1IF] stage 1 layer 11 material loaded
+[E1IF] layer=1 rank=0 experts=256/256
+[E1IF] stage 0 layer 1 material loaded
+[E1IF] layer=12 rank=0 experts=256/256
+[E1IF] stage 1 layer 12 material loaded
+[E1IF] layer=2 rank=0 experts=256/256
+[E1IF] stage 0 layer 2 material loaded
+[E1IF] layer=13 rank=0 experts=256/256
+[E1IF] stage 1 layer 13 material loaded
+[E1IF] layer=3 rank=0 experts=256/256
+[E1IF] stage 0 layer 3 material loaded
+[E1IF] layer=14 rank=0 experts=256/256
+[E1IF] stage 1 layer 14 material loaded
+[E1IF] layer=4 rank=0 experts=256/256
+[E1IF] stage 0 layer 4 material loaded
+[E1IF] layer=15 rank=0 experts=256/256
+[E1IF] stage 1 layer 15 material loaded
+[E1IF] layer=5 rank=0 experts=256/256
+[E1IF] stage 0 layer 5 material loaded
+[E1IF] layer=16 rank=0 experts=256/256
+[E1IF] stage 1 layer 16 material loaded
+[E1IF] layer=6 rank=0 experts=256/256
+[E1IF] stage 0 layer 6 material loaded
+[E1IF] layer=17 rank=0 experts=256/256
+[E1IF] stage 1 layer 17 material loaded
+[E1IF] layer=7 rank=0 experts=256/256
+[E1IF] stage 0 layer 7 material loaded
+[E1IF] layer=18 rank=0 experts=256/256
+[E1IF] stage 1 layer 18 material loaded
+[E1IF] layer=8 rank=0 experts=256/256
+[E1IF] stage 0 layer 8 material loaded
+[E1IF] layer=19 rank=0 experts=256/256
+[E1IF] stage 1 layer 19 material loaded
+[E1IF] layer=9 rank=0 experts=256/256
+[E1IF] stage 0 layer 9 material loaded
+[E1IF] layer=20 rank=0 experts=256/256
+[E1IF] stage 1 layer 20 material loaded
+[E1IF] layer=10 rank=0 experts=256/256
+[E1IF] stage 0 layer 10 material loaded
+[E1IF] layer=21 rank=0 experts=256/256
+[E1IF] stage 1 layer 21 material loaded
+[E1IF] stage 1 loaded (11 layers, free 8.09 GiB, 13s)
+[E1IF] stage 0 loaded (11 layers, free 7.20 GiB, 14s)
+[E1IF] stage 0 lane mb0 built
+[E1IF] stage 0 lane mb1 built
+[E1IF] stage 0 lane mb2 built
+[E1IF] stage 0 lane mb3 built
+[E1IF] stage 1 4 lanes built, free 6.80 GiB
+[E1IF] stage 0 4 lanes built, free 5.96 GiB
+[E1IF] stage 0 mb0 warm done
+[E1IF] stage 0 mb1 warm done
+[E1IF] stage 0 mb2 warm done
+[E1IF] stage 0 mb3 warm done
+[E1IF] stage 0 warmup done (75s, free 6.17 GiB)
+[E1IF] stage 1 warmup done (75s, free 6.97 GiB)
+[E1IF] stage 0 settle captured mb0/normal at position 2048 (0.1s)
+[E1IF] stage 0 settle captured mb1/normal at position 2048 (0.1s)
+[E1IF] stage 0 settle captured mb2/normal at position 2048 (0.1s)
+[E1IF] stage 0 settle captured mb3/normal at position 2048 (0.1s)
+[E1IF] settle cycle 0/132 pos 2048 family normal
+[E1IF] stage 0 settle captured mb0/ratio4_boundary at position 2051 (0.1s)
+[E1IF] stage 0 settle captured mb1/ratio4_boundary at position 2051 (0.1s)
+[E1IF] stage 0 settle captured mb2/ratio4_boundary at position 2051 (0.1s)
+[E1IF] stage 0 settle captured mb3/ratio4_boundary at position 2051 (0.1s)
+[E1IF] settle cycle 64/132 pos 2112 family normal
+[E1IF] stage 0 settle captured mb0/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] stage 0 settle captured mb1/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] stage 0 settle captured mb2/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] stage 0 settle captured mb3/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] settle cycle 128/132 pos 2176 family normal
+[E1IF] settle done (14s)
+[E1IF] round0 cycle 0/300 pos 2180 family normal
+[E1IF] round0 cycle 64/300 pos 2244 family normal
+[E1IF] round0 cycle 128/300 pos 2308 family normal
+[E1IF] round0 cycle 192/300 pos 2372 family normal
+[E1IF] round0 cycle 256/300 pos 2436 family normal
+[E1IF] stage 0 round 0: iter_wall p50 22.22 ms, aggregate 5732 tok/s (wall), 5759 tok/s (iter p50), replay busy 92.1%
+[E1IF] round1 cycle 0/300 pos 2480 family normal
+[E1IF] round1 cycle 64/300 pos 2544 family normal
+[E1IF] round1 cycle 128/300 pos 2608 family normal
+[E1IF] round1 cycle 192/300 pos 2672 family normal
+[E1IF] round1 cycle 256/300 pos 2736 family normal
+[E1IF] stage 0 round 1: iter_wall p50 21.85 ms, aggregate 5831 tok/s (wall), 5858 tok/s (iter p50), replay busy 93.1%
+[E1IF] round2 cycle 0/300 pos 2780 family normal
+[E1IF] round2 cycle 64/300 pos 2844 family normal
+[E1IF] round2 cycle 128/300 pos 2908 family normal
+[E1IF] round2 cycle 192/300 pos 2972 family normal
+[E1IF] round2 cycle 256/300 pos 3036 family normal
+[E1IF] stage 0 round 2: iter_wall p50 21.57 ms, aggregate 5885 tok/s (wall), 5933 tok/s (iter p50), replay busy 93.7%
+[E1IF] overall: PASS
