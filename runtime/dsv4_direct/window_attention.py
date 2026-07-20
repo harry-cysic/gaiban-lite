@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Any, Literal, Mapping, MutableMapping
+from typing import Any, Callable, Literal, Mapping, MutableMapping
 
 import torch
 import torch.nn.functional as F
@@ -234,11 +234,48 @@ class WindowDecodePlan:
     batch_indices: torch.Tensor
 
 
+@dataclass(frozen=True)
+class WindowStatefulDecodePlan:
+    """Cursor-driven fixed-shape workspace for a consecutive decode range.
+
+    Window counterpart of ``attention.Ratio128StatefulDecodePlan``.  A window
+    layer has no compressed rows, so the visible KV at every position
+    ``p >= 128`` is exactly the full 128-slot ring; the workspace is one fixed
+    ``[batch, 1, 128]`` gather rebuilt from the shared device position each
+    step.  There is no boundary variant: the reference decode branch for
+    compress_ratio == 0 is the same ring write at every position
+    (model.py:530), so one plan serves every graph family unchanged.
+    """
+
+    start_position: int
+    stop_position: int
+    batch_size: int
+    hidden_size: int
+    owner_id: int
+    state_id: int
+    position: torch.Tensor
+    window_columns: torch.Tensor
+    gather_indices: torch.Tensor
+    batch_indices: torch.Tensor
+    tensor_pointers: tuple[int, ...]
+
+    @property
+    def resident_bytes(self) -> int:
+        return sum(
+            int(value.numel() * value.element_size())
+            for value in (
+                self.window_columns,
+                self.gather_indices,
+                self.batch_indices,
+            )
+        )
+
+
 def _window_sparse_decode_prevalidated(
     query: torch.Tensor,
     latent_kv: torch.Tensor,
     attn_sink: torch.Tensor,
-    plan: WindowDecodePlan,
+    plan: "WindowDecodePlan | WindowStatefulDecodePlan",
     softmax_scale: float,
 ) -> torch.Tensor:
     """Fixed-index sparse MLA over the full window ring (no padding mask).
@@ -588,6 +625,231 @@ class WindowTorchAttention:
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
         return F.linear(projected.flatten(2), self.weights.wo_b)
 
+    def prepare_stateful_decode_plan(
+        self,
+        *,
+        position: torch.Tensor,
+        start_position: int,
+        stop_position: int,
+    ) -> WindowStatefulDecodePlan:
+        """Allocate one fixed workspace for ``[start_position, stop_position)``.
+
+        Mirrors ``Ratio128TorchAttention.prepare_stateful_decode_plan`` minus
+        every compressor/bucket check: the window layer's visible KV width is
+        the constant 128-row ring, so no position-dependent bucket sizing is
+        needed and every index is valid at every covered position.
+        """
+
+        if (
+            not isinstance(start_position, int)
+            or isinstance(start_position, bool)
+            or not isinstance(stop_position, int)
+            or isinstance(stop_position, bool)
+            or start_position < WINDOW_SIZE
+            or stop_position <= start_position
+            or stop_position > self.config.max_seq_len
+        ):
+            raise ValueError(
+                "stateful window decode range must be a non-empty interval "
+                "within capacity"
+            )
+        if (
+            not isinstance(position, torch.Tensor)
+            or tuple(position.shape) != (1,)
+            or position.dtype != torch.int64
+            or position.device != self.state.device
+            or not position.is_contiguous()
+        ):
+            raise ValueError("stateful position must be contiguous INT64 [1]")
+        if int(position.item()) != start_position:
+            raise ValueError("device position does not match stateful range start")
+        if self.state.next_position != start_position:
+            raise ValueError("window state does not match stateful range start")
+
+        absolute_raw = torch.arange(
+            start_position - WINDOW_SIZE,
+            start_position,
+            dtype=torch.int64,
+            device=self.state.device,
+        )
+        raw_slots = absolute_raw.remainder(WINDOW_SIZE)
+        expected_raw = absolute_raw.unsqueeze(0).expand(
+            self.state.num_local_sequences, -1
+        )
+        if not bool(
+            torch.all(
+                self.state._raw_positions.index_select(1, raw_slots) == expected_raw
+            ).item()
+        ):
+            raise RuntimeError("static window KV raw-ring metadata is inconsistent")
+
+        batch = self.state.num_local_sequences
+        device = self.state.device
+        shape = (batch, 1, WINDOW_SIZE)
+        window_columns = torch.arange(
+            WINDOW_SIZE, dtype=torch.int64, device=device
+        )
+        gather_indices = torch.zeros(shape, dtype=torch.int64, device=device)
+        batch_indices = (
+            torch.arange(batch, dtype=torch.int64, device=device)
+            .view(batch, 1, 1)
+            .expand(shape)
+            .contiguous()
+        )
+        tensors = (position, window_columns, gather_indices, batch_indices)
+        tensor_pointers = tuple(
+            int(value.untyped_storage().data_ptr()) for value in tensors
+        )
+        if len(set(tensor_pointers)) != len(tensor_pointers):
+            raise RuntimeError("stateful window workspaces must not alias")
+        return WindowStatefulDecodePlan(
+            start_position=start_position,
+            stop_position=stop_position,
+            batch_size=batch,
+            hidden_size=self.config.hidden_size,
+            owner_id=id(self),
+            state_id=id(self.state),
+            position=position,
+            window_columns=window_columns,
+            gather_indices=gather_indices,
+            batch_indices=batch_indices,
+            tensor_pointers=tensor_pointers,
+        )
+
+    def _validate_stateful_decode_plan(
+        self,
+        hidden: torch.Tensor,
+        plan: WindowStatefulDecodePlan,
+    ) -> None:
+        if not isinstance(plan, WindowStatefulDecodePlan):
+            raise TypeError("plan must be a WindowStatefulDecodePlan")
+        if plan.owner_id != id(self) or plan.state_id != id(self.state):
+            raise ValueError("stateful decode plan belongs to another attention state")
+        if tuple(hidden.shape) != (plan.batch_size, 1, plan.hidden_size):
+            raise ValueError("stateful hidden shape does not match its plan")
+        if hidden.dtype != torch.bfloat16 or hidden.device != self.state.device:
+            raise ValueError("stateful hidden must use state-local BF16 storage")
+        shape = (plan.batch_size, 1, WINDOW_SIZE)
+        expected = (
+            ("position", plan.position, (1,), torch.int64),
+            ("window_columns", plan.window_columns, (WINDOW_SIZE,), torch.int64),
+            ("gather_indices", plan.gather_indices, shape, torch.int64),
+            ("batch_indices", plan.batch_indices, shape, torch.int64),
+        )
+        pointers = []
+        for name, value, expected_shape, expected_dtype in expected:
+            if tuple(value.shape) != expected_shape:
+                raise ValueError(
+                    f"stateful {name} shape {tuple(value.shape)} != {expected_shape}"
+                )
+            if value.dtype != expected_dtype or value.device != self.state.device:
+                raise ValueError(f"stateful {name} dtype/device differs")
+            if not value.is_contiguous():
+                raise ValueError(f"stateful {name} must be contiguous")
+            pointers.append(int(value.untyped_storage().data_ptr()))
+        if len(set(pointers)) != len(pointers):
+            raise ValueError("stateful plan tensors must not alias")
+        if tuple(pointers) != plan.tensor_pointers:
+            raise ValueError("stateful plan tensor storage differs from setup")
+
+    def forward_stateful_decode_tensor(
+        self,
+        hidden: torch.Tensor,
+        *,
+        plan: WindowStatefulDecodePlan,
+        stage_marker: Callable[[str], None] | None = None,
+    ) -> torch.Tensor:
+        """Run one cursor-driven graph-family token without host value reads.
+
+        Identical operator chain to ``forward_decode_tensor`` with every
+        position-derived quantity computed from the shared device cursor: the
+        RoPE slice via ``index_select``, the ring write slot via
+        ``position % 128``, and the full-ring gather rebuilt in the eager
+        chronological order ``(column + position % 128 + 1) % 128`` (the
+        closed form of ``window_topk_indices``'s full-ring concatenation), so
+        the gather order -- and therefore the accumulation order -- is bitwise
+        identical to the fixed eager plan at the same position.
+        """
+
+        self._validate_stateful_decode_plan(hidden, plan)
+        cfg = self.config
+        position = plan.position
+        frequencies = self.freqs_cis.index_select(0, position)
+
+        query_lora = rms_norm(
+            F.linear(hidden, self.weights.wq_a),
+            self.weights.q_norm,
+            eps=cfg.norm_eps,
+        )
+        query = F.linear(query_lora, self.weights.wq_b).reshape(
+            plan.batch_size, 1, cfg.num_heads, cfg.head_dim
+        )
+        query *= torch.rsqrt(
+            query.square().mean(dim=-1, keepdim=True) + cfg.norm_eps
+        )
+        query[..., -cfg.rope_dim :] = apply_rotary_emb(
+            query[..., -cfg.rope_dim :], frequencies
+        )
+        if stage_marker is not None:
+            stage_marker("query_done")
+
+        raw_latent = rms_norm(
+            F.linear(hidden, self.weights.wkv),
+            self.weights.kv_norm,
+            eps=cfg.norm_eps,
+        )
+        raw_latent[..., -cfg.rope_dim :] = apply_rotary_emb(
+            raw_latent[..., -cfg.rope_dim :], frequencies
+        )
+        raw_latent[..., : -cfg.rope_dim] = self._nope_control(
+            raw_latent[..., : -cfg.rope_dim]
+        )
+        if stage_marker is not None:
+            stage_marker("raw_kv_done")
+        self.state._write_decode_stateful_prevalidated(
+            raw_latent, position=position
+        )
+        if stage_marker is not None:
+            stage_marker("state_write_done")
+
+        ring = position.remainder(WINDOW_SIZE)
+        chronological = (plan.window_columns + ring + 1).remainder(WINDOW_SIZE)
+        plan.gather_indices.copy_(
+            chronological.view(1, 1, WINDOW_SIZE).expand(
+                plan.batch_size, 1, WINDOW_SIZE
+            )
+        )
+        if stage_marker is not None:
+            stage_marker("index_done")
+        output = _window_sparse_decode_prevalidated(
+            query,
+            self.state.latent,
+            self.weights.attn_sink,
+            plan,
+            cfg.head_dim**-0.5,
+        )
+        if stage_marker is not None:
+            stage_marker("sparse_done")
+        output[..., -cfg.rope_dim :] = apply_rotary_emb(
+            output[..., -cfg.rope_dim :], frequencies, inverse=True
+        )
+        grouped = output.reshape(
+            plan.batch_size,
+            1,
+            cfg.o_groups,
+            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+        )
+        wo_a = self.weights.wo_a.reshape(
+            cfg.o_groups,
+            cfg.o_lora_rank,
+            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+        )
+        projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
+        final_output = F.linear(projected.flatten(2), self.weights.wo_b)
+        if stage_marker is not None:
+            stage_marker("output_done")
+        return final_output
+
     def __call__(
         self,
         hidden: torch.Tensor,
@@ -730,6 +992,7 @@ __all__ = [
     "WindowAttentionConfig",
     "WindowAttentionTrace",
     "WindowDecodePlan",
+    "WindowStatefulDecodePlan",
     "WindowTorchAttention",
     "prepare_window_attention_weights",
 ]

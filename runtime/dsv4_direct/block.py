@@ -20,11 +20,12 @@ Flash-specific changes:
 Deliberate scope reductions for this port vertical (deferred, not dropped by
 accident):
 
-- The stateful/cursor decode surface (``StatefulPreMoEBundle``,
-  ``forward_stateful_decode_tensor``, ``prepare_stateful_decode_pre_moe``,
-  ``DirectPreMoEBlockFragment``) belongs to the CUDA-graph / PP verticals and
-  is not ported here; the window attention path has no stateful plan yet, so
-  porting it now would ship an unexercisable third branch.
+- ``forward_stateful_decode_tensor`` (cursor-driven graph-family forward) is
+  ported for the CUDA-graph vertical as a direct composition of the stateful
+  attention half + ``prepare_ffn`` + MoE tail.  The gaiban
+  ``StatefulPreMoEBundle`` / ``prepare_stateful_decode_pre_moe`` /
+  ``DirectPreMoEBlockFragment`` indirection is a PP fragment-split surface
+  and stays deferred with the rest of PP.
 - The ``attention_pre_backend`` / ``ffn_post_pre_backend`` fused-operator
   injection hooks are superstage performance surfaces and are omitted; this
   block always uses the verified eager ``hc_pre``/``hc_post``/``rms_norm``
@@ -42,6 +43,7 @@ import torch
 
 from .attention import (
     Ratio128DecodePlan,
+    Ratio128StatefulDecodePlan,
     Ratio128TorchAttention,
     rms_norm,
 )
@@ -49,8 +51,17 @@ from .block_weights import ResidentBlockWeights
 from .hyper_connections import hc_post, hc_pre
 from .model_contract import EXPECTED_RATIO128_CONFIG, SUPPORTED_LAYER_SPECS
 from .moe_runtime import TP4MoE
-from .ratio4_attention import Ratio4DecodePlan, Ratio4TorchAttention
-from .window_attention import WindowDecodePlan, WindowTorchAttention
+from .ratio4_attention import (
+    Ratio4DecodePlan,
+    Ratio4StatefulDecodePlan,
+    Ratio4TorchAttention,
+)
+from .stateful_decode import DecodeGraphFamily, family_boundary_flags
+from .window_attention import (
+    WindowDecodePlan,
+    WindowStatefulDecodePlan,
+    WindowTorchAttention,
+)
 
 
 # Frozen Flash residual geometry (checkpoint config.json via model_contract).
@@ -61,12 +72,22 @@ BlockAttention = (
     WindowTorchAttention | Ratio4TorchAttention | Ratio128TorchAttention
 )
 BlockDecodePlan = WindowDecodePlan | Ratio4DecodePlan | Ratio128DecodePlan
+BlockStatefulDecodePlan = (
+    WindowStatefulDecodePlan
+    | Ratio4StatefulDecodePlan
+    | Ratio128StatefulDecodePlan
+)
 
-# compress_ratio -> (attention type, fixed decode-plan type).
-_ATTENTION_DISPATCH: dict[int, tuple[type, type]] = {
-    0: (WindowTorchAttention, WindowDecodePlan),
-    4: (Ratio4TorchAttention, Ratio4DecodePlan),
-    128: (Ratio128TorchAttention, Ratio128DecodePlan),
+# compress_ratio -> (attention type, fixed decode-plan type, stateful
+# cursor-driven plan type).
+_ATTENTION_DISPATCH: dict[int, tuple[type, type, type]] = {
+    0: (WindowTorchAttention, WindowDecodePlan, WindowStatefulDecodePlan),
+    4: (Ratio4TorchAttention, Ratio4DecodePlan, Ratio4StatefulDecodePlan),
+    128: (
+        Ratio128TorchAttention,
+        Ratio128DecodePlan,
+        Ratio128StatefulDecodePlan,
+    ),
 }
 
 
@@ -114,9 +135,11 @@ class DirectDecodeBlock:
                 f"layer-{layer_id} compression ratio {compression_ratio} has no "
                 "attention dispatch"
             )
-        expected_attention_type, expected_plan_type = _ATTENTION_DISPATCH[
-            compression_ratio
-        ]
+        (
+            expected_attention_type,
+            expected_plan_type,
+            expected_stateful_plan_type,
+        ) = _ATTENTION_DISPATCH[compression_ratio]
         if not isinstance(attention, expected_attention_type):
             raise TypeError(
                 f"layer-{layer_id} compression ratio {compression_ratio} requires "
@@ -155,6 +178,7 @@ class DirectDecodeBlock:
         self.compression_ratio = compression_ratio
         self.route_kind = route_kind
         self._attention_plan_type = expected_plan_type
+        self._stateful_attention_plan_type = expected_stateful_plan_type
         self.weights = weights
         self.attention = attention
         self.moe = moe
@@ -246,6 +270,84 @@ class DirectDecodeBlock:
                 residual,
                 start_pos=start_pos,
                 attention_plan=attention_plan,
+            )
+        )
+        return hc_post(
+            attention_output,
+            residual,
+            attention_post,
+            attention_comb,
+        )
+
+    def _attention_branch_stateful_decode(
+        self,
+        residual: torch.Tensor,
+        *,
+        attention_plan: BlockStatefulDecodePlan,
+        boundary_flags: tuple[bool, bool],
+        stage_marker: Callable[[str], None] | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Cursor-driven attention branch (gaiban block.py:879, Flash 3-way).
+
+        The graph family's boundary flags map onto the layer types per the
+        reference decode branch: ratio-4 layers consume ``ratio4_boundary``,
+        ratio-128 layers consume ``ratio128_boundary``, and window layers
+        (compress_ratio == 0, Flash-only) consume neither -- their decode
+        step is the unconditional ring write (model.py:530 with the
+        compressor branch at :531-532 skipped).
+        """
+
+        self.validate_residual(residual)
+        attention_hidden, attention_post, attention_comb = self._hc_pre(
+            residual, branch="attn"
+        )
+        attention_hidden = rms_norm(
+            attention_hidden,
+            self.weights.attn_norm,
+            eps=self.norm_eps,
+        )
+        if stage_marker is not None:
+            stage_marker("attention_input_ready")
+        ratio4_boundary, ratio128_boundary = boundary_flags
+        arguments: dict[str, Any] = {"plan": attention_plan}
+        if stage_marker is not None:
+            arguments["stage_marker"] = stage_marker
+        if self.compression_ratio == 0:
+            if not isinstance(attention_plan, WindowStatefulDecodePlan):
+                raise AssertionError("validated window stateful plan changed type")
+            if not isinstance(self.attention, WindowTorchAttention):
+                raise AssertionError("validated window attention changed type")
+        elif self.compression_ratio == 4:
+            if not isinstance(attention_plan, Ratio4StatefulDecodePlan):
+                raise AssertionError("validated ratio-4 stateful plan changed type")
+            if not isinstance(self.attention, Ratio4TorchAttention):
+                raise AssertionError("validated ratio-4 attention changed type")
+            arguments["ratio4_boundary"] = ratio4_boundary
+        else:
+            if not isinstance(attention_plan, Ratio128StatefulDecodePlan):
+                raise AssertionError("validated ratio-128 stateful plan changed type")
+            if not isinstance(self.attention, Ratio128TorchAttention):
+                raise AssertionError("validated ratio-128 attention changed type")
+            arguments["ratio128_boundary"] = ratio128_boundary
+        attention_output = self.attention.forward_stateful_decode_tensor(
+            attention_hidden, **arguments
+        )
+        return attention_output, attention_post, attention_comb
+
+    def attention_half_stateful_decode(
+        self,
+        residual: torch.Tensor,
+        *,
+        attention_plan: BlockStatefulDecodePlan,
+        boundary_flags: tuple[bool, bool],
+        stage_marker: Callable[[str], None] | None = None,
+    ) -> torch.Tensor:
+        attention_output, attention_post, attention_comb = (
+            self._attention_branch_stateful_decode(
+                residual,
+                attention_plan=attention_plan,
+                boundary_flags=boundary_flags,
+                stage_marker=stage_marker,
             )
         )
         return hc_post(
@@ -347,10 +449,69 @@ class DirectDecodeBlock:
             stage_marker("block_done")
         return output
 
+    def forward_stateful_decode_tensor(
+        self,
+        residual: torch.Tensor,
+        *,
+        input_ids_local: torch.Tensor | None = None,
+        attention_plan: BlockStatefulDecodePlan,
+        graph_family: DecodeGraphFamily,
+        moe_slot: int = 0,
+        stage_marker: Callable[[str], None] | None = None,
+    ) -> torch.Tensor:
+        """Run one cursor-driven block without advancing the shared cursor.
+
+        Direct composition of the stateful attention half, FFN preparation,
+        and MoE tail (gaiban block.py:1365 via :1146/:1232).  The gaiban
+        ``StatefulPreMoEBundle`` / ``DirectPreMoEBlockFragment`` indirection
+        exists for the PP fragment split and is deliberately not carried into
+        this vertical; the composed math is identical.
+        """
+
+        self.validate_residual(residual)
+        self._validate_route_input(input_ids_local, residual)
+        if not isinstance(attention_plan, self._stateful_attention_plan_type):
+            raise TypeError(
+                f"layer-{self.layer_id} compression ratio {self.compression_ratio} "
+                f"requires {self._stateful_attention_plan_type.__name__}"
+            )
+        boundary_flags = family_boundary_flags(graph_family)
+        if stage_marker is not None:
+            stage_marker("block_start")
+        after_attention = self.attention_half_stateful_decode(
+            residual,
+            attention_plan=attention_plan,
+            boundary_flags=boundary_flags,
+            stage_marker=stage_marker,
+        )
+        if stage_marker is not None:
+            stage_marker("attention_done")
+        ffn_hidden, ffn_post, ffn_comb = self.prepare_ffn(after_attention)
+        if stage_marker is not None:
+            stage_marker("ffn_prepare_done")
+        moe_arguments: dict[str, Any] = {"slot": moe_slot}
+        if self.route_kind == "hash":
+            if input_ids_local is None:
+                raise AssertionError("validated hash routing lost input IDs")
+            moe_arguments["input_ids_local"] = input_ids_local
+        if stage_marker is not None:
+            moe_arguments["stage_marker"] = stage_marker
+        moe_output = self.moe.forward_tensor(ffn_hidden, **moe_arguments)
+        output = hc_post(
+            moe_output,
+            after_attention,
+            ffn_post,
+            ffn_comb,
+        )
+        if stage_marker is not None:
+            stage_marker("block_done")
+        return output
+
 
 __all__ = [
     "BLOCK_HC_MULT",
     "BLOCK_HIDDEN_SIZE",
     "BlockDecodePlan",
+    "BlockStatefulDecodePlan",
     "DirectDecodeBlock",
 ]

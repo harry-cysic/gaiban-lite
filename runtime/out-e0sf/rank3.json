@@ -1,0 +1,2558 @@
+{
+  "accepted": true,
+  "checkpoint_id": "f8ae78fd4ac3ff86caef651581a560aded8d56083cedb86a376fccaa3c82cb88",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "build": 0.1491619700100273,
+    "load": 10.498261674074456,
+    "part_a": 2.0767012529540807,
+    "part_b": 25.02701889909804,
+    "process": 38.32102849311195
+  },
+  "errors": [],
+  "experiment": "E0sf-superstage-stateful-graph",
+  "host": "titan064",
+  "layer_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "local_rank": 3,
+  "measurement_class": "semantic_correctness_gate",
+  "memory_after_build": {
+    "free_bytes": 16634544128,
+    "total_bytes": 25252724736
+  },
+  "part_a": {
+    "accepted": true,
+    "judgment": "bitwise_per_layer_per_position (E0df assembly-parity class)",
+    "positions": [
+      8192,
+      8193,
+      8194
+    ],
+    "steps": [
+      {
+        "layers": {
+          "0": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.06266383081674576,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "1": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.06422427296638489,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "2": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.11136364936828613,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "3": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.11499220132827759,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "4": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.114991195499897,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "5": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.11637433618307114,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          }
+        },
+        "position": 8192
+      },
+      {
+        "layers": {
+          "0": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.13149774074554443,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "1": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.2620733678340912,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "2": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.2623288035392761,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "3": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.26658204197883606,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "4": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.2689400315284729,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "5": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.27674517035484314,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          }
+        },
+        "position": 8193
+      },
+      {
+        "layers": {
+          "0": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.1034928411245346,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "1": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.20664756000041962,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "2": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.16621112823486328,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "3": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.15743377804756165,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "4": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.1515560746192932,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          },
+          "5": {
+            "bitwise_exact": true,
+            "finite": true,
+            "max_abs": 0.0,
+            "reference_rms": 0.1554437130689621,
+            "rms_abs": 0.0,
+            "rms_rel": 0.0
+          }
+        },
+        "position": 8194
+      }
+    ]
+  },
+  "part_b": {
+    "accepted": true,
+    "capture_order": [
+      "normal",
+      "ratio4_boundary",
+      "ratio4_ratio128_boundary"
+    ],
+    "eager_moe_slot": 0,
+    "final_state_digests": {
+      "0": {
+        "eager": "bbd8c6c60d1d64ed5b674017be897f10226b44ddce427694bc98d85ce32a7f54",
+        "graph": "bbd8c6c60d1d64ed5b674017be897f10226b44ddce427694bc98d85ce32a7f54"
+      },
+      "1": {
+        "eager": "ace463484e909ba6ae97b734cc3c98971b24973062726254b28088a2ed456578",
+        "graph": "ace463484e909ba6ae97b734cc3c98971b24973062726254b28088a2ed456578"
+      },
+      "2": {
+        "eager": "419d90bcafaff2e55f7cf60dc474caac5c1df3688ba63ac8fcab2668482b4f65",
+        "graph": "419d90bcafaff2e55f7cf60dc474caac5c1df3688ba63ac8fcab2668482b4f65"
+      },
+      "3": {
+        "eager": "0c51ecc6b5c914a432085225d8df39ceeaafb704ece4fbedffa2ce785bae038c",
+        "graph": "0c51ecc6b5c914a432085225d8df39ceeaafb704ece4fbedffa2ce785bae038c"
+      },
+      "4": {
+        "eager": "d7fe2437cc73ea820647ba0813ee19ebbdca8bd350cce9995522ef843fd12c6a",
+        "graph": "d7fe2437cc73ea820647ba0813ee19ebbdca8bd350cce9995522ef843fd12c6a"
+      },
+      "5": {
+        "eager": "685815de119833562d3424c25b7a1b3a4056ea2a51496e6809c87a9210b473bc",
+        "graph": "685815de119833562d3424c25b7a1b3a4056ea2a51496e6809c87a9210b473bc"
+      }
+    },
+    "graph_moe_slots": [
+      1,
+      2,
+      3
+    ],
+    "initial_state": "deterministic_seeded_kv_not_real_prefix",
+    "judgment": "graph_vs_eager_output bitwise_primary_plus_numeric_witness (gaiban E1a27)",
+    "mismatched_step_positions": [],
+    "plan_resident_bytes": {
+      "eager": 136936,
+      "graph": 136936
+    },
+    "schedule": {
+      "family_counts": {
+        "normal": 99,
+        "ratio4_boundary": 32,
+        "ratio4_ratio128_boundary": 1
+      },
+      "start_position": 8192,
+      "step_count": 132,
+      "stop_position": 8324
+    },
+    "steps": [
+      {
+        "captured_here": true,
+        "family": "normal",
+        "index": 0,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.11634029448032379,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8192,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 1,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.2766111195087433,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8193,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 2,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.1553904116153717,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8194,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": true,
+        "family": "ratio4_boundary",
+        "index": 3,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07638979703187943,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8195,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 4,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07534006237983704,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8196,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 5,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.10917142033576965,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8197,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 6,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06225289776921272,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8198,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 7,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.08936665207147598,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8199,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 8,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.08484958112239838,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8200,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 9,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0550161749124527,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8201,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 10,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.08686341345310211,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8202,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 11,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06356304883956909,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8203,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 12,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.11297358572483063,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8204,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 13,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.12199555337429047,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8205,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 14,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.09038908034563065,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8206,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 15,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07819303125143051,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8207,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 16,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07002179324626923,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8208,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 17,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0775739848613739,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8209,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 18,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06744441390037537,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8210,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 19,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06529497355222702,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8211,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 20,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06654331088066101,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8212,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 21,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0680350810289383,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8213,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 22,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06944961100816727,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8214,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 23,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07179299741983414,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8215,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 24,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07011565566062927,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8216,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 25,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06830080598592758,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8217,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 26,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.09578585624694824,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8218,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 27,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07437746226787567,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8219,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 28,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07164537906646729,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8220,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 29,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.08321930468082428,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8221,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 30,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0807451456785202,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8222,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 31,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.20721283555030823,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8223,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 32,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.13755983114242554,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8224,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 33,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07041008025407791,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8225,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 34,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.10971883684396744,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8226,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 35,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.14855769276618958,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8227,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 36,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.08706467598676682,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8228,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 37,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06832802295684814,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8229,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 38,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.10125386714935303,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8230,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 39,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.1307602822780609,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8231,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 40,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06399010121822357,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8232,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 41,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.2991601526737213,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8233,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 42,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07148364186286926,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8234,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 43,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07436872273683548,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8235,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 44,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.08972938358783722,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8236,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 45,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.056450970470905304,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8237,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 46,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07298523932695389,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8238,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 47,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0593654103577137,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8239,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 48,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06711495667695999,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8240,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 49,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.1176493912935257,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8241,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 50,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.11291061341762543,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8242,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 51,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07641252130270004,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8243,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 52,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.04585910215973854,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8244,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 53,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.09193040430545807,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8245,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 54,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06344179064035416,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8246,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 55,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0798707827925682,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8247,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 56,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06824502348899841,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8248,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 57,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.099408820271492,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8249,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 58,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.08110541105270386,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8250,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 59,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.08752500265836716,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8251,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 60,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06895176321268082,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8252,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 61,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07081679999828339,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8253,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 62,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07002968341112137,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8254,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 63,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07435298711061478,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8255,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 64,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07935911417007446,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8256,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 65,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.10195156186819077,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8257,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 66,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06458953022956848,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8258,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 67,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.1377764344215393,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8259,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 68,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06446494907140732,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8260,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 69,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.05019579827785492,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8261,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 70,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06917543709278107,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8262,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 71,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07719672471284866,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8263,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 72,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.12364643812179565,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8264,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 73,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07257050275802612,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8265,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 74,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0434308797121048,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8266,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 75,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.09358087927103043,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8267,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 76,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.05858415365219116,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8268,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 77,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.17724506556987762,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8269,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 78,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07298952341079712,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8270,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 79,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.05735786259174347,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8271,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 80,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0865265503525734,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8272,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 81,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.10230564326047897,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8273,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 82,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07567865401506424,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8274,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 83,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.09781091660261154,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8275,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 84,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06695903837680817,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8276,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 85,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0641070157289505,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8277,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 86,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06579757481813431,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8278,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 87,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06708861142396927,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8279,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 88,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.09323877096176147,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8280,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 89,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06202084198594093,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8281,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 90,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07154117524623871,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8282,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 91,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.09170323610305786,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8283,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 92,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.10604550689458847,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8284,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 93,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06671939045190811,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8285,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 94,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.050765980035066605,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8286,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 95,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.058019306510686874,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8287,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 96,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06261062622070312,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8288,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 97,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06342799961566925,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8289,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 98,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.059500016272068024,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8290,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 99,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06400615721940994,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8291,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 100,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06262580305337906,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8292,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 101,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06391586363315582,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8293,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 102,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07362566143274307,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8294,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 103,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.08202477544546127,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8295,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 104,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.05170845240354538,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8296,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 105,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07039322704076767,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8297,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 106,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07360290735960007,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8298,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 107,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.05673283338546753,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8299,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 108,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.060988977551460266,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8300,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 109,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.058634862303733826,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8301,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 110,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07302983105182648,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8302,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 111,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06911369413137436,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8303,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 112,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07762309908866882,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8304,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 113,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.09192842990159988,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8305,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 114,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07298319786787033,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8306,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 115,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0861240029335022,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8307,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 116,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07910588383674622,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8308,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 117,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06138283759355545,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8309,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 118,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0978187844157219,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8310,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 119,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.18884806334972382,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8311,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 120,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06718848645687103,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8312,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 121,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0688558965921402,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8313,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 122,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06810423731803894,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8314,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 123,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0728808045387268,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8315,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 124,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06247052550315857,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8316,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 125,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.27330902218818665,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8317,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 126,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0713835284113884,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8318,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": true,
+        "family": "ratio4_ratio128_boundary",
+        "index": 127,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.06465201824903488,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8319,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 128,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.068627268075943,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8320,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 129,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.05768816918134689,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8321,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "normal",
+        "index": 130,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.4018601179122925,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8322,
+        "state_next_position_parity": true
+      },
+      {
+        "captured_here": false,
+        "family": "ratio4_boundary",
+        "index": 131,
+        "metrics": {
+          "bitwise_exact": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.07213076204061508,
+          "rms_abs": 0.0,
+          "rms_rel": 0.0
+        },
+        "position": 8323,
+        "state_next_position_parity": true
+      }
+    ],
+    "summary": {
+      "final_states_equal": true,
+      "max_abs_over_steps": 0.0,
+      "state_parity_all_steps": true,
+      "steps_bitwise_exact": 132,
+      "steps_total": 132,
+      "teardown_accepted": true
+    },
+    "teardown": {
+      "accepted": true,
+      "empty_cache_called": true,
+      "errors": [],
+      "families": [
+        "normal",
+        "ratio4_boundary",
+        "ratio4_ratio128_boundary"
+      ],
+      "gc_collected": true,
+      "gc_unreachable": 3350,
+      "global_rows": 4,
+      "graph_moe_slots": [
+        1,
+        2,
+        3
+      ],
+      "graph_pool_objects_distinct": true,
+      "graph_registry": {
+        "bindings": {
+          "normal": true,
+          "ratio4_boundary": true,
+          "ratio4_ratio128_boundary": true
+        },
+        "bindings_exact": true,
+        "bindings_released": {
+          "normal": true,
+          "ratio4_boundary": true,
+          "ratio4_ratio128_boundary": true
+        },
+        "families_exact": true,
+        "observed_families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "registry_cleared": true,
+        "reset": {
+          "normal": true,
+          "ratio4_boundary": true,
+          "ratio4_ratio128_boundary": true
+        },
+        "reset_capable": true,
+        "values_distinct": true,
+        "values_present": true,
+        "values_valid": true
+      },
+      "graph_slot_layer_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "pool_registry": {
+        "families_exact": true,
+        "observed_families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "registry_cleared": true,
+        "reset_capable": true,
+        "values_distinct": true,
+        "values_present": true,
+        "values_valid": true
+      },
+      "registry_objects_distinct": true,
+      "schema": "dsv4-stateful-graph-teardown-v1",
+      "semantic_layer_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "slot_cleanup": {
+        "normal": {
+          "accepted": true,
+          "layers": {
+            "0": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "1": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "2": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "3": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "4": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "5": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            }
+          },
+          "slot": 1
+        },
+        "ratio4_boundary": {
+          "accepted": true,
+          "layers": {
+            "0": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "1": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "2": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "3": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "4": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "5": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            }
+          },
+          "slot": 2
+        },
+        "ratio4_ratio128_boundary": {
+          "accepted": true,
+          "layers": {
+            "0": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "1": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "2": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "3": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "4": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            },
+            "5": {
+              "accepted": true,
+              "reset": true,
+              "status": {
+                "has_completion_event": false,
+                "state": "free"
+              }
+            }
+          },
+          "slot": 3
+        }
+      },
+      "slot_cleanup_accepted": true,
+      "synchronization": {
+        "after_reset": true,
+        "before_reset": true,
+        "final": true
+      }
+    },
+    "terminal": {
+      "eager": {
+        "accepted": true,
+        "device_position": 8324,
+        "dispatch_error": 0,
+        "expected_position": 8324,
+        "host_position": 8324,
+        "state_positions": [
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ]
+        ],
+        "stop_position": 8324
+      },
+      "graph": {
+        "accepted": true,
+        "device_position": 8324,
+        "dispatch_error": 0,
+        "expected_position": 8324,
+        "host_position": 8324,
+        "state_positions": [
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ]
+        ],
+        "stop_position": 8324
+      }
+    }
+  },
+  "rank": 3,
+  "schema_version": 1,
+  "seed": 20260720,
+  "torch": "2.11.0+cu130",
+  "world": 4
+}

@@ -97,6 +97,175 @@ class StaticWindowKV:
             for tensor in (self.latent, self._next_position, self._raw_positions)
         )
 
+    def _owned_tensor_items(self) -> tuple[tuple[str, torch.Tensor], ...]:
+        return (
+            ("latent", self.latent),
+            ("next_position", self._next_position),
+            ("raw_positions", self._raw_positions),
+        )
+
+    def _owned_tensors(self) -> tuple[torch.Tensor, ...]:
+        return tuple(tensor for _, tensor in self._owned_tensor_items())
+
+    def _validate_owned_tensor_contract(
+        self, *, label: str
+    ) -> tuple[tuple[str, torch.Tensor], ...]:
+        batch = self.num_local_sequences
+        expected = {
+            "latent": ((batch, WINDOW_SIZE, LATENT_DIM), torch.bfloat16),
+            "next_position": ((batch,), torch.int64),
+            "raw_positions": ((batch, WINDOW_SIZE), torch.int64),
+        }
+        items = self._owned_tensor_items()
+        if tuple(name for name, _ in items) != tuple(expected):
+            raise RuntimeError(f"{label} window state ownership contract differs")
+        storage_owners: dict[tuple[torch.device, int], str] = {}
+        for name, tensor in items:
+            shape, dtype = expected[name]
+            if tuple(tensor.shape) != shape:
+                raise ValueError(
+                    f"{label} window state {name} shape "
+                    f"{tuple(tensor.shape)} != {shape}"
+                )
+            if tensor.dtype != dtype:
+                raise TypeError(
+                    f"{label} window state {name} dtype {tensor.dtype} != {dtype}"
+                )
+            if tensor.device != self.device:
+                raise ValueError(
+                    f"{label} window state {name} device "
+                    f"{tensor.device} != {self.device}"
+                )
+            if not tensor.is_contiguous():
+                raise ValueError(f"{label} window state {name} must be contiguous")
+            owner = (tensor.device, int(tensor.untyped_storage().data_ptr()))
+            previous = storage_owners.setdefault(owner, name)
+            if previous != name:
+                raise ValueError(
+                    f"{label} window state tensors {previous} and {name} "
+                    "alias one storage"
+                )
+        return items
+
+    def copy_from(self, source: "StaticWindowKV") -> None:
+        """Copy one complete pre-step state after validating both owners."""
+
+        if not isinstance(source, StaticWindowKV):
+            raise TypeError("window state source must be StaticWindowKV")
+        identity = (self.num_local_sequences, self.max_seq_len, self.layer_id, self.device)
+        source_identity = (
+            source.num_local_sequences,
+            source.max_seq_len,
+            source.layer_id,
+            source.device,
+        )
+        if identity != source_identity:
+            raise ValueError(
+                f"window state identity {source_identity} cannot copy into {identity}"
+            )
+        destination_items = self._validate_owned_tensor_contract(label="destination")
+        source_items = source._validate_owned_tensor_contract(label="source")
+        destination_owners = {
+            (tensor.device, int(tensor.untyped_storage().data_ptr()))
+            for _, tensor in destination_items
+        }
+        source_owners = {
+            (tensor.device, int(tensor.untyped_storage().data_ptr()))
+            for _, tensor in source_items
+        }
+        if destination_owners & source_owners:
+            raise ValueError("window source and destination alias storage")
+        for (destination_name, destination), (source_name, value) in zip(
+            destination_items, source_items, strict=True
+        ):
+            if destination_name != source_name:
+                raise RuntimeError("window state copy order differs")
+            destination.copy_(value)
+
+    def seed_decode_residency(
+        self,
+        *,
+        start_pos: int,
+        raw: torch.Tensor,
+    ) -> None:
+        """Seed a synthetic BF16 full-ring residency for fixed-position decode.
+
+        Window counterpart of ``StaticLayerKV.seed_decode_residency``: with
+        compress_ratio == 0 the state is the raw ring alone, so the seed is
+        the physical 128-slot ring payload for positions
+        ``[start_pos - 128, start_pos)`` (reference model.py:530 ring
+        mapping ``position % window``).
+        """
+
+        if (
+            not isinstance(start_pos, int)
+            or isinstance(start_pos, bool)
+            or start_pos < WINDOW_SIZE
+            or start_pos >= self.max_seq_len
+        ):
+            raise ValueError(
+                "seed start_pos must be an integer in [128, max_seq_len)"
+            )
+        self._require_tensor(
+            "seed raw",
+            raw,
+            (self.num_local_sequences, WINDOW_SIZE, LATENT_DIM),
+            torch.bfloat16,
+        )
+        absolute_raw = torch.arange(
+            start_pos - WINDOW_SIZE,
+            start_pos,
+            dtype=torch.int64,
+            device=self.device,
+        )
+        raw_slots = absolute_raw.remainder(WINDOW_SIZE)
+        raw_positions = torch.full_like(self._raw_positions, -1)
+        raw_positions.index_copy_(
+            1,
+            raw_slots,
+            absolute_raw.unsqueeze(0).expand(self.num_local_sequences, -1),
+        )
+        latent = torch.zeros_like(self.latent)
+        latent.index_copy_(1, raw_slots, raw)
+
+        self.latent.copy_(latent)
+        self._raw_positions.copy_(raw_positions)
+        self._next_position.fill_(start_pos)
+
+    def _write_decode_stateful_prevalidated(
+        self,
+        raw_latent: torch.Tensor,
+        *,
+        position: torch.Tensor,
+    ) -> None:
+        """Commit one prevalidated cursor-driven token without device value reads.
+
+        Window counterpart of ``StaticLayerKV._write_decode_stateful_prevalidated``
+        minus every compressor write: the reference decode branch for
+        compress_ratio == 0 performs only ``kv_cache[:, start_pos % win] = kv``
+        (model.py:530; the compressor call at :531-532 is guarded by
+        ``if self.compress_ratio:``).  All position-derived slots remain device
+        tensors so one captured graph can replay across many tokens.
+        """
+
+        batch = self.num_local_sequences
+        self._require_tensor(
+            "raw_latent", raw_latent, (batch, 1, LATENT_DIM), torch.bfloat16
+        )
+        if (
+            not isinstance(position, torch.Tensor)
+            or tuple(position.shape) != (1,)
+            or position.dtype != torch.int64
+            or position.device != self.device
+            or not position.is_contiguous()
+        ):
+            raise ValueError("stateful decode position must be contiguous INT64 [1]")
+        slot = position.remainder(WINDOW_SIZE)
+        expanded_position = position.view(1, 1).expand(batch, 1)
+        self.latent.index_copy_(1, slot, raw_latent)
+        self._raw_positions.index_copy_(1, slot, expanded_position)
+        self._next_position.copy_((position + 1).expand(batch))
+
     def reset(self) -> None:
         """Clear payload and metadata so the state can serve a new batch."""
 
