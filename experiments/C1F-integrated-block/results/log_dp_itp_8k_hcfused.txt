@@ -1,0 +1,19 @@
+EXIT=0
+    2     4   128   32     5319.1     2231.1      57371.3      326.0     1.47
+  DP-BD layer=2 B=128 bl=32 | attn_local=   745.8 allgather=  163.5 moe_total=  1302.6 routed=   811.0 shared=    64.6 (us)
+    2     4   256   64     5294.5     2746.2      93219.8      529.7     1.48
+  DP-BD layer=2 B=256 bl=64 | attn_local=   857.3 allgather=  285.6 moe_total=  1584.0 routed=   296.8 shared=    76.5 (us)
+    2     4   512  128     5731.8     3937.4     130034.6      738.8     1.61
+  DP-BD layer=2 B=512 bl=128 | attn_local=  1262.5 allgather=  545.8 moe_total=  2115.4 routed=   411.1 shared=    90.7 (us)
+    3   128   128   32     4833.8     1940.8      65952.6      374.7     1.61
+  DP-BD layer=3 B=128 bl=32 | attn_local=   461.4 allgather=  164.3 moe_total=  1301.7 routed=   958.6 shared=    61.6 (us)
+    3   128   256   64     4700.0     2411.0     106181.2      603.3     1.61
+  DP-BD layer=3 B=256 bl=64 | attn_local=   513.3 allgather=  285.6 moe_total=  1592.8 routed=  1036.2 shared=    68.0 (us)
+    3   128   512  128     4487.5     3309.0     154731.7      879.2     1.61
+  DP-BD layer=3 B=512 bl=128 | attn_local=   651.2 allgather=  545.7 moe_total=  2114.1 routed=  1095.5 shared=    84.8 (us)
+    0     0   128   32     4244.7     1890.0      67726.5      384.8     1.61
+  DP-BD layer=0 B=128 bl=32 | attn_local=   402.8 allgather=  163.4 moe_total=  1314.1 routed=   164.1 shared=    64.6 (us)
+    0     0   256   64     4264.2     2351.0     108889.8      618.7     1.61
+  DP-BD layer=0 B=256 bl=64 | attn_local=   449.1 allgather=  285.5 moe_total=  1592.1 routed=   285.1 shared=    71.4 (us)
+    0     0   512  128     4269.7     3210.7     159467.6      906.1     1.61
+  DP-BD layer=0 B=512 bl=128 | attn_local=   568.8 allgather=  545.7 moe_total=  2112.6 routed=  1096.8 shared=    81.3 (us)

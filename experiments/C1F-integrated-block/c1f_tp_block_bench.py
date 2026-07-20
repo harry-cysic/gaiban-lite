@@ -268,6 +268,73 @@ def bench_graph_no_model_allreduce(fn, iters=30, warmup=8):
         M.dist.all_reduce = original
 
 
+def hc_pre_fused(self, x, hc_fn, hc_scale, hc_base):
+    """gaiban C2f precision-neutral fused HC pre (same fp32 math, einsum
+    contraction, no [b,s,hc,d] broadcast temp)."""
+    import torch.nn.functional as F
+    from kernel import hc_split_sinkhorn
+    shape, dtype = x.size(), x.dtype
+    x = x.flatten(2).float()
+    rsqrt = torch.rsqrt(x.square().mean(-1, keepdim=True) + self.norm_eps)
+    mixes = F.linear(x, hc_fn) * rsqrt
+    pre, post, comb = hc_split_sinkhorn(mixes, hc_scale, hc_base, self.hc_mult,
+                                        self.hc_sinkhorn_iters, self.hc_eps)
+    y = torch.einsum("bsh,bshd->bsd", pre, x.view(shape))
+    return y.to(dtype), post, comb
+
+
+def hc_post_fused(self, x, residual, post, comb):
+    """gaiban C2f: comb^T @ residual matmul replaces the [b,s,hc,hc,d] temp.
+    comb is sinkhorn-normalized and NOT symmetric — transpose is load-bearing."""
+    mix = torch.matmul(comb.transpose(-1, -2), residual.float())
+    y = post.unsqueeze(-1) * x.unsqueeze(-2) + mix
+    return y.type_as(x)
+
+
+def configure_hc(mode):
+    if mode == "fused":
+        M.Block.hc_pre = hc_pre_fused
+        M.Block.hc_post = hc_post_fused
+    return mode
+
+
+def configure_attn_linear(mode):
+    """w8a16: route FP8-weight linears through the gaiban E1b2q weight-only
+    Triton GEMM (dequant-in-kernel, bf16 activations) instead of the reference
+    act_quant + fp8_gemm path. FP4 (expert) and bf16 linears untouched; MoE
+    modules do not go through M.linear at all."""
+    if mode != "w8a16":
+        return mode
+    import weight_only_linear as WOL
+    orig_linear = M.linear
+    cache = {}
+
+    def linear_w8a16(x, weight, bias=None):
+        if weight.dtype != FP8:
+            return orig_linear(x, weight, bias)
+        lead = x.shape[:-1]
+        k = x.shape[-1]
+        xf = x.reshape(-1, k)
+        if not xf.is_contiguous():
+            xf = xf.contiguous()
+        m, n = xf.shape[0], weight.shape[0]
+        key = (m, n, k)
+        entry = cache.get(key)
+        if entry is None:
+            plan = WOL.make_gemm_plan(m, n, k)
+            out = torch.empty(m, n, dtype=torch.bfloat16, device=x.device)
+            ws = torch.empty(plan.workspace_shape, dtype=torch.float32, device=x.device)
+            entry = (plan, out, ws)
+            cache[key] = entry
+        plan, out, ws = entry
+        WOL.w8a16_gemm_into(xf, weight, weight.scale, out, ws, plan=plan)
+        # clone: the cached out buffer is reused by any later same-shape call
+        return out.clone().view(*lead, n)
+
+    M.linear = linear_w8a16
+    return mode
+
+
 def configure_rotate(mode):
     if mode == "stub":
         M.rotate_activation = lambda x: x * (x.size(-1) ** -0.5)
@@ -373,6 +440,11 @@ def main():
     parser.add_argument("--no-graph", action="store_true")
     parser.add_argument("--breakdown", action="store_true")
     parser.add_argument("--rotate", choices=["fht", "stub"], default="fht")
+    parser.add_argument("--hc-mode", choices=["ref", "fused"], default="ref",
+                        help="fused: gaiban C2f precision-neutral HC (einsum/matmul)")
+    parser.add_argument("--attn-linear", choices=["ref", "w8a16"], default="ref",
+                        help="w8a16: E1b2q weight-only FP8 Triton GEMM for attention "
+                             "projections (vs reference act_quant+fp8_gemm)")
     args = parser.parse_args()
 
     dist.init_process_group("nccl")
@@ -395,11 +467,14 @@ def main():
     M.sparse_attn = (make_headloop_sparse_attn(sparse_attn_base, args.sa_max_heads)
                      if heads_rank > args.sa_max_heads else sparse_attn_base)
     rotate_label = configure_rotate(args.rotate)
+    hc_label = configure_hc(args.hc_mode)
+    lin_label = configure_attn_linear(args.attn_linear)
     n_attn_launch = -(-heads_rank // args.sa_max_heads)
 
     if rank == 0:
         print(f"C1F integrated TP block | world={world} | attn={args.attn_mode} | "
-              f"moe={args.moe_mode} | gpu={torch.cuda.get_device_name(0)}")
+              f"moe={args.moe_mode} | hc={hc_label} | lin={lin_label} | "
+              f"gpu={torch.cuda.get_device_name(0)}")
         print("heads/rank=%d | attn_launches=%d | rotate=%s | allreduce_dtype=%s | "
               "inter/rank=%d | experts/rank=%d" % (
                   heads_rank, n_attn_launch, rotate_label, args.allreduce_dtype,

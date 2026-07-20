@@ -54,6 +54,20 @@ tok/s(16 卡聚合)**,即 ~785 tok/s/GPU。低于可行性预估带 15–25k 的
 结论:**12.5k 是 reference-op 未优化基线,不构成对 15–25k 区间的证伪**;
 预估带能否回收取决于上述三项在 Flash 上的兑现,列为 Phase 2 首批工作。
 
+## 资产接入 A/B(2026-07-20 追加)
+
+1. **fused MHC(C2f eager 级,`--hc-mode fused`)**:数值等价确认
+   (hc_pre 精确相等,hc_post 差 1 ulp bf16)。B=512 整层 −100 µs 左右
+   (L2 4043→3937,L3 3404→3309,L0 3312→3211,约 −2.6~3.0%)。
+   **结论:eager 级融合在 decode 收益很小**——C2f 的大头在 prefill 大 chunk
+   的巨型临时张量;decode 下 HC 的 ~700 µs 是 sinkhorn kernel + fp32
+   [512,16384] 传输本身。要真正压缩需 C2g 的 tilelang 边界融合
+   (vllm `mhc_fused_post_pre_tilelang`,hc_post+hc_pre+norm 单 kernel),
+   属 dsv4_direct 运行时结构改动,归入 Phase 2 移植。
+2. **fused Triton indexer(D0b)重新定位**:该 kernel 的收益是 prefill 的
+   O(s²) score 物化(`_FUSE_MIN_SEQLEN=1024` 才启用);decode(s=1)不在
+   收益面。从 decode 回收清单移除,归入 prefill(C2 级)工作。
+
 ## 容量注记
 
 DP bl=128 @8K 每卡 KV ≈ 6.9 GB + 权重 ~9.4 GiB → B=512 已近 24 GB 上限,
