@@ -80,6 +80,15 @@ def main() -> int:
     parser.add_argument("--stage-root", type=Path, required=True)
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--seed", type=int, default=20260720)
+    parser.add_argument(
+        "--kv-dtype",
+        type=str,
+        default="bf16",
+        choices=("bf16", "fp8", "fp8_rope_bf16"),
+    )
+    parser.add_argument(
+        "--indexer-kv-dtype", type=str, default="bf16", choices=("bf16", "fp8")
+    )
     args = parser.parse_args()
 
     torch.set_grad_enabled(False)
@@ -93,6 +102,8 @@ def main() -> int:
         "experiment": "E0e2e-ratio4-fullpos-selfcheck",
         "measurement_class": "semantic_correctness_gate",
         "layer_id": LAYER_ID,
+        "kv_dtype": args.kv_dtype,
+        "indexer_kv_dtype": args.indexer_kv_dtype,
         "checkpoint_id": None,
         "decode_mirror": None,
         "prefill_consistency": None,
@@ -130,7 +141,12 @@ def main() -> int:
         # ------------------------------------------------------------------
         # 1. decode mirror vs the E0ff-verified plan path
         lane = Ratio4FullPositionAttention(
-            config, prepared, batch_size=1, device=device
+            config,
+            prepared,
+            batch_size=1,
+            device=device,
+            kv_dtype=args.kv_dtype,
+            indexer_dtype=args.indexer_kv_dtype,
         )
         prefill_len = 16
         lane(deterministic_hidden(args.seed, prefill_len, device), start_pos=0)
@@ -144,12 +160,18 @@ def main() -> int:
             max_seq_len=MAX_SEQ_LEN,
             layer_id=LAYER_ID,
             device=device,
+            kv_dtype=args.kv_dtype,
+            indexer_dtype=args.indexer_kv_dtype,
         )
+        # seed payload contract is BF16; FP8 lanes hand over dequantized rows
+        # (requantization on install is exact: e4m3 values round-trip).
         candidate_state.seed_decode_payload(
             MIRROR_SEED_POSITION,
-            raw=lane.raw.clone(),
-            compressed=lane.compressed.clone(),
-            indexer_kv=lane.indexer_kv.clone(),
+            raw=lane._dequantized(lane.raw, lane.raw_rope).clone(),
+            compressed=lane._dequantized(
+                lane.compressed, lane.compressed_rope
+            ).clone(),
+            indexer_kv=lane.indexer_kv.to(torch.bfloat16).clone(),
             main_kv_state=lane.main_kv_state.clone(),
             main_score_state=lane.main_score_state.clone(),
             index_kv_state=lane.index_kv_state.clone(),
@@ -181,14 +203,37 @@ def main() -> int:
                 }
             )
         state_bitwise = {
-            "raw": bool(torch.equal(lane.raw, candidate_state.raw)),
+            "raw": bool(
+                torch.equal(
+                    lane.raw.view(torch.uint8), candidate_state.raw.view(torch.uint8)
+                )
+                if lane.raw.dtype != torch.bfloat16
+                else torch.equal(lane.raw, candidate_state.raw)
+            ),
             "compressed": bool(
-                torch.equal(lane.compressed, candidate_state.compressed)
+                torch.equal(
+                    lane.compressed.view(torch.uint8),
+                    candidate_state.compressed.view(torch.uint8),
+                )
+                if lane.compressed.dtype != torch.bfloat16
+                else torch.equal(lane.compressed, candidate_state.compressed)
             ),
             "indexer_kv": bool(
-                torch.equal(lane.indexer_kv, candidate_state.indexer_kv)
+                torch.equal(
+                    lane.indexer_kv.view(torch.uint8),
+                    candidate_state.indexer_kv.view(torch.uint8),
+                )
+                if lane.indexer_kv.dtype != torch.bfloat16
+                else torch.equal(lane.indexer_kv, candidate_state.indexer_kv)
             ),
         }
+        if lane.raw_rope is not None:
+            state_bitwise["raw_rope"] = bool(
+                torch.equal(lane.raw_rope, candidate_state.raw_rope)
+            )
+            state_bitwise["compressed_rope"] = bool(
+                torch.equal(lane.compressed_rope, candidate_state.compressed_rope)
+            )
         result["decode_mirror"] = {
             "seed_position": MIRROR_SEED_POSITION,
             "steps": mirror_steps,
@@ -206,7 +251,12 @@ def main() -> int:
         outputs: dict[int, dict[int, torch.Tensor]] = {}
         for prefill in CONSISTENCY_PREFILLS:
             lane = Ratio4FullPositionAttention(
-                config, prepared, batch_size=1, device=device
+                config,
+                prepared,
+                batch_size=1,
+                device=device,
+                kv_dtype=args.kv_dtype,
+                indexer_dtype=args.indexer_kv_dtype,
             )
             stream = torch.cat(
                 [position_hidden(position) for position in range(prefill)], dim=1
@@ -231,12 +281,12 @@ def main() -> int:
                 }
             )
         state_rms = {
-            "raw": rms_rel(lanes[short].raw, lanes[long].raw),
+            "raw": rms_rel(lanes[short].raw.float(), lanes[long].raw.float()),
             "compressed": rms_rel(
-                lanes[short].compressed, lanes[long].compressed
+                lanes[short].compressed.float(), lanes[long].compressed.float()
             ),
             "indexer_kv": rms_rel(
-                lanes[short].indexer_kv, lanes[long].indexer_kv
+                lanes[short].indexer_kv.float(), lanes[long].indexer_kv.float()
             ),
         }
         result["prefill_consistency"] = {

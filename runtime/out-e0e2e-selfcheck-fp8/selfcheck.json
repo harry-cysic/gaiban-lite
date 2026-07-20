@@ -1,0 +1,219 @@
+{
+  "accepted": true,
+  "checkpoint_id": "b3d44d9f14e59b1be0f108fd91e4a9a171650795e03a48dc8c47957cf40d22d9",
+  "decode_mirror": {
+    "accepted": true,
+    "seed_position": 192,
+    "state_bitwise": {
+      "compressed": true,
+      "indexer_kv": true,
+      "raw": true
+    },
+    "steps": [
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 192
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 193
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 194
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 195
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 196
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 197
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 198
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 199
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 200
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 201
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 202
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 203
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 204
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 205
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 206
+      },
+      {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "position": 207
+      }
+    ]
+  },
+  "errors": [],
+  "experiment": "E0e2e-ratio4-fullpos-selfcheck",
+  "indexer_kv_dtype": "bf16",
+  "kv_dtype": "fp8",
+  "layer_id": 2,
+  "measurement_class": "semantic_correctness_gate",
+  "prefill_consistency": {
+    "accepted": true,
+    "prefills": [
+      12,
+      20
+    ],
+    "rms_rel_limit": 0.02,
+    "state_rms_rel": {
+      "compressed": 0.0,
+      "indexer_kv": 0.0,
+      "raw": 0.009101442353937037
+    },
+    "steps": [
+      {
+        "bitwise": false,
+        "position": 20,
+        "rms_rel": 0.007824857995641072
+      },
+      {
+        "bitwise": false,
+        "position": 21,
+        "rms_rel": 0.00742321244308487
+      },
+      {
+        "bitwise": false,
+        "position": 22,
+        "rms_rel": 0.007538919322038825
+      },
+      {
+        "bitwise": false,
+        "position": 23,
+        "rms_rel": 0.007280747253751573
+      },
+      {
+        "bitwise": false,
+        "position": 24,
+        "rms_rel": 0.00750880887258512
+      },
+      {
+        "bitwise": false,
+        "position": 25,
+        "rms_rel": 0.008579822667007997
+      },
+      {
+        "bitwise": false,
+        "position": 26,
+        "rms_rel": 0.007311746867376514
+      },
+      {
+        "bitwise": false,
+        "position": 27,
+        "rms_rel": 0.007542778248097603
+      },
+      {
+        "bitwise": false,
+        "position": 28,
+        "rms_rel": 0.006196548927963926
+      },
+      {
+        "bitwise": false,
+        "position": 29,
+        "rms_rel": 0.006875673629808108
+      },
+      {
+        "bitwise": false,
+        "position": 30,
+        "rms_rel": 0.006315356689753926
+      },
+      {
+        "bitwise": false,
+        "position": 31,
+        "rms_rel": 0.007159083455173652
+      },
+      {
+        "bitwise": false,
+        "position": 32,
+        "rms_rel": 0.006909622299584931
+      },
+      {
+        "bitwise": false,
+        "position": 33,
+        "rms_rel": 0.005872090164092538
+      },
+      {
+        "bitwise": false,
+        "position": 34,
+        "rms_rel": 0.0064115447755895465
+      },
+      {
+        "bitwise": false,
+        "position": 35,
+        "rms_rel": 0.0058288456123172325
+      },
+      {
+        "bitwise": false,
+        "position": 36,
+        "rms_rel": 0.006031975091222308
+      },
+      {
+        "bitwise": false,
+        "position": 37,
+        "rms_rel": 0.005944786613968046
+      },
+      {
+        "bitwise": false,
+        "position": 38,
+        "rms_rel": 0.005861832639907399
+      },
+      {
+        "bitwise": false,
+        "position": 39,
+        "rms_rel": 0.0064236146808508135
+      }
+    ],
+    "stop": 40
+  },
+  "schema_version": 1,
+  "seconds": 2.1221940680406988
+}

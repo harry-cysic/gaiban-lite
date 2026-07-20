@@ -236,6 +236,7 @@ def clone_state(source: DirectState) -> DirectState:
             max_seq_len=source.max_seq_len,
             layer_id=source.layer_id,
             device=source.device,
+            kv_dtype=source.kv_dtype,
         )
     elif isinstance(source, StaticRatio4KV):
         result = StaticRatio4KV(
@@ -243,6 +244,8 @@ def clone_state(source: DirectState) -> DirectState:
             max_seq_len=source.max_seq_len,
             layer_id=source.layer_id,
             device=source.device,
+            kv_dtype=source.kv_dtype,
+            indexer_dtype=source.indexer_dtype,
         )
     elif isinstance(source, StaticLayerKV):
         result = StaticLayerKV(
@@ -250,6 +253,7 @@ def clone_state(source: DirectState) -> DirectState:
             max_seq_len=source.max_seq_len,
             layer_id=source.layer_id,
             device=source.device,
+            kv_dtype=source.kv_dtype,
         )
     else:
         raise TypeError("unsupported direct state type")

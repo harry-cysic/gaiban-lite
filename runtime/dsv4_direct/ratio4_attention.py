@@ -32,6 +32,7 @@ from .attention import (
 from .block_weights import ResidentAttentionWeights
 from .model_contract import validate_model_layer_config
 from .moe_forward import dequant_fp8_block
+from .static_kv import LATENT_ROPE_DIM, quantize_latent_rows
 from .static_ratio4_kv import (
     COMPRESS_RATIO,
     INDEX_DIM,
@@ -543,6 +544,12 @@ class Ratio4TorchAttention:
             sparse_attention_backend
         ):
             raise TypeError("ratio-4 sparse attention backend must be callable")
+        if sparse_attention_backend is not None and (
+            state.kv_dtype != "bf16" or state.indexer_dtype != "bf16"
+        ):
+            raise ValueError(
+                "injected ratio-4 sparse backends require BF16 KV storage"
+            )
         self._sparse_attention_backend = sparse_attention_backend
         _validate_attention_projection_backend(
             projection_backend,
@@ -928,6 +935,7 @@ class Ratio4TorchAttention:
         output_dim: int,
         finalizer: Any,
         output_cache: torch.Tensor,
+        output_cache_rope: torch.Tensor | None = None,
         collect_evidence: bool = False,
     ) -> _Ratio4OverlapEvidence | None:
         kv_state[:, plan.overlap_slot].copy_(projected[:, 0])
@@ -937,8 +945,12 @@ class Ratio4TorchAttention:
         pooled = overlap_pool(kv_state, score_state, output_dim=output_dim)
         finalized = finalizer(pooled, plan.group_start_frequencies)
         output_cache[:, plan.compressed_row : plan.compressed_row + 1].copy_(
-            finalized
+            quantize_latent_rows(finalized, output_cache.dtype)
         )
+        if output_cache_rope is not None:
+            output_cache_rope[
+                :, plan.compressed_row : plan.compressed_row + 1
+            ].copy_(finalized[..., -LATENT_ROPE_DIM:])
         evidence = None
         if collect_evidence:
             evidence = _Ratio4OverlapEvidence(
@@ -1112,6 +1124,12 @@ class Ratio4TorchAttention:
         )
         if sparse_attention_backend is None:
             selected = state.latent[plan.batch_indices, plan.topk_indices]
+            if selected.dtype == torch.float8_e4m3fn:
+                selected = selected.to(torch.bfloat16)
+            if state.latent_rope is not None:
+                selected[..., -LATENT_ROPE_DIM:] = state.latent_rope[
+                    plan.batch_indices, plan.topk_indices
+                ]
             attention_scores = torch.einsum(
                 "bshd,bskd->bshk", query.float(), selected.float()
             ) * (cfg.head_dim**-0.5)
@@ -1261,7 +1279,11 @@ class Ratio4TorchAttention:
         raw_latent[..., : -cfg.rope_dim] = fp8_quant_dequant(
             raw_latent[..., : -cfg.rope_dim], group_size=64
         )
-        state.raw[:, plan.raw_slot].copy_(raw_latent[:, 0])
+        state.raw[:, plan.raw_slot].copy_(state._quantize_rows(raw_latent[:, 0]))
+        if state.raw_rope is not None:
+            state.raw_rope[:, plan.raw_slot].copy_(
+                raw_latent[:, 0, -LATENT_ROPE_DIM:]
+            )
 
         main_projected = F.linear(hidden.float(), weights.compressor_wkv)
         main_score = F.linear(hidden.float(), weights.compressor_wgate)
@@ -1275,6 +1297,7 @@ class Ratio4TorchAttention:
             output_dim=LATENT_DIM,
             finalizer=self._main_finalizer,
             output_cache=state.compressed,
+            output_cache_rope=state.compressed_rope,
             collect_evidence=collect_evidence,
         )
 
@@ -1343,6 +1366,12 @@ class Ratio4TorchAttention:
         selected = None
         if sparse_attention_backend is None:
             selected = state.latent[plan.batch_indices, topk]
+            if selected.dtype == torch.float8_e4m3fn:
+                selected = selected.to(torch.bfloat16)
+            if state.latent_rope is not None:
+                selected[..., -LATENT_ROPE_DIM:] = state.latent_rope[
+                    plan.batch_indices, topk
+                ]
             attention_scores = torch.einsum(
                 "bshd,bskd->bshk", query.float(), selected.float()
             ) * (cfg.head_dim**-0.5)

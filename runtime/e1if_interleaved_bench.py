@@ -249,6 +249,20 @@ def main() -> int:
     parser.add_argument(
         "--hc-backend", type=str, default="fused", choices=("fused", "eager", "default")
     )
+    parser.add_argument(
+        "--kv-dtype",
+        type=str,
+        default="bf16",
+        choices=("bf16", "fp8", "fp8_rope_bf16"),
+        help="latent KV storage dtype (A6F fp8_cast capacity option)",
+    )
+    parser.add_argument(
+        "--indexer-kv-dtype",
+        type=str,
+        default="bf16",
+        choices=("bf16", "fp8"),
+        help="ratio-4 indexer_kv storage dtype",
+    )
     parser.add_argument("--progress-every", type=int, default=256)
     parser.add_argument("--config-tag", type=str, default="nogdr-dp-interleaved")
     args = parser.parse_args()
@@ -335,6 +349,8 @@ def main() -> int:
                 "(E0qf serial decomposition caliber)"
             ),
             "hc_backend": args.hc_backend,
+            "kv_dtype": args.kv_dtype,
+            "indexer_kv_dtype": args.indexer_kv_dtype,
             "transport": "NCCL P2P fixed endpoints per lane, no-GDR",
         },
         "config_tag": args.config_tag,
@@ -354,6 +370,8 @@ def main() -> int:
         "device": torch.cuda.get_device_name(device),
         "torch": torch.__version__,
         "seed": args.seed,
+        "kv_dtype": args.kv_dtype,
+        "indexer_kv_dtype": args.indexer_kv_dtype,
         "local_batch": local_batch,
         "mb_count": mb_count,
         "mb_global": mb_global,
@@ -482,6 +500,8 @@ def main() -> int:
                     if rank in (0, 4, 8, 12)
                     else None
                 ),
+                kv_dtype=args.kv_dtype,
+                indexer_kv_dtype=args.indexer_kv_dtype,
             )
 
         stage_material = synchronized_local_step(
@@ -1328,6 +1348,8 @@ def main() -> int:
             {
                 "experiment": "E1F-full-decode-throughput/interleaved",
                 "accepted": accepted_all,
+                "kv_dtype": args.kv_dtype,
+                "indexer_kv_dtype": args.indexer_kv_dtype,
                 "mb_count": mb_count,
                 "local_batch": local_batch,
                 "global_batch": total_global,

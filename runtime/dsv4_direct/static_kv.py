@@ -21,7 +21,63 @@ WINDOW_SIZE = 128
 COMPRESS_RATIO = 128
 LATENT_DIM = 512
 
+# FP8 KV capacity option (A6F fp8_cast form): latent rows are stored as
+# e4m3 and cast back to BF16 after the sparse-core gather.  The rope tail
+# (frozen Flash qk_rope_head_dim == 64, validated by every attention config)
+# may optionally stay BF16 in a parallel side tensor ("fp8_rope_bf16"),
+# mirroring the reference QAT choice of keeping rope dims BF16
+# (model.py:505 comment) at 640 B/row instead of 512 B/row.
+KV_DTYPE_CHOICES = ("bf16", "fp8", "fp8_rope_bf16")
+LATENT_ROPE_DIM = 64
+FP8_LATENT_MAX = 448.0
+
 CompressionFinalizer = Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+
+
+def resolve_kv_dtype(kv_dtype: str) -> torch.dtype:
+    """Map a KV dtype policy string onto the latent storage dtype."""
+
+    if kv_dtype not in KV_DTYPE_CHOICES:
+        raise ValueError(
+            f"kv_dtype must be one of {KV_DTYPE_CHOICES}, got {kv_dtype!r}"
+        )
+    if kv_dtype == "bf16":
+        return torch.bfloat16
+    return torch.float8_e4m3fn
+
+
+def quantize_latent_rows(
+    value: torch.Tensor, storage_dtype: torch.dtype
+) -> torch.Tensor:
+    """Write-side cast of BF16 latent rows to the cache storage dtype.
+
+    Constant scale 1.0 (A6F fp8_cast form) with a saturating clamp to the
+    e4m3 dynamic range: a plain ``.to(float8_e4m3fn)`` maps overflow to NaN,
+    so the clamp freezes saturation semantics instead.  Identity for BF16.
+    """
+
+    if value.dtype == storage_dtype:
+        return value
+    if storage_dtype != torch.float8_e4m3fn:
+        raise TypeError(f"unsupported latent storage dtype {storage_dtype}")
+    return value.clamp(-FP8_LATENT_MAX, FP8_LATENT_MAX).to(storage_dtype)
+
+
+def index_copy_rows(
+    destination: torch.Tensor, index: torch.Tensor, source: torch.Tensor
+) -> None:
+    """dim-1 ``index_copy_`` covering FP8 storage.
+
+    CUDA has no fp8 ``index_copy_`` kernel (verified on torch 2.11.0+cu130);
+    a same-itemsize uint8 reinterpret performs the identical byte movement.
+    """
+
+    if destination.dtype == torch.float8_e4m3fn:
+        destination.view(torch.uint8).index_copy_(
+            1, index, source.contiguous().view(torch.uint8)
+        )
+    else:
+        destination.index_copy_(1, index, source)
 
 
 @dataclass(frozen=True)
@@ -48,6 +104,7 @@ class StaticLayerKV:
         max_seq_len: int,
         layer_id: int = 3,
         device: torch.device | str = "cpu",
+        kv_dtype: str = "bf16",
     ) -> None:
         if (
             not isinstance(num_local_sequences, int)
@@ -64,19 +121,32 @@ class StaticLayerKV:
             raise ValueError("max_seq_len must be a positive multiple of 128")
         if not isinstance(layer_id, int) or isinstance(layer_id, bool) or layer_id < 0:
             raise ValueError("layer_id must be a non-negative integer")
+        latent_dtype = resolve_kv_dtype(kv_dtype)
 
         self.num_local_sequences = num_local_sequences
         self.max_seq_len = max_seq_len
         self.layer_id = layer_id
         self.device = torch.device(device)
+        self.kv_dtype = kv_dtype
         self.compressed_capacity = max_seq_len // COMPRESS_RATIO
 
         self.latent = torch.zeros(
             num_local_sequences,
             WINDOW_SIZE + self.compressed_capacity,
             LATENT_DIM,
-            dtype=torch.bfloat16,
+            dtype=latent_dtype,
             device=self.device,
+        )
+        self.latent_rope: torch.Tensor | None = (
+            torch.zeros(
+                num_local_sequences,
+                WINDOW_SIZE + self.compressed_capacity,
+                LATENT_ROPE_DIM,
+                dtype=torch.bfloat16,
+                device=self.device,
+            )
+            if kv_dtype == "fp8_rope_bf16"
+            else None
         )
         self.kv_state = torch.zeros(
             num_local_sequences,
@@ -114,6 +184,61 @@ class StaticLayerKV:
         return self.latent[:, WINDOW_SIZE:]
 
     @property
+    def raw_rope(self) -> torch.Tensor | None:
+        return None if self.latent_rope is None else self.latent_rope[:, :WINDOW_SIZE]
+
+    @property
+    def compressed_rope(self) -> torch.Tensor | None:
+        return None if self.latent_rope is None else self.latent_rope[:, WINDOW_SIZE:]
+
+    def _quantize_rows(self, value: torch.Tensor) -> torch.Tensor:
+        return quantize_latent_rows(value, self.latent.dtype)
+
+    def quantize_dequantize_rows(self, value: torch.Tensor) -> torch.Tensor:
+        """BF16 rows after one cache write+read round trip (identity for bf16)."""
+
+        if self.kv_dtype == "bf16":
+            return value
+        result = self._quantize_rows(value).to(torch.bfloat16)
+        if self.latent_rope is not None:
+            result[..., -LATENT_ROPE_DIM:] = value[..., -LATENT_ROPE_DIM:]
+        return result
+
+    def dequantized_latent(self) -> torch.Tensor:
+        """BF16 view of the complete latent cache (reads exactly what decode reads)."""
+
+        if self.kv_dtype == "bf16":
+            return self.latent
+        value = self.latent.to(torch.bfloat16)
+        if self.latent_rope is not None:
+            value[..., -LATENT_ROPE_DIM:] = self.latent_rope
+        return value
+
+    def dequantized_compressed(self, count: int) -> torch.Tensor:
+        """BF16 view of the first ``count`` compressed rows."""
+
+        value = self.compressed[:, :count]
+        if self.kv_dtype == "bf16":
+            return value
+        value = value.to(torch.bfloat16)
+        rope = self.compressed_rope
+        if rope is not None:
+            value[..., -LATENT_ROPE_DIM:] = rope[:, :count]
+        return value
+
+    def dequantized_compressed_rows(self, rows: torch.Tensor) -> torch.Tensor:
+        """BF16 view of selected compressed rows (evidence/diagnostics)."""
+
+        value = self.compressed.index_select(1, rows)
+        if self.kv_dtype == "bf16":
+            return value
+        value = value.to(torch.bfloat16)
+        rope = self.compressed_rope
+        if rope is not None:
+            value[..., -LATENT_ROPE_DIM:] = rope.index_select(1, rows)
+        return value
+
+    @property
     def next_position(self) -> int:
         positions = self._next_position
         if not bool(torch.all(positions == positions[0]).item()):
@@ -128,8 +253,12 @@ class StaticLayerKV:
         )
 
     def _owned_tensor_items(self) -> tuple[tuple[str, torch.Tensor], ...]:
+        rope_items: tuple[tuple[str, torch.Tensor], ...] = (
+            () if self.latent_rope is None else (("latent_rope", self.latent_rope),)
+        )
         return (
             ("latent", self.latent),
+            *rope_items,
             ("kv_state", self.kv_state),
             ("score_state", self.score_state),
             ("next_position", self._next_position),
@@ -149,7 +278,7 @@ class StaticLayerKV:
         expected = {
             "latent": (
                 (batch, WINDOW_SIZE + self.compressed_capacity, LATENT_DIM),
-                torch.bfloat16,
+                resolve_kv_dtype(self.kv_dtype),
             ),
             "kv_state": ((batch, COMPRESS_RATIO, LATENT_DIM), torch.float32),
             "score_state": ((batch, COMPRESS_RATIO, LATENT_DIM), torch.float32),
@@ -162,6 +291,15 @@ class StaticLayerKV:
             ),
             "state_positions": ((batch, COMPRESS_RATIO), torch.int64),
         }
+        if self.latent_rope is not None:
+            rope_entry = {
+                "latent_rope": (
+                    (batch, WINDOW_SIZE + self.compressed_capacity, LATENT_ROPE_DIM),
+                    torch.bfloat16,
+                )
+            }
+            reordered = {"latent": expected.pop("latent"), **rope_entry, **expected}
+            expected = reordered
         items = self._owned_tensor_items()
         if tuple(name for name, _ in items) != tuple(expected):
             raise RuntimeError(f"{label} ratio-128 state ownership contract differs")
@@ -207,6 +345,7 @@ class StaticLayerKV:
             self.layer_id,
             self.compressed_capacity,
             self.device,
+            self.kv_dtype,
         )
         source_identity = (
             source.num_local_sequences,
@@ -214,6 +353,7 @@ class StaticLayerKV:
             source.layer_id,
             source.compressed_capacity,
             source.device,
+            source.kv_dtype,
         )
         if identity != source_identity:
             raise ValueError(
@@ -244,6 +384,8 @@ class StaticLayerKV:
         """Clear all payload and metadata so the state can serve a new batch."""
 
         self.latent.zero_()
+        if self.latent_rope is not None:
+            self.latent_rope.zero_()
         self.kv_state.zero_()
         self.score_state.fill_(float("-inf"))
         self._next_position.zero_()
@@ -294,9 +436,13 @@ class StaticLayerKV:
 
         # Build the complete replacement before touching resident state. This
         # also makes seeding safe when a caller passes views of this state.
-        latent = torch.zeros_like(self.latent)
-        latent[:, :WINDOW_SIZE].copy_(raw)
-        latent[:, WINDOW_SIZE : WINDOW_SIZE + completed].copy_(compressed)
+        # The seed contract stays BF16; FP8 storage quantizes on install.
+        latent_bf16 = torch.zeros(
+            self.latent.shape, dtype=torch.bfloat16, device=self.device
+        )
+        latent_bf16[:, :WINDOW_SIZE].copy_(raw)
+        latent_bf16[:, WINDOW_SIZE : WINDOW_SIZE + completed].copy_(compressed)
+        latent = self._quantize_rows(latent_bf16)
         kv_state = torch.zeros_like(self.kv_state)
         score_state = torch.full_like(self.score_state, float("-inf"))
 
@@ -329,6 +475,8 @@ class StaticLayerKV:
         compressed_count = torch.full_like(self._compressed_count, completed)
 
         self.latent.copy_(latent)
+        if self.latent_rope is not None:
+            self.latent_rope.copy_(latent_bf16[..., -LATENT_ROPE_DIM:])
         self.kv_state.copy_(kv_state)
         self.score_state.copy_(score_state)
         self._raw_positions.copy_(raw_positions)
@@ -348,7 +496,10 @@ class StaticLayerKV:
     ) -> None:
         """Commit one prevalidated non-boundary decode token without host sync."""
 
-        self.raw[:, slot].copy_(raw_latent[:, 0])
+        self.raw[:, slot].copy_(self._quantize_rows(raw_latent[:, 0]))
+        raw_rope = self.raw_rope
+        if raw_rope is not None:
+            raw_rope[:, slot].copy_(raw_latent[:, 0, -LATENT_ROPE_DIM:])
         self.kv_state[:, slot].copy_(projected_kv[:, 0])
         self.score_state[:, slot].copy_(adjusted_score)
         self._raw_positions[:, slot].fill_(position)
@@ -400,7 +551,12 @@ class StaticLayerKV:
 
         slot = position.remainder(COMPRESS_RATIO)
         expanded_position = position.view(1, 1).expand(batch, 1)
-        self.raw.index_copy_(1, slot, raw_latent)
+        index_copy_rows(self.raw, slot, self._quantize_rows(raw_latent))
+        raw_rope = self.raw_rope
+        if raw_rope is not None:
+            raw_rope.index_copy_(
+                1, slot, raw_latent[..., -LATENT_ROPE_DIM:].contiguous()
+            )
         self.kv_state.index_copy_(1, slot, projected_kv)
         self.score_state.index_copy_(1, slot, adjusted_score.unsqueeze(1))
         self._raw_positions.index_copy_(1, slot, expanded_position)
@@ -419,7 +575,16 @@ class StaticLayerKV:
                 shape,
                 torch.bfloat16,
             )
-            self.compressed.index_copy_(1, compressed_row, finalized)
+            index_copy_rows(
+                self.compressed, compressed_row, self._quantize_rows(finalized)
+            )
+            compressed_rope = self.compressed_rope
+            if compressed_rope is not None:
+                compressed_rope.index_copy_(
+                    1,
+                    compressed_row,
+                    finalized[..., -LATENT_ROPE_DIM:].contiguous(),
+                )
             self._compressed_group_starts.index_copy_(
                 1,
                 compressed_row,
@@ -443,6 +608,7 @@ class StaticLayerKV:
             "latent_dim": LATENT_DIM,
             "latent_shape": list(self.latent.shape),
             "latent_dtype": str(self.latent.dtype),
+            "kv_dtype": self.kv_dtype,
             "compressor_state_dtype": str(self.kv_state.dtype),
             "next_position": self._next_position.cpu().tolist(),
             "compressed_count": self._compressed_count.cpu().tolist(),
@@ -500,7 +666,16 @@ class StaticLayerKV:
             seqlen - kept, seqlen, dtype=torch.int64, device=self.device
         )
         raw_slots = absolute_positions.remainder(WINDOW_SIZE)
-        self.raw.index_copy_(1, raw_slots, raw_latent[:, -kept:])
+        index_copy_rows(
+            self.raw, raw_slots, self._quantize_rows(raw_latent[:, -kept:])
+        )
+        raw_rope = self.raw_rope
+        if raw_rope is not None:
+            raw_rope.index_copy_(
+                1,
+                raw_slots,
+                raw_latent[:, -kept:, -LATENT_ROPE_DIM:].contiguous(),
+            )
         self._raw_positions.index_copy_(
             1,
             raw_slots,
@@ -508,7 +683,12 @@ class StaticLayerKV:
         )
 
         if finalized is not None:
-            self.compressed[:, :completed].copy_(finalized)
+            self.compressed[:, :completed].copy_(self._quantize_rows(finalized))
+            compressed_rope = self.compressed_rope
+            if compressed_rope is not None:
+                compressed_rope[:, :completed].copy_(
+                    finalized[..., -LATENT_ROPE_DIM:]
+                )
             starts = torch.arange(
                 0, cutoff, COMPRESS_RATIO, dtype=torch.int64, device=self.device
             )
@@ -592,7 +772,10 @@ class StaticLayerKV:
                 finalize_compressed=finalize_compressed,
             )
 
-        self.raw[:, raw_slot].copy_(raw_latent[:, 0])
+        self.raw[:, raw_slot].copy_(self._quantize_rows(raw_latent[:, 0]))
+        raw_rope = self.raw_rope
+        if raw_rope is not None:
+            raw_rope[:, raw_slot].copy_(raw_latent[:, 0, -LATENT_ROPE_DIM:])
         self._raw_positions[:, raw_slot].fill_(position)
         self.kv_state[:, state_slot].copy_(projected_kv[:, 0])
         self.score_state[:, state_slot].copy_(adjusted_score)
@@ -600,7 +783,12 @@ class StaticLayerKV:
 
         if finalized is not None:
             row = expected_compressed
-            self.compressed[:, row : row + 1].copy_(finalized)
+            self.compressed[:, row : row + 1].copy_(self._quantize_rows(finalized))
+            compressed_rope = self.compressed_rope
+            if compressed_rope is not None:
+                compressed_rope[:, row : row + 1].copy_(
+                    finalized[..., -LATENT_ROPE_DIM:]
+                )
             self._compressed_group_starts[:, row].fill_(
                 position + 1 - COMPRESS_RATIO
             )
@@ -715,9 +903,15 @@ class StaticLayerKV:
 
 __all__ = [
     "COMPRESS_RATIO",
+    "FP8_LATENT_MAX",
+    "KV_DTYPE_CHOICES",
     "LATENT_DIM",
+    "LATENT_ROPE_DIM",
     "WINDOW_SIZE",
     "CompressionFinalizer",
     "CompressionWrite",
     "StaticLayerKV",
+    "index_copy_rows",
+    "quantize_latent_rows",
+    "resolve_kv_dtype",
 ]

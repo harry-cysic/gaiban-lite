@@ -55,6 +55,11 @@ from .ratio4_attention import (
     hadamard_transform,
     overlap_pool,
 )
+from .static_kv import (
+    LATENT_ROPE_DIM,
+    quantize_latent_rows,
+    resolve_kv_dtype,
+)
 from .static_ratio4_kv import (
     COMPRESS_RATIO,
     INDEX_DIM,
@@ -77,6 +82,8 @@ class Ratio4FullPositionAttention:
         *,
         batch_size: int,
         device: torch.device,
+        kv_dtype: str = "bf16",
+        indexer_dtype: str = "bf16",
     ) -> None:
         config.validate()
         if weights.layer_id != config.layer_id:
@@ -85,9 +92,16 @@ class Ratio4FullPositionAttention:
             )
         if not isinstance(batch_size, int) or isinstance(batch_size, bool) or batch_size <= 0:
             raise Ratio4FullPositionError("batch_size must be a positive integer")
+        latent_dtype = resolve_kv_dtype(kv_dtype)
+        if indexer_dtype not in ("bf16", "fp8"):
+            raise Ratio4FullPositionError(
+                f"indexer_dtype must be 'bf16' or 'fp8', got {indexer_dtype!r}"
+            )
         self.config = config
         self.weights = weights
         self.batch_size = batch_size
+        self.kv_dtype = kv_dtype
+        self.indexer_dtype = indexer_dtype
         self.device = torch.device(device)
         self.freqs_cis = precompute_freqs_cis(
             dim=config.rope_dim,
@@ -100,15 +114,47 @@ class Ratio4FullPositionAttention:
             device=self.device,
         )
         capacity = config.max_seq_len // COMPRESS_RATIO
-        # Reference-shaped state (model.py:300-305, :399, :473-474).
+        # Reference-shaped state (model.py:300-305, :399, :473-474).  FP8 KV
+        # stores latent rows as e4m3 (A6F fp8_cast form) and reads them back
+        # through a BF16 cast; "fp8_rope_bf16" keeps the rope tail BF16 in
+        # parallel side tensors.
         self.raw = torch.zeros(
-            batch_size, WINDOW_SIZE, LATENT_DIM, dtype=torch.bfloat16, device=device
+            batch_size, WINDOW_SIZE, LATENT_DIM, dtype=latent_dtype, device=device
         )
         self.compressed = torch.zeros(
-            batch_size, capacity, LATENT_DIM, dtype=torch.bfloat16, device=device
+            batch_size, capacity, LATENT_DIM, dtype=latent_dtype, device=device
+        )
+        rope_split = kv_dtype == "fp8_rope_bf16"
+        self.raw_rope: torch.Tensor | None = (
+            torch.zeros(
+                batch_size,
+                WINDOW_SIZE,
+                LATENT_ROPE_DIM,
+                dtype=torch.bfloat16,
+                device=device,
+            )
+            if rope_split
+            else None
+        )
+        self.compressed_rope: torch.Tensor | None = (
+            torch.zeros(
+                batch_size,
+                capacity,
+                LATENT_ROPE_DIM,
+                dtype=torch.bfloat16,
+                device=device,
+            )
+            if rope_split
+            else None
         )
         self.indexer_kv = torch.zeros(
-            batch_size, capacity, INDEX_DIM, dtype=torch.bfloat16, device=device
+            batch_size,
+            capacity,
+            INDEX_DIM,
+            dtype=(
+                torch.bfloat16 if indexer_dtype == "bf16" else torch.float8_e4m3fn
+            ),
+            device=device,
         )
         self.main_kv_state = torch.zeros(
             batch_size, 2 * COMPRESS_RATIO, 2 * LATENT_DIM,
@@ -122,6 +168,33 @@ class Ratio4FullPositionAttention:
         self.index_score_state = torch.full_like(self.index_kv_state, float("-inf"))
         self.next_position = 0
         self.compressed_count = 0
+
+    # ------------------------------------------------------------------
+    # FP8 KV storage helpers
+
+    def _quantize_rows(self, value: torch.Tensor) -> torch.Tensor:
+        return quantize_latent_rows(value, self.raw.dtype)
+
+    def _quantize_indexer_rows(self, value: torch.Tensor) -> torch.Tensor:
+        return quantize_latent_rows(value, self.indexer_kv.dtype)
+
+    def _quantize_dequantize_rows(self, value: torch.Tensor) -> torch.Tensor:
+        if self.kv_dtype == "bf16":
+            return value
+        result = self._quantize_rows(value).to(torch.bfloat16)
+        if self.raw_rope is not None:
+            result[..., -LATENT_ROPE_DIM:] = value[..., -LATENT_ROPE_DIM:]
+        return result
+
+    def _dequantized(
+        self, value: torch.Tensor, rope: torch.Tensor | None
+    ) -> torch.Tensor:
+        if self.kv_dtype == "bf16":
+            return value
+        result = value.to(torch.bfloat16)
+        if rope is not None:
+            result[..., -LATENT_ROPE_DIM:] = rope
+        return result
 
     # ------------------------------------------------------------------
     # compression finalizers (mirror of Ratio4TorchAttention:889-918,
@@ -166,6 +239,7 @@ class Ratio4FullPositionAttention:
         output_dim: int,
         finalizer,
         output_cache: torch.Tensor,
+        output_cache_rope: torch.Tensor | None = None,
     ) -> int:
         """Reference overlap-compressor prefill (model.py:325-342, :307-314).
 
@@ -212,7 +286,11 @@ class Ratio4FullPositionAttention:
         finalized = finalizer(
             pooled, self.freqs_cis[0:cutoff:COMPRESS_RATIO]
         )
-        output_cache[:, :rows].copy_(finalized)
+        output_cache[:, :rows].copy_(
+            quantize_latent_rows(finalized, output_cache.dtype)
+        )
+        if output_cache_rope is not None:
+            output_cache_rope[:, :rows].copy_(finalized[..., -LATENT_ROPE_DIM:])
         return rows
 
     def _decode_compress(
@@ -225,6 +303,7 @@ class Ratio4FullPositionAttention:
         output_dim: int,
         finalizer,
         output_cache: torch.Tensor,
+        output_cache_rope: torch.Tensor | None = None,
         overlap_slot: int,
         boundary: bool,
         compressed_row: int,
@@ -238,7 +317,13 @@ class Ratio4FullPositionAttention:
             return
         pooled = overlap_pool(kv_state, score_state, output_dim=output_dim)
         finalized = finalizer(pooled, group_start_frequencies)
-        output_cache[:, compressed_row : compressed_row + 1].copy_(finalized)
+        output_cache[:, compressed_row : compressed_row + 1].copy_(
+            quantize_latent_rows(finalized, output_cache.dtype)
+        )
+        if output_cache_rope is not None:
+            output_cache_rope[:, compressed_row : compressed_row + 1].copy_(
+                finalized[..., -LATENT_ROPE_DIM:]
+            )
         kv_state[:, :COMPRESS_RATIO].copy_(kv_state[:, COMPRESS_RATIO:])
         score_state[:, :COMPRESS_RATIO].copy_(score_state[:, COMPRESS_RATIO:])
 
@@ -303,7 +388,11 @@ class Ratio4FullPositionAttention:
 
         if start_pos == 0:
             # ring keeps the whole (<= window) prefill (model.py:520-521)
-            self.raw[:, :seqlen].copy_(raw_latent)
+            self.raw[:, :seqlen].copy_(self._quantize_rows(raw_latent))
+            if self.raw_rope is not None:
+                self.raw_rope[:, :seqlen].copy_(
+                    raw_latent[..., -LATENT_ROPE_DIM:]
+                )
             main_rows = self._prefill_compress(
                 main_projected,
                 main_score,
@@ -313,6 +402,7 @@ class Ratio4FullPositionAttention:
                 output_dim=LATENT_DIM,
                 finalizer=self._finalize_main,
                 output_cache=self.compressed,
+                output_cache_rope=self.compressed_rope,
             )
             index_rows = self._prefill_compress(
                 index_projected,
@@ -328,8 +418,18 @@ class Ratio4FullPositionAttention:
                 raise AssertionError("main/index compressors disagree on row count")
             compressed_count = main_rows
             offset = seqlen  # model.py:509 (prefill: raw rows precede compressed)
+            compressed_rope = self.compressed_rope
             attention_kv = torch.cat(
-                (raw_latent, self.compressed[:, :compressed_count]), dim=1
+                (
+                    self._quantize_dequantize_rows(raw_latent),
+                    self._dequantized(
+                        self.compressed[:, :compressed_count],
+                        None
+                        if compressed_rope is None
+                        else compressed_rope[:, :compressed_count],
+                    ),
+                ),
+                dim=1,
             )
         else:
             phase = start_pos % COMPRESS_RATIO
@@ -339,7 +439,13 @@ class Ratio4FullPositionAttention:
             group_start_frequencies = self.freqs_cis[
                 start_pos + 1 - COMPRESS_RATIO : start_pos + 2 - COMPRESS_RATIO
             ]
-            self.raw[:, start_pos % WINDOW_SIZE].copy_(raw_latent[:, 0])
+            self.raw[:, start_pos % WINDOW_SIZE].copy_(
+                self._quantize_rows(raw_latent[:, 0])
+            )
+            if self.raw_rope is not None:
+                self.raw_rope[:, start_pos % WINDOW_SIZE].copy_(
+                    raw_latent[:, 0, -LATENT_ROPE_DIM:]
+                )
             self._decode_compress(
                 main_projected,
                 main_score[:, 0] + weights.compressor_ape[phase],
@@ -348,6 +454,7 @@ class Ratio4FullPositionAttention:
                 output_dim=LATENT_DIM,
                 finalizer=self._finalize_main,
                 output_cache=self.compressed,
+                output_cache_rope=self.compressed_rope,
                 overlap_slot=overlap_slot,
                 boundary=boundary,
                 compressed_row=compressed_row,
@@ -368,8 +475,18 @@ class Ratio4FullPositionAttention:
             )
             compressed_count = (start_pos + 1) // COMPRESS_RATIO
             offset = WINDOW_SIZE  # model.py:509 (decode: ring precedes compressed)
+            compressed_rope = self.compressed_rope
             attention_kv = torch.cat(
-                (self.raw, self.compressed[:, :compressed_count]), dim=1
+                (
+                    self._dequantized(self.raw, self.raw_rope),
+                    self._dequantized(
+                        self.compressed[:, :compressed_count],
+                        None
+                        if compressed_rope is None
+                        else compressed_rope[:, :compressed_count],
+                    ),
+                ),
+                dim=1,
             )
 
         # indexer scoring (model.py:411-433; ops mirror ratio4_attention:1313-1338)

@@ -1,0 +1,211 @@
+W0720 17:37:13.536000 167967 torch/distributed/run.py:851] 
+W0720 17:37:13.536000 167967 torch/distributed/run.py:851] *****************************************
+W0720 17:37:13.536000 167967 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 17:37:13.536000 167967 torch/distributed/run.py:851] *****************************************
+[E1IF] placement {0: ['titan064'], 1: ['titan064'], 2: ['titan065'], 3: ['titan065']}
+[E1IF] layer=11 rank=0 experts=256/256
+[E1IF] stage 1 layer 11 material loaded
+[E1IF] layer=0 rank=0 experts=256/256
+[E1IF] stage 0 layer 0 material loaded
+[E1IF] layer=12 rank=0 experts=256/256
+[E1IF] stage 1 layer 12 material loaded
+[E1IF] layer=1 rank=0 experts=256/256
+[E1IF] stage 0 layer 1 material loaded
+[E1IF] layer=13 rank=0 experts=256/256
+[E1IF] stage 1 layer 13 material loaded
+[E1IF] layer=2 rank=0 experts=256/256
+[E1IF] stage 0 layer 2 material loaded
+[E1IF] layer=14 rank=0 experts=256/256
+[E1IF] stage 1 layer 14 material loaded
+[E1IF] layer=3 rank=0 experts=256/256
+[E1IF] stage 0 layer 3 material loaded
+[E1IF] layer=15 rank=0 experts=256/256
+[E1IF] layer=4 rank=0 experts=256/256
+[E1IF] stage 1 layer 15 material loaded
+[E1IF] stage 0 layer 4 material loaded
+[E1IF] layer=5 rank=0 experts=256/256
+[E1IF] layer=16 rank=0 experts=256/256
+[E1IF] stage 0 layer 5 material loaded
+[E1IF] stage 1 layer 16 material loaded
+[E1IF] layer=6 rank=0 experts=256/256
+[E1IF] stage 0 layer 6 material loaded
+[E1IF] layer=17 rank=0 experts=256/256
+[E1IF] stage 1 layer 17 material loaded
+[E1IF] layer=7 rank=0 experts=256/256
+[E1IF] stage 0 layer 7 material loaded
+[E1IF] layer=18 rank=0 experts=256/256
+[E1IF] stage 1 layer 18 material loaded
+[E1IF] layer=8 rank=0 experts=256/256
+[E1IF] stage 0 layer 8 material loaded
+[E1IF] layer=19 rank=0 experts=256/256
+[E1IF] stage 1 layer 19 material loaded
+[E1IF] layer=9 rank=0 experts=256/256
+[E1IF] stage 0 layer 9 material loaded
+[E1IF] layer=20 rank=0 experts=256/256
+[E1IF] stage 1 layer 20 material loaded
+[E1IF] layer=10 rank=0 experts=256/256
+[E1IF] stage 0 layer 10 material loaded
+[E1IF] layer=21 rank=0 experts=256/256
+[E1IF] stage 1 layer 21 material loaded
+[E1IF] stage 1 loaded (11 layers, free 6.85 GiB, 13s)
+[E1IF] stage 0 loaded (11 layers, free 5.94 GiB, 13s)
+[E1IF] stage 0 lane mb0 built
+[E1IF] stage 0 lane mb1 built
+[E1IF] stage 0 lane mb2 built
+[E1IF] stage 0 lane mb3 built
+[E1IF] stage 1 4 lanes built, free 2.73 GiB
+[E1IF] stage 0 4 lanes built, free 1.92 GiB
+[E1IF] stage 0 mb0 warm done
+[E1IF] stage 0 mb1 warm done
+[E1IF] stage 0 mb2 warm done
+[E1IF] stage 0 mb3 warm done
+[E1IF] stage 0 warmup done (80s, free 2.49 GiB)
+[E1IF] stage 1 warmup done (80s, free 3.42 GiB)
+[E1IF] stage 0 settle captured mb0/normal at position 8192 (0.1s)
+[E1IF] stage 0 settle captured mb1/normal at position 8192 (0.1s)
+[E1IF] stage 0 settle captured mb2/normal at position 8192 (0.1s)
+[E1IF] stage 0 settle captured mb3/normal at position 8192 (0.1s)
+[E1IF] settle cycle 0/132 pos 8192 family normal
+[E1IF] stage 0 settle captured mb0/ratio4_boundary at position 8195 (0.1s)
+[E1IF] stage 0 settle captured mb1/ratio4_boundary at position 8195 (0.1s)
+[E1IF] stage 0 settle captured mb2/ratio4_boundary at position 8195 (0.1s)
+[E1IF] stage 0 settle captured mb3/ratio4_boundary at position 8195 (0.1s)
+[E1IF] settle cycle 64/132 pos 8256 family normal
+[E1IF] stage 0 settle captured mb0/ratio4_ratio128_boundary at position 8319 (0.1s)
+[E1F][rank 1] capture mb1 ratio4_ratio128_boundary raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 841, in capture
+    return capture_stateful_graph(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/stateful_graph.py", line 448, in capture_stateful_graph
+    output = stage.forward_stateful_decode_tensor_prevalidated(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/superstage.py", line 1505, in forward_stateful_decode_tensor_prevalidated
+    output = self._forward_stateful_fused_chain(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/superstage.py", line 1421, in _forward_stateful_fused_chain
+    branch_output = block.run_stateful_attention(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/block.py", line 789, in run_stateful_attention
+    return self.attention.forward_stateful_decode_tensor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_attention.py", line 1101, in forward_stateful_decode_tensor
+    "bshd,btd->bsht", index_query.float(), index_kv.float()
+                                           ^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 68.00 MiB. GPU 1 has a total capacity of 23.52 GiB of which 43.88 MiB is free. Including non-PyTorch memory, this process has 23.47 GiB memory in use. Of the allocated memory 21.31 GiB is allocated by PyTorch, with 2.19 GiB allocated in private pools (e.g., CUDA Graphs), and 1.14 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 2] capture mb1 ratio4_ratio128_boundary raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 841, in capture
+    return capture_stateful_graph(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/stateful_graph.py", line 448, in capture_stateful_graph
+    output = stage.forward_stateful_decode_tensor_prevalidated(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/superstage.py", line 1505, in forward_stateful_decode_tensor_prevalidated
+    output = self._forward_stateful_fused_chain(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/superstage.py", line 1421, in _forward_stateful_fused_chain
+    branch_output = block.run_stateful_attention(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/block.py", line 789, in run_stateful_attention
+    return self.attention.forward_stateful_decode_tensor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_attention.py", line 1101, in forward_stateful_decode_tensor
+    "bshd,btd->bsht", index_query.float(), index_kv.float()
+                                           ^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 68.00 MiB. GPU 2 has a total capacity of 23.52 GiB of which 43.88 MiB is free. Including non-PyTorch memory, this process has 23.47 GiB memory in use. Of the allocated memory 21.31 GiB is allocated by PyTorch, with 2.19 GiB allocated in private pools (e.g., CUDA Graphs), and 1.14 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 3] capture mb1 ratio4_ratio128_boundary raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 841, in capture
+    return capture_stateful_graph(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/stateful_graph.py", line 448, in capture_stateful_graph
+    output = stage.forward_stateful_decode_tensor_prevalidated(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/superstage.py", line 1505, in forward_stateful_decode_tensor_prevalidated
+    output = self._forward_stateful_fused_chain(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/superstage.py", line 1421, in _forward_stateful_fused_chain
+    branch_output = block.run_stateful_attention(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/block.py", line 789, in run_stateful_attention
+    return self.attention.forward_stateful_decode_tensor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_attention.py", line 1101, in forward_stateful_decode_tensor
+    "bshd,btd->bsht", index_query.float(), index_kv.float()
+                                           ^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 68.00 MiB. GPU 3 has a total capacity of 23.52 GiB of which 63.88 MiB is free. Including non-PyTorch memory, this process has 23.45 GiB memory in use. Of the allocated memory 21.31 GiB is allocated by PyTorch, with 2.19 GiB allocated in private pools (e.g., CUDA Graphs), and 1.14 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 0] capture mb1 ratio4_ratio128_boundary raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 841, in capture
+    return capture_stateful_graph(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/stateful_graph.py", line 448, in capture_stateful_graph
+    output = stage.forward_stateful_decode_tensor_prevalidated(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/superstage.py", line 1505, in forward_stateful_decode_tensor_prevalidated
+    output = self._forward_stateful_fused_chain(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/superstage.py", line 1421, in _forward_stateful_fused_chain
+    branch_output = block.run_stateful_attention(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/block.py", line 789, in run_stateful_attention
+    return self.attention.forward_stateful_decode_tensor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_attention.py", line 1101, in forward_stateful_decode_tensor
+    "bshd,btd->bsht", index_query.float(), index_kv.float()
+                                           ^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 68.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 43.88 MiB is free. Including non-PyTorch memory, this process has 23.47 GiB memory in use. Of the allocated memory 21.31 GiB is allocated by PyTorch, with 2.19 GiB allocated in private pools (e.g., CUDA Graphs), and 1.14 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+W0720 17:53:03.422000 167967 torch/distributed/elastic/agent/server/api.py:739] Received 15 death signal, shutting down workers
+W0720 17:53:03.426000 167967 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 168058 closing signal SIGTERM
+W0720 17:53:03.427000 167967 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 168059 closing signal SIGTERM
+W0720 17:53:03.427000 167967 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 168060 closing signal SIGTERM
+W0720 17:53:03.427000 167967 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 168061 closing signal SIGTERM
+W0720 17:53:03.427000 167967 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 168062 closing signal SIGTERM
+W0720 17:53:03.427000 167967 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 168063 closing signal SIGTERM
+W0720 17:53:03.427000 167967 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 168064 closing signal SIGTERM
+W0720 17:53:03.427000 167967 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 168065 closing signal SIGTERM
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 308, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/metrics/api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 731, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 908, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 86, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 167967 got signal: 15

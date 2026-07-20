@@ -623,10 +623,22 @@ def _torch_sparse_decode_prevalidated(
     attn_sink: torch.Tensor,
     plan: Ratio128DecodePlan,
     softmax_scale: float,
+    latent_rope: torch.Tensor | None = None,
 ) -> torch.Tensor:
-    """Fixed-index sparse MLA used after decode-plan validation."""
+    """Fixed-index sparse MLA used after decode-plan validation.
+
+    FP8 KV (A6F fp8_cast form): an e4m3 cache is cast back to BF16 right
+    after the gather; an optional BF16 ``latent_rope`` side tensor overwrites
+    the rope tail so positional lanes stay full precision.
+    """
 
     selected = latent_kv[plan.batch_indices, plan.gather_indices]
+    if selected.dtype == torch.float8_e4m3fn:
+        selected = selected.to(torch.bfloat16)
+    if latent_rope is not None:
+        selected[..., -latent_rope.shape[-1] :] = latent_rope[
+            plan.batch_indices, plan.gather_indices
+        ]
     scores = torch.einsum(
         "bshd,bskd->bshk", query.float(), selected.float()
     ) * softmax_scale
@@ -645,10 +657,20 @@ def _torch_sparse_decode_padded_prevalidated(
     attn_sink: torch.Tensor,
     plan: Ratio128StatefulDecodePlan,
     softmax_scale: float,
+    latent_rope: torch.Tensor | None = None,
 ) -> torch.Tensor:
-    """Fixed-width sparse MLA with an explicit mask for ``-1`` padding."""
+    """Fixed-width sparse MLA with an explicit mask for ``-1`` padding.
+
+    FP8 KV: same read-side cast form as the fixed-index variant above.
+    """
 
     selected = latent_kv[plan.batch_indices, plan.gather_indices]
+    if selected.dtype == torch.float8_e4m3fn:
+        selected = selected.to(torch.bfloat16)
+    if latent_rope is not None:
+        selected[..., -latent_rope.shape[-1] :] = latent_rope[
+            plan.batch_indices, plan.gather_indices
+        ]
     selected = selected.masked_fill(~plan.valid_mask.unsqueeze(-1), 0.0)
     scores = torch.einsum(
         "bshd,bskd->bshk", query.float(), selected.float()
@@ -802,6 +824,10 @@ class Ratio128TorchAttention:
             sparse_attention_backend
         ):
             raise TypeError("ratio-128 sparse attention backend must be callable")
+        if sparse_attention_backend is not None and state.kv_dtype != "bf16":
+            raise ValueError(
+                "injected ratio-128 sparse backends require BF16 KV storage"
+            )
         self._sparse_attention_backend = sparse_attention_backend
         _validate_attention_projection_backend(
             projection_backend,
@@ -1215,6 +1241,7 @@ class Ratio128TorchAttention:
             self.weights.attn_sink,
             plan,
             cfg.head_dim**-0.5,
+            latent_rope=self.state.latent_rope,
         )
         if stage_marker is not None:
             stage_marker("sparse_done")
@@ -1349,6 +1376,7 @@ class Ratio128TorchAttention:
                 self.weights.attn_sink,
                 plan,
                 cfg.head_dim**-0.5,
+                latent_rope=self.state.latent_rope,
             )
         else:
             output = sparse_attention_backend(
@@ -1491,8 +1519,14 @@ class Ratio128TorchAttention:
                 finalize_compressed=self._compress_finalizer,
             )
             compressed_count = seqlen // COMPRESS_RATIO
+            # FP8 KV: attention reads what the cache would return (write+read
+            # round trip of the fresh rows; dequantized compressed rows).
             attention_kv = torch.cat(
-                (raw_latent, self.state.compressed[:, :compressed_count]), dim=1
+                (
+                    self.state.quantize_dequantize_rows(raw_latent),
+                    self.state.dequantized_compressed(compressed_count),
+                ),
+                dim=1,
             )
             compressed = compressed_topk_indices(
                 batch_size=batch,
@@ -1509,7 +1543,7 @@ class Ratio128TorchAttention:
                 ape=self.weights.compressor_ape,
                 finalize_compressed=self._compress_finalizer,
             )
-            attention_kv = self.state.latent
+            attention_kv = self.state.dequantized_latent()
             compressed = compressed_topk_indices(
                 batch_size=batch,
                 seqlen=1,
@@ -1527,7 +1561,7 @@ class Ratio128TorchAttention:
                 )
                 record(
                     "compression_finalized",
-                    self.state.compressed.index_select(1, compressed_rows),
+                    self.state.dequantized_compressed_rows(compressed_rows),
                 )
         record("attention_kv", attention_kv)
         window = window_topk_indices(

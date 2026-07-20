@@ -55,6 +55,11 @@ from dsv4_direct.block_weights import (
 )
 from dsv4_direct.checkpoint import inspect_stage_checkpoint
 from dsv4_direct.static_window_kv import StaticWindowKV
+from fp8_kv_gate_common import (
+    FP8_STAGE_RMS_REL_OVERRIDES,
+    fp8_qdq_error_stats,
+    latent_amplitude_stats,
+)
 from dsv4_direct.window_attention import (
     WindowAttentionConfig,
     WindowTorchAttention,
@@ -323,7 +328,9 @@ def compare_phase(
     add_metric(
         stage_metrics,
         f"{phase}.state.raw",
-        candidate_state.raw,
+        # FP8 KV: compare the BF16 values decode actually reads (identity
+        # for bf16 storage, so the frozen comparison is unchanged there).
+        candidate_state.dequantized_latent(),
         oracle_state.raw,
     )
 
@@ -339,12 +346,14 @@ def run_case(
     candidate_weights: Any,
     oracle_weights: Any,
     device: torch.device,
+    kv_dtype: str = "bf16",
 ) -> dict[str, Any]:
     candidate_state = StaticWindowKV(
         num_local_sequences=1,
         max_seq_len=config.max_seq_len,
         layer_id=EXPECTED_LAYER,
         device=device,
+        kv_dtype=kv_dtype,
     )
     candidate = WindowTorchAttention(
         config,
@@ -366,6 +375,7 @@ def run_case(
     stage_metrics: dict[str, dict[str, Any]] = {}
     exact_checks: dict[str, bool] = {}
     inputs: dict[str, dict[str, Any]] = {}
+    fp8_diagnostics: dict[str, Any] = {}
 
     phase_specs = [("prefill", 0, prefill_len, seed + rank * 100_003)]
     for step in range(decode_steps):
@@ -427,6 +437,15 @@ def run_case(
         if not torch.equal(oracle_hidden, canonical_hidden):
             raise AssertionError("oracle attention mutated its hidden input")
         oracle_state = oracle_step.state
+        if kv_dtype != "bf16" and phase in ("prefill", f"decode_pos{prefill_len:03d}"):
+            fp8_diagnostics[phase] = {
+                "raw_latent_amplitude": latent_amplitude_stats(
+                    candidate_evidence["raw_latent"], rope_dim=config.rope_dim
+                ),
+                "raw_latent_qdq_error": fp8_qdq_error_stats(
+                    candidate_evidence["raw_latent"], rope_dim=config.rope_dim
+                ),
+            }
         compare_phase(
             phase=phase,
             candidate_evidence=candidate_evidence,
@@ -446,9 +465,11 @@ def run_case(
         "accepted": accepted,
         "prefill_len": prefill_len,
         "decode_steps": decode_steps,
+        "kv_dtype": kv_dtype,
         "inputs": inputs,
         "exact_checks": exact_checks,
         "stage_metrics": stage_metrics,
+        "fp8_diagnostics": fp8_diagnostics,
         "errors": [],
     }
 
@@ -534,7 +555,20 @@ def main() -> int:
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--seed", type=int, default=20260720)
     parser.add_argument("--max-seq-len", type=int, default=256)
+    parser.add_argument(
+        "--kv-dtype",
+        type=str,
+        default="bf16",
+        choices=("bf16", "fp8", "fp8_rope_bf16"),
+        help="candidate latent KV storage dtype (oracle stays reference BF16)",
+    )
     args = parser.parse_args()
+    if args.kv_dtype != "bf16":
+        # FP8 KV semantic-change arm (E0hf form): cache-derived stages get
+        # magnitude-recording ceilings; other stages keep frozen limits.
+        for key, value in FP8_STAGE_RMS_REL_OVERRIDES.items():
+            if key in STAGE_RMS_REL_LIMITS:
+                STAGE_RMS_REL_LIMITS[key] = value
 
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
     torch.cuda.set_device(local_rank)
@@ -553,6 +587,8 @@ def main() -> int:
     workload = {
         "local_batch": 1,
         "max_seq_len": args.max_seq_len,
+        "kv_dtype": args.kv_dtype,
+        "stage_rms_rel_limits": dict(STAGE_RMS_REL_LIMITS),
         "seed": args.seed,
         "cases": [
             {"name": name, "prefill_len": prefill, "decode_steps": steps}
@@ -681,6 +717,7 @@ def main() -> int:
                     candidate_weights=candidate_weights,
                     oracle_weights=oracle_weights,
                     device=device,
+                    kv_dtype=args.kv_dtype,
                 )
             except Exception:
                 result["cases"][case_name] = {

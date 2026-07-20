@@ -182,6 +182,8 @@ class PhysicalLayerMaterial:
     sinkhorn_iters: int
     hc_eps: float
     evidence: Mapping[str, Any]
+    kv_dtype: str = "bf16"
+    indexer_kv_dtype: str = "bf16"
 
     def new_state(self, *, num_local_sequences: int) -> PhysicalLayerState:
         if self.kind == "window":
@@ -190,6 +192,7 @@ class PhysicalLayerMaterial:
                 max_seq_len=self.max_seq_len,
                 layer_id=self.layer_id,
                 device=self.device,
+                kv_dtype=self.kv_dtype,
             )
         if self.kind == "ratio4":
             return StaticRatio4KV(
@@ -197,12 +200,15 @@ class PhysicalLayerMaterial:
                 max_seq_len=self.max_seq_len,
                 layer_id=self.layer_id,
                 device=self.device,
+                kv_dtype=self.kv_dtype,
+                indexer_dtype=self.indexer_kv_dtype,
             )
         return StaticLayerKV(
             num_local_sequences=num_local_sequences,
             max_seq_len=self.max_seq_len,
             layer_id=self.layer_id,
             device=self.device,
+            kv_dtype=self.kv_dtype,
         )
 
     def new_attention(self, state: PhysicalLayerState) -> Any:
@@ -275,6 +281,8 @@ def build_physical_layer_material(
     slots_per_shape: int = 4,
     progress_every: int = 64,
     progress: Callable[[str], None] | None = None,
+    kv_dtype: str = "bf16",
+    indexer_kv_dtype: str = "bf16",
 ) -> PhysicalLayerMaterial:
     """Load and construct one real-weight physical layer on a TP subgroup."""
 
@@ -376,6 +384,8 @@ def build_physical_layer_material(
         "registered_global_rows": list(global_row_shapes),
         "moe_slots_per_shape": int(slots_per_shape),
         "tp_collective": dict(collective_evidence),
+        "kv_dtype": kv_dtype,
+        "indexer_kv_dtype": indexer_kv_dtype,
     }
     return PhysicalLayerMaterial(
         layer_id=layer_id,
@@ -394,6 +404,8 @@ def build_physical_layer_material(
         sinkhorn_iters=int(model_config["hc_sinkhorn_iters"]),
         hc_eps=float(model_config["hc_eps"]),
         evidence=evidence,
+        kv_dtype=kv_dtype,
+        indexer_kv_dtype=indexer_kv_dtype,
     )
 
 
@@ -431,6 +443,8 @@ def build_physical_stage(
     slots_per_shape: int = 4,
     progress_every: int = 64,
     progress: Callable[[str], None] | None = None,
+    kv_dtype: str = "bf16",
+    indexer_kv_dtype: str = "bf16",
 ) -> PhysicalStageMaterial:
     """Load every layer material of one PP stage through one code path.
 
@@ -462,6 +476,8 @@ def build_physical_stage(
                 slots_per_shape=slots_per_shape,
                 progress_every=progress_every,
                 progress=progress,
+                kv_dtype=kv_dtype,
+                indexer_kv_dtype=indexer_kv_dtype,
             )
         )
         if progress is not None:
@@ -472,6 +488,8 @@ def build_physical_stage(
         "layers": [dict(material.evidence) for material in materials],
         "tp_global_ranks": list(tp_global_ranks),
         "tp_rank": tp_rank,
+        "kv_dtype": kv_dtype,
+        "indexer_kv_dtype": indexer_kv_dtype,
     }
     return PhysicalStageMaterial(
         stage_id=stage_id,

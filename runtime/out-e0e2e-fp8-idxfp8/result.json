@@ -1,0 +1,250 @@
+{
+  "accepted": true,
+  "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+  "errors": [],
+  "experiment": "E0e2e-tp4-pp4-golden-token-gate",
+  "mode_summaries": {
+    "fused": {
+      "lane_argmax_agreement": false,
+      "match_rate": 0.9688796680497925,
+      "matched_tokens": 467,
+      "mismatch_count": 15,
+      "mismatch_golden_deficit": {
+        "max": 1.4422988891601562,
+        "median": 0.23902130126953125,
+        "min": 0.017730712890625
+      },
+      "mismatch_top2_gap": {
+        "max": 0.6291236877441406,
+        "median": 0.23715591430664062,
+        "min": 0.017730712890625
+      },
+      "per_prompt": [
+        {
+          "compare_steps": 2,
+          "first_mismatch": null,
+          "matched": 2,
+          "prompt_index": 0
+        },
+        {
+          "compare_steps": 29,
+          "first_mismatch": {
+            "golden": 1516,
+            "golden_deficit": 0.28623008728027344,
+            "golden_logit": 31.669620513916016,
+            "match": false,
+            "position": 25,
+            "predicted": 9168,
+            "step": 16,
+            "top1_logit": 31.95585060119629,
+            "top2_gap": 0.28623008728027344,
+            "top2_logit": 31.669620513916016
+          },
+          "matched": 28,
+          "prompt_index": 1
+        },
+        {
+          "compare_steps": 128,
+          "first_mismatch": null,
+          "matched": 128,
+          "prompt_index": 2
+        },
+        {
+          "compare_steps": 128,
+          "first_mismatch": {
+            "golden": 4407,
+            "golden_deficit": 1.4422988891601562,
+            "golden_logit": 29.21437644958496,
+            "match": false,
+            "position": 26,
+            "predicted": 1380,
+            "step": 11,
+            "top1_logit": 30.656675338745117,
+            "top2_gap": 0.07927513122558594,
+            "top2_logit": 30.57740020751953
+          },
+          "matched": 124,
+          "prompt_index": 3
+        },
+        {
+          "compare_steps": 13,
+          "first_mismatch": {
+            "golden": 671,
+            "golden_deficit": 0.5067672729492188,
+            "golden_logit": 37.16200256347656,
+            "match": false,
+            "position": 15,
+            "predicted": 125386,
+            "step": 0,
+            "top1_logit": 37.66876983642578,
+            "top2_gap": 0.5067672729492188,
+            "top2_logit": 37.16200256347656
+          },
+          "matched": 12,
+          "prompt_index": 4
+        },
+        {
+          "compare_steps": 22,
+          "first_mismatch": null,
+          "matched": 22,
+          "prompt_index": 5
+        },
+        {
+          "compare_steps": 32,
+          "first_mismatch": {
+            "golden": 790,
+            "golden_deficit": 0.15159225463867188,
+            "golden_logit": 39.465057373046875,
+            "match": false,
+            "position": 38,
+            "predicted": 305,
+            "step": 17,
+            "top1_logit": 39.61664962768555,
+            "top2_gap": 0.15159225463867188,
+            "top2_logit": 39.465057373046875
+          },
+          "matched": 31,
+          "prompt_index": 6
+        },
+        {
+          "compare_steps": 128,
+          "first_mismatch": {
+            "golden": 4102,
+            "golden_deficit": 0.23715591430664062,
+            "golden_logit": 32.688385009765625,
+            "match": false,
+            "position": 14,
+            "predicted": 1870,
+            "step": 2,
+            "top1_logit": 32.925540924072266,
+            "top2_gap": 0.23715591430664062,
+            "top2_logit": 32.688385009765625
+          },
+          "matched": 120,
+          "prompt_index": 7
+        }
+      ],
+      "prompts": 8,
+      "total_tokens": 482
+    }
+  },
+  "placement": {
+    "accepted": true,
+    "ranks": [
+      {
+        "host": "titan064",
+        "local_rank": 0,
+        "rank": 0,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 1,
+        "rank": 1,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 2,
+        "rank": 2,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 3,
+        "rank": 3,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 4,
+        "rank": 4,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 5,
+        "rank": 5,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 6,
+        "rank": 6,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 7,
+        "rank": 7,
+        "stage": 1
+      },
+      {
+        "host": "titan065",
+        "local_rank": 0,
+        "rank": 8,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 1,
+        "rank": 9,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 2,
+        "rank": 10,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 3,
+        "rank": 11,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 4,
+        "rank": 12,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 5,
+        "rank": 13,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 6,
+        "rank": 14,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 7,
+        "rank": 15,
+        "stage": 3
+      }
+    ],
+    "stage_hosts": {
+      "0": [
+        "titan064"
+      ],
+      "1": [
+        "titan064"
+      ],
+      "2": [
+        "titan065"
+      ],
+      "3": [
+        "titan065"
+      ]
+    }
+  },
+  "tokenizer_preflight": {
+    "accepted": true,
+    "eos_token_id": 1
+  }
+}

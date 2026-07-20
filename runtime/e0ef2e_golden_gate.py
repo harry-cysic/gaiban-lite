@@ -215,6 +215,8 @@ class StageLane:
                     material.prepared,
                     batch_size=LOCAL_BATCH,
                     device=device,
+                    kv_dtype=material.kv_dtype,
+                    indexer_dtype=material.indexer_kv_dtype,
                 )
             else:
                 state = material.new_state(num_local_sequences=LOCAL_BATCH)
@@ -532,6 +534,20 @@ def main() -> int:
         help="cap on compared completion steps per prompt",
     )
     parser.add_argument("--progress-every", type=int, default=64)
+    parser.add_argument(
+        "--kv-dtype",
+        type=str,
+        default="bf16",
+        choices=("bf16", "fp8", "fp8_rope_bf16"),
+        help="latent KV storage dtype for every layer kind (FP8 KV E2E arm)",
+    )
+    parser.add_argument(
+        "--indexer-kv-dtype",
+        type=str,
+        default="bf16",
+        choices=("bf16", "fp8"),
+        help="ratio-4 indexer_kv storage dtype",
+    )
     args = parser.parse_args()
 
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
@@ -557,6 +573,8 @@ def main() -> int:
         "local_rank": local_rank,
         "world": world,
         "host": platform.node(),
+        "kv_dtype": args.kv_dtype,
+        "indexer_kv_dtype": args.indexer_kv_dtype,
         "device": torch.cuda.get_device_name(device),
         "torch": torch.__version__,
         "modes": modes,
@@ -694,6 +712,8 @@ def main() -> int:
             max_seq_len=MAX_SEQ_LEN,
             global_row_shapes=global_row_shapes,
             slots_per_shape=1,
+            kv_dtype=args.kv_dtype,
+            indexer_kv_dtype=args.indexer_kv_dtype,
             progress_every=args.progress_every,
             progress=(
                 (lambda message: print(f"[E0e2e] {message}", flush=True))

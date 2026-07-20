@@ -1,0 +1,127 @@
+W0720 16:22:59.157000 164334 torch/distributed/run.py:851] 
+W0720 16:22:59.157000 164334 torch/distributed/run.py:851] *****************************************
+W0720 16:22:59.157000 164334 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 16:22:59.157000 164334 torch/distributed/run.py:851] *****************************************
+[E0e2e] placement {0: ['titan064'], 1: ['titan064'], 2: ['titan065'], 3: ['titan065']}
+[transformers] Unrecognized keys in `rope_parameters` for 'rope_type'='default': {'attention_factor'}
+[E0e2e] layer=0 rank=0 experts=64/256
+[E0e2e] layer=0 rank=0 experts=128/256
+[E0e2e] layer=0 rank=0 experts=192/256
+[E0e2e] layer=0 rank=0 experts=256/256
+[E0e2e] stage 0 layer 0 material loaded
+[E0e2e] layer=1 rank=0 experts=64/256
+[E0e2e] layer=1 rank=0 experts=128/256
+[E0e2e] layer=1 rank=0 experts=192/256
+[E0e2e] layer=1 rank=0 experts=256/256
+[E0e2e] stage 0 layer 1 material loaded
+[E0e2e] layer=11 rank=0 experts=64/256
+[E0e2e] layer=2 rank=0 experts=64/256
+[E0e2e] layer=11 rank=0 experts=128/256
+[E0e2e] layer=2 rank=0 experts=128/256
+[E0e2e] layer=2 rank=0 experts=192/256
+[E0e2e] layer=11 rank=0 experts=192/256
+[E0e2e] layer=2 rank=0 experts=256/256
+[E0e2e] layer=11 rank=0 experts=256/256
+[E0e2e] stage 0 layer 2 material loaded
+[E0e2e] stage 1 layer 11 material loaded
+[E0e2e] layer=3 rank=0 experts=64/256
+[E0e2e] layer=12 rank=0 experts=64/256
+[E0e2e] layer=3 rank=0 experts=128/256
+[E0e2e] layer=12 rank=0 experts=128/256
+[E0e2e] layer=3 rank=0 experts=192/256
+[E0e2e] layer=12 rank=0 experts=192/256
+[E0e2e] layer=3 rank=0 experts=256/256
+[E0e2e] stage 0 layer 3 material loaded
+[E0e2e] layer=12 rank=0 experts=256/256
+[E0e2e] stage 1 layer 12 material loaded
+[E0e2e] layer=4 rank=0 experts=64/256
+[E0e2e] layer=13 rank=0 experts=64/256
+[E0e2e] layer=4 rank=0 experts=128/256
+[E0e2e] layer=13 rank=0 experts=128/256
+[E0e2e] layer=4 rank=0 experts=192/256
+[E0e2e] layer=13 rank=0 experts=192/256
+[E0e2e] layer=4 rank=0 experts=256/256
+[E0e2e] stage 0 layer 4 material loaded
+[E0e2e] layer=13 rank=0 experts=256/256
+[E0e2e] stage 1 layer 13 material loaded
+[E0e2e] layer=5 rank=0 experts=64/256
+[E0e2e] layer=14 rank=0 experts=64/256
+[E0e2e] layer=5 rank=0 experts=128/256
+[E0e2e] layer=5 rank=0 experts=192/256
+[E0e2e] layer=14 rank=0 experts=128/256
+[E0e2e] layer=5 rank=0 experts=256/256
+[E0e2e] layer=14 rank=0 experts=192/256
+[E0e2e] stage 0 layer 5 material loaded
+[E0e2e] layer=14 rank=0 experts=256/256
+[E0e2e] stage 1 layer 14 material loaded
+[E0e2e] layer=6 rank=0 experts=64/256
+[E0e2e] layer=6 rank=0 experts=128/256
+[E0e2e] layer=15 rank=0 experts=64/256
+[E0e2e] layer=6 rank=0 experts=192/256
+[E0e2e] layer=15 rank=0 experts=128/256
+[E0e2e] layer=6 rank=0 experts=256/256
+[E0e2e] layer=15 rank=0 experts=192/256
+[E0e2e] stage 0 layer 6 material loaded
+[E0e2e] layer=15 rank=0 experts=256/256
+[E0e2e] stage 1 layer 15 material loaded
+[E0e2e] layer=7 rank=0 experts=64/256
+[E0e2e] layer=7 rank=0 experts=128/256
+[E0e2e] layer=16 rank=0 experts=64/256
+[E0e2e] layer=7 rank=0 experts=192/256
+[E0e2e] layer=16 rank=0 experts=128/256
+[E0e2e] layer=7 rank=0 experts=256/256
+[E0e2e] stage 0 layer 7 material loaded
+[E0e2e] layer=16 rank=0 experts=192/256
+[E0e2e] layer=16 rank=0 experts=256/256
+[E0e2e] stage 1 layer 16 material loaded
+[E0e2e] layer=8 rank=0 experts=64/256
+[E0e2e] layer=8 rank=0 experts=128/256
+[E0e2e] layer=17 rank=0 experts=64/256
+[E0e2e] layer=8 rank=0 experts=192/256
+[E0e2e] layer=17 rank=0 experts=128/256
+[E0e2e] layer=8 rank=0 experts=256/256
+[E0e2e] stage 0 layer 8 material loaded
+[E0e2e] layer=17 rank=0 experts=192/256
+[E0e2e] layer=17 rank=0 experts=256/256
+[E0e2e] stage 1 layer 17 material loaded
+[E0e2e] layer=9 rank=0 experts=64/256
+[E0e2e] layer=9 rank=0 experts=128/256
+[E0e2e] layer=18 rank=0 experts=64/256
+[E0e2e] layer=9 rank=0 experts=192/256
+[E0e2e] layer=9 rank=0 experts=256/256
+[E0e2e] layer=18 rank=0 experts=128/256
+[E0e2e] stage 0 layer 9 material loaded
+[E0e2e] layer=18 rank=0 experts=192/256
+[E0e2e] layer=18 rank=0 experts=256/256
+[E0e2e] layer=10 rank=0 experts=64/256
+[E0e2e] stage 1 layer 18 material loaded
+[E0e2e] layer=10 rank=0 experts=128/256
+[E0e2e] layer=10 rank=0 experts=192/256
+[E0e2e] layer=19 rank=0 experts=64/256
+[E0e2e] layer=10 rank=0 experts=256/256
+[E0e2e] layer=19 rank=0 experts=128/256
+[E0e2e] stage 0 layer 10 material loaded
+[E0e2e] layer=19 rank=0 experts=192/256
+[E0e2e] layer=19 rank=0 experts=256/256
+[E0e2e] stage 0 loaded (11 layers, free 8.32 GiB, 11s)
+[E0e2e] stage 1 layer 19 material loaded
+[E0e2e] layer=20 rank=0 experts=64/256
+[E0e2e] layer=20 rank=0 experts=128/256
+[E0e2e] layer=20 rank=0 experts=192/256
+[E0e2e] layer=20 rank=0 experts=256/256
+[E0e2e] stage 1 layer 20 material loaded
+[E0e2e] layer=21 rank=0 experts=64/256
+[E0e2e] layer=21 rank=0 experts=128/256
+[E0e2e] layer=21 rank=0 experts=192/256
+[E0e2e] layer=21 rank=0 experts=256/256
+[E0e2e] stage 1 layer 21 material loaded
+[E0e2e] stage 1 loaded (11 layers, free 9.25 GiB, 12s)
+[E0e2e][fused] prompt 0: 2/2 golden tokens matched (decode 3198 ms/step)
+[E0e2e][fused] prompt 1: 28/29 golden tokens matched; first mismatch step 16 pred 9168 vs golden 1516 top2_gap 0.2862 golden_deficit 0.2862 (decode 56 ms/step)
+[E0e2e][fused] prompt 2: 128/128 golden tokens matched (decode 58 ms/step)
+[E0e2e][fused] prompt 3: 124/128 golden tokens matched; first mismatch step 11 pred 1380 vs golden 4407 top2_gap 0.0793 golden_deficit 1.4423 (decode 57 ms/step)
+[E0e2e][fused] prompt 4: 12/13 golden tokens matched; first mismatch step 0 pred 125386 vs golden 671 top2_gap 0.5068 golden_deficit 0.5068 (decode 56 ms/step)
+[E0e2e][fused] prompt 5: 22/22 golden tokens matched (decode 56 ms/step)
+[E0e2e][fused] prompt 6: 31/32 golden tokens matched; first mismatch step 17 pred 305 vs golden 790 top2_gap 0.1516 golden_deficit 0.1516 (decode 56 ms/step)
+[E0e2e][fused] prompt 7: 120/128 golden tokens matched; first mismatch step 2 pred 1870 vs golden 4102 top2_gap 0.2372 golden_deficit 0.2372 (decode 57 ms/step)
+[E0e2e] overall: PASS

@@ -20,7 +20,14 @@ import json
 
 import torch
 
-from .static_kv import LATENT_DIM, WINDOW_SIZE
+from .static_kv import (
+    LATENT_DIM,
+    LATENT_ROPE_DIM,
+    WINDOW_SIZE,
+    index_copy_rows,
+    quantize_latent_rows,
+    resolve_kv_dtype,
+)
 
 
 class StaticWindowKV:
@@ -37,6 +44,7 @@ class StaticWindowKV:
         max_seq_len: int,
         layer_id: int = 0,
         device: torch.device | str = "cpu",
+        kv_dtype: str = "bf16",
     ) -> None:
         if (
             not isinstance(num_local_sequences, int)
@@ -54,11 +62,13 @@ class StaticWindowKV:
             )
         if not isinstance(layer_id, int) or isinstance(layer_id, bool) or layer_id < 0:
             raise ValueError("layer_id must be a non-negative integer")
+        latent_dtype = resolve_kv_dtype(kv_dtype)
 
         self.num_local_sequences = num_local_sequences
         self.max_seq_len = max_seq_len
         self.layer_id = layer_id
         self.device = torch.device(device)
+        self.kv_dtype = kv_dtype
 
         # The whole latent is the raw ring: reference model.py:473-474 with
         # compress_ratio == 0 registers kv_cache of window_size rows only.
@@ -66,8 +76,19 @@ class StaticWindowKV:
             num_local_sequences,
             WINDOW_SIZE,
             LATENT_DIM,
-            dtype=torch.bfloat16,
+            dtype=latent_dtype,
             device=self.device,
+        )
+        self.latent_rope: torch.Tensor | None = (
+            torch.zeros(
+                num_local_sequences,
+                WINDOW_SIZE,
+                LATENT_ROPE_DIM,
+                dtype=torch.bfloat16,
+                device=self.device,
+            )
+            if kv_dtype == "fp8_rope_bf16"
+            else None
         )
         self._next_position = torch.zeros(
             num_local_sequences, dtype=torch.int64, device=self.device
@@ -83,6 +104,29 @@ class StaticWindowKV:
     def raw(self) -> torch.Tensor:
         return self.latent
 
+    def _quantize_rows(self, value: torch.Tensor) -> torch.Tensor:
+        return quantize_latent_rows(value, self.latent.dtype)
+
+    def quantize_dequantize_rows(self, value: torch.Tensor) -> torch.Tensor:
+        """BF16 rows after one cache write+read round trip (identity for bf16)."""
+
+        if self.kv_dtype == "bf16":
+            return value
+        result = self._quantize_rows(value).to(torch.bfloat16)
+        if self.latent_rope is not None:
+            result[..., -LATENT_ROPE_DIM:] = value[..., -LATENT_ROPE_DIM:]
+        return result
+
+    def dequantized_latent(self) -> torch.Tensor:
+        """BF16 view of the ring (reads exactly what decode reads)."""
+
+        if self.kv_dtype == "bf16":
+            return self.latent
+        value = self.latent.to(torch.bfloat16)
+        if self.latent_rope is not None:
+            value[..., -LATENT_ROPE_DIM:] = self.latent_rope
+        return value
+
     @property
     def next_position(self) -> int:
         positions = self._next_position
@@ -94,12 +138,16 @@ class StaticWindowKV:
     def resident_bytes(self) -> int:
         return sum(
             int(tensor.numel() * tensor.element_size())
-            for tensor in (self.latent, self._next_position, self._raw_positions)
+            for tensor in self._owned_tensors()
         )
 
     def _owned_tensor_items(self) -> tuple[tuple[str, torch.Tensor], ...]:
+        rope_items: tuple[tuple[str, torch.Tensor], ...] = (
+            () if self.latent_rope is None else (("latent_rope", self.latent_rope),)
+        )
         return (
             ("latent", self.latent),
+            *rope_items,
             ("next_position", self._next_position),
             ("raw_positions", self._raw_positions),
         )
@@ -112,10 +160,22 @@ class StaticWindowKV:
     ) -> tuple[tuple[str, torch.Tensor], ...]:
         batch = self.num_local_sequences
         expected = {
-            "latent": ((batch, WINDOW_SIZE, LATENT_DIM), torch.bfloat16),
+            "latent": (
+                (batch, WINDOW_SIZE, LATENT_DIM),
+                resolve_kv_dtype(self.kv_dtype),
+            ),
             "next_position": ((batch,), torch.int64),
             "raw_positions": ((batch, WINDOW_SIZE), torch.int64),
         }
+        if self.latent_rope is not None:
+            expected = {
+                "latent": expected.pop("latent"),
+                "latent_rope": (
+                    (batch, WINDOW_SIZE, LATENT_ROPE_DIM),
+                    torch.bfloat16,
+                ),
+                **expected,
+            }
         items = self._owned_tensor_items()
         if tuple(name for name, _ in items) != tuple(expected):
             raise RuntimeError(f"{label} window state ownership contract differs")
@@ -152,12 +212,19 @@ class StaticWindowKV:
 
         if not isinstance(source, StaticWindowKV):
             raise TypeError("window state source must be StaticWindowKV")
-        identity = (self.num_local_sequences, self.max_seq_len, self.layer_id, self.device)
+        identity = (
+            self.num_local_sequences,
+            self.max_seq_len,
+            self.layer_id,
+            self.device,
+            self.kv_dtype,
+        )
         source_identity = (
             source.num_local_sequences,
             source.max_seq_len,
             source.layer_id,
             source.device,
+            source.kv_dtype,
         )
         if identity != source_identity:
             raise ValueError(
@@ -225,10 +292,14 @@ class StaticWindowKV:
             raw_slots,
             absolute_raw.unsqueeze(0).expand(self.num_local_sequences, -1),
         )
-        latent = torch.zeros_like(self.latent)
-        latent.index_copy_(1, raw_slots, raw)
+        latent_bf16 = torch.zeros(
+            self.latent.shape, dtype=torch.bfloat16, device=self.device
+        )
+        latent_bf16.index_copy_(1, raw_slots, raw)
 
-        self.latent.copy_(latent)
+        self.latent.copy_(self._quantize_rows(latent_bf16))
+        if self.latent_rope is not None:
+            self.latent_rope.copy_(latent_bf16[..., -LATENT_ROPE_DIM:])
         self._raw_positions.copy_(raw_positions)
         self._next_position.fill_(start_pos)
 
@@ -262,7 +333,11 @@ class StaticWindowKV:
             raise ValueError("stateful decode position must be contiguous INT64 [1]")
         slot = position.remainder(WINDOW_SIZE)
         expanded_position = position.view(1, 1).expand(batch, 1)
-        self.latent.index_copy_(1, slot, raw_latent)
+        index_copy_rows(self.latent, slot, self._quantize_rows(raw_latent))
+        if self.latent_rope is not None:
+            self.latent_rope.index_copy_(
+                1, slot, raw_latent[..., -LATENT_ROPE_DIM:].contiguous()
+            )
         self._raw_positions.index_copy_(1, slot, expanded_position)
         self._next_position.copy_((position + 1).expand(batch))
 
@@ -270,6 +345,8 @@ class StaticWindowKV:
         """Clear payload and metadata so the state can serve a new batch."""
 
         self.latent.zero_()
+        if self.latent_rope is not None:
+            self.latent_rope.zero_()
         self._next_position.zero_()
         self._raw_positions.fill_(-1)
 
@@ -294,6 +371,7 @@ class StaticWindowKV:
             "latent_dim": LATENT_DIM,
             "latent_shape": list(self.latent.shape),
             "latent_dtype": str(self.latent.dtype),
+            "kv_dtype": self.kv_dtype,
             "next_position": self._next_position.cpu().tolist(),
             "raw_positions": self._raw_positions.cpu().tolist(),
         }
@@ -326,7 +404,15 @@ class StaticWindowKV:
             seqlen - kept, seqlen, dtype=torch.int64, device=self.device
         )
         raw_slots = absolute_positions.remainder(WINDOW_SIZE)
-        self.latent.index_copy_(1, raw_slots, raw_latent[:, -kept:])
+        index_copy_rows(
+            self.latent, raw_slots, self._quantize_rows(raw_latent[:, -kept:])
+        )
+        if self.latent_rope is not None:
+            self.latent_rope.index_copy_(
+                1,
+                raw_slots,
+                raw_latent[:, -kept:, -LATENT_ROPE_DIM:].contiguous(),
+            )
         self._raw_positions.index_copy_(
             1,
             raw_slots,
@@ -352,7 +438,9 @@ class StaticWindowKV:
             torch.bfloat16,
         )
         slot = position % WINDOW_SIZE
-        self.latent[:, slot].copy_(raw_latent[:, 0])
+        self.latent[:, slot].copy_(self._quantize_rows(raw_latent[:, 0]))
+        if self.latent_rope is not None:
+            self.latent_rope[:, slot].copy_(raw_latent[:, 0, -LATENT_ROPE_DIM:])
         self._raw_positions[:, slot].fill_(position)
         self._next_position.fill_(position + 1)
 
@@ -378,7 +466,9 @@ class StaticWindowKV:
             (self.num_local_sequences, 1, LATENT_DIM),
             torch.bfloat16,
         )
-        self.latent[:, slot].copy_(raw_latent[:, 0])
+        self.latent[:, slot].copy_(self._quantize_rows(raw_latent[:, 0]))
+        if self.latent_rope is not None:
+            self.latent_rope[:, slot].copy_(raw_latent[:, 0, -LATENT_ROPE_DIM:])
         self._raw_positions[:, slot].fill_(position)
         self._next_position.fill_(position + 1)
 

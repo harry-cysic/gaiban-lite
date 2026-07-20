@@ -277,6 +277,7 @@ def _window_sparse_decode_prevalidated(
     attn_sink: torch.Tensor,
     plan: "WindowDecodePlan | WindowStatefulDecodePlan",
     softmax_scale: float,
+    latent_rope: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """Fixed-index sparse MLA over the full window ring (no padding mask).
 
@@ -285,6 +286,12 @@ def _window_sparse_decode_prevalidated(
     """
 
     selected = latent_kv[plan.batch_indices, plan.gather_indices]
+    if selected.dtype == torch.float8_e4m3fn:
+        selected = selected.to(torch.bfloat16)
+    if latent_rope is not None:
+        selected[..., -latent_rope.shape[-1] :] = latent_rope[
+            plan.batch_indices, plan.gather_indices
+        ]
     scores = torch.einsum(
         "bshd,bskd->bshk", query.float(), selected.float()
     ) * softmax_scale
@@ -607,6 +614,7 @@ class WindowTorchAttention:
             self.weights.attn_sink,
             plan,
             cfg.head_dim**-0.5,
+            latent_rope=self.state.latent_rope,
         )
         output[..., -cfg.rope_dim :] = apply_rotary_emb(
             output[..., -cfg.rope_dim :], frequencies, inverse=True
@@ -827,6 +835,7 @@ class WindowTorchAttention:
             self.weights.attn_sink,
             plan,
             cfg.head_dim**-0.5,
+            latent_rope=self.state.latent_rope,
         )
         if stage_marker is not None:
             stage_marker("sparse_done")
@@ -928,10 +937,11 @@ class WindowTorchAttention:
         # window part alone (model.py:507, 515).
         if start_pos == 0:
             self.state.prefill_write(raw_latent)
-            attention_kv = raw_latent
+            # FP8 KV: attention reads what the cache write+read returns.
+            attention_kv = self.state.quantize_dequantize_rows(raw_latent)
         else:
             self.state.decode_write(raw_latent)
-            attention_kv = self.state.latent
+            attention_kv = self.state.dequantized_latent()
         record("attention_kv", attention_kv)
         topk = window_topk_indices(
             batch_size=batch,

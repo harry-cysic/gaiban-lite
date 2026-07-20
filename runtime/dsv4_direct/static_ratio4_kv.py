@@ -21,6 +21,12 @@ from typing import Any, Callable
 import torch
 
 from .model_contract import SUPPORTED_LAYER_SPECS
+from .static_kv import (
+    LATENT_ROPE_DIM,
+    index_copy_rows,
+    quantize_latent_rows,
+    resolve_kv_dtype,
+)
 
 
 WINDOW_SIZE = 128
@@ -49,6 +55,8 @@ class StaticRatio4KV:
         max_seq_len: int,
         layer_id: int = 2,
         device: torch.device | str = "cpu",
+        kv_dtype: str = "bf16",
+        indexer_dtype: str = "bf16",
     ) -> None:
         if (
             not isinstance(num_local_sequences, int)
@@ -73,24 +81,45 @@ class StaticRatio4KV:
                 f"got {layer_id!r}"
             )
 
+        latent_dtype = resolve_kv_dtype(kv_dtype)
+        if indexer_dtype not in ("bf16", "fp8"):
+            raise ValueError(
+                f"indexer_dtype must be 'bf16' or 'fp8', got {indexer_dtype!r}"
+            )
+
         self.num_local_sequences = num_local_sequences
         self.max_seq_len = max_seq_len
         self.layer_id = layer_id
         self.device = torch.device(device)
+        self.kv_dtype = kv_dtype
+        self.indexer_dtype = indexer_dtype
         self.compressed_capacity = max_seq_len // COMPRESS_RATIO
 
         self.latent = torch.zeros(
             num_local_sequences,
             WINDOW_SIZE + self.compressed_capacity,
             LATENT_DIM,
-            dtype=torch.bfloat16,
+            dtype=latent_dtype,
             device=self.device,
+        )
+        self.latent_rope: torch.Tensor | None = (
+            torch.zeros(
+                num_local_sequences,
+                WINDOW_SIZE + self.compressed_capacity,
+                LATENT_ROPE_DIM,
+                dtype=torch.bfloat16,
+                device=self.device,
+            )
+            if kv_dtype == "fp8_rope_bf16"
+            else None
         )
         self.indexer_kv = torch.zeros(
             num_local_sequences,
             self.compressed_capacity,
             INDEX_DIM,
-            dtype=torch.bfloat16,
+            dtype=(
+                torch.bfloat16 if indexer_dtype == "bf16" else torch.float8_e4m3fn
+            ),
             device=self.device,
         )
         self.main_kv_state = torch.zeros(
@@ -149,6 +178,40 @@ class StaticRatio4KV:
         return self.latent[:, WINDOW_SIZE:]
 
     @property
+    def raw_rope(self) -> torch.Tensor | None:
+        return None if self.latent_rope is None else self.latent_rope[:, :WINDOW_SIZE]
+
+    @property
+    def compressed_rope(self) -> torch.Tensor | None:
+        return None if self.latent_rope is None else self.latent_rope[:, WINDOW_SIZE:]
+
+    def _quantize_rows(self, value: torch.Tensor) -> torch.Tensor:
+        return quantize_latent_rows(value, self.latent.dtype)
+
+    def _quantize_indexer_rows(self, value: torch.Tensor) -> torch.Tensor:
+        return quantize_latent_rows(value, self.indexer_kv.dtype)
+
+    def quantize_dequantize_rows(self, value: torch.Tensor) -> torch.Tensor:
+        """BF16 rows after one cache write+read round trip (identity for bf16)."""
+
+        if self.kv_dtype == "bf16":
+            return value
+        result = self._quantize_rows(value).to(torch.bfloat16)
+        if self.latent_rope is not None:
+            result[..., -LATENT_ROPE_DIM:] = value[..., -LATENT_ROPE_DIM:]
+        return result
+
+    def dequantized_latent(self) -> torch.Tensor:
+        """BF16 view of the complete latent cache."""
+
+        if self.kv_dtype == "bf16":
+            return self.latent
+        value = self.latent.to(torch.bfloat16)
+        if self.latent_rope is not None:
+            value[..., -LATENT_ROPE_DIM:] = self.latent_rope
+        return value
+
+    @property
     def next_position(self) -> int:
         if not bool(torch.all(self._next_position == self._next_position[0]).item()):
             raise RuntimeError("local sequences no longer share one next position")
@@ -162,8 +225,12 @@ class StaticRatio4KV:
         )
 
     def _owned_tensor_items(self) -> tuple[tuple[str, torch.Tensor], ...]:
+        rope_items: tuple[tuple[str, torch.Tensor], ...] = (
+            () if self.latent_rope is None else (("latent_rope", self.latent_rope),)
+        )
         return (
             ("latent", self.latent),
+            *rope_items,
             ("indexer_kv", self.indexer_kv),
             ("main_kv_state", self.main_kv_state),
             ("main_score_state", self.main_score_state),
@@ -187,11 +254,13 @@ class StaticRatio4KV:
         expected = {
             "latent": (
                 (batch, WINDOW_SIZE + self.compressed_capacity, LATENT_DIM),
-                torch.bfloat16,
+                resolve_kv_dtype(self.kv_dtype),
             ),
             "indexer_kv": (
                 (batch, self.compressed_capacity, INDEX_DIM),
-                torch.bfloat16,
+                torch.bfloat16
+                if self.indexer_dtype == "bf16"
+                else torch.float8_e4m3fn,
             ),
             "main_kv_state": (
                 (batch, OVERLAP_STATE_ROWS, MAIN_PROJECTED_DIM),
@@ -225,6 +294,15 @@ class StaticRatio4KV:
                 torch.int64,
             ),
         }
+        if self.latent_rope is not None:
+            expected = {
+                "latent": expected.pop("latent"),
+                "latent_rope": (
+                    (batch, WINDOW_SIZE + self.compressed_capacity, LATENT_ROPE_DIM),
+                    torch.bfloat16,
+                ),
+                **expected,
+            }
         items = self._owned_tensor_items()
         if tuple(name for name, _ in items) != tuple(expected):
             raise RuntimeError(f"{label} ratio-4 state ownership contract differs")
@@ -270,6 +348,8 @@ class StaticRatio4KV:
             self.layer_id,
             self.compressed_capacity,
             self.device,
+            self.kv_dtype,
+            self.indexer_dtype,
         )
         source_identity = (
             source.num_local_sequences,
@@ -277,6 +357,8 @@ class StaticRatio4KV:
             source.layer_id,
             source.compressed_capacity,
             source.device,
+            source.kv_dtype,
+            source.indexer_dtype,
         )
         if identity != source_identity:
             raise ValueError(
@@ -305,6 +387,8 @@ class StaticRatio4KV:
 
     def reset(self) -> None:
         self.latent.zero_()
+        if self.latent_rope is not None:
+            self.latent_rope.zero_()
         self.indexer_kv.zero_()
         self.main_kv_state.zero_()
         self.main_score_state.fill_(float("-inf"))
@@ -390,7 +474,13 @@ class StaticRatio4KV:
         owned_storage = {
             tensor.untyped_storage().data_ptr() for tensor in self._owned_tensors()
         }
+        # Payload contract stays BF16 for latent/indexer rows regardless of the
+        # storage dtype; FP8 storage quantizes on install.
+        quantized_names = {"raw", "compressed", "indexer_kv"}
         for name, (value, destination) in payload.items():
+            expected_dtype = (
+                torch.bfloat16 if name in quantized_names else destination.dtype
+            )
             if not isinstance(value, torch.Tensor):
                 raise TypeError(f"{name} payload must be a tensor")
             if tuple(value.shape) != tuple(destination.shape):
@@ -398,9 +488,9 @@ class StaticRatio4KV:
                     f"{name} payload shape {tuple(value.shape)} != "
                     f"{tuple(destination.shape)}"
                 )
-            if value.dtype != destination.dtype or value.device != self.device:
+            if value.dtype != expected_dtype or value.device != self.device:
                 raise ValueError(
-                    f"{name} payload must use {destination.dtype} on {self.device}"
+                    f"{name} payload must use {expected_dtype} on {self.device}"
                 )
             if value.untyped_storage().data_ptr() in owned_storage:
                 raise ValueError(f"{name} payload must not alias destination state")
@@ -429,8 +519,19 @@ class StaticRatio4KV:
 
         self.reset()
         self._seed_decode_metadata(start_pos)
-        for value, destination in payload.values():
-            destination.copy_(value)
+        for name, (value, destination) in payload.items():
+            if name in ("raw", "compressed"):
+                destination.copy_(self._quantize_rows(value))
+            elif name == "indexer_kv":
+                destination.copy_(self._quantize_indexer_rows(value))
+            else:
+                destination.copy_(value)
+        raw_rope = self.raw_rope
+        if raw_rope is not None:
+            raw_rope.copy_(payload["raw"][0][..., -LATENT_ROPE_DIM:])
+            compressed_rope = self.compressed_rope
+            assert compressed_rope is not None
+            compressed_rope.copy_(payload["compressed"][0][..., -LATENT_ROPE_DIM:])
 
     def _seed_decode_metadata(self, start_pos: int) -> None:
         """Populate decode metadata after payload storage has been reset."""
@@ -574,7 +675,12 @@ class StaticRatio4KV:
         overlap_slot = phase + COMPRESS_RATIO
         expanded_position = position.view(1, 1).expand(batch, 1)
 
-        self.raw.index_copy_(1, raw_slot, raw_latent)
+        index_copy_rows(self.raw, raw_slot, self._quantize_rows(raw_latent))
+        raw_rope = self.raw_rope
+        if raw_rope is not None:
+            raw_rope.index_copy_(
+                1, raw_slot, raw_latent[..., -LATENT_ROPE_DIM:].contiguous()
+            )
         self.main_kv_state.index_copy_(1, overlap_slot, main_projected)
         self.main_score_state.index_copy_(
             1, overlap_slot, main_adjusted_score.unsqueeze(1)
@@ -649,8 +755,21 @@ class StaticRatio4KV:
                 torch.bfloat16,
             )
 
-            self.compressed.index_copy_(1, compressed_row, finalized_main)
-            self.indexer_kv.index_copy_(1, compressed_row, finalized_index)
+            index_copy_rows(
+                self.compressed, compressed_row, self._quantize_rows(finalized_main)
+            )
+            compressed_rope = self.compressed_rope
+            if compressed_rope is not None:
+                compressed_rope.index_copy_(
+                    1,
+                    compressed_row,
+                    finalized_main[..., -LATENT_ROPE_DIM:].contiguous(),
+                )
+            index_copy_rows(
+                self.indexer_kv,
+                compressed_row,
+                self._quantize_indexer_rows(finalized_index),
+            )
             group_start = position + 1 - COMPRESS_RATIO
             self._compressed_group_starts.index_copy_(
                 1,
@@ -720,6 +839,8 @@ class StaticRatio4KV:
             "window_size": WINDOW_SIZE,
             "compress_ratio": COMPRESS_RATIO,
             "latent_shape": list(self.latent.shape),
+            "kv_dtype": self.kv_dtype,
+            "indexer_dtype": self.indexer_dtype,
             "indexer_kv_shape": list(self.indexer_kv.shape),
             "main_overlap_shape": list(self.main_kv_state.shape),
             "index_overlap_shape": list(self.index_kv_state.shape),
