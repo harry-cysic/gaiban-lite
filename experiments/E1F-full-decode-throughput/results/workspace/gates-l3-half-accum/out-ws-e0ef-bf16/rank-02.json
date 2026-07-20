@@ -1,0 +1,1199 @@
+{
+  "accepted": true,
+  "block_contract_id": "8830881a121919c6e7824bfe4a0ed009a3efab70e7c2ad36b9faa1611a3c477f",
+  "cases": {
+    "prefill127_decode127_boundary": {
+      "accepted": true,
+      "decode_start_pos": 127,
+      "errors": [],
+      "exact_checks": {
+        "decode.compressed_count": true,
+        "decode.compression_presence": true,
+        "decode.next_position": true,
+        "decode.topk": true,
+        "prefill.compressed_count": true,
+        "prefill.compression_presence": true,
+        "prefill.next_position": true,
+        "prefill.topk": true
+      },
+      "fp8_diagnostics": {},
+      "inputs": {
+        "decode": {
+          "dtype": "torch.bfloat16",
+          "seed": 21510720,
+          "sha256": "8616c2ba9eb38812c4988a18cce45c8278156a5aa2780e747febe39af48f4c9c",
+          "shape": [
+            1,
+            1,
+            4096
+          ],
+          "start_pos": 127
+        },
+        "prefill": {
+          "dtype": "torch.bfloat16",
+          "seed": 21460720,
+          "sha256": "bd3f8c05d5d6d48de082f61519953a598035782d314cde39e573a62edd6f7b74",
+          "shape": [
+            1,
+            127,
+            4096
+          ],
+          "start_pos": 0
+        }
+      },
+      "kv_dtype": "bf16",
+      "prefill_len": 127,
+      "stage_metrics": {
+        "decode.attention_kv": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.006350920535624027,
+          "rms_rel": 0.0093201985774094,
+          "row_rms_rel_max": 0.01629786565899849,
+          "shape": [
+            1,
+            130,
+            512
+          ]
+        },
+        "decode.branch": {
+          "accepted": true,
+          "declared_limit": 0.04,
+          "declared_row_limit": 0.16,
+          "finite": true,
+          "max_abs": 0.015625,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0037900807801634073,
+          "rms_rel": 0.00872869340117985,
+          "row_rms_rel_max": 0.00872869323939085,
+          "shape": [
+            1,
+            1,
+            4096
+          ]
+        },
+        "decode.compression_finalized": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.compression_pooled": {
+          "accepted": true,
+          "declared_limit": 5e-05,
+          "declared_row_limit": 0.0002,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.inverse_rotated": {
+          "accepted": true,
+          "declared_limit": 0.03,
+          "declared_row_limit": 0.12,
+          "finite": true,
+          "max_abs": 0.00830078125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0008964106673374772,
+          "rms_rel": 0.007908446066328057,
+          "row_rms_rel_max": 0.012808723375201225,
+          "shape": [
+            1,
+            1,
+            64,
+            512
+          ]
+        },
+        "decode.output_lora": {
+          "accepted": true,
+          "declared_limit": 0.035,
+          "declared_row_limit": 0.14,
+          "finite": true,
+          "max_abs": 0.005859375,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0013247443130239844,
+          "rms_rel": 0.008444821127164338,
+          "row_rms_rel_max": 0.012630853801965714,
+          "shape": [
+            1,
+            1,
+            8,
+            1024
+          ]
+        },
+        "decode.projected_kv": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.projected_score": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.query": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.03125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.002957593882456422,
+          "rms_rel": 0.0029606035053153725,
+          "row_rms_rel_max": 0.005484509747475386,
+          "shape": [
+            1,
+            1,
+            64,
+            512
+          ]
+        },
+        "decode.query_lora": {
+          "accepted": true,
+          "declared_limit": 0.012,
+          "declared_row_limit": 0.048,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            1024
+          ]
+        },
+        "decode.raw_latent": {
+          "accepted": true,
+          "declared_limit": 0.012,
+          "declared_row_limit": 0.048,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.sparse_control": {
+          "accepted": true,
+          "declared_limit": 0.003,
+          "declared_row_limit": 0.012,
+          "finite": true,
+          "max_abs": 0.00048828125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 2.781134526230744e-06,
+          "rms_rel": 2.4578268210595607e-05,
+          "row_rms_rel_max": 0.00015432336658705026,
+          "shape": [
+            1,
+            1,
+            64,
+            512
+          ]
+        },
+        "decode.sparse_output": {
+          "accepted": true,
+          "declared_limit": 0.03,
+          "declared_row_limit": 0.12,
+          "finite": true,
+          "max_abs": 0.00830078125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0008956967503763735,
+          "rms_rel": 0.007902126346886322,
+          "row_rms_rel_max": 0.01280728355050087,
+          "shape": [
+            1,
+            1,
+            64,
+            512
+          ]
+        },
+        "decode.state.compressed": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            2,
+            512
+          ]
+        },
+        "decode.state.raw": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.006400344893336296,
+          "rms_rel": 0.009326026243157141,
+          "row_rms_rel_max": 0.01629786565899849,
+          "shape": [
+            1,
+            128,
+            512
+          ]
+        },
+        "prefill.attention_kv": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.006425493396818638,
+          "rms_rel": 0.00936374231684976,
+          "row_rms_rel_max": 0.01629786565899849,
+          "shape": [
+            1,
+            127,
+            512
+          ]
+        },
+        "prefill.branch": {
+          "accepted": true,
+          "declared_limit": 0.04,
+          "declared_row_limit": 0.16,
+          "finite": true,
+          "max_abs": 0.0859375,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.008097968995571136,
+          "rms_rel": 0.011206245789761376,
+          "row_rms_rel_max": 0.017041562125086784,
+          "shape": [
+            1,
+            127,
+            4096
+          ]
+        },
+        "prefill.inverse_rotated": {
+          "accepted": true,
+          "declared_limit": 0.03,
+          "declared_row_limit": 0.12,
+          "finite": true,
+          "max_abs": 0.125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0018851679051294923,
+          "rms_rel": 0.010491081239004541,
+          "row_rms_rel_max": 0.03273716941475868,
+          "shape": [
+            1,
+            127,
+            64,
+            512
+          ]
+        },
+        "prefill.output_lora": {
+          "accepted": true,
+          "declared_limit": 0.035,
+          "declared_row_limit": 0.14,
+          "finite": true,
+          "max_abs": 0.02734375,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.002814702456817031,
+          "rms_rel": 0.01144974797144235,
+          "row_rms_rel_max": 0.030556539073586464,
+          "shape": [
+            1,
+            127,
+            8,
+            1024
+          ]
+        },
+        "prefill.projected_kv": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            127,
+            512
+          ]
+        },
+        "prefill.projected_score": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            127,
+            512
+          ]
+        },
+        "prefill.query": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.004634201060980558,
+          "rms_rel": 0.004638861152730472,
+          "row_rms_rel_max": 0.00816836766898632,
+          "shape": [
+            1,
+            127,
+            64,
+            512
+          ]
+        },
+        "prefill.query_lora": {
+          "accepted": true,
+          "declared_limit": 0.012,
+          "declared_row_limit": 0.048,
+          "finite": true,
+          "max_abs": 0.0009765625,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 8.092395728453994e-05,
+          "rms_rel": 0.0028215197475513843,
+          "row_rms_rel_max": 0.003316201502457261,
+          "shape": [
+            1,
+            127,
+            1024
+          ]
+        },
+        "prefill.raw_latent": {
+          "accepted": true,
+          "declared_limit": 0.012,
+          "declared_row_limit": 0.048,
+          "finite": true,
+          "max_abs": 0.125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.006425493396818638,
+          "rms_rel": 0.00936374231684976,
+          "row_rms_rel_max": 0.01629786565899849,
+          "shape": [
+            1,
+            127,
+            512
+          ]
+        },
+        "prefill.sparse_control": {
+          "accepted": true,
+          "declared_limit": 0.003,
+          "declared_row_limit": 0.012,
+          "finite": true,
+          "max_abs": 0.00390625,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 4.000111857749289e-06,
+          "rms_rel": 2.2259276971743898e-05,
+          "row_rms_rel_max": 0.000522107002325356,
+          "shape": [
+            1,
+            127,
+            64,
+            512
+          ]
+        },
+        "prefill.sparse_output": {
+          "accepted": true,
+          "declared_limit": 0.03,
+          "declared_row_limit": 0.12,
+          "finite": true,
+          "max_abs": 0.125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0018841533455997705,
+          "rms_rel": 0.010485447322861934,
+          "row_rms_rel_max": 0.03272414207458496,
+          "shape": [
+            1,
+            127,
+            64,
+            512
+          ]
+        },
+        "prefill.state.compressed": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            2,
+            512
+          ]
+        },
+        "prefill.state.compressor_kv": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            127,
+            512
+          ]
+        },
+        "prefill.state.compressor_score": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            127,
+            512
+          ]
+        },
+        "prefill.state.raw": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.006400344893336296,
+          "rms_rel": 0.009363743045317199,
+          "row_rms_rel_max": 0.01629786565899849,
+          "shape": [
+            1,
+            128,
+            512
+          ]
+        }
+      }
+    },
+    "prefill128_decode128": {
+      "accepted": true,
+      "decode_start_pos": 128,
+      "errors": [],
+      "exact_checks": {
+        "decode.compressed_count": true,
+        "decode.compression_presence": true,
+        "decode.next_position": true,
+        "decode.topk": true,
+        "prefill.compressed_count": true,
+        "prefill.compression_presence": true,
+        "prefill.next_position": true,
+        "prefill.topk": true
+      },
+      "fp8_diagnostics": {},
+      "inputs": {
+        "decode": {
+          "dtype": "torch.bfloat16",
+          "seed": 20510717,
+          "sha256": "91d53b420807ec5087ba1211ec5f343d73d3d370d70ded0755547558007b0e55",
+          "shape": [
+            1,
+            1,
+            4096
+          ],
+          "start_pos": 128
+        },
+        "prefill": {
+          "dtype": "torch.bfloat16",
+          "seed": 20460717,
+          "sha256": "dcd9c6128655ec54f7f9fda4ac815901dc645394e6b587d504b99371e4a754f1",
+          "shape": [
+            1,
+            128,
+            4096
+          ],
+          "start_pos": 0
+        }
+      },
+      "kv_dtype": "bf16",
+      "prefill_len": 128,
+      "stage_metrics": {
+        "decode.attention_kv": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.25,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.006920612417161465,
+          "rms_rel": 0.010163220009870109,
+          "row_rms_rel_max": 0.017862077802419662,
+          "shape": [
+            1,
+            130,
+            512
+          ]
+        },
+        "decode.branch": {
+          "accepted": true,
+          "declared_limit": 0.04,
+          "declared_row_limit": 0.16,
+          "finite": true,
+          "max_abs": 0.015625,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0038108404260128736,
+          "rms_rel": 0.008279295810334226,
+          "row_rms_rel_max": 0.008279295638203621,
+          "shape": [
+            1,
+            1,
+            4096
+          ]
+        },
+        "decode.inverse_rotated": {
+          "accepted": true,
+          "declared_limit": 0.03,
+          "declared_row_limit": 0.12,
+          "finite": true,
+          "max_abs": 0.00927734375,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0009100715979002416,
+          "rms_rel": 0.008090146508704437,
+          "row_rms_rel_max": 0.013839959166944027,
+          "shape": [
+            1,
+            1,
+            64,
+            512
+          ]
+        },
+        "decode.output_lora": {
+          "accepted": true,
+          "declared_limit": 0.035,
+          "declared_row_limit": 0.14,
+          "finite": true,
+          "max_abs": 0.005126953125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0013537113554775715,
+          "rms_rel": 0.00844784589581812,
+          "row_rms_rel_max": 0.01313234493136406,
+          "shape": [
+            1,
+            1,
+            8,
+            1024
+          ]
+        },
+        "decode.projected_kv": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.projected_score": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.query": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.03125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0029670416843146086,
+          "rms_rel": 0.002970060389549291,
+          "row_rms_rel_max": 0.004727314691990614,
+          "shape": [
+            1,
+            1,
+            64,
+            512
+          ]
+        },
+        "decode.query_lora": {
+          "accepted": true,
+          "declared_limit": 0.012,
+          "declared_row_limit": 0.048,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            1024
+          ]
+        },
+        "decode.raw_latent": {
+          "accepted": true,
+          "declared_limit": 0.012,
+          "declared_row_limit": 0.048,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.sparse_control": {
+          "accepted": true,
+          "declared_limit": 0.003,
+          "declared_row_limit": 0.012,
+          "finite": true,
+          "max_abs": 0.00048828125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 2.7804208002635278e-06,
+          "rms_rel": 2.471748119308558e-05,
+          "row_rms_rel_max": 0.0002694060676731169,
+          "shape": [
+            1,
+            1,
+            64,
+            512
+          ]
+        },
+        "decode.sparse_output": {
+          "accepted": true,
+          "declared_limit": 0.03,
+          "declared_row_limit": 0.12,
+          "finite": true,
+          "max_abs": 0.00927734375,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.000909385911654681,
+          "rms_rel": 0.008083984124043115,
+          "row_rms_rel_max": 0.01383669301867485,
+          "shape": [
+            1,
+            1,
+            64,
+            512
+          ]
+        },
+        "decode.state.compressed": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            2,
+            512
+          ]
+        },
+        "decode.state.compressor_kv": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.state.compressor_score": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "decode.state.raw": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.25,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0069744703359901905,
+          "rms_rel": 0.0101711102524276,
+          "row_rms_rel_max": 0.017862077802419662,
+          "shape": [
+            1,
+            128,
+            512
+          ]
+        },
+        "prefill.attention_kv": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.25,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.006982467137277126,
+          "rms_rel": 0.01021555173367617,
+          "row_rms_rel_max": 0.017862077802419662,
+          "shape": [
+            1,
+            129,
+            512
+          ]
+        },
+        "prefill.branch": {
+          "accepted": true,
+          "declared_limit": 0.04,
+          "declared_row_limit": 0.16,
+          "finite": true,
+          "max_abs": 0.09375,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.008922632783651352,
+          "rms_rel": 0.012532721159751677,
+          "row_rms_rel_max": 0.01830442063510418,
+          "shape": [
+            1,
+            128,
+            4096
+          ]
+        },
+        "prefill.compression_finalized": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "prefill.compression_pooled": {
+          "accepted": true,
+          "declared_limit": 5e-05,
+          "declared_row_limit": 0.0002,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            1,
+            512
+          ]
+        },
+        "prefill.inverse_rotated": {
+          "accepted": true,
+          "declared_limit": 0.03,
+          "declared_row_limit": 0.12,
+          "finite": true,
+          "max_abs": 0.2265625,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0020997694227844477,
+          "rms_rel": 0.01179475002818674,
+          "row_rms_rel_max": 0.02951192855834961,
+          "shape": [
+            1,
+            128,
+            64,
+            512
+          ]
+        },
+        "prefill.output_lora": {
+          "accepted": true,
+          "declared_limit": 0.035,
+          "declared_row_limit": 0.14,
+          "finite": true,
+          "max_abs": 0.03515625,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0030947993509471416,
+          "rms_rel": 0.012797061820634384,
+          "row_rms_rel_max": 0.02492089755833149,
+          "shape": [
+            1,
+            128,
+            8,
+            1024
+          ]
+        },
+        "prefill.projected_kv": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            128,
+            512
+          ]
+        },
+        "prefill.projected_score": {
+          "accepted": true,
+          "declared_limit": 2e-05,
+          "declared_row_limit": 8e-05,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.float32",
+          "oracle_dtype": "torch.float32",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            128,
+            512
+          ]
+        },
+        "prefill.query": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.004648029338568449,
+          "rms_rel": 0.004652626441479946,
+          "row_rms_rel_max": 0.007677815388888121,
+          "shape": [
+            1,
+            128,
+            64,
+            512
+          ]
+        },
+        "prefill.query_lora": {
+          "accepted": true,
+          "declared_limit": 0.012,
+          "declared_row_limit": 0.048,
+          "finite": true,
+          "max_abs": 0.0009765625,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 8.161461300915107e-05,
+          "rms_rel": 0.0028459997801189465,
+          "row_rms_rel_max": 0.0032291612587869167,
+          "shape": [
+            1,
+            128,
+            1024
+          ]
+        },
+        "prefill.raw_latent": {
+          "accepted": true,
+          "declared_limit": 0.012,
+          "declared_row_limit": 0.048,
+          "finite": true,
+          "max_abs": 0.25,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0070096892304718494,
+          "rms_rel": 0.010223483363888522,
+          "row_rms_rel_max": 0.017862077802419662,
+          "shape": [
+            1,
+            128,
+            512
+          ]
+        },
+        "prefill.sparse_control": {
+          "accepted": true,
+          "declared_limit": 0.003,
+          "declared_row_limit": 0.012,
+          "finite": true,
+          "max_abs": 0.001953125,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 3.6197593544784468e-06,
+          "rms_rel": 2.033674614092248e-05,
+          "row_rms_rel_max": 0.0005875708302482963,
+          "shape": [
+            1,
+            128,
+            64,
+            512
+          ]
+        },
+        "prefill.sparse_output": {
+          "accepted": true,
+          "declared_limit": 0.03,
+          "declared_row_limit": 0.12,
+          "finite": true,
+          "max_abs": 0.2265625,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0020989389158785343,
+          "rms_rel": 0.011790085921226446,
+          "row_rms_rel_max": 0.029505427926778793,
+          "shape": [
+            1,
+            128,
+            64,
+            512
+          ]
+        },
+        "prefill.state.compressed": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.0,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0,
+          "rms_rel": 0.0,
+          "row_rms_rel_max": 0.0,
+          "shape": [
+            1,
+            2,
+            512
+          ]
+        },
+        "prefill.state.raw": {
+          "accepted": true,
+          "declared_limit": 0.02,
+          "declared_row_limit": 0.08,
+          "finite": true,
+          "max_abs": 0.25,
+          "observed_dtype": "torch.bfloat16",
+          "oracle_dtype": "torch.bfloat16",
+          "rms_abs": 0.0070096892304718494,
+          "rms_rel": 0.010223483363888522,
+          "row_rms_rel_max": 0.017862077802419662,
+          "shape": [
+            1,
+            128,
+            512
+          ]
+        }
+      }
+    }
+  },
+  "checkpoint_id": "e33d9526298d9d5c5bc5ffa563fd0b6b84f724c79fa29877b103541750ae95b4",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "load_and_prepare": 0.18165521486662328,
+    "process": 5.9873410479631275
+  },
+  "errors": [],
+  "experiment": "E0ef-ratio128-attention-oracle",
+  "host": "titan064",
+  "identity": {
+    "block_contract_id": "8830881a121919c6e7824bfe4a0ed009a3efab70e7c2ad36b9faa1611a3c477f",
+    "checkpoint_id": "e33d9526298d9d5c5bc5ffa563fd0b6b84f724c79fa29877b103541750ae95b4",
+    "layer": 3,
+    "world": 4
+  },
+  "implementation_sha256": "59b27698d700d648b0e63f6a9eeab45f5cf32ab73a0455776e056c417e2e2991",
+  "local_rank": 2,
+  "measurement_class": "semantic_correctness_gate",
+  "rank": 2,
+  "schema_version": 1,
+  "semantic_contract": {
+    "candidate_projection": "bf16_dequantized_weight_control",
+    "compress_ratio": 128,
+    "compressor_oracle": "independent_fp32_ape_softmax_pool",
+    "geometry": "hidden4096_heads64_headdim512_qlora1024_ogroups8",
+    "layer": 3,
+    "measurement_scope": "semantic_correctness_not_performance",
+    "model": "deepseek-v4-flash",
+    "nope_decision": "the model comment, scale_fmt=ue8m0 config, and quantizer API define QAT E4M3 quantize/dequantize intent; the current executable inplace BF16 nested cast is treated as a reference implementation defect",
+    "nope_quant": "qat_intended_e4m3_ue8m0",
+    "sparse_oracle": "independent_fp32_sink_softmax",
+    "weight_oracle": "raw_checkpoint_fp8_e8m0_block_dequant_fp32"
+  },
+  "torch": "2.11.0+cu130",
+  "workload": {
+    "cases": [
+      "prefill128_decode128",
+      "prefill127_decode127_boundary"
+    ],
+    "input_distribution": "CPU FP32 normal * 0.02, cast BF16, deterministic per rank",
+    "kv_dtype": "bf16",
+    "local_batch": 1,
+    "max_seq_len": 256,
+    "seed": 20260711,
+    "stage_rms_rel_limits": {
+      "attention_kv": 0.02,
+      "branch": 0.04,
+      "compression_finalized": 0.02,
+      "compression_pooled": 5e-05,
+      "inverse_rotated": 0.03,
+      "output_lora": 0.035,
+      "projected_kv": 2e-05,
+      "projected_score": 2e-05,
+      "query": 0.02,
+      "query_lora": 0.012,
+      "raw_latent": 0.012,
+      "sparse_control": 0.003,
+      "sparse_output": 0.03,
+      "state.compressed": 0.02,
+      "state.compressor_kv": 2e-05,
+      "state.compressor_score": 2e-05,
+      "state.raw": 0.02
+    }
+  },
+  "world": 4
+}

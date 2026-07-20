@@ -286,24 +286,27 @@ def _window_sparse_decode_prevalidated(
 
     Same math as ``attention._torch_sparse_decode_prevalidated``; duplicated
     here so the window module does not depend on a ratio-128 private helper.
+
+    17th vertical (workspace slimming): one FP32 materialization of the
+    gathered rows plus in-place softmax -- exact conversions and identical
+    elementwise values keep the output bitwise identical to the previous
+    gather -> bf16 -> double-``.float()`` chain.
     """
 
-    selected = latent_kv[plan.batch_indices, plan.gather_indices]
-    if selected.dtype == torch.float8_e4m3fn:
-        selected = selected.to(torch.bfloat16)
+    selected = latent_kv[plan.batch_indices, plan.gather_indices].float()
     if latent_rope is not None:
         selected[..., -latent_rope.shape[-1] :] = latent_rope[
             plan.batch_indices, plan.gather_indices
         ]
     scores = torch.einsum(
-        "bshd,bskd->bshk", query.float(), selected.float()
+        "bshd,bskd->bshk", query.float(), selected
     ) * softmax_scale
     sink = attn_sink.float().view(1, 1, query.shape[2], 1)
     maximum = torch.maximum(scores.amax(dim=-1, keepdim=True), sink)
-    exponent = torch.exp(scores - maximum)
+    exponent = scores.sub_(maximum).exp_()
     denominator = exponent.sum(dim=-1, keepdim=True) + torch.exp(sink - maximum)
-    probabilities = exponent / denominator
-    output = torch.einsum("bshk,bskd->bshd", probabilities, selected.float())
+    probabilities = exponent.div_(denominator)
+    output = torch.einsum("bshk,bskd->bshd", probabilities, selected)
     return output.to(query.dtype)
 
 

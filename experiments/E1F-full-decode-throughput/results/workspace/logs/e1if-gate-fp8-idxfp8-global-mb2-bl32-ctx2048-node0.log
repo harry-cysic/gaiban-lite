@@ -1,0 +1,78 @@
+W0720 21:24:15.557000 174560 torch/distributed/run.py:851] 
+W0720 21:24:15.557000 174560 torch/distributed/run.py:851] *****************************************
+W0720 21:24:15.557000 174560 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 21:24:15.557000 174560 torch/distributed/run.py:851] *****************************************
+[E1IF] placement {0: ['titan064'], 1: ['titan064'], 2: ['titan065'], 3: ['titan065']}
+[E1IF] layer=11 rank=0 experts=256/256
+[E1IF] layer=0 rank=0 experts=256/256
+[E1IF] stage 1 layer 11 material loaded
+[E1IF] stage 0 layer 0 material loaded
+[E1IF] layer=12 rank=0 experts=256/256
+[E1IF] layer=1 rank=0 experts=256/256
+[E1IF] stage 1 layer 12 material loaded
+[E1IF] stage 0 layer 1 material loaded
+[E1IF] layer=13 rank=0 experts=256/256
+[E1IF] layer=2 rank=0 experts=256/256
+[E1IF] stage 0 layer 2 material loaded
+[E1IF] stage 1 layer 13 material loaded
+[E1IF] layer=3 rank=0 experts=256/256
+[E1IF] stage 0 layer 3 material loaded
+[E1IF] layer=14 rank=0 experts=256/256
+[E1IF] stage 1 layer 14 material loaded
+[E1IF] layer=4 rank=0 experts=256/256
+[E1IF] stage 0 layer 4 material loaded
+[E1IF] layer=15 rank=0 experts=256/256
+[E1IF] stage 1 layer 15 material loaded
+[E1IF] layer=5 rank=0 experts=256/256
+[E1IF] stage 0 layer 5 material loaded
+[E1IF] layer=16 rank=0 experts=256/256
+[E1IF] stage 1 layer 16 material loaded
+[E1IF] layer=6 rank=0 experts=256/256
+[E1IF] stage 0 layer 6 material loaded
+[E1IF] layer=17 rank=0 experts=256/256
+[E1IF] stage 1 layer 17 material loaded
+[E1IF] layer=7 rank=0 experts=256/256
+[E1IF] stage 0 layer 7 material loaded
+[E1IF] layer=18 rank=0 experts=256/256
+[E1IF] stage 1 layer 18 material loaded
+[E1IF] layer=8 rank=0 experts=256/256
+[E1IF] stage 0 layer 8 material loaded
+[E1IF] layer=19 rank=0 experts=256/256
+[E1IF] stage 1 layer 19 material loaded
+[E1IF] layer=9 rank=0 experts=256/256
+[E1IF] stage 0 layer 9 material loaded
+[E1IF] layer=20 rank=0 experts=256/256
+[E1IF] layer=10 rank=0 experts=256/256
+[E1IF] stage 1 layer 20 material loaded
+[E1IF] stage 0 layer 10 material loaded
+[E1IF] layer=21 rank=0 experts=256/256
+[E1IF] stage 1 layer 21 material loaded
+[E1IF] stage 1 loaded (11 layers, free 8.74 GiB, 13s)
+[E1IF] stage 0 loaded (11 layers, free 7.78 GiB, 13s)
+[E1IF] stage 0 lane mb0 built
+[E1IF] stage 0 lane mb1 built
+[E1IF] stage 1 2 lanes built (+twins), free 8.03 GiB
+[E1IF] stage 0 2 lanes built (+twins), free 7.20 GiB
+[E1IF] stage 0 mb0 warm done
+[E1IF] stage 0 mb1 warm done
+[E1IF] stage 1 warmup done (55s, free 7.65 GiB)
+[E1IF] stage 0 warmup done (55s, free 6.94 GiB)
+[E1IF] stage 0 solo-mb0 captured mb0/normal at position 2048 (0.1s)
+[E1IF] solo-mb0 cycle 0/132 pos 2048 family normal
+[E1IF] stage 0 solo-mb0 captured mb0/ratio4_boundary at position 2051 (0.1s)
+[E1IF] solo-mb0 cycle 64/132 pos 2112 family normal
+[E1IF] stage 0 solo-mb0 captured mb0/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] solo-mb0 cycle 128/132 pos 2176 family normal
+[E1IF] stage 0 solo-mb0 done: bitwise 132/132
+[E1IF] stage 0 solo-mb1 captured mb1/normal at position 2048 (0.1s)
+[E1IF] solo-mb1 cycle 0/132 pos 2048 family normal
+[E1IF] stage 0 solo-mb1 captured mb1/ratio4_boundary at position 2051 (0.1s)
+[E1IF] solo-mb1 cycle 64/132 pos 2112 family normal
+[E1IF] stage 0 solo-mb1 captured mb1/ratio4_ratio128_boundary at position 2175 (0.1s)
+[E1IF] solo-mb1 cycle 128/132 pos 2176 family normal
+[E1IF] stage 0 solo-mb1 done: bitwise 132/132
+[E1IF] interleaved cycle 0/132 pos 2048 family normal
+[E1IF] interleaved cycle 64/132 pos 2112 family normal
+[E1IF] interleaved cycle 128/132 pos 2176 family normal
+[E1IF] gate: PASS on this rank
+[E1IF] overall: PASS

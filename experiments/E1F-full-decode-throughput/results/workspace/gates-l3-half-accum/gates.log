@@ -1,0 +1,124 @@
++ cd /home/cysic/e0f-runtime
++ export CUDA_HOME=/usr/local/cuda-13.2
++ CUDA_HOME=/usr/local/cuda-13.2
++ export PATH=/usr/local/cuda-13.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ PATH=/usr/local/cuda-13.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ export LD_LIBRARY_PATH=/usr/local/cuda-13.2/lib64
++ LD_LIBRARY_PATH=/usr/local/cuda-13.2/lib64
++ export DSV4_R4_HALF_ACCUM=1
++ DSV4_R4_HALF_ACCUM=1
++ TR=/home/cysic/Workspace/venvs/sglang/bin/torchrun
++ SR=/home/cysic/Workspace/DeepSeek-V4-Flash
++ rc=0
++ for arm in bf16 fp8
++ rm -rf out-ws-e0wf-bf16
++ /home/cysic/Workspace/venvs/sglang/bin/torchrun --standalone --nproc_per_node=4 e0wf_window_attention_oracle.py --stage-root /home/cysic/Workspace/DeepSeek-V4-Flash --out-dir out-ws-e0wf-bf16 --kv-dtype bf16
+W0720 21:27:33.469000 174953 torch/distributed/run.py:851] 
+W0720 21:27:33.469000 174953 torch/distributed/run.py:851] *****************************************
+W0720 21:27:33.469000 174953 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 21:27:33.469000 174953 torch/distributed/run.py:851] *****************************************
++ rm -rf out-ws-e0ef-bf16
++ /home/cysic/Workspace/venvs/sglang/bin/torchrun --standalone --nproc_per_node=4 e0ef_ratio128_attention_oracle.py --stage-root /home/cysic/Workspace/DeepSeek-V4-Flash --out-dir out-ws-e0ef-bf16 --kv-dtype bf16
+W0720 21:27:45.214000 175091 torch/distributed/run.py:851] 
+W0720 21:27:45.214000 175091 torch/distributed/run.py:851] *****************************************
+W0720 21:27:45.214000 175091 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 21:27:45.214000 175091 torch/distributed/run.py:851] *****************************************
++ for arm in bf16 fp8
++ rm -rf out-ws-e0wf-fp8
++ /home/cysic/Workspace/venvs/sglang/bin/torchrun --standalone --nproc_per_node=4 e0wf_window_attention_oracle.py --stage-root /home/cysic/Workspace/DeepSeek-V4-Flash --out-dir out-ws-e0wf-fp8 --kv-dtype fp8
+W0720 21:27:57.140000 175230 torch/distributed/run.py:851] 
+W0720 21:27:57.140000 175230 torch/distributed/run.py:851] *****************************************
+W0720 21:27:57.140000 175230 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 21:27:57.140000 175230 torch/distributed/run.py:851] *****************************************
++ rm -rf out-ws-e0ef-fp8
++ /home/cysic/Workspace/venvs/sglang/bin/torchrun --standalone --nproc_per_node=4 e0ef_ratio128_attention_oracle.py --stage-root /home/cysic/Workspace/DeepSeek-V4-Flash --out-dir out-ws-e0ef-fp8 --kv-dtype fp8
+W0720 21:28:09.688000 175368 torch/distributed/run.py:851] 
+W0720 21:28:09.688000 175368 torch/distributed/run.py:851] *****************************************
+W0720 21:28:09.688000 175368 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 21:28:09.688000 175368 torch/distributed/run.py:851] *****************************************
++ rm -rf out-ws-e0ff
++ /home/cysic/Workspace/venvs/sglang/bin/torchrun --standalone --nproc_per_node=4 e0ff_ratio4_attention_oracle.py --stage-root /home/cysic/Workspace/DeepSeek-V4-Flash --out-dir out-ws-e0ff
+W0720 21:28:21.687000 175506 torch/distributed/run.py:851] 
+W0720 21:28:21.687000 175506 torch/distributed/run.py:851] *****************************************
+W0720 21:28:21.687000 175506 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 21:28:21.687000 175506 torch/distributed/run.py:851] *****************************************
+W0720 21:28:26.801000 175506 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 175599 closing signal SIGTERM
+W0720 21:28:26.803000 175506 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 175600 closing signal SIGTERM
+W0720 21:28:26.803000 175506 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 175601 closing signal SIGTERM
+E0720 21:28:27.017000 175506 torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: 1) local_rank: 0 (pid: 175598) of binary: /home/cysic/Workspace/venvs/sglang/bin/python3
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+e0ff_ratio4_attention_oracle.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-07-20_21:28:27
+  host      : titan064
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 175599)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-07-20_21:28:27
+  host      : titan064
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 175600)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2026-07-20_21:28:27
+  host      : titan064
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 175601)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-20_21:28:26
+  host      : titan064
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 175598)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
++ rc=1
++ rm -rf out-ws-e0kf
++ /home/cysic/Workspace/venvs/sglang/bin/torchrun --standalone --nproc_per_node=4 e0kf_fp8_ratio4_paired_gate.py --stage-root /home/cysic/Workspace/DeepSeek-V4-Flash --out-dir out-ws-e0kf
+W0720 21:28:28.836000 175644 torch/distributed/run.py:851] 
+W0720 21:28:28.836000 175644 torch/distributed/run.py:851] *****************************************
+W0720 21:28:28.836000 175644 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 21:28:28.836000 175644 torch/distributed/run.py:851] *****************************************
+[E0kf] fp8: branch rms_rel max 0.03031 last 0.023350078865912553, topk equal 64/64, accepted True
+[E0kf] fp8_rope_bf16: branch rms_rel max 0.00353 last 0.0016384231339780645, topk equal 64/64, accepted True
+[E0kf] fp8_idx: branch rms_rel max 0.03031 last 0.023350078865912553, topk equal 64/64, accepted True
+[E0kf] overall: PASS
+[E0kf] fp8: branch rms_rel max 0.03031 last 0.023350078865912553, topk equal 64/64, accepted True
+[E0kf] fp8_rope_bf16: branch rms_rel max 0.00353 last 0.0016384231339780645, topk equal 64/64, accepted True
+[E0kf] fp8_idx: branch rms_rel max 0.03031 last 0.023350078865912553, topk equal 64/64, accepted True
+[E0kf] overall: PASS
+[E0kf] fp8: branch rms_rel max 0.03031 last 0.023350078865912553, topk equal 64/64, accepted True
+[E0kf] fp8_rope_bf16: branch rms_rel max 0.00353 last 0.0016384231339780645, topk equal 64/64, accepted True
+[E0kf] fp8_idx: branch rms_rel max 0.03031 last 0.023350078865912553, topk equal 64/64, accepted True
+[E0kf] overall: PASS
+[E0kf] fp8: branch rms_rel max 0.03031 last 0.023350078865912553, topk equal 64/64, accepted True
+[E0kf] fp8_rope_bf16: branch rms_rel max 0.00353 last 0.0016384231339780645, topk equal 64/64, accepted True
+[E0kf] fp8_idx: branch rms_rel max 0.03031 last 0.023350078865912553, topk equal 64/64, accepted True
+[E0kf] overall: PASS
++ exit 1

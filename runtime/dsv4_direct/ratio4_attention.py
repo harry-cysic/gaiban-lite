@@ -10,6 +10,7 @@ against immutable inputs before replacing this path.
 from __future__ import annotations
 
 import math
+import os
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Callable, Iterator, Mapping, Protocol
@@ -314,6 +315,17 @@ def _evidence_snapshot(value: torch.Tensor | None) -> torch.Tensor | None:
     if value is None:
         return None
     return value.detach().clone()
+
+
+# 17th vertical, leverage 3 (half-precision accumulation EXPERIMENT).
+# Default off: the shipped semantics stay the FP32 score/softmax chain.
+# When DSV4_R4_HALF_ACCUM=1, the ratio-4 sparse-attention score/output
+# einsums run on BF16 operands (BF16-rounded score storage; matmul-internal
+# FP32 accumulation) and the indexer scoring chain runs in BF16.  This is a
+# semantic change and must pass the single-layer oracle numeric gate (E0ff
+# limits) before it may be considered further; evidence tensors are upcast
+# to their contract dtypes so the oracle ABI still applies.
+_HALF_ACCUM = os.environ.get("DSV4_R4_HALF_ACCUM", "0") == "1"
 
 
 def hadamard_transform(value: torch.Tensor) -> torch.Tensor:
@@ -1097,10 +1109,31 @@ class Ratio4TorchAttention:
         if stage_marker is not None:
             stage_marker("index_query_done")
         index_kv = state.indexer_kv[:, : plan.candidate_width]
-        scores = torch.einsum(
-            "bshd,btd->bsht", index_query.float(), index_kv.float()
-        )
-        scores = (scores.relu() * index_weights.float().unsqueeze(-1)).sum(dim=2)
+        if _HALF_ACCUM:
+            index_kv_b = (
+                index_kv
+                if index_kv.dtype == torch.bfloat16
+                else index_kv.to(torch.bfloat16)
+            )
+            scores = torch.einsum("bshd,btd->bsht", index_query, index_kv_b)
+            scores = (
+                scores.relu_()
+                .mul_(index_weights.unsqueeze(-1))
+                .sum(dim=2)
+                .float()
+            )
+        else:
+            scores = torch.einsum(
+                "bshd,btd->bsht", index_query.float(), index_kv.float()
+            )
+            # 17th vertical: in-place relu/scale (bitwise-identical
+            # elementwise values, two fewer (b,1,h,t) fp32 temporaries in
+            # the capture pool).
+            scores = (
+                scores.relu_()
+                .mul_(index_weights.float().unsqueeze(-1))
+                .sum(dim=2)
+            )
         compressed_after = torch.div(
             position + 1, COMPRESS_RATIO, rounding_mode="floor"
         )
@@ -1123,26 +1156,45 @@ class Ratio4TorchAttention:
             self, "_sparse_attention_backend", None
         )
         if sparse_attention_backend is None:
+            # 17th vertical (workspace slimming): one FP32 materialization of
+            # the gathered rows + in-place softmax steps.  fp8/bf16 -> fp32
+            # conversions are exact and the in-place elementwise kernels
+            # compute the same values, so the einsum inputs -- and the output
+            # -- are bitwise identical to the previous
+            # gather -> bf16 -> double-``.float()`` chain.  With
+            # DSV4_R4_HALF_ACCUM=1 (leverage-3 experiment) the gathered rows
+            # stay BF16 and the score/output einsums run on BF16 operands.
             selected = state.latent[plan.batch_indices, plan.topk_indices]
-            if selected.dtype == torch.float8_e4m3fn:
-                selected = selected.to(torch.bfloat16)
+            if _HALF_ACCUM:
+                if selected.dtype != torch.bfloat16:
+                    selected = selected.to(torch.bfloat16)
+            else:
+                selected = selected.float()
             if state.latent_rope is not None:
                 selected[..., -LATENT_ROPE_DIM:] = state.latent_rope[
                     plan.batch_indices, plan.topk_indices
                 ]
-            attention_scores = torch.einsum(
-                "bshd,bskd->bshk", query.float(), selected.float()
-            ) * (cfg.head_dim**-0.5)
+            if _HALF_ACCUM:
+                attention_scores = torch.einsum(
+                    "bshd,bskd->bshk", query, selected
+                ).float() * (cfg.head_dim**-0.5)
+            else:
+                attention_scores = torch.einsum(
+                    "bshd,bskd->bshk", query.float(), selected
+                ) * (cfg.head_dim**-0.5)
             sink = weights.attn_sink.float().view(1, 1, cfg.num_heads, 1)
             maximum = torch.maximum(
                 attention_scores.amax(dim=-1, keepdim=True), sink
             )
-            exponent = torch.exp(attention_scores - maximum)
+            exponent = attention_scores.sub_(maximum).exp_()
             denominator = exponent.sum(dim=-1, keepdim=True) + torch.exp(
                 sink - maximum
             )
+            probabilities = exponent.div_(denominator)
+            if _HALF_ACCUM:
+                probabilities = probabilities.to(torch.bfloat16)
             sparse_output = torch.einsum(
-                "bshk,bskd->bshd", exponent / denominator, selected.float()
+                "bshk,bskd->bshd", probabilities, selected
             ).to(query.dtype)
         else:
             sparse_output = sparse_attention_backend(
@@ -1351,10 +1403,29 @@ class Ratio4TorchAttention:
             cfg.index_head_dim**-0.5 * cfg.index_n_heads**-0.5
         )
         index_kv = state.indexer_kv[:, : plan.compressed_count_after]
-        scores = torch.einsum(
-            "bshd,btd->bsht", index_query.float(), index_kv.float()
-        )
-        scores = (scores.relu() * index_weights.float().unsqueeze(-1)).sum(dim=2)
+        if _HALF_ACCUM:
+            index_kv_b = (
+                index_kv
+                if index_kv.dtype == torch.bfloat16
+                else index_kv.to(torch.bfloat16)
+            )
+            scores = torch.einsum("bshd,btd->bsht", index_query, index_kv_b)
+            scores = (
+                scores.relu_()
+                .mul_(index_weights.unsqueeze(-1))
+                .sum(dim=2)
+                .float()
+            )
+        else:
+            scores = torch.einsum(
+                "bshd,btd->bsht", index_query.float(), index_kv.float()
+            )
+            # 17th vertical: in-place relu/scale (bitwise-identical values).
+            scores = (
+                scores.relu_()
+                .mul_(index_weights.float().unsqueeze(-1))
+                .sum(dim=2)
+            )
         compressed_indices = scores.topk(plan.index_topk_count, dim=-1).indices
         topk = torch.cat(
             (plan.window_indices, compressed_indices + WINDOW_SIZE), dim=-1
@@ -1365,26 +1436,40 @@ class Ratio4TorchAttention:
 
         selected = None
         if sparse_attention_backend is None:
+            # 17th vertical: single FP32 materialization + in-place softmax
+            # (bitwise identical; see forward_stateful_decode_tensor).  With
+            # DSV4_R4_HALF_ACCUM=1 the BF16 leverage-3 experiment applies.
             selected = state.latent[plan.batch_indices, topk]
-            if selected.dtype == torch.float8_e4m3fn:
-                selected = selected.to(torch.bfloat16)
+            if _HALF_ACCUM:
+                if selected.dtype != torch.bfloat16:
+                    selected = selected.to(torch.bfloat16)
+            else:
+                selected = selected.float()
             if state.latent_rope is not None:
                 selected[..., -LATENT_ROPE_DIM:] = state.latent_rope[
                     plan.batch_indices, topk
                 ]
-            attention_scores = torch.einsum(
-                "bshd,bskd->bshk", query.float(), selected.float()
-            ) * (cfg.head_dim**-0.5)
+            if _HALF_ACCUM:
+                attention_scores = torch.einsum(
+                    "bshd,bskd->bshk", query, selected
+                ).float() * (cfg.head_dim**-0.5)
+            else:
+                attention_scores = torch.einsum(
+                    "bshd,bskd->bshk", query.float(), selected
+                ) * (cfg.head_dim**-0.5)
             sink = weights.attn_sink.float().view(1, 1, cfg.num_heads, 1)
             maximum = torch.maximum(
                 attention_scores.amax(dim=-1, keepdim=True), sink
             )
-            exponent = torch.exp(attention_scores - maximum)
+            exponent = attention_scores.sub_(maximum).exp_()
             denominator = exponent.sum(dim=-1, keepdim=True) + torch.exp(
                 sink - maximum
             )
+            probabilities = exponent.div_(denominator)
+            if _HALF_ACCUM:
+                probabilities = probabilities.to(torch.bfloat16)
             sparse_output = torch.einsum(
-                "bshk,bskd->bshd", exponent / denominator, selected.float()
+                "bshk,bskd->bshd", probabilities, selected
             ).to(query.dtype)
         else:
             sparse_output = sparse_attention_backend(
@@ -1482,7 +1567,12 @@ class Ratio4TorchAttention:
                     index_scores=_evidence_snapshot(scores),
                     compressed_indices=_evidence_snapshot(compressed_indices),
                     topk_indices=_evidence_snapshot(topk),
-                    selected_kv=_evidence_snapshot(selected),
+                    # selected is now held in FP32 (exact); evidence keeps the
+                    # oracle's BF16 contract -- every value is
+                    # bf16-representable, so this cast is bitwise-lossless.
+                    selected_kv=_evidence_snapshot(
+                        None if selected is None else selected.to(torch.bfloat16)
+                    ),
                     sparse_output=sparse_snapshot,
                     inverse_rotated=_evidence_snapshot(inverse_rotated),
                     output_lora=_evidence_snapshot(projected),

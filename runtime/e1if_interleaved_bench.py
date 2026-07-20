@@ -165,6 +165,7 @@ class MicrobatchLane:
         stop_position: int,
         device: torch.device,
         moe_slots: Mapping[DecodeGraphFamily, int],
+        pools: Mapping[DecodeGraphFamily, object] | None = None,
     ) -> None:
         self.label = label
         self.lane_index = lane_index
@@ -191,9 +192,20 @@ class MicrobatchLane:
             graph_moe_slots=self.moe_slot_tuple,
         )
         self.graphs: dict[DecodeGraphFamily, torch.cuda.CUDAGraph] = {}
-        self.pools = {
-            family: torch.cuda.graph_pool_handle() for family in DecodeGraphFamily
-        }
+        # Pool scope (17th vertical): callers may inject shared pool handles
+        # (per-family across lanes, or one global pool).  Sharing is safe
+        # because every replay/capture on this device is serialized on one
+        # stream and all graph outputs/state live in external allocations, so
+        # pool blocks only ever hold capture-transient workspace (E0hf
+        # two-lane precedent, extended).  Default: private per-lane
+        # per-family pools (the pre-17th-vertical layout).
+        if pools is None:
+            self.pools = {
+                family: torch.cuda.graph_pool_handle()
+                for family in DecodeGraphFamily
+            }
+        else:
+            self.pools = {family: pools[family] for family in DecodeGraphFamily}
         self.capture_order: list[str] = []
 
     def state_digests(self) -> dict[str, str]:
@@ -262,6 +274,19 @@ def main() -> int:
         default="bf16",
         choices=("bf16", "fp8"),
         help="ratio-4 indexer_kv storage dtype",
+    )
+    parser.add_argument(
+        "--graph-pool-scope",
+        type=str,
+        default="lane_family",
+        choices=("lane_family", "family", "global"),
+        help=(
+            "CUDA-graph private pool sharing: lane_family = one pool per "
+            "lane per family (12 at mb=4, pre-17th-vertical layout); family "
+            "= one pool per family shared by all lanes (3, E0hf precedent); "
+            "global = one pool for all graphs (max sharing; serialized "
+            "replays make pool blocks capture-transient only)"
+        ),
     )
     parser.add_argument("--progress-every", type=int, default=256)
     parser.add_argument("--config-tag", type=str, default="nogdr-dp-interleaved")
@@ -341,7 +366,8 @@ def main() -> int:
             ),
             "graphs": (
                 "per lane x per family stateful CUDA graphs (E0sf), lane-owned "
-                "MoE graph slots (1+3m,2+3m,3+3m), per-lane per-family pools; "
+                "MoE graph slots (1+3m,2+3m,3+3m), pool scope "
+                f"{args.graph_pool_scope}; "
                 f"slots_per_shape={slots_per_shape}, eager slot 0 shared"
             ),
             "timing": (
@@ -370,6 +396,7 @@ def main() -> int:
         "device": torch.cuda.get_device_name(device),
         "torch": torch.__version__,
         "seed": args.seed,
+        "graph_pool_scope": args.graph_pool_scope,
         "kv_dtype": args.kv_dtype,
         "indexer_kv_dtype": args.indexer_kv_dtype,
         "local_batch": local_batch,
@@ -542,6 +569,19 @@ def main() -> int:
         )
         phase_started = time.perf_counter()
 
+        # Shared graph-pool handles (17th vertical).  "family": one handle
+        # per family reused by every lane; "global": a single handle for all
+        # graphs.  Twins never capture graphs, so they keep private handles.
+        shared_pools: dict[DecodeGraphFamily, object] | None = None
+        if args.graph_pool_scope == "family":
+            shared_pools = {
+                family: torch.cuda.graph_pool_handle()
+                for family in DecodeGraphFamily
+            }
+        elif args.graph_pool_scope == "global":
+            single_pool = torch.cuda.graph_pool_handle()
+            shared_pools = {family: single_pool for family in DecodeGraphFamily}
+
         def build_all_lanes() -> tuple[list[MicrobatchLane], dict[int, MicrobatchLane]]:
             lanes: list[MicrobatchLane] = []
             twins: dict[int, MicrobatchLane] = {}
@@ -569,6 +609,7 @@ def main() -> int:
                         stop_position=stop_position,
                         device=device,
                         moe_slots=lane_moe_slots(m),
+                        pools=shared_pools,
                     )
                 )
                 if gate:
@@ -615,9 +656,17 @@ def main() -> int:
                 [clone_state(state) for state in lane.stage.states] for lane in lanes
             ]
 
-        snapshots = synchronized_local_step(
-            "snapshot states", snapshot_all, device=device, world=world
-        )
+        # 17th vertical (workspace slimming): warmup snapshots are only needed
+        # for the duration of one lane's warmup in timed mode, so they are
+        # taken per lane inside the warmup loop (peak = one lane's KV copy,
+        # not mb_count of them -- the all-lanes clone was the bl=72 OOM wall).
+        # Gate mode still snapshots every lane up front because the solo/
+        # interleaved phases restore from them long after warmup.
+        snapshots: list[list[DirectState]] | None = None
+        if gate:
+            snapshots = synchronized_local_step(
+                "snapshot states", snapshot_all, device=device, world=world
+            )
 
         def warm_inputs(m: int, position: int) -> tuple[torch.Tensor, torch.Tensor]:
             seed_m = lane_seed(args.seed, m)
@@ -664,15 +713,24 @@ def main() -> int:
 
         def warmup_all() -> None:
             for m, lane in enumerate(lanes):
+                if gate:
+                    lane_snapshot = snapshots[m]
+                else:
+                    lane_snapshot = [
+                        clone_state(state) for state in lane.stage.states
+                    ]
                 run_warm_cycle(lane)
-                restore_cycle(lane, snapshots[m])
+                restore_cycle(lane, lane_snapshot)
                 with torch.cuda.stream(capture_stream):
                     run_warm_cycle(lane, moe_slots=lane.moe_slots)
                 torch.cuda.synchronize(device)
-                restore_cycle(lane, snapshots[m])
+                restore_cycle(lane, lane_snapshot)
                 for slot in lane.moe_slot_tuple:
                     for moe in lane.stage.moes:
                         moe.reset_free_slot_completion_event(global_rows, slot)
+                if not gate:
+                    del lane_snapshot
+                    torch.cuda.empty_cache()
                 if rank in (0, 12):
                     print(f"[E1IF] stage {stage} mb{m} warm done", flush=True)
             for m, twin in twins.items():

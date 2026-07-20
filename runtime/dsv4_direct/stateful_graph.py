@@ -549,6 +549,14 @@ def teardown_stateful_graphs(
     Malformed registries are still cleared best-effort, but their evidence can
     never be accepted. CUDA/runtime failures are recorded while later safe
     cleanup steps continue where possible.
+
+    Pool handles may legitimately be shared -- across families and across
+    lanes -- when every capture/replay on the device is serialized (E0hf
+    two-lane shared-pool precedent, extended by the 17th vertical): pool
+    blocks then only hold capture-transient workspace, never live outputs.
+    Pool-token distinctness is therefore recorded as evidence
+    (``values_distinct``) but is not required for acceptance; graph objects
+    themselves must still be distinct per family.
     """
 
     contract = _stage_plan_contract(stage, plan)
@@ -780,7 +788,6 @@ def teardown_stateful_graphs(
         and pool_registry["families_exact"]
         and pool_registry["values_present"]
         and pool_registry["values_valid"]
-        and pool_registry["values_distinct"]
         and registry_objects_distinct
         and graph_pool_objects_distinct
         and slot_cleanup_accepted

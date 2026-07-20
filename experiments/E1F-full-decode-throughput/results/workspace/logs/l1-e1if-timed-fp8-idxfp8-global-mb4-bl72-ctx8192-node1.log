@@ -1,0 +1,270 @@
+W0720 20:17:45.057000 149905 torch/distributed/run.py:851] 
+W0720 20:17:45.057000 149905 torch/distributed/run.py:851] *****************************************
+W0720 20:17:45.057000 149905 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 20:17:45.057000 149905 torch/distributed/run.py:851] *****************************************
+[E1IF] layer=22 rank=0 experts=256/256
+[E1IF] stage 2 layer 22 material loaded
+[E1IF] layer=33 rank=0 experts=256/256
+[E1IF] stage 3 layer 33 material loaded
+[E1IF] layer=23 rank=0 experts=256/256
+[E1IF] stage 2 layer 23 material loaded
+[E1IF] layer=34 rank=0 experts=256/256
+[E1IF] stage 3 layer 34 material loaded
+[E1IF] layer=24 rank=0 experts=256/256
+[E1IF] stage 2 layer 24 material loaded
+[E1IF] layer=35 rank=0 experts=256/256
+[E1IF] stage 3 layer 35 material loaded
+[E1IF] layer=25 rank=0 experts=256/256
+[E1IF] stage 2 layer 25 material loaded
+[E1IF] layer=36 rank=0 experts=256/256
+[E1IF] stage 3 layer 36 material loaded
+[E1IF] layer=26 rank=0 experts=256/256
+[E1IF] stage 2 layer 26 material loaded
+[E1IF] layer=37 rank=0 experts=256/256
+[E1IF] stage 3 layer 37 material loaded
+[E1IF] layer=27 rank=0 experts=256/256
+[E1IF] stage 2 layer 27 material loaded
+[E1IF] layer=38 rank=0 experts=256/256
+[E1IF] stage 3 layer 38 material loaded
+[E1IF] layer=28 rank=0 experts=256/256
+[E1IF] stage 2 layer 28 material loaded
+[E1IF] layer=39 rank=0 experts=256/256
+[E1IF] stage 3 layer 39 material loaded
+[E1IF] layer=29 rank=0 experts=256/256
+[E1IF] stage 2 layer 29 material loaded
+[E1IF] layer=40 rank=0 experts=256/256
+[E1IF] stage 3 layer 40 material loaded
+[E1IF] layer=30 rank=0 experts=256/256
+[E1IF] stage 2 layer 30 material loaded
+[E1IF] layer=41 rank=0 experts=256/256
+[E1IF] stage 3 layer 41 material loaded
+[E1IF] layer=31 rank=0 experts=256/256
+[E1IF] stage 2 layer 31 material loaded
+[E1IF] layer=42 rank=0 experts=256/256
+[E1IF] stage 3 layer 42 material loaded
+[E1IF] layer=32 rank=0 experts=256/256
+[E1IF] stage 2 layer 32 material loaded
+[E1IF] stage 2 loaded (11 layers, free 6.30 GiB, 13s)
+[E1IF] stage 3 loaded (10 layers, free 4.81 GiB, 13s)
+[E1IF] stage 3 lane mb0 built
+[E1IF] stage 3 lane mb1 built
+[E1IF] stage 3 lane mb2 built
+[E1IF] stage 3 lane mb3 built
+[E1IF] stage 2 4 lanes built, free 0.62 GiB
+[E1IF] stage 3 4 lanes built, free 1.06 GiB
+[E1F][rank 8] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 656, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 242, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 98, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 88.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 77.88 MiB is free. Including non-PyTorch memory, this process has 23.43 GiB memory in use. Of the allocated memory 22.50 GiB is allocated by PyTorch, and 165.03 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 9] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 656, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 242, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 98, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 88.00 MiB. GPU 1 has a total capacity of 23.52 GiB of which 77.88 MiB is free. Including non-PyTorch memory, this process has 23.43 GiB memory in use. Of the allocated memory 22.50 GiB is allocated by PyTorch, and 165.03 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 10] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 656, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 242, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 98, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 88.00 MiB. GPU 2 has a total capacity of 23.52 GiB of which 77.88 MiB is free. Including non-PyTorch memory, this process has 23.43 GiB memory in use. Of the allocated memory 22.50 GiB is allocated by PyTorch, and 165.03 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 13] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 656, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 242, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 98, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 88.00 MiB. GPU 5 has a total capacity of 23.52 GiB of which 7.88 MiB is free. Including non-PyTorch memory, this process has 23.50 GiB memory in use. Of the allocated memory 22.70 GiB is allocated by PyTorch, and 24.11 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 11] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 656, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 242, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 98, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 88.00 MiB. GPU 3 has a total capacity of 23.52 GiB of which 7.88 MiB is free. Including non-PyTorch memory, this process has 23.50 GiB memory in use. Of the allocated memory 22.66 GiB is allocated by PyTorch, and 95.34 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 12] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 656, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 242, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 98, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 88.00 MiB. GPU 4 has a total capacity of 23.52 GiB of which 11.88 MiB is free. Including non-PyTorch memory, this process has 23.50 GiB memory in use. Of the allocated memory 22.70 GiB is allocated by PyTorch, and 24.11 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 14] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 656, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 242, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 98, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 88.00 MiB. GPU 6 has a total capacity of 23.52 GiB of which 7.88 MiB is free. Including non-PyTorch memory, this process has 23.50 GiB memory in use. Of the allocated memory 22.70 GiB is allocated by PyTorch, and 24.11 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E1F][rank 15] snapshot states raised:
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 210, in synchronized_local_step
+    value = fn()
+            ^^^^
+  File "/home/cysic/e0f-runtime/e1if_interleaved_bench.py", line 656, in snapshot_all
+    [clone_state(state) for state in lane.stage.states] for lane in lanes
+     ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e1f_full_decode_bench.py", line 242, in clone_state
+    result = StaticRatio4KV(
+             ^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/static_ratio4_kv.py", line 98, in __init__
+    self.latent = torch.zeros(
+                  ^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 88.00 MiB. GPU 7 has a total capacity of 23.52 GiB of which 7.88 MiB is free. Including non-PyTorch memory, this process has 23.50 GiB memory in use. Of the allocated memory 22.70 GiB is allocated by PyTorch, and 24.11 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+W0720 20:32:04.805000 149905 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 149995 closing signal SIGTERM
+W0720 20:32:04.806000 149905 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 149996 closing signal SIGTERM
+W0720 20:32:04.806000 149905 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 149998 closing signal SIGTERM
+W0720 20:32:04.806000 149905 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 149999 closing signal SIGTERM
+W0720 20:32:04.806000 149905 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 150000 closing signal SIGTERM
+W0720 20:32:04.806000 149905 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 150001 closing signal SIGTERM
+W0720 20:32:04.806000 149905 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 150002 closing signal SIGTERM
+E0720 20:32:05.599000 149905 torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: 1) local_rank: 2 (pid: 149997) of binary: /home/cysic/Workspace/venvs/sglang/bin/python3
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+e1if_interleaved_bench.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-07-20_20:32:05
+  host      : titan065
+  rank      : 8 (local_rank: 0)
+  exitcode  : 1 (pid: 149995)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-07-20_20:32:05
+  host      : titan065
+  rank      : 9 (local_rank: 1)
+  exitcode  : 1 (pid: 149996)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2026-07-20_20:32:05
+  host      : titan065
+  rank      : 11 (local_rank: 3)
+  exitcode  : 1 (pid: 149998)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[4]:
+  time      : 2026-07-20_20:32:05
+  host      : titan065
+  rank      : 12 (local_rank: 4)
+  exitcode  : 1 (pid: 149999)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[5]:
+  time      : 2026-07-20_20:32:05
+  host      : titan065
+  rank      : 13 (local_rank: 5)
+  exitcode  : 1 (pid: 150000)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[6]:
+  time      : 2026-07-20_20:32:05
+  host      : titan065
+  rank      : 14 (local_rank: 6)
+  exitcode  : 1 (pid: 150001)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[7]:
+  time      : 2026-07-20_20:32:05
+  host      : titan065
+  rank      : 15 (local_rank: 7)
+  exitcode  : 1 (pid: 150002)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-20_20:32:04
+  host      : titan065
+  rank      : 10 (local_rank: 2)
+  exitcode  : 1 (pid: 149997)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

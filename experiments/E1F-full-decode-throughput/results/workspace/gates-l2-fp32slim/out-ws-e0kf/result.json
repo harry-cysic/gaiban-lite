@@ -1,0 +1,2100 @@
+{
+  "accepted": true,
+  "arms": {
+    "bf16": {
+      "accepted": true,
+      "boundary_steps": 0,
+      "branch_rms_rel_last": null,
+      "branch_rms_rel_max": 0.0,
+      "indexer_dtype": "bf16",
+      "kv_dtype": "bf16",
+      "seed_install_latent_rms_rel": null,
+      "steps": [],
+      "topk_equal_steps": 0
+    },
+    "fp8": {
+      "accepted": true,
+      "boundary_steps": 16,
+      "branch_rms_rel_last": 0.02293987822101738,
+      "branch_rms_rel_max": 0.030236116234092027,
+      "indexer_dtype": "bf16",
+      "kv_dtype": "fp8",
+      "seed_install_latent_rms_rel": {
+        "compressed": 0.019274642498828338,
+        "raw": 0.016074269935192644
+      },
+      "steps": [
+        {
+          "boundary": false,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.014499590525686577,
+          "compressed_indices_overlap": 1.0,
+          "position": 8192,
+          "selected_kv_rms_rel": 0.015071122542324568,
+          "sparse_output_rms_rel": 0.009266058407440362,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0155029296875,
+          "branch_rms_rel": 0.014341827248165363,
+          "compressed_indices_overlap": 1.0,
+          "position": 8193,
+          "selected_kv_rms_rel": 0.013191049375759822,
+          "sparse_output_rms_rel": 0.007822100810915306,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.013134055679903464,
+          "compressed_indices_overlap": 1.0,
+          "position": 8194,
+          "selected_kv_rms_rel": 0.012186453867071845,
+          "sparse_output_rms_rel": 0.008248608091592795,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.01359577312877694,
+          "compressed_indices_overlap": 1.0,
+          "position": 8195,
+          "selected_kv_rms_rel": 0.011279361079146044,
+          "sparse_output_rms_rel": 0.006804236919500347,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.02734375,
+          "branch_rms_rel": 0.019056549333486234,
+          "compressed_indices_overlap": 1.0,
+          "position": 8196,
+          "selected_kv_rms_rel": 0.009805294627772134,
+          "sparse_output_rms_rel": 0.010182896265022728,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0126953125,
+          "branch_rms_rel": 0.012591313336525304,
+          "compressed_indices_overlap": 1.0,
+          "position": 8197,
+          "selected_kv_rms_rel": 0.009572895730168203,
+          "sparse_output_rms_rel": 0.00712055603508509,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.017955326923698514,
+          "compressed_indices_overlap": 1.0,
+          "position": 8198,
+          "selected_kv_rms_rel": 0.00943341031659134,
+          "sparse_output_rms_rel": 0.008446687816117614,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.0126953125,
+          "branch_rms_rel": 0.019261416920992983,
+          "compressed_indices_overlap": 1.0,
+          "position": 8199,
+          "selected_kv_rms_rel": 0.01010076364439293,
+          "sparse_output_rms_rel": 0.00886119202376994,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0126953125,
+          "branch_rms_rel": 0.017602356676310597,
+          "compressed_indices_overlap": 1.0,
+          "position": 8200,
+          "selected_kv_rms_rel": 0.009301046070439483,
+          "sparse_output_rms_rel": 0.009797753756064087,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.015539688843808906,
+          "compressed_indices_overlap": 1.0,
+          "position": 8201,
+          "selected_kv_rms_rel": 0.008705622025816604,
+          "sparse_output_rms_rel": 0.008011988640259676,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01953125,
+          "branch_rms_rel": 0.02000744798094352,
+          "compressed_indices_overlap": 1.0,
+          "position": 8202,
+          "selected_kv_rms_rel": 0.008978920034645014,
+          "sparse_output_rms_rel": 0.00637429082507042,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.014869409272572244,
+          "compressed_indices_overlap": 1.0,
+          "position": 8203,
+          "selected_kv_rms_rel": 0.008785079927479584,
+          "sparse_output_rms_rel": 0.00808460287065088,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.014226265706271177,
+          "compressed_indices_overlap": 1.0,
+          "position": 8204,
+          "selected_kv_rms_rel": 0.008454178957923494,
+          "sparse_output_rms_rel": 0.009390557099398572,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01953125,
+          "branch_rms_rel": 0.017844015122233894,
+          "compressed_indices_overlap": 1.0,
+          "position": 8205,
+          "selected_kv_rms_rel": 0.008085116316411357,
+          "sparse_output_rms_rel": 0.007646983467443181,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01318359375,
+          "branch_rms_rel": 0.015489491695702235,
+          "compressed_indices_overlap": 1.0,
+          "position": 8206,
+          "selected_kv_rms_rel": 0.008362009790811531,
+          "sparse_output_rms_rel": 0.008809358528511382,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.011664952772393124,
+          "compressed_indices_overlap": 1.0,
+          "position": 8207,
+          "selected_kv_rms_rel": 0.007995549952644622,
+          "sparse_output_rms_rel": 0.006793525880298192,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.016714566464990786,
+          "compressed_indices_overlap": 1.0,
+          "position": 8208,
+          "selected_kv_rms_rel": 0.008531592589809624,
+          "sparse_output_rms_rel": 0.007011134279875635,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.011371574936694774,
+          "compressed_indices_overlap": 1.0,
+          "position": 8209,
+          "selected_kv_rms_rel": 0.008146938453880826,
+          "sparse_output_rms_rel": 0.006428596541037178,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.01099686607652938,
+          "compressed_indices_overlap": 1.0,
+          "position": 8210,
+          "selected_kv_rms_rel": 0.00836204324623449,
+          "sparse_output_rms_rel": 0.006554287345989958,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.015685677190521392,
+          "compressed_indices_overlap": 1.0,
+          "position": 8211,
+          "selected_kv_rms_rel": 0.007727112869541607,
+          "sparse_output_rms_rel": 0.008938684700964428,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01953125,
+          "branch_rms_rel": 0.015591447513383113,
+          "compressed_indices_overlap": 1.0,
+          "position": 8212,
+          "selected_kv_rms_rel": 0.007715171407330829,
+          "sparse_output_rms_rel": 0.008245270987346143,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0166015625,
+          "branch_rms_rel": 0.016697289282753762,
+          "compressed_indices_overlap": 1.0,
+          "position": 8213,
+          "selected_kv_rms_rel": 0.007754129531367555,
+          "sparse_output_rms_rel": 0.008843166924669512,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.017726124853649477,
+          "compressed_indices_overlap": 1.0,
+          "position": 8214,
+          "selected_kv_rms_rel": 0.008115774852513115,
+          "sparse_output_rms_rel": 0.007007512934550192,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01513671875,
+          "branch_rms_rel": 0.01694698664789265,
+          "compressed_indices_overlap": 1.0,
+          "position": 8215,
+          "selected_kv_rms_rel": 0.008068803564900385,
+          "sparse_output_rms_rel": 0.008667447042475858,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0126953125,
+          "branch_rms_rel": 0.015134484913374333,
+          "compressed_indices_overlap": 1.0,
+          "position": 8216,
+          "selected_kv_rms_rel": 0.007543180879606281,
+          "sparse_output_rms_rel": 0.006168723259122051,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.025390625,
+          "branch_rms_rel": 0.021147978742315224,
+          "compressed_indices_overlap": 1.0,
+          "position": 8217,
+          "selected_kv_rms_rel": 0.007427347760211533,
+          "sparse_output_rms_rel": 0.008202183387758036,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.015386185894670383,
+          "compressed_indices_overlap": 1.0,
+          "position": 8218,
+          "selected_kv_rms_rel": 0.007719523460916096,
+          "sparse_output_rms_rel": 0.008434643396672131,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.015211893209121861,
+          "compressed_indices_overlap": 1.0,
+          "position": 8219,
+          "selected_kv_rms_rel": 0.007506193512345532,
+          "sparse_output_rms_rel": 0.006476727761487799,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.013022917079084149,
+          "compressed_indices_overlap": 1.0,
+          "position": 8220,
+          "selected_kv_rms_rel": 0.008083598181577984,
+          "sparse_output_rms_rel": 0.007813533016038954,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0146484375,
+          "branch_rms_rel": 0.013152659819829597,
+          "compressed_indices_overlap": 1.0,
+          "position": 8221,
+          "selected_kv_rms_rel": 0.008028956452754133,
+          "sparse_output_rms_rel": 0.006249419507309638,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0107421875,
+          "branch_rms_rel": 0.014402734196618803,
+          "compressed_indices_overlap": 1.0,
+          "position": 8222,
+          "selected_kv_rms_rel": 0.00773297292218026,
+          "sparse_output_rms_rel": 0.00809587206847986,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.016124756527678915,
+          "compressed_indices_overlap": 1.0,
+          "position": 8223,
+          "selected_kv_rms_rel": 0.007179926810128275,
+          "sparse_output_rms_rel": 0.007081466878172744,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.012878516131300472,
+          "compressed_indices_overlap": 1.0,
+          "position": 8224,
+          "selected_kv_rms_rel": 0.007168611200735131,
+          "sparse_output_rms_rel": 0.006899124502034552,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.016058622449051655,
+          "compressed_indices_overlap": 1.0,
+          "position": 8225,
+          "selected_kv_rms_rel": 0.0074247475332960295,
+          "sparse_output_rms_rel": 0.010612198289017608,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0185546875,
+          "branch_rms_rel": 0.020635547473829036,
+          "compressed_indices_overlap": 1.0,
+          "position": 8226,
+          "selected_kv_rms_rel": 0.0073765304260715245,
+          "sparse_output_rms_rel": 0.010023134620329102,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.0390625,
+          "branch_rms_rel": 0.030236116234092027,
+          "compressed_indices_overlap": 1.0,
+          "position": 8227,
+          "selected_kv_rms_rel": 0.007399573103575496,
+          "sparse_output_rms_rel": 0.011425407330583063,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01788330078125,
+          "branch_rms_rel": 0.016841347695130297,
+          "compressed_indices_overlap": 1.0,
+          "position": 8228,
+          "selected_kv_rms_rel": 0.008153286787230539,
+          "sparse_output_rms_rel": 0.008777262850685358,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0234375,
+          "branch_rms_rel": 0.02452441157254409,
+          "compressed_indices_overlap": 1.0,
+          "position": 8229,
+          "selected_kv_rms_rel": 0.007361719896051112,
+          "sparse_output_rms_rel": 0.008904136045220721,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.01635287071797705,
+          "compressed_indices_overlap": 1.0,
+          "position": 8230,
+          "selected_kv_rms_rel": 0.007919137569882327,
+          "sparse_output_rms_rel": 0.00852129659992918,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01904296875,
+          "branch_rms_rel": 0.018017854509551654,
+          "compressed_indices_overlap": 1.0,
+          "position": 8231,
+          "selected_kv_rms_rel": 0.008169144152845068,
+          "sparse_output_rms_rel": 0.009106893741055989,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0146484375,
+          "branch_rms_rel": 0.018107329152840287,
+          "compressed_indices_overlap": 1.0,
+          "position": 8232,
+          "selected_kv_rms_rel": 0.007451214708764978,
+          "sparse_output_rms_rel": 0.0076864952238289595,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0166015625,
+          "branch_rms_rel": 0.01726805783721611,
+          "compressed_indices_overlap": 1.0,
+          "position": 8233,
+          "selected_kv_rms_rel": 0.007822459872372504,
+          "sparse_output_rms_rel": 0.008827363062297592,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01513671875,
+          "branch_rms_rel": 0.012604671938251811,
+          "compressed_indices_overlap": 1.0,
+          "position": 8234,
+          "selected_kv_rms_rel": 0.0076666271083716975,
+          "sparse_output_rms_rel": 0.009308904914165727,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.017037518405624494,
+          "compressed_indices_overlap": 1.0,
+          "position": 8235,
+          "selected_kv_rms_rel": 0.007926625619441385,
+          "sparse_output_rms_rel": 0.008826812654413858,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01953125,
+          "branch_rms_rel": 0.019348552084284636,
+          "compressed_indices_overlap": 1.0,
+          "position": 8236,
+          "selected_kv_rms_rel": 0.007398738547843492,
+          "sparse_output_rms_rel": 0.009081134203361223,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.009765625,
+          "branch_rms_rel": 0.011963592960337029,
+          "compressed_indices_overlap": 1.0,
+          "position": 8237,
+          "selected_kv_rms_rel": 0.0079130358595744,
+          "sparse_output_rms_rel": 0.0077426469524206855,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0142822265625,
+          "branch_rms_rel": 0.012829363717729539,
+          "compressed_indices_overlap": 1.0,
+          "position": 8238,
+          "selected_kv_rms_rel": 0.008153147848717726,
+          "sparse_output_rms_rel": 0.007201843372146725,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.01652667049622495,
+          "compressed_indices_overlap": 1.0,
+          "position": 8239,
+          "selected_kv_rms_rel": 0.0075120699142851724,
+          "sparse_output_rms_rel": 0.007925529275578146,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.020144387406562735,
+          "compressed_indices_overlap": 1.0,
+          "position": 8240,
+          "selected_kv_rms_rel": 0.007561460963342636,
+          "sparse_output_rms_rel": 0.011517513185788544,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.0198808334473912,
+          "compressed_indices_overlap": 1.0,
+          "position": 8241,
+          "selected_kv_rms_rel": 0.008089378166680384,
+          "sparse_output_rms_rel": 0.008896750877404413,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.01664728599221994,
+          "compressed_indices_overlap": 1.0,
+          "position": 8242,
+          "selected_kv_rms_rel": 0.007610840584844633,
+          "sparse_output_rms_rel": 0.008099414281372182,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.025390625,
+          "branch_rms_rel": 0.02001167568665885,
+          "compressed_indices_overlap": 1.0,
+          "position": 8243,
+          "selected_kv_rms_rel": 0.007763135719652873,
+          "sparse_output_rms_rel": 0.006164176342192395,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0205078125,
+          "branch_rms_rel": 0.01924071975992239,
+          "compressed_indices_overlap": 1.0,
+          "position": 8244,
+          "selected_kv_rms_rel": 0.0073777442576221835,
+          "sparse_output_rms_rel": 0.009926522278683111,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01806640625,
+          "branch_rms_rel": 0.015596608858760037,
+          "compressed_indices_overlap": 1.0,
+          "position": 8245,
+          "selected_kv_rms_rel": 0.007352588865842346,
+          "sparse_output_rms_rel": 0.007376882808542881,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.012554399764646753,
+          "compressed_indices_overlap": 1.0,
+          "position": 8246,
+          "selected_kv_rms_rel": 0.007633901351768785,
+          "sparse_output_rms_rel": 0.0073476812630545365,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.018963658153539197,
+          "compressed_indices_overlap": 1.0,
+          "position": 8247,
+          "selected_kv_rms_rel": 0.007469241346192222,
+          "sparse_output_rms_rel": 0.009092029946481336,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01611328125,
+          "branch_rms_rel": 0.016763639755915778,
+          "compressed_indices_overlap": 1.0,
+          "position": 8248,
+          "selected_kv_rms_rel": 0.007458176019719817,
+          "sparse_output_rms_rel": 0.01008874933649063,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0185546875,
+          "branch_rms_rel": 0.01917556208442994,
+          "compressed_indices_overlap": 1.0,
+          "position": 8249,
+          "selected_kv_rms_rel": 0.007603716435724678,
+          "sparse_output_rms_rel": 0.008521809637858844,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.015539402828362562,
+          "compressed_indices_overlap": 1.0,
+          "position": 8250,
+          "selected_kv_rms_rel": 0.0075696748739543015,
+          "sparse_output_rms_rel": 0.008745377266489973,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.014347221132849811,
+          "compressed_indices_overlap": 1.0,
+          "position": 8251,
+          "selected_kv_rms_rel": 0.007588635772926653,
+          "sparse_output_rms_rel": 0.007489876988464191,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.017617997256356755,
+          "compressed_indices_overlap": 1.0,
+          "position": 8252,
+          "selected_kv_rms_rel": 0.007916058443260683,
+          "sparse_output_rms_rel": 0.007750077170462867,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.015515412923806555,
+          "compressed_indices_overlap": 1.0,
+          "position": 8253,
+          "selected_kv_rms_rel": 0.007822185145999404,
+          "sparse_output_rms_rel": 0.009218778176822639,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01025390625,
+          "branch_rms_rel": 0.010430508046528907,
+          "compressed_indices_overlap": 1.0,
+          "position": 8254,
+          "selected_kv_rms_rel": 0.00782029481134471,
+          "sparse_output_rms_rel": 0.006190494769948424,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.03125,
+          "branch_rms_rel": 0.02293987822101738,
+          "compressed_indices_overlap": 1.0,
+          "position": 8255,
+          "selected_kv_rms_rel": 0.007401578535528715,
+          "sparse_output_rms_rel": 0.011462927474710822,
+          "topk_equal": true
+        }
+      ],
+      "topk_equal_steps": 64
+    },
+    "fp8_idx": {
+      "accepted": true,
+      "boundary_steps": 16,
+      "branch_rms_rel_last": 0.02293987822101738,
+      "branch_rms_rel_max": 0.030236116234092027,
+      "indexer_dtype": "fp8",
+      "kv_dtype": "fp8",
+      "seed_install_latent_rms_rel": {
+        "compressed": 0.019274642498828338,
+        "raw": 0.016074269935192644
+      },
+      "steps": [
+        {
+          "boundary": false,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.014499590525686577,
+          "compressed_indices_overlap": 1.0,
+          "position": 8192,
+          "selected_kv_rms_rel": 0.015071122542324568,
+          "sparse_output_rms_rel": 0.009266058407440362,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0155029296875,
+          "branch_rms_rel": 0.014341827248165363,
+          "compressed_indices_overlap": 1.0,
+          "position": 8193,
+          "selected_kv_rms_rel": 0.013191049375759822,
+          "sparse_output_rms_rel": 0.007822100810915306,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.013134055679903464,
+          "compressed_indices_overlap": 1.0,
+          "position": 8194,
+          "selected_kv_rms_rel": 0.012186453867071845,
+          "sparse_output_rms_rel": 0.008248608091592795,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.01359577312877694,
+          "compressed_indices_overlap": 1.0,
+          "position": 8195,
+          "selected_kv_rms_rel": 0.011279361079146044,
+          "sparse_output_rms_rel": 0.006804236919500347,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.02734375,
+          "branch_rms_rel": 0.019056549333486234,
+          "compressed_indices_overlap": 1.0,
+          "position": 8196,
+          "selected_kv_rms_rel": 0.009805294627772134,
+          "sparse_output_rms_rel": 0.010182896265022728,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0126953125,
+          "branch_rms_rel": 0.012591313336525304,
+          "compressed_indices_overlap": 1.0,
+          "position": 8197,
+          "selected_kv_rms_rel": 0.009572895730168203,
+          "sparse_output_rms_rel": 0.00712055603508509,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.017955326923698514,
+          "compressed_indices_overlap": 1.0,
+          "position": 8198,
+          "selected_kv_rms_rel": 0.00943341031659134,
+          "sparse_output_rms_rel": 0.008446687816117614,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.0126953125,
+          "branch_rms_rel": 0.019261416920992983,
+          "compressed_indices_overlap": 1.0,
+          "position": 8199,
+          "selected_kv_rms_rel": 0.01010076364439293,
+          "sparse_output_rms_rel": 0.00886119202376994,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0126953125,
+          "branch_rms_rel": 0.017602356676310597,
+          "compressed_indices_overlap": 1.0,
+          "position": 8200,
+          "selected_kv_rms_rel": 0.009301046070439483,
+          "sparse_output_rms_rel": 0.009797753756064087,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.015539688843808906,
+          "compressed_indices_overlap": 1.0,
+          "position": 8201,
+          "selected_kv_rms_rel": 0.008705622025816604,
+          "sparse_output_rms_rel": 0.008011988640259676,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01953125,
+          "branch_rms_rel": 0.02000744798094352,
+          "compressed_indices_overlap": 1.0,
+          "position": 8202,
+          "selected_kv_rms_rel": 0.008978920034645014,
+          "sparse_output_rms_rel": 0.00637429082507042,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.014869409272572244,
+          "compressed_indices_overlap": 1.0,
+          "position": 8203,
+          "selected_kv_rms_rel": 0.008785079927479584,
+          "sparse_output_rms_rel": 0.00808460287065088,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.014226265706271177,
+          "compressed_indices_overlap": 1.0,
+          "position": 8204,
+          "selected_kv_rms_rel": 0.008454178957923494,
+          "sparse_output_rms_rel": 0.009390557099398572,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01953125,
+          "branch_rms_rel": 0.017844015122233894,
+          "compressed_indices_overlap": 1.0,
+          "position": 8205,
+          "selected_kv_rms_rel": 0.008085116316411357,
+          "sparse_output_rms_rel": 0.007646983467443181,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01318359375,
+          "branch_rms_rel": 0.015489491695702235,
+          "compressed_indices_overlap": 1.0,
+          "position": 8206,
+          "selected_kv_rms_rel": 0.008362009790811531,
+          "sparse_output_rms_rel": 0.008809358528511382,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.011664952772393124,
+          "compressed_indices_overlap": 1.0,
+          "position": 8207,
+          "selected_kv_rms_rel": 0.007995549952644622,
+          "sparse_output_rms_rel": 0.006793525880298192,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.016714566464990786,
+          "compressed_indices_overlap": 1.0,
+          "position": 8208,
+          "selected_kv_rms_rel": 0.008531592589809624,
+          "sparse_output_rms_rel": 0.007011134279875635,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.011371574936694774,
+          "compressed_indices_overlap": 1.0,
+          "position": 8209,
+          "selected_kv_rms_rel": 0.008146938453880826,
+          "sparse_output_rms_rel": 0.006428596541037178,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.01099686607652938,
+          "compressed_indices_overlap": 1.0,
+          "position": 8210,
+          "selected_kv_rms_rel": 0.00836204324623449,
+          "sparse_output_rms_rel": 0.006554287345989958,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.015685677190521392,
+          "compressed_indices_overlap": 1.0,
+          "position": 8211,
+          "selected_kv_rms_rel": 0.007727112869541607,
+          "sparse_output_rms_rel": 0.008938684700964428,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01953125,
+          "branch_rms_rel": 0.015591447513383113,
+          "compressed_indices_overlap": 1.0,
+          "position": 8212,
+          "selected_kv_rms_rel": 0.007715171407330829,
+          "sparse_output_rms_rel": 0.008245270987346143,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0166015625,
+          "branch_rms_rel": 0.016697289282753762,
+          "compressed_indices_overlap": 1.0,
+          "position": 8213,
+          "selected_kv_rms_rel": 0.007754129531367555,
+          "sparse_output_rms_rel": 0.008843166924669512,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.017726124853649477,
+          "compressed_indices_overlap": 1.0,
+          "position": 8214,
+          "selected_kv_rms_rel": 0.008115774852513115,
+          "sparse_output_rms_rel": 0.007007512934550192,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01513671875,
+          "branch_rms_rel": 0.01694698664789265,
+          "compressed_indices_overlap": 1.0,
+          "position": 8215,
+          "selected_kv_rms_rel": 0.008068803564900385,
+          "sparse_output_rms_rel": 0.008667447042475858,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0126953125,
+          "branch_rms_rel": 0.015134484913374333,
+          "compressed_indices_overlap": 1.0,
+          "position": 8216,
+          "selected_kv_rms_rel": 0.007543180879606281,
+          "sparse_output_rms_rel": 0.006168723259122051,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.025390625,
+          "branch_rms_rel": 0.021147978742315224,
+          "compressed_indices_overlap": 1.0,
+          "position": 8217,
+          "selected_kv_rms_rel": 0.007427347760211533,
+          "sparse_output_rms_rel": 0.008202183387758036,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.015386185894670383,
+          "compressed_indices_overlap": 1.0,
+          "position": 8218,
+          "selected_kv_rms_rel": 0.007719523460916096,
+          "sparse_output_rms_rel": 0.008434643396672131,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.015211893209121861,
+          "compressed_indices_overlap": 1.0,
+          "position": 8219,
+          "selected_kv_rms_rel": 0.007506193512345532,
+          "sparse_output_rms_rel": 0.006476727761487799,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.013022917079084149,
+          "compressed_indices_overlap": 1.0,
+          "position": 8220,
+          "selected_kv_rms_rel": 0.008083598181577984,
+          "sparse_output_rms_rel": 0.007813533016038954,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0146484375,
+          "branch_rms_rel": 0.013152659819829597,
+          "compressed_indices_overlap": 1.0,
+          "position": 8221,
+          "selected_kv_rms_rel": 0.008028956452754133,
+          "sparse_output_rms_rel": 0.006249419507309638,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0107421875,
+          "branch_rms_rel": 0.014402734196618803,
+          "compressed_indices_overlap": 1.0,
+          "position": 8222,
+          "selected_kv_rms_rel": 0.00773297292218026,
+          "sparse_output_rms_rel": 0.00809587206847986,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.016124756527678915,
+          "compressed_indices_overlap": 1.0,
+          "position": 8223,
+          "selected_kv_rms_rel": 0.007179926810128275,
+          "sparse_output_rms_rel": 0.007081466878172744,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.012878516131300472,
+          "compressed_indices_overlap": 1.0,
+          "position": 8224,
+          "selected_kv_rms_rel": 0.007168611200735131,
+          "sparse_output_rms_rel": 0.006899124502034552,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.016058622449051655,
+          "compressed_indices_overlap": 1.0,
+          "position": 8225,
+          "selected_kv_rms_rel": 0.0074247475332960295,
+          "sparse_output_rms_rel": 0.010612198289017608,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0185546875,
+          "branch_rms_rel": 0.020635547473829036,
+          "compressed_indices_overlap": 1.0,
+          "position": 8226,
+          "selected_kv_rms_rel": 0.0073765304260715245,
+          "sparse_output_rms_rel": 0.010023134620329102,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.0390625,
+          "branch_rms_rel": 0.030236116234092027,
+          "compressed_indices_overlap": 1.0,
+          "position": 8227,
+          "selected_kv_rms_rel": 0.007399573103575496,
+          "sparse_output_rms_rel": 0.011425407330583063,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01788330078125,
+          "branch_rms_rel": 0.016841347695130297,
+          "compressed_indices_overlap": 1.0,
+          "position": 8228,
+          "selected_kv_rms_rel": 0.008153286787230539,
+          "sparse_output_rms_rel": 0.008777262850685358,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0234375,
+          "branch_rms_rel": 0.02452441157254409,
+          "compressed_indices_overlap": 1.0,
+          "position": 8229,
+          "selected_kv_rms_rel": 0.007361719896051112,
+          "sparse_output_rms_rel": 0.008904136045220721,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.01635287071797705,
+          "compressed_indices_overlap": 1.0,
+          "position": 8230,
+          "selected_kv_rms_rel": 0.007919137569882327,
+          "sparse_output_rms_rel": 0.00852129659992918,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01904296875,
+          "branch_rms_rel": 0.018017854509551654,
+          "compressed_indices_overlap": 1.0,
+          "position": 8231,
+          "selected_kv_rms_rel": 0.008169144152845068,
+          "sparse_output_rms_rel": 0.009106893741055989,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0146484375,
+          "branch_rms_rel": 0.018107329152840287,
+          "compressed_indices_overlap": 1.0,
+          "position": 8232,
+          "selected_kv_rms_rel": 0.007451214708764978,
+          "sparse_output_rms_rel": 0.0076864952238289595,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0166015625,
+          "branch_rms_rel": 0.01726805783721611,
+          "compressed_indices_overlap": 1.0,
+          "position": 8233,
+          "selected_kv_rms_rel": 0.007822459872372504,
+          "sparse_output_rms_rel": 0.008827363062297592,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01513671875,
+          "branch_rms_rel": 0.012604671938251811,
+          "compressed_indices_overlap": 1.0,
+          "position": 8234,
+          "selected_kv_rms_rel": 0.0076666271083716975,
+          "sparse_output_rms_rel": 0.009308904914165727,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.017037518405624494,
+          "compressed_indices_overlap": 1.0,
+          "position": 8235,
+          "selected_kv_rms_rel": 0.007926625619441385,
+          "sparse_output_rms_rel": 0.008826812654413858,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01953125,
+          "branch_rms_rel": 0.019348552084284636,
+          "compressed_indices_overlap": 1.0,
+          "position": 8236,
+          "selected_kv_rms_rel": 0.007398738547843492,
+          "sparse_output_rms_rel": 0.009081134203361223,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.009765625,
+          "branch_rms_rel": 0.011963592960337029,
+          "compressed_indices_overlap": 1.0,
+          "position": 8237,
+          "selected_kv_rms_rel": 0.0079130358595744,
+          "sparse_output_rms_rel": 0.0077426469524206855,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0142822265625,
+          "branch_rms_rel": 0.012829363717729539,
+          "compressed_indices_overlap": 1.0,
+          "position": 8238,
+          "selected_kv_rms_rel": 0.008153147848717726,
+          "sparse_output_rms_rel": 0.007201843372146725,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.01652667049622495,
+          "compressed_indices_overlap": 1.0,
+          "position": 8239,
+          "selected_kv_rms_rel": 0.0075120699142851724,
+          "sparse_output_rms_rel": 0.007925529275578146,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.020144387406562735,
+          "compressed_indices_overlap": 1.0,
+          "position": 8240,
+          "selected_kv_rms_rel": 0.007561460963342636,
+          "sparse_output_rms_rel": 0.011517513185788544,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.0198808334473912,
+          "compressed_indices_overlap": 1.0,
+          "position": 8241,
+          "selected_kv_rms_rel": 0.008089378166680384,
+          "sparse_output_rms_rel": 0.008896750877404413,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.01664728599221994,
+          "compressed_indices_overlap": 1.0,
+          "position": 8242,
+          "selected_kv_rms_rel": 0.007610840584844633,
+          "sparse_output_rms_rel": 0.008099414281372182,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.025390625,
+          "branch_rms_rel": 0.02001167568665885,
+          "compressed_indices_overlap": 1.0,
+          "position": 8243,
+          "selected_kv_rms_rel": 0.007763135719652873,
+          "sparse_output_rms_rel": 0.006164176342192395,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0205078125,
+          "branch_rms_rel": 0.01924071975992239,
+          "compressed_indices_overlap": 1.0,
+          "position": 8244,
+          "selected_kv_rms_rel": 0.0073777442576221835,
+          "sparse_output_rms_rel": 0.009926522278683111,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01806640625,
+          "branch_rms_rel": 0.015596608858760037,
+          "compressed_indices_overlap": 1.0,
+          "position": 8245,
+          "selected_kv_rms_rel": 0.007352588865842346,
+          "sparse_output_rms_rel": 0.007376882808542881,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.012554399764646753,
+          "compressed_indices_overlap": 1.0,
+          "position": 8246,
+          "selected_kv_rms_rel": 0.007633901351768785,
+          "sparse_output_rms_rel": 0.0073476812630545365,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.013671875,
+          "branch_rms_rel": 0.018963658153539197,
+          "compressed_indices_overlap": 1.0,
+          "position": 8247,
+          "selected_kv_rms_rel": 0.007469241346192222,
+          "sparse_output_rms_rel": 0.009092029946481336,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01611328125,
+          "branch_rms_rel": 0.016763639755915778,
+          "compressed_indices_overlap": 1.0,
+          "position": 8248,
+          "selected_kv_rms_rel": 0.007458176019719817,
+          "sparse_output_rms_rel": 0.01008874933649063,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.0185546875,
+          "branch_rms_rel": 0.01917556208442994,
+          "compressed_indices_overlap": 1.0,
+          "position": 8249,
+          "selected_kv_rms_rel": 0.007603716435724678,
+          "sparse_output_rms_rel": 0.008521809637858844,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.015539402828362562,
+          "compressed_indices_overlap": 1.0,
+          "position": 8250,
+          "selected_kv_rms_rel": 0.0075696748739543015,
+          "sparse_output_rms_rel": 0.008745377266489973,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.01171875,
+          "branch_rms_rel": 0.014347221132849811,
+          "compressed_indices_overlap": 1.0,
+          "position": 8251,
+          "selected_kv_rms_rel": 0.007588635772926653,
+          "sparse_output_rms_rel": 0.007489876988464191,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.017578125,
+          "branch_rms_rel": 0.017617997256356755,
+          "compressed_indices_overlap": 1.0,
+          "position": 8252,
+          "selected_kv_rms_rel": 0.007916058443260683,
+          "sparse_output_rms_rel": 0.007750077170462867,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.015625,
+          "branch_rms_rel": 0.015515412923806555,
+          "compressed_indices_overlap": 1.0,
+          "position": 8253,
+          "selected_kv_rms_rel": 0.007822185145999404,
+          "sparse_output_rms_rel": 0.009218778176822639,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.01025390625,
+          "branch_rms_rel": 0.010430508046528907,
+          "compressed_indices_overlap": 1.0,
+          "position": 8254,
+          "selected_kv_rms_rel": 0.00782029481134471,
+          "sparse_output_rms_rel": 0.006190494769948424,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.03125,
+          "branch_rms_rel": 0.02293987822101738,
+          "compressed_indices_overlap": 1.0,
+          "position": 8255,
+          "selected_kv_rms_rel": 0.007401578535528715,
+          "sparse_output_rms_rel": 0.011462927474710822,
+          "topk_equal": true
+        }
+      ],
+      "topk_equal_steps": 64
+    },
+    "fp8_rope_bf16": {
+      "accepted": true,
+      "boundary_steps": 16,
+      "branch_rms_rel_last": 0.0014591998122488392,
+      "branch_rms_rel_max": 0.0023149100819891983,
+      "indexer_dtype": "bf16",
+      "kv_dtype": "fp8_rope_bf16",
+      "seed_install_latent_rms_rel": {
+        "compressed": 0.016047899226967897,
+        "raw": 0.012407451532763732
+      },
+      "steps": [
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0020103578585358144,
+          "compressed_indices_overlap": 1.0,
+          "position": 8192,
+          "selected_kv_rms_rel": 0.011360424349067555,
+          "sparse_output_rms_rel": 0.0008530008350689759,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.002003448583512814,
+          "compressed_indices_overlap": 1.0,
+          "position": 8193,
+          "selected_kv_rms_rel": 0.009533416984618098,
+          "sparse_output_rms_rel": 0.0008162118380064757,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016229008760190436,
+          "compressed_indices_overlap": 1.0,
+          "position": 8194,
+          "selected_kv_rms_rel": 0.008360316924674214,
+          "sparse_output_rms_rel": 0.00041577887054907456,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017213956582044047,
+          "compressed_indices_overlap": 1.0,
+          "position": 8195,
+          "selected_kv_rms_rel": 0.007520762795006884,
+          "sparse_output_rms_rel": 0.000391872327497582,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001346125912292028,
+          "compressed_indices_overlap": 1.0,
+          "position": 8196,
+          "selected_kv_rms_rel": 0.005939045336416756,
+          "sparse_output_rms_rel": 0.0004399750261464293,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.002099478676914509,
+          "compressed_indices_overlap": 1.0,
+          "position": 8197,
+          "selected_kv_rms_rel": 0.005621331967968612,
+          "sparse_output_rms_rel": 0.0007609201619753779,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0015527489660735081,
+          "compressed_indices_overlap": 1.0,
+          "position": 8198,
+          "selected_kv_rms_rel": 0.005332896670952818,
+          "sparse_output_rms_rel": 0.00043931429211157733,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017548227661842396,
+          "compressed_indices_overlap": 1.0,
+          "position": 8199,
+          "selected_kv_rms_rel": 0.005692172375549877,
+          "sparse_output_rms_rel": 0.0006340275107589626,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001848227030036339,
+          "compressed_indices_overlap": 1.0,
+          "position": 8200,
+          "selected_kv_rms_rel": 0.004894533990109754,
+          "sparse_output_rms_rel": 0.00048084352945451734,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017610168142435576,
+          "compressed_indices_overlap": 1.0,
+          "position": 8201,
+          "selected_kv_rms_rel": 0.004349294207079451,
+          "sparse_output_rms_rel": 0.00039878748157672143,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0018757150559123423,
+          "compressed_indices_overlap": 1.0,
+          "position": 8202,
+          "selected_kv_rms_rel": 0.004528829686865358,
+          "sparse_output_rms_rel": 0.0004725775333462161,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0015954215871091572,
+          "compressed_indices_overlap": 1.0,
+          "position": 8203,
+          "selected_kv_rms_rel": 0.004371969896524939,
+          "sparse_output_rms_rel": 0.00046091559016491775,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016286305010478363,
+          "compressed_indices_overlap": 1.0,
+          "position": 8204,
+          "selected_kv_rms_rel": 0.003967158201014239,
+          "sparse_output_rms_rel": 0.0004212304276675847,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016738590506901593,
+          "compressed_indices_overlap": 1.0,
+          "position": 8205,
+          "selected_kv_rms_rel": 0.003662060202840323,
+          "sparse_output_rms_rel": 0.00045061538193159905,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016552572328665067,
+          "compressed_indices_overlap": 1.0,
+          "position": 8206,
+          "selected_kv_rms_rel": 0.003776672229756945,
+          "sparse_output_rms_rel": 0.00041601308490254866,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001857447837831285,
+          "compressed_indices_overlap": 1.0,
+          "position": 8207,
+          "selected_kv_rms_rel": 0.0035076320373424305,
+          "sparse_output_rms_rel": 0.0005330030221815256,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001453217831849176,
+          "compressed_indices_overlap": 1.0,
+          "position": 8208,
+          "selected_kv_rms_rel": 0.003796531399817424,
+          "sparse_output_rms_rel": 0.00037834668560132284,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017002414168938759,
+          "compressed_indices_overlap": 1.0,
+          "position": 8209,
+          "selected_kv_rms_rel": 0.00351838300860007,
+          "sparse_output_rms_rel": 0.0004127749783424588,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016699523244535512,
+          "compressed_indices_overlap": 1.0,
+          "position": 8210,
+          "selected_kv_rms_rel": 0.003614255296421697,
+          "sparse_output_rms_rel": 0.0004983525209978828,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0021510901309811812,
+          "compressed_indices_overlap": 1.0,
+          "position": 8211,
+          "selected_kv_rms_rel": 0.003112522603003602,
+          "sparse_output_rms_rel": 0.0007592791703405369,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0015869697529245868,
+          "compressed_indices_overlap": 1.0,
+          "position": 8212,
+          "selected_kv_rms_rel": 0.0030602988661584327,
+          "sparse_output_rms_rel": 0.00046331013915140067,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0014550094262020161,
+          "compressed_indices_overlap": 1.0,
+          "position": 8213,
+          "selected_kv_rms_rel": 0.0029964592870864414,
+          "sparse_output_rms_rel": 0.00039148984752789733,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001704642379900234,
+          "compressed_indices_overlap": 1.0,
+          "position": 8214,
+          "selected_kv_rms_rel": 0.0031923632634910833,
+          "sparse_output_rms_rel": 0.00041817071047906636,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017897585046775183,
+          "compressed_indices_overlap": 1.0,
+          "position": 8215,
+          "selected_kv_rms_rel": 0.003128241817030074,
+          "sparse_output_rms_rel": 0.00048507455475235153,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001706711752380779,
+          "compressed_indices_overlap": 1.0,
+          "position": 8216,
+          "selected_kv_rms_rel": 0.002780271025039107,
+          "sparse_output_rms_rel": 0.00047877985216572213,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0020159535432108717,
+          "compressed_indices_overlap": 1.0,
+          "position": 8217,
+          "selected_kv_rms_rel": 0.002662346340333544,
+          "sparse_output_rms_rel": 0.0005964907194889909,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017713403246158077,
+          "compressed_indices_overlap": 1.0,
+          "position": 8218,
+          "selected_kv_rms_rel": 0.002792978370212751,
+          "sparse_output_rms_rel": 0.0004460116777119042,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.0078125,
+          "branch_rms_rel": 0.0017317349074513894,
+          "compressed_indices_overlap": 1.0,
+          "position": 8219,
+          "selected_kv_rms_rel": 0.002668690183854279,
+          "sparse_output_rms_rel": 0.0004050172886062407,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017564003364402574,
+          "compressed_indices_overlap": 1.0,
+          "position": 8220,
+          "selected_kv_rms_rel": 0.002984376687913012,
+          "sparse_output_rms_rel": 0.0004411891544149178,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001622323307920556,
+          "compressed_indices_overlap": 1.0,
+          "position": 8221,
+          "selected_kv_rms_rel": 0.00294200433572366,
+          "sparse_output_rms_rel": 0.00044166589236373607,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001902712248321542,
+          "compressed_indices_overlap": 1.0,
+          "position": 8222,
+          "selected_kv_rms_rel": 0.002726806639652461,
+          "sparse_output_rms_rel": 0.0004946555645133218,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017148355800981666,
+          "compressed_indices_overlap": 1.0,
+          "position": 8223,
+          "selected_kv_rms_rel": 0.0023552035430680763,
+          "sparse_output_rms_rel": 0.000475941886747085,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0019814462634842366,
+          "compressed_indices_overlap": 1.0,
+          "position": 8224,
+          "selected_kv_rms_rel": 0.0023301808225657875,
+          "sparse_output_rms_rel": 0.0005506984844197584,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001882252117658781,
+          "compressed_indices_overlap": 1.0,
+          "position": 8225,
+          "selected_kv_rms_rel": 0.002415717456014592,
+          "sparse_output_rms_rel": 0.000521053584441402,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001764039923640244,
+          "compressed_indices_overlap": 1.0,
+          "position": 8226,
+          "selected_kv_rms_rel": 0.002335443429763586,
+          "sparse_output_rms_rel": 0.00042946295191039245,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0020359678690462014,
+          "compressed_indices_overlap": 1.0,
+          "position": 8227,
+          "selected_kv_rms_rel": 0.0022675690383908934,
+          "sparse_output_rms_rel": 0.0005639100561109927,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0014653612563278063,
+          "compressed_indices_overlap": 1.0,
+          "position": 8228,
+          "selected_kv_rms_rel": 0.0026549726584726256,
+          "sparse_output_rms_rel": 0.0004063773470870292,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.002025328707548766,
+          "compressed_indices_overlap": 1.0,
+          "position": 8229,
+          "selected_kv_rms_rel": 0.0021752733692732137,
+          "sparse_output_rms_rel": 0.0005008977693869635,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0018988103395005409,
+          "compressed_indices_overlap": 1.0,
+          "position": 8230,
+          "selected_kv_rms_rel": 0.002464452467805278,
+          "sparse_output_rms_rel": 0.0005654129092302399,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001549121630583786,
+          "compressed_indices_overlap": 1.0,
+          "position": 8231,
+          "selected_kv_rms_rel": 0.0025608063476638436,
+          "sparse_output_rms_rel": 0.00044008787350362255,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0023149100819891983,
+          "compressed_indices_overlap": 1.0,
+          "position": 8232,
+          "selected_kv_rms_rel": 0.0021561437903761236,
+          "sparse_output_rms_rel": 0.0008418388368135832,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0019658520614011473,
+          "compressed_indices_overlap": 1.0,
+          "position": 8233,
+          "selected_kv_rms_rel": 0.0023210589553993126,
+          "sparse_output_rms_rel": 0.00051880189038962,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0020419270045967477,
+          "compressed_indices_overlap": 1.0,
+          "position": 8234,
+          "selected_kv_rms_rel": 0.002210568548921582,
+          "sparse_output_rms_rel": 0.0006082482134038105,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016351765839664667,
+          "compressed_indices_overlap": 1.0,
+          "position": 8235,
+          "selected_kv_rms_rel": 0.0022794544927582806,
+          "sparse_output_rms_rel": 0.00047240389815886416,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016058631402087191,
+          "compressed_indices_overlap": 1.0,
+          "position": 8236,
+          "selected_kv_rms_rel": 0.0020206068962886716,
+          "sparse_output_rms_rel": 0.00048120926677576177,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001693363263659807,
+          "compressed_indices_overlap": 1.0,
+          "position": 8237,
+          "selected_kv_rms_rel": 0.0022293295121060966,
+          "sparse_output_rms_rel": 0.0005520531700370312,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.002133556967624465,
+          "compressed_indices_overlap": 1.0,
+          "position": 8238,
+          "selected_kv_rms_rel": 0.002360644261760465,
+          "sparse_output_rms_rel": 0.0006095910947607608,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001545529963705092,
+          "compressed_indices_overlap": 1.0,
+          "position": 8239,
+          "selected_kv_rms_rel": 0.0020302571314799677,
+          "sparse_output_rms_rel": 0.0004772303095444423,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001796516993532402,
+          "compressed_indices_overlap": 1.0,
+          "position": 8240,
+          "selected_kv_rms_rel": 0.002019107361292182,
+          "sparse_output_rms_rel": 0.00042183845806481195,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001637548473135609,
+          "compressed_indices_overlap": 1.0,
+          "position": 8241,
+          "selected_kv_rms_rel": 0.0022349961194266274,
+          "sparse_output_rms_rel": 0.0005268110708956431,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016261939627635763,
+          "compressed_indices_overlap": 1.0,
+          "position": 8242,
+          "selected_kv_rms_rel": 0.0019848425093434334,
+          "sparse_output_rms_rel": 0.00044490924349555586,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016491399960798271,
+          "compressed_indices_overlap": 1.0,
+          "position": 8243,
+          "selected_kv_rms_rel": 0.0020679556582814456,
+          "sparse_output_rms_rel": 0.00043580041816685674,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016895738075163426,
+          "compressed_indices_overlap": 1.0,
+          "position": 8244,
+          "selected_kv_rms_rel": 0.0018628446056864775,
+          "sparse_output_rms_rel": 0.00043114895026320174,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.001800242488811373,
+          "compressed_indices_overlap": 1.0,
+          "position": 8245,
+          "selected_kv_rms_rel": 0.0018284234994007523,
+          "sparse_output_rms_rel": 0.0005083997638877046,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0015776834106165096,
+          "compressed_indices_overlap": 1.0,
+          "position": 8246,
+          "selected_kv_rms_rel": 0.0019573586347501667,
+          "sparse_output_rms_rel": 0.00043402054421587085,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017678873512324482,
+          "compressed_indices_overlap": 1.0,
+          "position": 8247,
+          "selected_kv_rms_rel": 0.001855866550644232,
+          "sparse_output_rms_rel": 0.0005562713379491984,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0018071725045764966,
+          "compressed_indices_overlap": 1.0,
+          "position": 8248,
+          "selected_kv_rms_rel": 0.001818089732243711,
+          "sparse_output_rms_rel": 0.00048223192338060794,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016824539636518846,
+          "compressed_indices_overlap": 1.0,
+          "position": 8249,
+          "selected_kv_rms_rel": 0.0018856439368806885,
+          "sparse_output_rms_rel": 0.0004945621813390773,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017509153486847063,
+          "compressed_indices_overlap": 1.0,
+          "position": 8250,
+          "selected_kv_rms_rel": 0.0018383116203920342,
+          "sparse_output_rms_rel": 0.0005389717834044366,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0019168104455011185,
+          "compressed_indices_overlap": 1.0,
+          "position": 8251,
+          "selected_kv_rms_rel": 0.0018603110957456288,
+          "sparse_output_rms_rel": 0.0005953303707968347,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0016571622165894887,
+          "compressed_indices_overlap": 1.0,
+          "position": 8252,
+          "selected_kv_rms_rel": 0.0019976189462430163,
+          "sparse_output_rms_rel": 0.0005943099170216786,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0017711644144640906,
+          "compressed_indices_overlap": 1.0,
+          "position": 8253,
+          "selected_kv_rms_rel": 0.0019187692436501045,
+          "sparse_output_rms_rel": 0.0005098138047978087,
+          "topk_equal": true
+        },
+        {
+          "boundary": false,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0015754807497692562,
+          "compressed_indices_overlap": 1.0,
+          "position": 8254,
+          "selected_kv_rms_rel": 0.001902923969693463,
+          "sparse_output_rms_rel": 0.00046204784954074465,
+          "topk_equal": true
+        },
+        {
+          "boundary": true,
+          "branch_max_abs": 0.00390625,
+          "branch_rms_rel": 0.0014591998122488392,
+          "compressed_indices_overlap": 1.0,
+          "position": 8255,
+          "selected_kv_rms_rel": 0.0016956586325487953,
+          "sparse_output_rms_rel": 0.0004896863471567796,
+          "topk_equal": true
+        }
+      ],
+      "topk_equal_steps": 64
+    }
+  },
+  "branch_limit": 0.1,
+  "checkpoint_id": "b3d44d9f14e59b1be0f108fd91e4a9a171650795e03a48dc8c47957cf40d22d9",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "load": 0.22252731397747993,
+    "process": 3.3106231610290706
+  },
+  "errors": [],
+  "experiment": "E0kf-fp8-ratio4-paired-gate",
+  "host": "titan064",
+  "judgment": "bf16 candidate lane (E0ff-gated vs raw FP32 oracle) is the reference; each FP8 arm consumes the identical teacher-forced hidden stream over the same seeded saturated state; exact topk for latent-only arms, branch rms_rel ceiling 0.1 per step, trajectory recorded",
+  "layer": 2,
+  "measurement_class": "semantic_change_paired_gate",
+  "schema_version": 1,
+  "seed": 20260721,
+  "seed_payload": {
+    "compressed_amplitude": {
+      "nope": {
+        "amax": 0.125,
+        "amin_nonzero": 2.384185791015625e-07,
+        "frac_above_e4m3_max": 0.0,
+        "frac_below_e4m3_min_normal": 0.4539773464202881,
+        "frac_below_e4m3_min_subnormal": 0.03013937920331955,
+        "frac_zero": 4.359654212748865e-06,
+        "p50": 0.017578125,
+        "p99": 0.0625,
+        "p999": 0.078125
+      },
+      "rope": {
+        "amax": 0.1044921875,
+        "amin_nonzero": 9.98377799987793e-07,
+        "frac_above_e4m3_max": 0.0,
+        "frac_below_e4m3_min_normal": 0.4676513671875,
+        "frac_below_e4m3_min_subnormal": 0.03148651123046875,
+        "frac_zero": 0.0,
+        "p50": 0.016845703125,
+        "p99": 0.064453125,
+        "p999": 0.0810546875
+      },
+      "shape": [
+        1,
+        2048,
+        512
+      ]
+    },
+    "compressed_qdq_error": {
+      "max_abs_err": 0.00390625,
+      "rms_rel_full": 0.019274642498828338,
+      "rms_rel_nope": 0.01715428901404131,
+      "rms_rel_rope": 0.030216453199296167
+    },
+    "raw_amplitude": {
+      "nope": {
+        "amax": 0.140625,
+        "amin_nonzero": 4.76837158203125e-07,
+        "frac_above_e4m3_max": 0.0,
+        "frac_below_e4m3_min_normal": 0.3872942328453064,
+        "frac_below_e4m3_min_subnormal": 0.02575683780014515,
+        "frac_zero": 0.0,
+        "p50": 0.01953125,
+        "p99": 0.078125,
+        "p999": 0.1015625
+      },
+      "rope": {
+        "amax": 0.10888671875,
+        "amin_nonzero": 4.708766937255859e-06,
+        "frac_above_e4m3_max": 0.0,
+        "frac_below_e4m3_min_normal": 0.3975830078125,
+        "frac_below_e4m3_min_subnormal": 0.02490234375,
+        "frac_zero": 0.0,
+        "p50": 0.020263671875,
+        "p99": 0.078125,
+        "p999": 0.09805130958557129
+      },
+      "shape": [
+        1,
+        128,
+        512
+      ]
+    },
+    "raw_qdq_error": {
+      "max_abs_err": 0.00390625,
+      "rms_rel_full": 0.016074269935192644,
+      "rms_rel_nope": 0.013277900854476223,
+      "rms_rel_rope": 0.02869740147582639
+    },
+    "step0_raw_latent_amplitude": {
+      "nope": {
+        "amax": 1.875,
+        "amin_nonzero": 0.00341796875,
+        "frac_above_e4m3_max": 0.0,
+        "frac_below_e4m3_min_normal": 0.015625,
+        "frac_below_e4m3_min_subnormal": 0.0,
+        "frac_zero": 0.0,
+        "p50": 0.375,
+        "p99": 1.5,
+        "p999": 1.875
+      },
+      "rope": {
+        "amax": 1.8203125,
+        "amin_nonzero": 0.01324462890625,
+        "frac_above_e4m3_max": 0.0,
+        "frac_below_e4m3_min_normal": 0.015625,
+        "frac_below_e4m3_min_subnormal": 0.0,
+        "frac_zero": 0.0,
+        "p50": 0.287109375,
+        "p99": 1.475780725479126,
+        "p999": 1.7858595848083496
+      },
+      "shape": [
+        1,
+        1,
+        512
+      ]
+    }
+  },
+  "start_position": 8192,
+  "steps": 64,
+  "torch": "2.11.0+cu130"
+}

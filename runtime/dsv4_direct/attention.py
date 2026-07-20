@@ -630,24 +630,29 @@ def _torch_sparse_decode_prevalidated(
     FP8 KV (A6F fp8_cast form): an e4m3 cache is cast back to BF16 right
     after the gather; an optional BF16 ``latent_rope`` side tensor overwrites
     the rope tail so positional lanes stay full precision.
+
+    17th vertical (workspace slimming): the gathered rows are materialized in
+    FP32 exactly once and the mask/softmax steps run in place.  e4m3/bf16 ->
+    fp32 conversions are exact and the in-place elementwise kernels compute
+    the same values, so every einsum consumes bitwise-identical inputs and
+    the output is bitwise identical to the previous
+    gather -> bf16 -> double-``.float()`` chain.
     """
 
-    selected = latent_kv[plan.batch_indices, plan.gather_indices]
-    if selected.dtype == torch.float8_e4m3fn:
-        selected = selected.to(torch.bfloat16)
+    selected = latent_kv[plan.batch_indices, plan.gather_indices].float()
     if latent_rope is not None:
         selected[..., -latent_rope.shape[-1] :] = latent_rope[
             plan.batch_indices, plan.gather_indices
         ]
     scores = torch.einsum(
-        "bshd,bskd->bshk", query.float(), selected.float()
+        "bshd,bskd->bshk", query.float(), selected
     ) * softmax_scale
     sink = attn_sink.float().view(1, 1, query.shape[2], 1)
     maximum = torch.maximum(scores.amax(dim=-1, keepdim=True), sink)
-    exponent = torch.exp(scores - maximum)
+    exponent = scores.sub_(maximum).exp_()
     denominator = exponent.sum(dim=-1, keepdim=True) + torch.exp(sink - maximum)
-    probabilities = exponent / denominator
-    output = torch.einsum("bshk,bskd->bshd", probabilities, selected.float())
+    probabilities = exponent.div_(denominator)
+    output = torch.einsum("bshk,bskd->bshd", probabilities, selected)
     return output.to(query.dtype)
 
 
@@ -662,27 +667,30 @@ def _torch_sparse_decode_padded_prevalidated(
     """Fixed-width sparse MLA with an explicit mask for ``-1`` padding.
 
     FP8 KV: same read-side cast form as the fixed-index variant above.
+
+    17th vertical (workspace slimming): one FP32 materialization of the
+    gathered rows plus in-place mask/softmax -- exact conversions and
+    identical elementwise values, so the output stays bitwise identical to
+    the previous chain (see ``_torch_sparse_decode_prevalidated``).
     """
 
-    selected = latent_kv[plan.batch_indices, plan.gather_indices]
-    if selected.dtype == torch.float8_e4m3fn:
-        selected = selected.to(torch.bfloat16)
+    selected = latent_kv[plan.batch_indices, plan.gather_indices].float()
     if latent_rope is not None:
         selected[..., -latent_rope.shape[-1] :] = latent_rope[
             plan.batch_indices, plan.gather_indices
         ]
-    selected = selected.masked_fill(~plan.valid_mask.unsqueeze(-1), 0.0)
+    selected.masked_fill_(~plan.valid_mask.unsqueeze(-1), 0.0)
     scores = torch.einsum(
-        "bshd,bskd->bshk", query.float(), selected.float()
+        "bshd,bskd->bshk", query.float(), selected
     ) * softmax_scale
     valid = plan.valid_mask.unsqueeze(2)
-    scores = scores.masked_fill(~valid, float("-inf"))
+    scores.masked_fill_(~valid, float("-inf"))
     sink = attn_sink.float().view(1, 1, query.shape[2], 1)
     maximum = torch.maximum(scores.amax(dim=-1, keepdim=True), sink)
-    exponent = torch.exp(scores - maximum).masked_fill(~valid, 0.0)
+    exponent = scores.sub_(maximum).exp_().masked_fill_(~valid, 0.0)
     denominator = exponent.sum(dim=-1, keepdim=True) + torch.exp(sink - maximum)
-    probabilities = exponent / denominator
-    output = torch.einsum("bshk,bskd->bshd", probabilities, selected.float())
+    probabilities = exponent.div_(denominator)
+    output = torch.einsum("bshk,bskd->bshd", probabilities, selected)
     return output.to(query.dtype)
 
 
