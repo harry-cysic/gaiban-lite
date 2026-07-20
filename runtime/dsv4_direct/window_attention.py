@@ -210,6 +210,57 @@ class PreparedWindowAttentionWeights:
 
 
 @dataclass(frozen=True)
+class WindowDecodePlan:
+    """Fixed-position tensors and slots for trace-free single-token decode.
+
+    Window counterpart of ``attention.Ratio128DecodePlan``: with
+    ``compress_ratio == 0`` there is no compressor state, so the plan carries
+    only the RoPE slice, the full-ring top-k gather, and the ring write slot.
+    ``start_pos >= WINDOW_SIZE`` is required so every ring row is valid and
+    the maskless fixed-index sparse core applies (positions below one full
+    window keep using the traced ``__call__`` path, exactly like the
+    ratio-128 plan's ``[128, max_seq_len)`` contract).
+    """
+
+    start_pos: int
+    slot: int
+    batch_size: int
+    hidden_size: int
+    owner_id: int
+    state_id: int
+    frequencies: torch.Tensor
+    topk_indices: torch.Tensor
+    gather_indices: torch.Tensor
+    batch_indices: torch.Tensor
+
+
+def _window_sparse_decode_prevalidated(
+    query: torch.Tensor,
+    latent_kv: torch.Tensor,
+    attn_sink: torch.Tensor,
+    plan: WindowDecodePlan,
+    softmax_scale: float,
+) -> torch.Tensor:
+    """Fixed-index sparse MLA over the full window ring (no padding mask).
+
+    Same math as ``attention._torch_sparse_decode_prevalidated``; duplicated
+    here so the window module does not depend on a ratio-128 private helper.
+    """
+
+    selected = latent_kv[plan.batch_indices, plan.gather_indices]
+    scores = torch.einsum(
+        "bshd,bskd->bshk", query.float(), selected.float()
+    ) * softmax_scale
+    sink = attn_sink.float().view(1, 1, query.shape[2], 1)
+    maximum = torch.maximum(scores.amax(dim=-1, keepdim=True), sink)
+    exponent = torch.exp(scores - maximum)
+    denominator = exponent.sum(dim=-1, keepdim=True) + torch.exp(sink - maximum)
+    probabilities = exponent / denominator
+    output = torch.einsum("bshk,bskd->bshd", probabilities, selected.float())
+    return output.to(query.dtype)
+
+
+@dataclass(frozen=True)
 class WindowAttentionTrace:
     start_pos: int
     input_shape: tuple[int, ...]
@@ -379,6 +430,164 @@ class WindowTorchAttention:
             return value
         return fp8_quant_dequant(value, group_size=64)
 
+    def prepare_decode_plan(self, start_pos: int) -> WindowDecodePlan:
+        """Validate state once and materialize a fixed full-ring decode plan.
+
+        Mirrors ``Ratio128TorchAttention.prepare_decode_plan`` minus every
+        compressor check: the window layer has no compressed rows and no
+        pending compressor state, so only the raw-ring metadata is validated.
+        """
+
+        if (
+            not isinstance(start_pos, int)
+            or isinstance(start_pos, bool)
+            or start_pos < WINDOW_SIZE
+            or start_pos >= self.config.max_seq_len
+        ):
+            raise ValueError(
+                "window decode plan start_pos must be an integer in "
+                f"[{WINDOW_SIZE}, max_seq_len)"
+            )
+        if self.state.next_position != start_pos:
+            raise ValueError(
+                f"start_pos {start_pos} != static KV next position "
+                f"{self.state.next_position}"
+            )
+        absolute_raw = torch.arange(
+            start_pos - WINDOW_SIZE,
+            start_pos,
+            dtype=torch.int64,
+            device=self.state.device,
+        )
+        raw_slots = absolute_raw.remainder(WINDOW_SIZE)
+        expected_raw = absolute_raw.unsqueeze(0).expand(
+            self.state.num_local_sequences, -1
+        )
+        if not bool(
+            torch.all(
+                self.state._raw_positions.index_select(1, raw_slots) == expected_raw
+            ).item()
+        ):
+            raise RuntimeError("static window KV raw-ring metadata is inconsistent")
+
+        # start_pos >= WINDOW_SIZE guarantees the full-ring branch of
+        # window_topk_indices (all indices valid, so the maskless fixed-index
+        # sparse core is legal).
+        topk = window_topk_indices(
+            batch_size=self.state.num_local_sequences,
+            seqlen=1,
+            start_pos=start_pos,
+            device=self.state.device,
+        )
+        if bool((topk < 0).any().item()):
+            raise AssertionError("full-ring window plan produced padded indices")
+        gather = topk.to(torch.int64)
+        batch_indices = (
+            torch.arange(
+                self.state.num_local_sequences,
+                dtype=torch.int64,
+                device=self.state.device,
+            )
+            .view(self.state.num_local_sequences, 1, 1)
+            .expand_as(gather)
+        )
+        return WindowDecodePlan(
+            start_pos=start_pos,
+            slot=start_pos % WINDOW_SIZE,
+            batch_size=self.state.num_local_sequences,
+            hidden_size=self.config.hidden_size,
+            owner_id=id(self),
+            state_id=id(self.state),
+            frequencies=self.freqs_cis[start_pos : start_pos + 1].contiguous(),
+            topk_indices=topk,
+            gather_indices=gather,
+            batch_indices=batch_indices,
+        )
+
+    def forward_decode_tensor(
+        self,
+        hidden: torch.Tensor,
+        *,
+        start_pos: int,
+        plan: WindowDecodePlan,
+    ) -> torch.Tensor:
+        """Run one fixed full-ring decode token without trace or host sync.
+
+        Identical operator chain to the decode branch of ``__call__``
+        (verified against the raw-FP32 window oracle in E0wf), with the plan
+        supplying frequencies/top-k and the ring write going through the
+        prevalidated fixed-slot path.
+        """
+
+        if not isinstance(plan, WindowDecodePlan):
+            raise TypeError("plan must be a WindowDecodePlan")
+        if plan.owner_id != id(self) or plan.state_id != id(self.state):
+            raise ValueError("decode plan belongs to a different attention state")
+        if start_pos != plan.start_pos:
+            raise ValueError("decode start_pos does not match the fixed plan")
+        if tuple(hidden.shape) != (plan.batch_size, 1, plan.hidden_size):
+            raise ValueError("decode hidden shape does not match the fixed plan")
+        if hidden.dtype != torch.bfloat16:
+            raise TypeError("trace-free decode requires BF16 hidden input")
+        if hidden.device != plan.frequencies.device:
+            raise ValueError("decode hidden and fixed plan must share a device")
+
+        cfg = self.config
+        frequencies = plan.frequencies
+        query_lora = rms_norm(
+            F.linear(hidden, self.weights.wq_a),
+            self.weights.q_norm,
+            eps=cfg.norm_eps,
+        )
+        query = F.linear(query_lora, self.weights.wq_b).reshape(
+            plan.batch_size, 1, cfg.num_heads, cfg.head_dim
+        )
+        query *= torch.rsqrt(
+            query.square().mean(dim=-1, keepdim=True) + cfg.norm_eps
+        )
+        query[..., -cfg.rope_dim :] = apply_rotary_emb(
+            query[..., -cfg.rope_dim :], frequencies
+        )
+
+        raw_latent = rms_norm(
+            F.linear(hidden, self.weights.wkv),
+            self.weights.kv_norm,
+            eps=cfg.norm_eps,
+        )
+        raw_latent[..., -cfg.rope_dim :] = apply_rotary_emb(
+            raw_latent[..., -cfg.rope_dim :], frequencies
+        )
+        raw_latent[..., : -cfg.rope_dim] = self._nope_control(
+            raw_latent[..., : -cfg.rope_dim]
+        )
+        self.state._write_decode_fixed(
+            raw_latent, position=start_pos, slot=plan.slot
+        )
+
+        output = _window_sparse_decode_prevalidated(
+            query,
+            self.state.latent,
+            self.weights.attn_sink,
+            plan,
+            cfg.head_dim**-0.5,
+        )
+        output[..., -cfg.rope_dim :] = apply_rotary_emb(
+            output[..., -cfg.rope_dim :], frequencies, inverse=True
+        )
+        grouped = output.reshape(
+            plan.batch_size,
+            1,
+            cfg.o_groups,
+            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+        )
+        wo_a = self.weights.wo_a.reshape(
+            cfg.o_groups,
+            cfg.o_lora_rank,
+            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+        )
+        projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
+        return F.linear(projected.flatten(2), self.weights.wo_b)
+
     def __call__(
         self,
         hidden: torch.Tensor,
@@ -520,6 +729,7 @@ __all__ = [
     "SUPPORTED_WINDOW_LAYER_IDS",
     "WindowAttentionConfig",
     "WindowAttentionTrace",
+    "WindowDecodePlan",
     "WindowTorchAttention",
     "prepare_window_attention_weights",
 ]

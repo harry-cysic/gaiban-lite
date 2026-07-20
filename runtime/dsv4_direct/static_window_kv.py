@@ -187,6 +187,32 @@ class StaticWindowKV:
         self._raw_positions[:, slot].fill_(position)
         self._next_position.fill_(position + 1)
 
+    def _write_decode_fixed(
+        self,
+        raw_latent: torch.Tensor,
+        *,
+        position: int,
+        slot: int,
+    ) -> None:
+        """Commit one prevalidated decode token without host sync.
+
+        Mirror of ``StaticLayerKV._write_decode_nonboundary_fixed`` for the
+        compressor-free window ring (reference model.py:530): the caller
+        (``WindowTorchAttention.prepare_decode_plan``) has already validated
+        ``position == next_position`` and the ring metadata, so this hot path
+        performs only the fixed-slot writes.
+        """
+
+        self._require_tensor(
+            "raw_latent",
+            raw_latent,
+            (self.num_local_sequences, 1, LATENT_DIM),
+            torch.bfloat16,
+        )
+        self.latent[:, slot].copy_(raw_latent[:, 0])
+        self._raw_positions[:, slot].fill_(position)
+        self._next_position.fill_(position + 1)
+
     def _require_tensor(
         self,
         name: str,

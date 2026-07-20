@@ -1,0 +1,95 @@
+# E0df DirectDecodeBlock block-assembly oracle run on titan064 (2026-07-20)
+# command: CUDA_HOME=/usr/local/cuda-13.2 ~/Workspace/venvs/sglang/bin/torchrun \
+#   --standalone --nproc_per_node=4 e0df_block_oracle.py \
+#   --stage-root ~/Workspace/DeepSeek-V4-Flash --out-dir out-e0df
+# workdir: titan064:~/e0f-runtime (rsync of gaiban-lite/runtime/)
+# exit status: 0 (PASS)
+#
+# candidate = DirectDecodeBlock.forward_decode_tensor (window/ratio-4/ratio-128
+# three-way dispatch), gated per stage against the verified component oracles:
+# attention lanes E0wf(raw-FP32)/E0ff(BF16-control)/E0ef(raw-FP32) with their
+# original limits, fp32 HC/RMSNorm recomputation (0.012), raw-checkpoint FP32
+# MoE (E0cf combined 0.03, route weights E0ff 2e-5); black-box output must be
+# bitwise-equal to the composed stage decomposition (exact check, all PASS).
+#
+# run history: first run (implementation 04a1..., not retained) FAILed only on
+# rank1/decode_pos08194 "state_matches_control" -- a full-payload digest
+# equality gate on the ratio-4 candidate-vs-BF16-control state that was
+# stricter than E0ff's own gate (E0ff gates state parity via CONTROL-limit
+# metrics + exact finite-mask on score states, not digest equality).  The gate
+# was aligned with E0ff; the digest is now a diagnostic and the one
+# bf16-rounding-level divergence reproduces deterministically (state.raw
+# rms_rel 4.08e-05 at that step, far under the 0.003 limit).
+#
+# accepted=True checkpoint_id=75c125cc9806171d31a28c30858dd26910596694dc5351f6d2d4375d42e2d07a
+# implementation_sha256=3930e0c4e8433dce5f69972918904589007cc594e2df3c24dd610dd9e1a27b59
+# block_contract_ids={"0": "25fd331b53b51ff29cb5048a671779c11cd58171b114ff19041d5037f6e875d4", "2": "5fe789349693e7ee6deb0df363a4a41397266005c4b29287b1cad6330b3e946a", "3": "8830881a121919c6e7824bfe4a0ed009a3efab70e7c2ad36b9faa1611a3c477f"}
+# identity_checks={'all_ranks_match': True} errors=0
+# host=titan064 device=NVIDIA GeForce RTX 4090 torch=2.11.0+cu130 world=4
+
+case layer0_window_hash: PASS accepted_ranks=[0, 1, 2, 3] exact_checks_all=True (23 checks)
+  after_attention        worst_rms_rel=1.667048e-03 limit=0.012 accepted=True at=decode_pos00130.after_attention
+  attn_hidden            worst_rms_rel=2.401601e-03 limit=0.012 accepted=True at=decode_pos00130.attn_hidden
+  block_output           worst_rms_rel=1.676888e-03 limit=0.012 accepted=True at=decode_pos00128.block_output
+  branch                 worst_rms_rel=1.243546e-02 limit=0.04 accepted=True at=prefill.branch
+  ffn_hidden             worst_rms_rel=2.438077e-03 limit=0.012 accepted=True at=decode_pos00129.ffn_hidden
+  moe_local              worst_rms_rel=5.493139e-03 limit=0.03 accepted=True at=decode_pos00129.moe_local
+  route_weights          worst_rms_rel=0.000000e+00 limit=2e-05 accepted=True at=decode_pos00128.route_weights
+  state.raw              worst_rms_rel=1.041876e-02 limit=0.02 accepted=True at=prefill.state.raw
+
+case layer2_ratio4_hash: PASS accepted_ranks=[0, 1, 2, 3] exact_checks_all=True (29 checks)
+  after_attention        worst_rms_rel=1.692830e-03 limit=0.012 accepted=True at=decode_pos08194.after_attention
+  attn_hidden            worst_rms_rel=2.382412e-03 limit=0.012 accepted=True at=decode_pos08192.attn_hidden
+  block_output           worst_rms_rel=1.688101e-03 limit=0.012 accepted=True at=decode_pos08193.block_output
+  branch                 worst_rms_rel=2.085624e-03 limit=0.01 accepted=True at=decode_pos08194.branch
+  ffn_hidden             worst_rms_rel=2.385867e-03 limit=0.012 accepted=True at=decode_pos08193.ffn_hidden
+  moe_local              worst_rms_rel=5.415130e-03 limit=0.03 accepted=True at=decode_pos08192.moe_local
+  route_weights          worst_rms_rel=0.000000e+00 limit=2e-05 accepted=True at=decode_pos08192.route_weights
+  state.compressed       worst_rms_rel=0.000000e+00 limit=0.003 accepted=True at=decode_pos08192.state.compressed
+  state.index_kv         worst_rms_rel=0.000000e+00 limit=2e-05 accepted=True at=decode_pos08192.state.index_kv
+  state.index_score      worst_rms_rel=0.000000e+00 limit=2e-05 accepted=True at=decode_pos08192.state.index_score
+  state.indexer_kv       worst_rms_rel=0.000000e+00 limit=0.003 accepted=True at=decode_pos08192.state.indexer_kv
+  state.main_kv          worst_rms_rel=0.000000e+00 limit=2e-05 accepted=True at=decode_pos08192.state.main_kv
+  state.main_score       worst_rms_rel=0.000000e+00 limit=2e-05 accepted=True at=decode_pos08192.state.main_score
+  state.raw              worst_rms_rel=4.084200e-05 limit=0.003 accepted=True at=decode_pos08194.state.raw
+
+case layer3_ratio128_learned: PASS accepted_ranks=[0, 1, 2, 3] exact_checks_all=True (23 checks)
+  after_attention        worst_rms_rel=1.683241e-03 limit=0.012 accepted=True at=decode_pos00129.after_attention
+  attn_hidden            worst_rms_rel=2.462118e-03 limit=0.012 accepted=True at=decode_pos00128.attn_hidden
+  block_output           worst_rms_rel=1.678853e-03 limit=0.012 accepted=True at=decode_pos00130.block_output
+  branch                 worst_rms_rel=1.299066e-02 limit=0.04 accepted=True at=prefill.branch
+  ffn_hidden             worst_rms_rel=2.432722e-03 limit=0.012 accepted=True at=decode_pos00128.ffn_hidden
+  moe_local              worst_rms_rel=5.341246e-03 limit=0.03 accepted=True at=decode_pos00129.moe_local
+  route_weights          worst_rms_rel=0.000000e+00 limit=2e-05 accepted=True at=decode_pos00128.route_weights
+  state.compressed       worst_rms_rel=0.000000e+00 limit=0.02 accepted=True at=decode_pos00128.state.compressed
+  state.raw              worst_rms_rel=1.012892e-02 limit=0.02 accepted=True at=prefill.state.raw
+
+diagnostics (per rank 0..3):
+  layer2_ratio4_hash.decode_pos08192.state_digest_matches_control: [True, True, True, True]
+  layer2_ratio4_hash.decode_pos08193.state_digest_matches_control: [True, True, True, True]
+  layer2_ratio4_hash.decode_pos08194.state_digest_matches_control: [True, False, True, True]
+  layer3_ratio128_learned.decode_pos00128.route_margin_min: [0.008204460144042969, 0.008204460144042969, 0.008204460144042969, 0.008204460144042969]
+  layer3_ratio128_learned.decode_pos00129.route_margin_min: [0.00502777099609375, 0.00502777099609375, 0.00502777099609375, 0.00502777099609375]
+  layer3_ratio128_learned.decode_pos00130.route_margin_min: [0.00231170654296875, 0.00231170654296875, 0.00231170654296875, 0.00231170654296875]
+
+diagnostic_seconds (per rank):
+  case.layer0_window_hash: [9.8, 9.8, 9.8, 9.8]
+  case.layer2_ratio4_hash: [1.4, 1.4, 1.4, 1.4]
+  case.layer3_ratio128_learned: [2.7, 2.7, 2.7, 2.7]
+  process: [14.2, 14.2, 14.2, 14.2]
+
+---- torchrun stdout/stderr (tail) ----
+W0720 09:03:59.617000 144759 torch/distributed/run.py:851] 
+W0720 09:03:59.617000 144759 torch/distributed/run.py:851] *****************************************
+W0720 09:03:59.617000 144759 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 09:03:59.617000 144759 torch/distributed/run.py:851] *****************************************
+[E0df] case layer0_window_hash starting
+[E0df] case layer0_window_hash: PASS
+[E0df] case layer2_ratio4_hash starting
+[E0df] case layer2_ratio4_hash: PASS
+[E0df] case layer3_ratio128_learned starting
+[E0df] case layer3_ratio128_learned: PASS
+PASS E0df DirectDecodeBlock decode gate (layers 0/2/3)
+  layer0_window_hash: PASS (exact_checks ok; worst prefill.state.raw: rms_rel 1.042e-02 <= 0.02)
+  layer2_ratio4_hash: PASS (exact_checks ok; worst decode_pos08194.branch: rms_rel 2.086e-03 <= 0.01)
+  layer3_ratio128_learned: PASS (exact_checks ok; worst prefill.state.raw: rms_rel 1.013e-02 <= 0.02)
