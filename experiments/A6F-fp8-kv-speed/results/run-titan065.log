@@ -1,0 +1,29 @@
+A6F FP8 KV speed microbench — titan065 GPU0, 2026-07-20
+env: torch 2.11.0+cu130, NVIDIA GeForce RTX 4090, venv ~/Workspace/venvs/sglang
+cmd: CUDA_VISIBLE_DEVICES=0 python a6f_fp8_kv_bench.py --out results.json
+iters=50/graph, rounds=3, h=64, d=512; p50 per-call µs
+
+family    ctx    bl   bf16_us   fp8_cast_us (ratio)   fp8_scale_us (ratio)
+window    2048   32     99.4      106.1 (1.068x)        105.0 (1.057x)
+window    2048   64    132.5      143.7 (1.084x)        139.7 (1.054x)
+window    2048  128    259.4      257.0 (0.991x)        230.9 (0.890x)
+ratio128  2048   32    112.5      119.1 (1.058x)        120.7 (1.073x)
+ratio128  2048   64    160.6      167.2 (1.041x)        168.3 (1.048x)
+ratio128  2048  128    351.5      357.9 (1.018x)        359.3 (1.022x)
+ratio128  8192   32    125.2      133.4 (1.065x)        135.1 (1.079x)
+ratio128  8192   64    206.9      209.3 (1.012x)        216.6 (1.047x)
+ratio128  8192  128    434.9      447.9 (1.030x)        480.5 (1.105x)
+ratio4    2048   32    336.4      357.3 (1.062x)        361.0 (1.073x)
+ratio4    2048   64    736.0      748.8 (1.017x)        959.4 (1.304x)
+ratio4    2048  128   1794.0     1911.6 (1.066x)       2015.0 (1.123x)
+ratio4    8192   32    340.3      345.9 (1.016x)        369.7 (1.086x)
+ratio4    8192   64    728.4      751.1 (1.031x)        960.0 (1.318x)
+ratio4    8192  128   1796.3     1913.0 (1.065x)       2014.1 (1.121x)
+
+alloc (latent cache tensors, ratio4/bl64/ctx8192, torch allocated bytes):
+  bf16      142,606,336
+  fp8_cast   71,303,168  (0.500x)
+  fp8_scale  71,860,224  (0.504x, +fp32 per-token scale [bl,N,1])
+
+round drift <2.5% everywhere (first round warm-up slightly high, rounds 2-3 tight).
+Full per-round data: results-titan065.json
