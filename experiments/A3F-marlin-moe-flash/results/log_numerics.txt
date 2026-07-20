@@ -1,0 +1,17 @@
+GPU: NVIDIA GeForce RTX 4090 | torch 2.11.0+cu130
+
+--- clamp-inactive (x*0.004) ---
+  B=16  max|gate|=6.06 max|up|=5.37
+    rel_fro vs oracle:  ref=4.690e-02  marlin16=4.213e-03  marlin8=4.621e-02
+    marlin16 vs ref: 4.707e-02
+  B=64  max|gate|=6.15 max|up|=6.97
+    rel_fro vs oracle:  ref=4.687e-02  marlin16=4.285e-03  marlin8=4.637e-02
+    marlin16 vs ref: 4.709e-02
+
+--- clamp-ACTIVE (x*0.2) ---
+  B=16  max|gate|=316.64 max|up|=286.74
+    rel_fro vs oracle:  ref=8.716e-02  marlin16=3.491e-03  marlin8=8.472e-02
+    marlin16 vs ref: 8.741e-02
+  B=64  max|gate|=304.21 max|up|=307.67
+    rel_fro vs oracle:  ref=8.765e-02  marlin16=3.414e-03  marlin8=8.482e-02
+    marlin16 vs ref: 8.809e-02

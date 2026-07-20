@@ -16,7 +16,13 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   确认免离线 repack、加载侧直读）、reference golden-token oracle
   （[`experiments/D0-reference-oracle`](experiments/D0-reference-oracle/README.md)，
   MP=8 单机跑通，8 条 prompt golden tokens 冻结）。
-- Phase 1 kernel regear：**进行中**——A3F Marlin MoE bench（256 experts，K=4096，
-  inter 2048/512，w4a16+w4a8）在 titan065 运行中
-  （[`experiments/A3F-marlin-moe-flash`](experiments/A3F-marlin-moe-flash/README.md)）；
-  待办：shared-expert FP8 / sparse_attn(h=16) / fused indexer 换几何与 A4/C1 级 bench。
+- Phase 1 kernel regear：**进行中**——
+  [`A3F`](experiments/A3F-marlin-moe-flash/README.md) Marlin MoE 完成：数值 gate 通过，
+  整 expert 口径峰值 899 GB/s（Pro 锚点 97%），TP4-local inter=512 口径 687–760 GB/s
+  （B=512 时 1.24 ms/层 → 11 层 stage MoE ≈ 13.7 ms，高于 §5.2 的 ~10.8 ms 假设）；
+  [`A4F`](experiments/A4F-attention-flash/README.md) attention/HC 计时完成：TP4 h=16
+  原生可跑（无需 topk-block 修复），h=64 单 launch 撞 sm89 smem 墙 → DP-attention 须
+  head-loop（4×h16）；DP 口径折算 11 层 stage 非 MoE 部分 ~13 ms 量级，高于 §5.2 的
+  6–7 ms 假设，decode 预估收敛至 **~15–17k tok/s**（区间下沿），待 C1F 实测修订。
+  下一步：**C1F 集成 block bench**（移植 gaiban C1' `--attn-mode dp`，Marlin MoE +
+  head-loop attention + HC + NCCL 整层 decode 定数）；随后 fused indexer 接入。
