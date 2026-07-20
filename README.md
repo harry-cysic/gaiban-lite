@@ -76,6 +76,10 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   算力限）、2K 达 8.6k;原 15–25k 带的两个假设被证伪——t_stage 线性缩放
   （实测强次线性）与管线填充 KV 同驻（×4 漏算）。**回收路径：FP8 KV（×2 行数,
   需 Flash 几何重验）+ MTP（~1.5×）投影 ~15–16k,带下沿在两杠杆齐备时可及**;
-  短 ctx 运营另有余量。下一步：FP8 KV 竖条 → MTP 竖条 → chunked prefill/serving。
+  短 ctx 运营另有余量。**FP8 KV 已判活并放行**（A6F：torch 路径罚金 0.99–1.08×,Pro 的 1.4–4.3×
+  是 tilelang dequant 特有；集成后质量 gate 全过,E2E 467–470/482 与基线不可
+  区分,**8K 前沿 6392→7523 tok/s +17.7%**）;容量瓶颈已转移到 fp32 attention
+  工作区 + graph 私有池（新杠杆:工作区瘦身）。下一步：MTP 竖条（~1.5×,
+  投影 8K ~11k）→ 工作区瘦身 → chunked prefill/serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
