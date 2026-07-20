@@ -1,0 +1,486 @@
+{
+  "accepted": true,
+  "checkpoint_id": "b6c6b8892cdab54b07bdd610a99773fd29d2ad2cb13a168caac0bf0ea6c89634",
+  "comparison": {
+    "handoff_accepted": true,
+    "judgment": "stage0 bitwise; stage1 bitwise when it holds, else numeric gate + self-consistency (cross-machine mode split, task contract)",
+    "pipeline_terminals_accepted": true,
+    "self_consistency_all": true
+  },
+  "config_tag": "nogdr",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "build": 0.28301234100945294,
+    "chain": 26.05236580502242,
+    "load": 14.075110697885975,
+    "pipeline_primary": 15.972933331038803,
+    "pipeline_replica": 12.837637769058347,
+    "process": 70.46767028304748
+  },
+  "errors": [],
+  "experiment": "E0qf-tp4-pp2-dual-node-serial-pipeline",
+  "group_probe": {
+    "cross_group_bitwise": true,
+    "judgment": "diagnostic_evidence_only_not_an_acceptance_gate",
+    "pairs": [
+      {
+        "all_gather_equal": true,
+        "reduce_scatter_equal": true,
+        "tp_rank": 0
+      },
+      {
+        "all_gather_equal": true,
+        "reduce_scatter_equal": true,
+        "tp_rank": 1
+      },
+      {
+        "all_gather_equal": true,
+        "reduce_scatter_equal": true,
+        "tp_rank": 2
+      },
+      {
+        "all_gather_equal": true,
+        "reduce_scatter_equal": true,
+        "tp_rank": 3
+      }
+    ]
+  },
+  "host": "titan065",
+  "local_rank": 2,
+  "measurement_class": "semantic_correctness_gate_plus_reportonly_timing",
+  "memory_after_build": {
+    "free_bytes": 16462577664,
+    "total_bytes": 25252724736
+  },
+  "memory_after_load": {
+    "free_bytes": 16481452032,
+    "total_bytes": 25252724736
+  },
+  "microbatches": 2,
+  "nccl_env": {
+    "NCCL_IB_DISABLE": "0",
+    "NCCL_NET_GDR_LEVEL": null,
+    "NCCL_P2P_LEVEL": "SYS",
+    "NCCL_SOCKET_IFNAME": "enp33s0f0"
+  },
+  "pipeline": {
+    "handoff_records": [
+      {
+        "accepted": true,
+        "endpoint_dtype": "torch.bfloat16",
+        "endpoint_pointer_stable": true,
+        "endpoint_shape": [
+          1,
+          1,
+          4,
+          4096
+        ],
+        "expected_steps": 132,
+        "payload_nbytes": 32768,
+        "role": "receive",
+        "stage_id": 1,
+        "steps_transferred": 132
+      },
+      {
+        "accepted": true,
+        "endpoint_dtype": "torch.bfloat16",
+        "endpoint_pointer_stable": true,
+        "endpoint_shape": [
+          1,
+          1,
+          4,
+          4096
+        ],
+        "expected_steps": 132,
+        "payload_nbytes": 32768,
+        "role": "receive",
+        "stage_id": 1,
+        "steps_transferred": 132
+      }
+    ],
+    "terminals": [
+      {
+        "accepted": true,
+        "device_position": 8324,
+        "dispatch_error": 0,
+        "expected_position": 8324,
+        "host_position": 8324,
+        "state_positions": [
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ]
+        ],
+        "stop_position": 8324
+      },
+      {
+        "accepted": true,
+        "device_position": 8324,
+        "dispatch_error": 0,
+        "expected_position": 8324,
+        "host_position": 8324,
+        "state_positions": [
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ]
+        ],
+        "stop_position": 8324
+      }
+    ],
+    "timing": {
+      "stage0_compute": {},
+      "stage0_send_wall": {},
+      "stage1_compute": {
+        "count": 264.0,
+        "max_ms": 3180.301062995568,
+        "mean_ms": 59.054056776045456,
+        "min_ms": 45.368999941274524,
+        "p50_ms": 45.93955003656447
+      },
+      "stage1_recv_wall": {
+        "count": 132.0,
+        "max_ms": 82.92473200708628,
+        "mean_ms": 1.0145738011818717,
+        "min_ms": 0.21998281590640545,
+        "p50_ms": 0.24154293350875378
+      },
+      "step_wall": {
+        "count": 132.0,
+        "max_ms": 3311.951122013852,
+        "mean_ms": 120.74929304159896,
+        "min_ms": 92.87283499725163,
+        "p50_ms": 93.75531086698174
+      }
+    },
+    "timing_first8": {
+      "stage0_compute": [],
+      "stage0_send_wall": [],
+      "stage1_compute": [
+        3180.3011,
+        45.6324,
+        45.8412,
+        49.7649,
+        46.7437,
+        45.4384,
+        50.6892,
+        50.4209,
+        45.9074,
+        45.7945,
+        45.7297,
+        49.5089,
+        45.6448,
+        46.609,
+        51.2035,
+        50.6866
+      ],
+      "stage1_recv_wall": [
+        82.9247,
+        0.3011,
+        0.2473,
+        3.2986,
+        0.2582,
+        0.2317,
+        0.2816,
+        0.2837,
+        0.2378,
+        0.2349,
+        0.2421,
+        0.2408,
+        0.241,
+        0.2368,
+        0.2386,
+        0.2301
+      ],
+      "step_wall": [
+        3311.9511,
+        97.601,
+        94.0823,
+        106.0251,
+        93.5726,
+        97.0811,
+        94.2406,
+        103.8185,
+        94.0818,
+        93.7563,
+        94.0127,
+        104.2703,
+        94.0042,
+        93.8918,
+        94.1074,
+        103.6492
+      ]
+    }
+  },
+  "pipeline_form": "stateful_eager_serial_handoff (overlap deferred; one payload in flight; microbatches interleave serially)",
+  "pipeline_replica": {
+    "handoff_records": [
+      {
+        "accepted": true,
+        "endpoint_dtype": "torch.bfloat16",
+        "endpoint_pointer_stable": true,
+        "endpoint_shape": [
+          1,
+          1,
+          4,
+          4096
+        ],
+        "expected_steps": 132,
+        "payload_nbytes": 32768,
+        "role": "receive",
+        "stage_id": 1,
+        "steps_transferred": 132
+      },
+      {
+        "accepted": true,
+        "endpoint_dtype": "torch.bfloat16",
+        "endpoint_pointer_stable": true,
+        "endpoint_shape": [
+          1,
+          1,
+          4,
+          4096
+        ],
+        "expected_steps": 132,
+        "payload_nbytes": 32768,
+        "role": "receive",
+        "stage_id": 1,
+        "steps_transferred": 132
+      }
+    ],
+    "terminals": [
+      {
+        "accepted": true,
+        "device_position": 8324,
+        "dispatch_error": 0,
+        "expected_position": 8324,
+        "host_position": 8324,
+        "state_positions": [
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ]
+        ],
+        "stop_position": 8324
+      },
+      {
+        "accepted": true,
+        "device_position": 8324,
+        "dispatch_error": 0,
+        "expected_position": 8324,
+        "host_position": 8324,
+        "state_positions": [
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ],
+          [
+            8324
+          ]
+        ],
+        "stop_position": 8324
+      }
+    ],
+    "timing": {
+      "stage0_compute": {},
+      "stage0_send_wall": {},
+      "stage1_compute": {
+        "count": 264.0,
+        "max_ms": 54.37779100611806,
+        "mean_ms": 47.20931770421113,
+        "min_ms": 45.53275788202882,
+        "p50_ms": 45.908152125775814
+      },
+      "stage1_recv_wall": {
+        "count": 132.0,
+        "max_ms": 87.21098420210183,
+        "mean_ms": 0.9893225735250973,
+        "min_ms": 0.22179586812853813,
+        "p50_ms": 0.23917900398373604
+      },
+      "step_wall": {
+        "count": 132.0,
+        "max_ms": 180.51704205572605,
+        "mean_ms": 97.00361548598404,
+        "min_ms": 93.17167615517974,
+        "p50_ms": 93.64868118427694
+      }
+    },
+    "timing_first8": {
+      "stage0_compute": [],
+      "stage0_send_wall": [],
+      "stage1_compute": [
+        45.8657,
+        45.7843,
+        46.0505,
+        45.7052,
+        47.5288,
+        45.7521,
+        50.8996,
+        50.8125,
+        45.918,
+        45.9082,
+        46.0578,
+        45.971,
+        46.0362,
+        45.9384,
+        51.0855,
+        50.9114
+      ],
+      "stage1_recv_wall": [
+        87.211,
+        0.2337,
+        0.2302,
+        0.2329,
+        0.2434,
+        0.2338,
+        0.2364,
+        0.2604,
+        0.2443,
+        0.2394,
+        0.2534,
+        1.2333,
+        0.244,
+        0.2404,
+        0.239,
+        0.3058
+      ],
+      "step_wall": [
+        180.517,
+        93.5754,
+        95.1148,
+        103.5438,
+        93.6534,
+        93.8785,
+        93.8079,
+        103.8474,
+        93.7097,
+        94.1079,
+        94.0128,
+        104.8974,
+        93.8576,
+        93.5916,
+        93.7732,
+        103.918
+      ]
+    }
+  },
+  "placement": {
+    "accepted": true,
+    "stage0_hosts": [
+      "titan064"
+    ],
+    "stage1_hosts": [
+      "titan065"
+    ]
+  },
+  "rank": 6,
+  "schedule": {
+    "family_counts": {
+      "normal": 99,
+      "ratio4_boundary": 32,
+      "ratio4_ratio128_boundary": 1
+    },
+    "start_position": 8192,
+    "step_count": 132,
+    "stop_position": 8324
+  },
+  "schema_version": 1,
+  "seed": 20260720,
+  "self_consistency": {
+    "accepted": true,
+    "judgment": "bitwise primary-vs-replica on the identical cross-machine path",
+    "kv_digests_equal": true,
+    "payload_shas_equal": true,
+    "stage1_outputs_equal": true
+  },
+  "stage1_rms_rel_tol": 0.02,
+  "stage_id": 1,
+  "stage_layer_ids": {
+    "stage0": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "stage1": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ]
+  },
+  "torch": "2.11.0+cu130",
+  "tp_group_binding": {
+    "backend": "nccl",
+    "global_rank": 6,
+    "global_ranks": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "local_rank": 2,
+    "validated_live": true,
+    "world_size": 4
+  },
+  "tp_rank": 2,
+  "world": 8
+}

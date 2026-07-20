@@ -1,0 +1,295 @@
+# E0qf dual-node TP4xPP2 gate — titan064 (stage0 GPU0-3) + titan065 (stage1 GPU0-3), IB NCCL handoff
+# Driven by run_e0qf_dual.sh on 2026-07-20T11:24:41Z; per-rank JSON in out-e0qf-{nogdr,gdr}/
+
+===== config=nogdr node0 (titan064) =====
+W0720 11:21:09.572000 150319 torch/distributed/run.py:851] 
+W0720 11:21:09.572000 150319 torch/distributed/run.py:851] *****************************************
+W0720 11:21:09.572000 150319 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 11:21:09.572000 150319 torch/distributed/run.py:851] *****************************************
+[E0qf] placement stage0=['titan064'] stage1=['titan065']
+[E0qf] layer=0 rank=0 experts=64/256
+[E0qf] layer=0 rank=0 experts=128/256
+[E0qf] layer=0 rank=0 experts=192/256
+[E0qf] layer=0 rank=0 experts=256/256
+[E0qf] stage 0 layer 0 material loaded
+[E0qf] layer=1 rank=0 experts=64/256
+[E0qf] layer=1 rank=0 experts=128/256
+[E0qf] layer=1 rank=0 experts=192/256
+[E0qf] layer=1 rank=0 experts=256/256
+[E0qf] stage 0 layer 1 material loaded
+[E0qf] layer=2 rank=0 experts=64/256
+[E0qf] layer=2 rank=0 experts=128/256
+[E0qf] layer=2 rank=0 experts=192/256
+[E0qf] layer=2 rank=0 experts=256/256
+[E0qf] stage 0 layer 2 material loaded
+[E0qf] layer=3 rank=0 experts=64/256
+[E0qf] layer=3 rank=0 experts=128/256
+[E0qf] layer=3 rank=0 experts=192/256
+[E0qf] layer=3 rank=0 experts=256/256
+[E0qf] stage 0 layer 3 material loaded
+[E0qf] layer=4 rank=0 experts=64/256
+[E0qf] layer=4 rank=0 experts=128/256
+[E0qf] layer=4 rank=0 experts=192/256
+[E0qf] layer=4 rank=0 experts=256/256
+[E0qf] stage 0 layer 4 material loaded
+[E0qf] layer=5 rank=0 experts=64/256
+[E0qf] layer=5 rank=0 experts=128/256
+[E0qf] layer=5 rank=0 experts=192/256
+[E0qf] layer=5 rank=0 experts=256/256
+[E0qf] stage 0 layer 5 material loaded
+[E0qf] layer=6 rank=0 experts=64/256
+[E0qf] layer=6 rank=0 experts=128/256
+[E0qf] layer=6 rank=0 experts=192/256
+[E0qf] layer=6 rank=0 experts=256/256
+[E0qf] stage 0 layer 6 material loaded
+[E0qf] layer=7 rank=0 experts=64/256
+[E0qf] layer=7 rank=0 experts=128/256
+[E0qf] layer=7 rank=0 experts=192/256
+[E0qf] layer=7 rank=0 experts=256/256
+[E0qf] stage 0 layer 7 material loaded
+[E0qf] layer=8 rank=0 experts=64/256
+[E0qf] layer=8 rank=0 experts=128/256
+[E0qf] layer=8 rank=0 experts=192/256
+[E0qf] layer=8 rank=0 experts=256/256
+[E0qf] stage 0 layer 8 material loaded
+[E0qf] layer=9 rank=0 experts=64/256
+[E0qf] layer=9 rank=0 experts=128/256
+[E0qf] layer=9 rank=0 experts=192/256
+[E0qf] layer=9 rank=0 experts=256/256
+[E0qf] stage 0 layer 9 material loaded
+[E0qf] layer=10 rank=0 experts=64/256
+[E0qf] layer=10 rank=0 experts=128/256
+[E0qf] layer=10 rank=0 experts=192/256
+[E0qf] layer=10 rank=0 experts=256/256
+[E0qf] stage 0 layer 10 material loaded
+[E0qf] layer=11 rank=0 experts=64/256
+[E0qf] layer=11 rank=0 experts=128/256
+[E0qf] layer=11 rank=0 experts=192/256
+[E0qf] layer=11 rank=0 experts=256/256
+[E0qf] stage 0 layer 11 material loaded
+[E0qf] stage 0 materials loaded, free 8.40 GiB
+[E0qf] cross-machine collective probe bitwise=True
+[E0qf] lanes built, free 8.37 GiB
+[E0qf] chain phase complete
+[E0qf][primary] stage0 pipeline step 0 pos 8192 family normal
+[E0qf][primary] stage0 pipeline step 32 pos 8224 family normal
+[E0qf][primary] stage0 pipeline step 64 pos 8256 family normal
+[E0qf][primary] stage0 pipeline step 96 pos 8288 family normal
+[E0qf][primary] stage0 pipeline step 128 pos 8320 family normal
+[E0qf] pipeline phase (primary) complete
+[E0qf][replica] stage0 pipeline step 0 pos 8192 family normal
+[E0qf][replica] stage0 pipeline step 32 pos 8224 family normal
+[E0qf][replica] stage0 pipeline step 64 pos 8256 family normal
+[E0qf][replica] stage0 pipeline step 96 pos 8288 family normal
+[E0qf][replica] stage0 pipeline step 128 pos 8320 family normal
+[E0qf] pipeline phase (replica) complete
+[E0qf] stage0 self-consistency accepted=True
+[E0qf] stage1 judgment mode: bitwise (bitwise steps 264/264, max_abs 0.000e+00, max_rms_rel 0.000e+00)
+[E0qf] overall: PASS
+
+===== config=nogdr node1 (titan065) =====
+W0720 11:21:09.453000 132637 torch/distributed/run.py:851] 
+W0720 11:21:09.453000 132637 torch/distributed/run.py:851] *****************************************
+W0720 11:21:09.453000 132637 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 11:21:09.453000 132637 torch/distributed/run.py:851] *****************************************
+[E0qf] layer=6 rank=0 experts=64/256
+[E0qf] layer=6 rank=0 experts=128/256
+[E0qf] layer=6 rank=0 experts=192/256
+[E0qf] layer=6 rank=0 experts=256/256
+[E0qf] stage 1 layer 6 material loaded
+[E0qf] layer=7 rank=0 experts=64/256
+[E0qf] layer=7 rank=0 experts=128/256
+[E0qf] layer=7 rank=0 experts=192/256
+[E0qf] layer=7 rank=0 experts=256/256
+[E0qf] stage 1 layer 7 material loaded
+[E0qf] layer=8 rank=0 experts=64/256
+[E0qf] layer=8 rank=0 experts=128/256
+[E0qf] layer=8 rank=0 experts=192/256
+[E0qf] layer=8 rank=0 experts=256/256
+[E0qf] stage 1 layer 8 material loaded
+[E0qf] layer=9 rank=0 experts=64/256
+[E0qf] layer=9 rank=0 experts=128/256
+[E0qf] layer=9 rank=0 experts=192/256
+[E0qf] layer=9 rank=0 experts=256/256
+[E0qf] stage 1 layer 9 material loaded
+[E0qf] layer=10 rank=0 experts=64/256
+[E0qf] layer=10 rank=0 experts=128/256
+[E0qf] layer=10 rank=0 experts=192/256
+[E0qf] layer=10 rank=0 experts=256/256
+[E0qf] stage 1 layer 10 material loaded
+[E0qf] layer=11 rank=0 experts=64/256
+[E0qf] layer=11 rank=0 experts=128/256
+[E0qf] layer=11 rank=0 experts=192/256
+[E0qf] layer=11 rank=0 experts=256/256
+[E0qf] stage 1 layer 11 material loaded
+[E0qf] stage 1 materials loaded, free 15.37 GiB
+[E0qf] lanes built, free 15.36 GiB
+[E0qf][primary] stage1 pipeline step 0 pos 8192 family normal
+[E0qf][primary] stage1 pipeline step 32 pos 8224 family normal
+[E0qf][primary] stage1 pipeline step 64 pos 8256 family normal
+[E0qf][primary] stage1 pipeline step 96 pos 8288 family normal
+[E0qf][primary] stage1 pipeline step 128 pos 8320 family normal
+[E0qf][replica] stage1 pipeline step 0 pos 8192 family normal
+[E0qf][replica] stage1 pipeline step 32 pos 8224 family normal
+[E0qf][replica] stage1 pipeline step 64 pos 8256 family normal
+[E0qf][replica] stage1 pipeline step 96 pos 8288 family normal
+[E0qf][replica] stage1 pipeline step 128 pos 8320 family normal
+[E0qf] stage1 self-consistency accepted=True
+
+===== config=gdr node0 (titan064) =====
+W0720 11:22:27.464000 150516 torch/distributed/run.py:851] 
+W0720 11:22:27.464000 150516 torch/distributed/run.py:851] *****************************************
+W0720 11:22:27.464000 150516 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 11:22:27.464000 150516 torch/distributed/run.py:851] *****************************************
+[E0qf] placement stage0=['titan064'] stage1=['titan065']
+[E0qf] layer=0 rank=0 experts=64/256
+[E0qf] layer=0 rank=0 experts=128/256
+[E0qf] layer=0 rank=0 experts=192/256
+[E0qf] layer=0 rank=0 experts=256/256
+[E0qf] stage 0 layer 0 material loaded
+[E0qf] layer=1 rank=0 experts=64/256
+[E0qf] layer=1 rank=0 experts=128/256
+[E0qf] layer=1 rank=0 experts=192/256
+[E0qf] layer=1 rank=0 experts=256/256
+[E0qf] stage 0 layer 1 material loaded
+[E0qf] layer=2 rank=0 experts=64/256
+[E0qf] layer=2 rank=0 experts=128/256
+[E0qf] layer=2 rank=0 experts=192/256
+[E0qf] layer=2 rank=0 experts=256/256
+[E0qf] stage 0 layer 2 material loaded
+[E0qf] layer=3 rank=0 experts=64/256
+[E0qf] layer=3 rank=0 experts=128/256
+[E0qf] layer=3 rank=0 experts=192/256
+[E0qf] layer=3 rank=0 experts=256/256
+[E0qf] stage 0 layer 3 material loaded
+[E0qf] layer=4 rank=0 experts=64/256
+[E0qf] layer=4 rank=0 experts=128/256
+[E0qf] layer=4 rank=0 experts=192/256
+[E0qf] layer=4 rank=0 experts=256/256
+[E0qf] stage 0 layer 4 material loaded
+[E0qf] layer=5 rank=0 experts=64/256
+[E0qf] layer=5 rank=0 experts=128/256
+[E0qf] layer=5 rank=0 experts=192/256
+[E0qf] layer=5 rank=0 experts=256/256
+[E0qf] stage 0 layer 5 material loaded
+[E0qf] layer=6 rank=0 experts=64/256
+[E0qf] layer=6 rank=0 experts=128/256
+[E0qf] layer=6 rank=0 experts=192/256
+[E0qf] layer=6 rank=0 experts=256/256
+[E0qf] stage 0 layer 6 material loaded
+[E0qf] layer=7 rank=0 experts=64/256
+[E0qf] layer=7 rank=0 experts=128/256
+[E0qf] layer=7 rank=0 experts=192/256
+[E0qf] layer=7 rank=0 experts=256/256
+[E0qf] stage 0 layer 7 material loaded
+[E0qf] layer=8 rank=0 experts=64/256
+[E0qf] layer=8 rank=0 experts=128/256
+[E0qf] layer=8 rank=0 experts=192/256
+[E0qf] layer=8 rank=0 experts=256/256
+[E0qf] stage 0 layer 8 material loaded
+[E0qf] layer=9 rank=0 experts=64/256
+[E0qf] layer=9 rank=0 experts=128/256
+[E0qf] layer=9 rank=0 experts=192/256
+[E0qf] layer=9 rank=0 experts=256/256
+[E0qf] stage 0 layer 9 material loaded
+[E0qf] layer=10 rank=0 experts=64/256
+[E0qf] layer=10 rank=0 experts=128/256
+[E0qf] layer=10 rank=0 experts=192/256
+[E0qf] layer=10 rank=0 experts=256/256
+[E0qf] stage 0 layer 10 material loaded
+[E0qf] layer=11 rank=0 experts=64/256
+[E0qf] layer=11 rank=0 experts=128/256
+[E0qf] layer=11 rank=0 experts=192/256
+[E0qf] layer=11 rank=0 experts=256/256
+[E0qf] stage 0 layer 11 material loaded
+[E0qf] stage 0 materials loaded, free 8.34 GiB
+[E0qf] cross-machine collective probe bitwise=True
+[E0qf] lanes built, free 8.30 GiB
+[E0qf] chain phase complete
+[E0qf][primary] stage0 pipeline step 0 pos 8192 family normal
+[E0qf][primary] stage0 pipeline step 32 pos 8224 family normal
+[E0qf][primary] stage0 pipeline step 64 pos 8256 family normal
+[E0qf][primary] stage0 pipeline step 96 pos 8288 family normal
+[E0qf][primary] stage0 pipeline step 128 pos 8320 family normal
+[E0qf] pipeline phase (primary) complete
+[E0qf][replica] stage0 pipeline step 0 pos 8192 family normal
+[E0qf][replica] stage0 pipeline step 32 pos 8224 family normal
+[E0qf][replica] stage0 pipeline step 64 pos 8256 family normal
+[E0qf][replica] stage0 pipeline step 96 pos 8288 family normal
+[E0qf][replica] stage0 pipeline step 128 pos 8320 family normal
+[E0qf] pipeline phase (replica) complete
+[E0qf] stage0 self-consistency accepted=True
+[E0qf] stage1 judgment mode: bitwise (bitwise steps 264/264, max_abs 0.000e+00, max_rms_rel 0.000e+00)
+[E0qf] overall: PASS
+
+===== config=gdr node1 (titan065) =====
+W0720 11:22:27.530000 132837 torch/distributed/run.py:851] 
+W0720 11:22:27.530000 132837 torch/distributed/run.py:851] *****************************************
+W0720 11:22:27.530000 132837 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 11:22:27.530000 132837 torch/distributed/run.py:851] *****************************************
+[E0qf] layer=6 rank=0 experts=64/256
+[E0qf] layer=6 rank=0 experts=128/256
+[E0qf] layer=6 rank=0 experts=192/256
+[E0qf] layer=6 rank=0 experts=256/256
+[E0qf] stage 1 layer 6 material loaded
+[E0qf] layer=7 rank=0 experts=64/256
+[E0qf] layer=7 rank=0 experts=128/256
+[E0qf] layer=7 rank=0 experts=192/256
+[E0qf] layer=7 rank=0 experts=256/256
+[E0qf] stage 1 layer 7 material loaded
+[E0qf] layer=8 rank=0 experts=64/256
+[E0qf] layer=8 rank=0 experts=128/256
+[E0qf] layer=8 rank=0 experts=192/256
+[E0qf] layer=8 rank=0 experts=256/256
+[E0qf] stage 1 layer 8 material loaded
+[E0qf] layer=9 rank=0 experts=64/256
+[E0qf] layer=9 rank=0 experts=128/256
+[E0qf] layer=9 rank=0 experts=192/256
+[E0qf] layer=9 rank=0 experts=256/256
+[E0qf] stage 1 layer 9 material loaded
+[E0qf] layer=10 rank=0 experts=64/256
+[E0qf] layer=10 rank=0 experts=128/256
+[E0qf] layer=10 rank=0 experts=192/256
+[E0qf] layer=10 rank=0 experts=256/256
+[E0qf] stage 1 layer 10 material loaded
+[E0qf] layer=11 rank=0 experts=64/256
+[E0qf] layer=11 rank=0 experts=128/256
+[E0qf] layer=11 rank=0 experts=192/256
+[E0qf] layer=11 rank=0 experts=256/256
+[E0qf] stage 1 layer 11 material loaded
+[E0qf] stage 1 materials loaded, free 15.31 GiB
+[E0qf] lanes built, free 15.29 GiB
+[E0qf][primary] stage1 pipeline step 0 pos 8192 family normal
+[E0qf][primary] stage1 pipeline step 32 pos 8224 family normal
+[E0qf][primary] stage1 pipeline step 64 pos 8256 family normal
+[E0qf][primary] stage1 pipeline step 96 pos 8288 family normal
+[E0qf][primary] stage1 pipeline step 128 pos 8320 family normal
+[E0qf][replica] stage1 pipeline step 0 pos 8192 family normal
+[E0qf][replica] stage1 pipeline step 32 pos 8224 family normal
+[E0qf][replica] stage1 pipeline step 64 pos 8256 family normal
+[E0qf][replica] stage1 pipeline step 96 pos 8288 family normal
+[E0qf][replica] stage1 pipeline step 128 pos 8320 family normal
+[E0qf] stage1 self-consistency accepted=True
+
+===== driver: fetch + GPU memory check =====
+== fetch results ==
+== GPU memory check ==
+--- titan064
+0, 1 MiB
+1, 1 MiB
+2, 1 MiB
+3, 1 MiB
+4, 1 MiB
+5, 1 MiB
+6, 1 MiB
+7, 1 MiB
+--- titan065
+0, 1 MiB
+1, 1 MiB
+2, 1 MiB
+3, 1 MiB
+4, 1 MiB
+5, 1 MiB
+6, 1 MiB
+7, 1 MiB
+ALL_DONE
