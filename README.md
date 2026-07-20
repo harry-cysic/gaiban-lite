@@ -48,8 +48,11 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   oracle 组合逐位相等，三层型全 PASS）。superstage + stateful CUDA graph 亦完成
   （E0sf：Flash graph family 与 Pro 同构的推导成立；6 层 stage 132 步 graph
   replay 与 eager 逐位相等，含 NCCL-in-graph 与 ratio-4×ratio-128 双边界）。
-  **单机 TP4 多层 stage 已具真实权重对拍背书**。下一步：C2g HC 边界融合 A/B
-  （语义变更走 oracle gate）→ 单机 TP4×PP2 → 双机 PP4 → E2E golden-token
-  对拍 D0 oracle → 性能收敛验证（12.5k→15k+）。
+  **单机 TP4 多层 stage 已具真实权重对拍背书**。C2g HC 边界融合已接入为可选 backend
+  （默认 eager 不变；per-layer gate PASS，stage 级发散在 1-ulp 路由敏感度包络内；
+  成对计时实测 6 层 stage −2.59 ms/步@bl=128、−6.4 ms/步@bl=512，11 层 stage 按
+  C1F 工作点回收 ~4.7 ms → decode 预估修正为 **~14k**，fused 放行与否由模型级
+  canary 裁决）。下一步：单机 TP4×PP2 → 双机 PP4 → **E2E golden-token 对拍
+  D0 oracle**（同时是 fused 的最终数值门）→ 性能收敛验证。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
