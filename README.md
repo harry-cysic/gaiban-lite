@@ -9,8 +9,11 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
 ## 当前状态（2026-07-20）
 
 - Phase 0 环境与权重：**已完成**（双机硬件/网络/软件栈核实与部署、权重三处逐分片校验
-  通过，详见可行性文档附录 B）。剩余前置：B1/RDMA 标定复跑、Flash 版 convert +
-  Marlin repack、reference golden-token oracle。
+  通过，详见可行性文档附录 B）。B1/RDMA 标定复跑已完成（2026-07-20，见
+  [`experiments/B1-allreduce-recal`](experiments/B1-allreduce-recal/README.md)、
+  [`experiments/B2-ib-recal`](experiments/B2-ib-recal/README.md)，锚点全部复现，
+  Flash 口径 TP4 [512,4096] allreduce ~300–342 µs、PP GDR 1.84 ms/16.8MB 跳）。
+  剩余前置：Flash 版 convert（mp8 转换进行中）+ reference golden-token oracle。
 - 下一阶段：**Phase 1 kernel regear**——Marlin MoE（256 experts, K=4096, inter 2048）/
   shared-expert FP8 / sparse_attn(h=16) / fused indexer 四件套换 Flash 几何并重跑
   A3/A4/C1 级 bench，确立 Flash 单层数字。

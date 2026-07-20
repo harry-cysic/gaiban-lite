@@ -1,0 +1,85 @@
+titan064:130002:130002 [0] NCCL INFO ncclOsDlopen(libnccl-env.so) failed: libnccl-env.so: cannot open shared object file: No such file or directory
+titan064:130002:130002 [0] NCCL INFO ENV/Plugin: Could not find: libnccl-env.so
+titan064:130002:130002 [0] NCCL INFO NCCL_SOCKET_IFNAME set to enp33s0f0
+titan064:130002:130002 [0] NCCL INFO cudaDriverVersion 13010
+titan064:130002:130002 [0] NCCL INFO NCCL version 2.30.4+cuda13.2
+titan064:130002:130002 [0] NCCL INFO NCCL git version HEAD 747384637
+titan064:130002:130002 [0] NCCL INFO ncclOsDlopen(libnccl-net.so) failed: libnccl-net.so: cannot open shared object file: No such file or directory
+titan064:130002:130002 [0] NCCL INFO NET/Plugin: Could not find: libnccl-net.so
+titan064:130002:130002 [0] NCCL INFO Count not open libibverbs.so
+titan064:130002:130002 [0] NCCL INFO dlvsym failed on mlx5dv_get_data_direct_sysfs_path - /lib/x86_64-linux-gnu/libmlx5.so.1: undefined symbol: mlx5dv_get_data_direct_sysfs_path, version MLX5_1.25 version MLX5_1.25
+titan064:130002:130002 [0] NCCL INFO dlvsym failed on mlx5dv_reg_dmabuf_mr - /lib/x86_64-linux-gnu/libmlx5.so.1: undefined symbol: mlx5dv_reg_dmabuf_mr, version MLX5_1.25 version MLX5_1.25
+titan064:130002:130002 [0] NCCL INFO NET/IB: [0] ibp194s0:uverbs0:1/IB provider=Mlx5 speed=100000 context=0x5a8e20287810 pciPath=/sys/devices/pci0000:c0/0000:c0:03.1/0000:c2:00.0 ar=1 oooRqSize=0
+titan064:130002:130002 [0] NCCL INFO NET/IB : Made virtual device [0] name=ibp194s0 speed=100000 ndevs=1
+titan064:130002:130002 [0] NCCL INFO NET/IB : Using [0]ibp194s0:1/IB [RO]; OOB enp33s0f0:10.234.1.64<0>
+titan064:130002:130002 [0] NCCL INFO Initialized NET plugin IB
+titan064:130002:130002 [0] NCCL INFO Assigned NET plugin IB to comm
+titan064:130002:130002 [0] NCCL INFO ncclOsDlopen(libnccl-gin.so) failed: libnccl-gin.so: cannot open shared object file: No such file or directory
+titan064:130002:130002 [0] NCCL INFO GIN/Plugin: Could not find: libnccl-gin.so
+titan064:130002:130002 [0] NCCL INFO Assigned GIN plugin GIN_IB_GDAKI to comm
+titan064:130002:130002 [0] NCCL INFO Assigned RMA plugin GIN_IB_PROXY to comm
+titan064:130002:130002 [0] NCCL INFO Using network IB
+titan064:130002:130002 [0] NCCL INFO Loaded NVML from libnvidia-ml.so.1
+titan064:130002:130002 [0] NCCL INFO [Rank 0] ncclCommInitRank comm 0x5a8e1bf48490 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 1000 commId 0xbc77223793afc67a - Init START
+titan064:130002:130002 [0] NCCL INFO RAS client listening socket at 127.0.0.1<28028>
+titan064:130002:130002 [0] NCCL INFO NCCL_P2P_LEVEL set by environment to SYS
+titan064:130002:130002 [0] NCCL INFO NET/GIN_IB_GDAKI : GPU Direct RDMA Disabled for HCA 0 'ibp194s0'
+titan064:130002:130002 [0] NCCL INFO NET/IB : GPU Direct RDMA Disabled for HCA 0 'ibp194s0'
+titan064:130002:130002 [0] NCCL INFO ncclTopoGetCpuAffinity: Affinity for GPU 0 is 0-63. (GPU affinity = 0-63 ; CPU affinity = 0-127).
+titan064:130002:130002 [0] NCCL INFO Rank 0: 1 Net devices
+titan064:130002:130002 [0] NCCL INFO Rank 0: 0 CollNet devices
+titan064:130002:130002 [0] NCCL INFO Local Net device counts across ranks: min 1 max 1
+titan064:130002:130002 [0] NCCL INFO Local CollNet device counts across ranks: min 0 max 0
+titan064:130002:130002 [0] NCCL INFO comm 0x5a8e1bf48490 rank 0 nRanks 2 nNodes 2 localRanks 1 localRank 0 MNNVL 0
+titan064:130002:130002 [0] NCCL INFO Channel 00/02 : 0 1
+titan064:130002:130002 [0] NCCL INFO Channel 01/02 : 0 1
+titan064:130002:130002 [0] NCCL INFO Trees [0] 1/-1/-1->0->-1 [1] -1/-1/-1->0->1
+titan064:130002:130002 [0] NCCL INFO P2P Chunksize set to 131072
+titan064:130002:130002 [0] NCCL INFO Tuning P2P operations with maxP2pPeers = 2
+titan064:130002:130002 [0] NCCL INFO ncclOsDlopen(libnccl-profiler.so) failed: libnccl-profiler.so: cannot open shared object file: No such file or directory
+titan064:130002:130002 [0] NCCL INFO PROFILER/Plugin: Could not find: libnccl-profiler.so
+titan064:130002:130002 [0] NCCL INFO Check P2P Type isAllDirectP2p 1 directMode 0 isAllCudaP2p 1
+titan064:130002:130013 [0] NCCL INFO [Proxy Service] Device 0 CPU core 15
+titan064:130002:130014 [0] NCCL INFO [Proxy Service UDS] Device 0 CPU core 16
+titan064:130002:130002 [0] NCCL INFO ncclOsDlopen(libnccl-tuner.so) failed: libnccl-tuner.so: cannot open shared object file: No such file or directory
+titan064:130002:130002 [0] NCCL INFO TUNER/Plugin: Could not find: libnccl-tuner.so
+titan064:130002:130002 [0] NCCL INFO threadThresholds 8/8/64 | 16/8/64 | 512 | 512
+titan064:130002:130002 [0] NCCL INFO 2 coll channels, 2 collnet channels, 0 nvls channels, 2 p2p channels, 1 p2p channels per peer
+titan064:130002:130002 [0] NCCL INFO Symmetric memory is not supported. cuMemEnable 1, globalGinSupport 0, globalNicFused 0 cuMemGdrSupport 0
+titan064:130002:130002 [0] NCCL INFO CC Off, workFifoBytes 1048576
+titan064:130002:130002 [0] NCCL INFO ncclCommInitRank comm 0x5a8e1bf48490 rank 0 nranks 2 cudaDev 0 nvmlDev 0 busId 1000 commId 0xbc77223793afc67a - Init COMPLETE
+titan064:130002:130002 [0] NCCL INFO Init timings - ncclCommInitRank: rank 0 nranks 2 total 0.25 (kernels 0.15, alloc 0.08, bootstrap 0.01, allgathers 0.00, topo 0.00, graphs 0.00, connections 0.00, rest 0.00)
+rank,size_bytes,iters,ms,algbw_GBps,busbw_GBps
+titan064:130002:130015 [0] NCCL INFO [Proxy Progress] Device 0 CPU core 31
+titan064:130002:130002 [0] NCCL INFO Channel 00/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+titan064:130002:130002 [0] NCCL INFO Channel 01/0 : 1[0] -> 0[0] [receive] via NET/IB/0
+titan064:130002:130002 [0] NCCL INFO Channel 00/0 : 0[0] -> 1[0] [send] via NET/IB/0
+titan064:130002:130002 [0] NCCL INFO Channel 01/0 : 0[0] -> 1[0] [send] via NET/IB/0
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbResiliencyInit: Resiliency is disabled on the send communicator (comm=0x7ada9800a000)
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbResiliencyInit: Resiliency is disabled on the recv communicator (comm=0x7ada9804e000)
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbRecvCommInit: Receive work requests will be posted on-demand
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbResiliencyInit: Resiliency is disabled on the send communicator (comm=0x7ada98096000)
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbSenderQpsCreate: QP created: port=1 dev=0 devName=ibp194s0 ndevs=1 nmdevs=1 qp_num=5404 pkey=0 pd=0x7ada98009c80 oooRq=0
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbConnect: NCCL Dev 0 IbDev 0 Port 1 qp_num 5404 mtu 5 LID 18 subnet-prefix 33022  FLID 0 ctsFifoRkey=0x14a796 ctsFifoLkey=0x14a796
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbConnect: IbDev 0 Port 1 qp_num 5404 query_ece={supported=1, vendor_id=0x15b3, options=0x30000000, comp_mask=0x0}
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbReceiverQpsCreateToRts: QP created: port=1 dev=0 devName=ibp194s0 ndevs=1 nmdevs=1 qp_num=5405 pkey=0 pd=0x7ada98009c80 oooRq=0
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbReceiverQpsCreateToRts: Flush QP created: port=1 dev=0 devName=ibp194s0 ndevs=1 nmdevs=1 qp_num=5406 pkey=0 pd=0x7ada98009c80
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbSenderQpsCreate: QP created: port=1 dev=0 devName=ibp194s0 ndevs=1 nmdevs=1 qp_num=5407 pkey=0 pd=0x7ada98009c80 oooRq=0
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbConnect: NCCL Dev 0 IbDev 0 Port 1 qp_num 5407 mtu 5 LID 18 subnet-prefix 33022  FLID 0 ctsFifoRkey=0x14f6e5 ctsFifoLkey=0x14f6e5
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbConnect: IbDev 0 Port 1 qp_num 5407 query_ece={supported=1, vendor_id=0x15b3, options=0x30000000, comp_mask=0x0}
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbResiliencyInit: Resiliency is disabled on the recv communicator (comm=0x7ada98198000)
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbRecvCommInit: Receive work requests will be posted on-demand
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbSenderQpsToRts: Set ECE: IbDev 0 Port 1 qp_num 5404 set_ece={supported=1, vendor_id=0x15b3, options=0x30000000, comp_mask=0x0}
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbReceiverQpsCreateToRts: QP created: port=1 dev=0 devName=ibp194s0 ndevs=1 nmdevs=1 qp_num=5408 pkey=0 pd=0x7ada98009c80 oooRq=0
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbReceiverQpsCreateToRts: Flush QP created: port=1 dev=0 devName=ibp194s0 ndevs=1 nmdevs=1 qp_num=5409 pkey=0 pd=0x7ada98009c80
+titan064:130002:130013 [0] NCCL INFO NET/IB: ncclIbSenderQpsToRts: Set ECE: IbDev 0 Port 1 qp_num 5407 set_ece={supported=1, vendor_id=0x15b3, options=0x30000000, comp_mask=0x0}
+titan064:130002:130002 [0] NCCL INFO Connected all rings, use ring PXN 0 GDR 0
+0,1048576,50,36.723,1.428,1.428
+0,2097152,50,70.908,1.479,1.479
+0,4194304,50,54.160,3.872,3.872
+0,8388608,50,105.233,3.986,3.986
+0,16777216,50,208.858,4.016,4.016
+0,33554432,50,419.312,4.001,4.001
+0,67108864,50,832.309,4.031,4.031
+0,134217728,50,1657.061,4.050,4.050
+0,268435456,50,3316.099,4.047,4.047
