@@ -31,7 +31,9 @@ DeepSeek-V4-Flash（284B/13B，FP4+FP8）的高吞吐推理系统，达到
   严格区分 roofline/proxy/open-loop 与完整模型 closed-loop E2E，表述不得混用。
 - **实验组织**：沿用 gaiban 惯例——每个实验一个 `experiments/<ID>-<name>/` 目录，
   README 记录动机、方法、结论与 artifact 路径；有效进展及时更新根 `README.md` 顶部
-  状态段并做范围清晰的 Git commit；大型结果 artifact 不进 Git。
+  状态段并做范围清晰的 Git commit；大型结果 artifact 不进 Git。机械执行/收集与
+  文档同步类子任务优先派给降档 agent 类型 `runner`/`scribe`（定义见
+  `.claude/agents/`）；产出结论（实验解读、归因、去留判断）的子任务不降档。
 
 ## 无人值守硬约束
 
