@@ -1,0 +1,15 @@
+What is the capital of France? Answer in one word.
+
+用一句话解释什么是黑洞。
+
+Write a Python function that returns the n-th Fibonacci number iteratively.
+
+计算 17 × 23,并给出计算过程。
+
+Translate to English: 星辰大海,永不止步。
+
+List three prime numbers greater than 100.
+
+What does the acronym GPU stand for, and what is it used for? Answer briefly.
+
+写一首关于秋天的五言绝句。

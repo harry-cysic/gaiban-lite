@@ -286,6 +286,12 @@ PP stage 落位时 IB 边界 stage 优先排 socket1。
 | sglang | dev（editable, `~/Workspace/sglang`） | gaiban Pro 时代部署，保持可用（正确性 oracle 用途） |
 | tokenspeed-mla / llguidance | 0.1.6 / 0.7.30 | sglang 钉住版本（vllm 安装曾改动，已恢复） |
 
+**tilelang JIT 环境要求（2026-07-20 实证）**：必须 `export CUDA_HOME=/usr/local/cuda-13.2`
+并把 `$CUDA_HOME/bin`、`$CUDA_HOME/lib64` 置于 PATH/LD_LIBRARY_PATH 前，否则 tilelang
+取 venv 内 pip 的 `nvidia/cu13/bin/nvcc`（同为 13.2.78 但头文件路径不兼容）报
+"CUDA compiler and CUDA toolkit headers are incompatible"。gaiban 各 `*_titan.sh`
+亦同此做法。
+
 **已知无害警告**：pip 会报 vllm 0.22.1 声明依赖（tilelang==0.1.9、
 flashinfer==0.6.11.post2、tokenspeed-mla==0.1.2、llguidance>=1.7）与现装不符——
 刻意保持 sglang 钉住版本优先；vllm 仅 kernel 库用途，其 serving 栈不运行。

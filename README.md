@@ -8,13 +8,15 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
 
 ## 当前状态（2026-07-20）
 
-- Phase 0 环境与权重：**已完成**（双机硬件/网络/软件栈核实与部署、权重三处逐分片校验
-  通过，详见可行性文档附录 B）。B1/RDMA 标定复跑已完成（2026-07-20，见
-  [`experiments/B1-allreduce-recal`](experiments/B1-allreduce-recal/README.md)、
-  [`experiments/B2-ib-recal`](experiments/B2-ib-recal/README.md)，锚点全部复现，
-  Flash 口径 TP4 [512,4096] allreduce ~300–342 µs、PP GDR 1.84 ms/16.8MB 跳）。
-  剩余前置：Flash 版 convert（mp8 转换进行中）+ reference golden-token oracle。
-- 下一阶段：**Phase 1 kernel regear**——Marlin MoE（256 experts, K=4096, inter 2048）/
-  shared-expert FP8 / sparse_attn(h=16) / fused indexer 四件套换 Flash 几何并重跑
-  A3/A4/C1 级 bench，确立 Flash 单层数字。
-- 尚无实验目录；实验从 `experiments/` 起建，编号惯例沿用 gaiban。
+- Phase 0 环境与权重：**全部完成**——双机部署与权重校验（附录 B）、B1/B2 标定复跑
+  （[`experiments/B1-allreduce-recal`](experiments/B1-allreduce-recal/README.md)、
+  [`experiments/B2-ib-recal`](experiments/B2-ib-recal/README.md)，锚点全部复现）、
+  Flash checkpoint 契约核实
+  （[`experiments/A0-flash-checkpoint-contract`](experiments/A0-flash-checkpoint-contract/README.md)，
+  确认免离线 repack、加载侧直读）、reference golden-token oracle
+  （[`experiments/D0-reference-oracle`](experiments/D0-reference-oracle/README.md)，
+  MP=8 单机跑通，8 条 prompt golden tokens 冻结）。
+- Phase 1 kernel regear：**进行中**——A3F Marlin MoE bench（256 experts，K=4096，
+  inter 2048/512，w4a16+w4a8）在 titan065 运行中
+  （[`experiments/A3F-marlin-moe-flash`](experiments/A3F-marlin-moe-flash/README.md)）；
+  待办：shared-expert FP8 / sparse_attn(h=16) / fused indexer 换几何与 A4/C1 级 bench。
