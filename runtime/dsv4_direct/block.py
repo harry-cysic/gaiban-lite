@@ -26,10 +26,15 @@ accident):
   ``StatefulPreMoEBundle`` / ``prepare_stateful_decode_pre_moe`` /
   ``DirectPreMoEBlockFragment`` indirection is a PP fragment-split surface
   and stays deferred with the rest of PP.
-- The ``attention_pre_backend`` / ``ffn_post_pre_backend`` fused-operator
-  injection hooks are superstage performance surfaces and are omitted; this
-  block always uses the verified eager ``hc_pre``/``hc_post``/``rms_norm``
-  composition.
+- The gaiban ``attention_pre_backend`` / ``ffn_post_pre_backend`` injection
+  hooks are replaced by one optional ``hc_boundary_backend`` (E0hf, C2g/A5F
+  lineage): when set, the intra-layer boundary (attention ``hc_post`` + FFN
+  ``hc_pre`` + ``ffn_norm``) runs through the backend's fused
+  ``post_pre_norm`` op; the inter-layer boundary is composed by the
+  superstage chain via :meth:`DirectDecodeBlock.attention_boundary`.  With
+  the default ``None`` the block uses the verified eager
+  ``hc_pre``/``hc_post``/``rms_norm`` composition, byte-for-byte the
+  pre-E0hf behavior.
 - ``Layer3DirectBlock`` / ``Layer2DirectBlock`` were Pro test-only wrappers;
   the single ``DirectDecodeBlock`` covers all three Flash layer types, so
   they are not carried over.
@@ -111,6 +116,7 @@ class DirectDecodeBlock:
         norm_eps: float = 1e-6,
         sinkhorn_iters: int = 20,
         hc_eps: float = 1e-6,
+        hc_boundary_backend: Any | None = None,
     ) -> None:
         layer_id = weights.layer_id
         if (
@@ -174,6 +180,12 @@ class DirectDecodeBlock:
             )
         if norm_eps != 1e-6 or sinkhorn_iters != 20 or hc_eps != 1e-6:
             raise ValueError("direct block numerical contract must be 1e-6/20/1e-6")
+        if hc_boundary_backend is not None and not callable(
+            getattr(hc_boundary_backend, "post_pre_norm", None)
+        ):
+            raise TypeError(
+                "hc_boundary_backend must expose a post_pre_norm operator"
+            )
         self.layer_id = layer_id
         self.compression_ratio = compression_ratio
         self.route_kind = route_kind
@@ -185,6 +197,7 @@ class DirectDecodeBlock:
         self.norm_eps = norm_eps
         self.sinkhorn_iters = sinkhorn_iters
         self.hc_eps = hc_eps
+        self.hc_boundary_backend = hc_boundary_backend
 
     @staticmethod
     def validate_residual(residual: torch.Tensor) -> tuple[int, ...]:
@@ -235,13 +248,16 @@ class DirectDecodeBlock:
             hc_eps=self.hc_eps,
         )
 
-    def _attention_branch_decode(
-        self,
-        residual: torch.Tensor,
-        *,
-        start_pos: int,
-        attention_plan: BlockDecodePlan,
+    def prepare_attention(
+        self, residual: torch.Tensor
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """HC attention-side pre-reduction + attention RMSNorm.
+
+        Mirror of :meth:`prepare_ffn` for the attention branch; the op order
+        is exactly the pre-E0hf inline sequence, so callers composing it are
+        bitwise identical to the original composition.
+        """
+
         self.validate_residual(residual)
         attention_hidden, attention_post, attention_comb = self._hc_pre(
             residual, branch="attn"
@@ -250,6 +266,18 @@ class DirectDecodeBlock:
             attention_hidden,
             self.weights.attn_norm,
             eps=self.norm_eps,
+        )
+        return attention_hidden, attention_post, attention_comb
+
+    def _attention_branch_decode(
+        self,
+        residual: torch.Tensor,
+        *,
+        start_pos: int,
+        attention_plan: BlockDecodePlan,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        attention_hidden, attention_post, attention_comb = (
+            self.prepare_attention(residual)
         )
         attention_output = self.attention.forward_decode_tensor(
             attention_hidden,
@@ -297,17 +325,34 @@ class DirectDecodeBlock:
         compressor branch at :531-532 skipped).
         """
 
-        self.validate_residual(residual)
-        attention_hidden, attention_post, attention_comb = self._hc_pre(
-            residual, branch="attn"
-        )
-        attention_hidden = rms_norm(
-            attention_hidden,
-            self.weights.attn_norm,
-            eps=self.norm_eps,
+        attention_hidden, attention_post, attention_comb = (
+            self.prepare_attention(residual)
         )
         if stage_marker is not None:
             stage_marker("attention_input_ready")
+        attention_output = self.run_stateful_attention(
+            attention_hidden,
+            attention_plan=attention_plan,
+            boundary_flags=boundary_flags,
+            stage_marker=stage_marker,
+        )
+        return attention_output, attention_post, attention_comb
+
+    def run_stateful_attention(
+        self,
+        attention_hidden: torch.Tensor,
+        *,
+        attention_plan: BlockStatefulDecodePlan,
+        boundary_flags: tuple[bool, bool],
+        stage_marker: Callable[[str], None] | None = None,
+    ) -> torch.Tensor:
+        """Dispatch one cursor-driven attention step on a prepared hidden.
+
+        Extracted from the stateful attention branch so the fused-boundary
+        chain (which produces ``attention_hidden`` inside the boundary op)
+        can reuse the exact three-way plan/type dispatch.
+        """
+
         ratio4_boundary, ratio128_boundary = boundary_flags
         arguments: dict[str, Any] = {"plan": attention_plan}
         if stage_marker is not None:
@@ -329,10 +374,9 @@ class DirectDecodeBlock:
             if not isinstance(self.attention, Ratio128TorchAttention):
                 raise AssertionError("validated ratio-128 attention changed type")
             arguments["ratio128_boundary"] = ratio128_boundary
-        attention_output = self.attention.forward_stateful_decode_tensor(
+        return self.attention.forward_stateful_decode_tensor(
             attention_hidden, **arguments
         )
-        return attention_output, attention_post, attention_comb
 
     def attention_half_stateful_decode(
         self,
@@ -370,6 +414,84 @@ class DirectDecodeBlock:
             eps=self.norm_eps,
         )
         return ffn_hidden, ffn_post, ffn_comb
+
+    def ffn_boundary(
+        self,
+        branch_output: torch.Tensor,
+        residual: torch.Tensor,
+        post: torch.Tensor,
+        comb: torch.Tensor,
+        *,
+        backend: Any | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Intra-layer HC boundary: attention ``hc_post`` + FFN ``hc_pre`` + norm.
+
+        Returns ``(after_attention, ffn_hidden, ffn_post, ffn_comb)``.  With
+        ``backend=None`` (and no injected block backend) this is the eager
+        composition in the original op order; otherwise the backend's fused
+        ``post_pre_norm`` runs the boundary with this layer's FFN HC
+        parameters and ``ffn_norm``.
+        """
+
+        backend = self.hc_boundary_backend if backend is None else backend
+        if backend is None:
+            after_attention = hc_post(branch_output, residual, post, comb)
+            ffn_hidden, ffn_post, ffn_comb = self.prepare_ffn(after_attention)
+            return after_attention, ffn_hidden, ffn_post, ffn_comb
+        hc = self.weights.hyper_connection
+        return backend.post_pre_norm(
+            branch_output,
+            residual,
+            post,
+            comb,
+            hc_fn=hc.ffn_fn,
+            hc_scale=hc.ffn_scale,
+            hc_base=hc.ffn_base,
+            norm_weight=self.weights.ffn_norm,
+            norm_eps=self.norm_eps,
+            sinkhorn_iters=self.sinkhorn_iters,
+            hc_eps=self.hc_eps,
+        )
+
+    def attention_boundary(
+        self,
+        branch_output: torch.Tensor,
+        residual: torch.Tensor,
+        post: torch.Tensor,
+        comb: torch.Tensor,
+        *,
+        backend: Any | None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Inter-layer HC boundary into **this** layer's attention branch.
+
+        Fuses the previous layer's FFN ``hc_post`` with this layer's
+        attention-side ``hc_pre`` + ``attn_norm``.  Returns
+        ``(block_input_residual, attention_hidden, attention_post,
+        attention_comb)``.  Only the superstage chain composes this surface;
+        a standalone block's tail ``hc_post`` has no fusion partner and stays
+        eager.
+        """
+
+        if backend is None:
+            block_residual = hc_post(branch_output, residual, post, comb)
+            attention_hidden, attention_post, attention_comb = (
+                self.prepare_attention(block_residual)
+            )
+            return block_residual, attention_hidden, attention_post, attention_comb
+        hc = self.weights.hyper_connection
+        return backend.post_pre_norm(
+            branch_output,
+            residual,
+            post,
+            comb,
+            hc_fn=hc.attn_fn,
+            hc_scale=hc.attn_scale,
+            hc_base=hc.attn_base,
+            norm_weight=self.weights.attn_norm,
+            norm_eps=self.norm_eps,
+            sinkhorn_iters=self.sinkhorn_iters,
+            hc_eps=self.hc_eps,
+        )
 
     def _validate_route_input(
         self,
@@ -413,16 +535,35 @@ class DirectDecodeBlock:
             stage_events[0].record()
         if stage_marker is not None:
             stage_marker("block_start")
-        after_attention = self.attention_half_decode(
-            residual,
-            start_pos=start_pos,
-            attention_plan=attention_plan,
-        )
-        if stage_events is not None:
-            stage_events[1].record()
-        if stage_marker is not None:
-            stage_marker("attention_done")
-        ffn_hidden, ffn_post, ffn_comb = self.prepare_ffn(after_attention)
+        if self.hc_boundary_backend is None:
+            after_attention = self.attention_half_decode(
+                residual,
+                start_pos=start_pos,
+                attention_plan=attention_plan,
+            )
+            if stage_events is not None:
+                stage_events[1].record()
+            if stage_marker is not None:
+                stage_marker("attention_done")
+            ffn_hidden, ffn_post, ffn_comb = self.prepare_ffn(after_attention)
+        else:
+            # Fused intra-layer boundary: ``attention_done`` here marks the
+            # raw attention branch (pre-hc_post) because hc_post is fused
+            # into the boundary op with the FFN hc_pre + norm.
+            attention_output, attention_post, attention_comb = (
+                self._attention_branch_decode(
+                    residual,
+                    start_pos=start_pos,
+                    attention_plan=attention_plan,
+                )
+            )
+            if stage_events is not None:
+                stage_events[1].record()
+            if stage_marker is not None:
+                stage_marker("attention_done")
+            after_attention, ffn_hidden, ffn_post, ffn_comb = self.ffn_boundary(
+                attention_output, residual, attention_post, attention_comb
+            )
         if stage_events is not None:
             stage_events[2].record()
         if stage_marker is not None:
@@ -478,15 +619,30 @@ class DirectDecodeBlock:
         boundary_flags = family_boundary_flags(graph_family)
         if stage_marker is not None:
             stage_marker("block_start")
-        after_attention = self.attention_half_stateful_decode(
-            residual,
-            attention_plan=attention_plan,
-            boundary_flags=boundary_flags,
-            stage_marker=stage_marker,
-        )
-        if stage_marker is not None:
-            stage_marker("attention_done")
-        ffn_hidden, ffn_post, ffn_comb = self.prepare_ffn(after_attention)
+        if self.hc_boundary_backend is None:
+            after_attention = self.attention_half_stateful_decode(
+                residual,
+                attention_plan=attention_plan,
+                boundary_flags=boundary_flags,
+                stage_marker=stage_marker,
+            )
+            if stage_marker is not None:
+                stage_marker("attention_done")
+            ffn_hidden, ffn_post, ffn_comb = self.prepare_ffn(after_attention)
+        else:
+            attention_output, attention_post, attention_comb = (
+                self._attention_branch_stateful_decode(
+                    residual,
+                    attention_plan=attention_plan,
+                    boundary_flags=boundary_flags,
+                    stage_marker=stage_marker,
+                )
+            )
+            if stage_marker is not None:
+                stage_marker("attention_done")
+            after_attention, ffn_hidden, ffn_post, ffn_comb = self.ffn_boundary(
+                attention_output, residual, attention_post, attention_comb
+            )
         if stage_marker is not None:
             stage_marker("ffn_prepare_done")
         moe_arguments: dict[str, Any] = {"slot": moe_slot}

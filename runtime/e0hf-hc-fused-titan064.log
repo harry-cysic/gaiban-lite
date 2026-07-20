@@ -1,0 +1,416 @@
+==================================================================
+=== e0hf-run-gate-bl32.log (titan064) ===
+==================================================================
+W0720 10:12:28.853000 147170 torch/distributed/run.py:851] 
+W0720 10:12:28.853000 147170 torch/distributed/run.py:851] *****************************************
+W0720 10:12:28.853000 147170 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 10:12:28.853000 147170 torch/distributed/run.py:851] *****************************************
+layer=0 rank=0 experts=64/256
+layer=0 rank=0 experts=128/256
+layer=0 rank=0 experts=192/256
+layer=0 rank=0 experts=256/256
+[E0hf] layer 0 loaded
+layer=1 rank=0 experts=64/256
+layer=1 rank=0 experts=128/256
+layer=1 rank=0 experts=192/256
+layer=1 rank=0 experts=256/256
+[E0hf] layer 1 loaded
+layer=2 rank=0 experts=64/256
+layer=2 rank=0 experts=128/256
+layer=2 rank=0 experts=192/256
+layer=2 rank=0 experts=256/256
+[E0hf] layer 2 loaded
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+[E0hf] layer 3 loaded
+layer=4 rank=0 experts=64/256
+layer=4 rank=0 experts=128/256
+layer=4 rank=0 experts=192/256
+layer=4 rank=0 experts=256/256
+[E0hf] layer 4 loaded
+layer=5 rank=0 experts=64/256
+layer=5 rank=0 experts=128/256
+layer=5 rank=0 experts=192/256
+layer=5 rank=0 experts=256/256
+[E0hf] layer 5 loaded
+[E0hf] assets loaded, free 14.24 GiB
+[E0hf] part (a) layer 0: PASS
+[E0hf] part (a) layer 1: PASS
+[E0hf] part (a) layer 2: PASS
+[E0hf] part (a) layer 3: PASS
+[E0hf] part (a) layer 4: PASS
+[E0hf] part (a) layer 5: PASS
+[E0hf] part (a) block boundary gate: PASS
+[E0hf] step 0 pos 8192 family normal captured=True graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.105e-01
+[E0hf] step 3 pos 8195 family ratio4_boundary captured=True graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.759e-01
+[E0hf] step 16 pos 8208 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.607e-01
+[E0hf] step 32 pos 8224 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.335e-01
+[E0hf] step 48 pos 8240 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.668e-01
+[E0hf] step 64 pos 8256 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=9.583e-02
+[E0hf] step 80 pos 8272 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.566e-01
+[E0hf] step 96 pos 8288 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.033e-01
+[E0hf] step 112 pos 8304 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.180e-01
+[E0hf] step 127 pos 8319 family ratio4_ratio128_boundary captured=True graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.110e-01
+[E0hf] step 128 pos 8320 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.102e-01
+[E0hf] part (b) stage stateful gate: PASS
+[E0hf] overall: PASS
+
+==================================================================
+=== e0hf-run-gate-bl1.log (titan064) ===
+==================================================================
+W0720 10:13:56.504000 147366 torch/distributed/run.py:851] 
+W0720 10:13:56.504000 147366 torch/distributed/run.py:851] *****************************************
+W0720 10:13:56.504000 147366 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 10:13:56.504000 147366 torch/distributed/run.py:851] *****************************************
+layer=0 rank=0 experts=64/256
+layer=0 rank=0 experts=128/256
+layer=0 rank=0 experts=192/256
+layer=0 rank=0 experts=256/256
+[E0hf] layer 0 loaded
+layer=1 rank=0 experts=64/256
+layer=1 rank=0 experts=128/256
+layer=1 rank=0 experts=192/256
+layer=1 rank=0 experts=256/256
+[E0hf] layer 1 loaded
+layer=2 rank=0 experts=64/256
+layer=2 rank=0 experts=128/256
+layer=2 rank=0 experts=192/256
+layer=2 rank=0 experts=256/256
+[E0hf] layer 2 loaded
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+[E0hf] layer 3 loaded
+layer=4 rank=0 experts=64/256
+layer=4 rank=0 experts=128/256
+layer=4 rank=0 experts=192/256
+layer=4 rank=0 experts=256/256
+[E0hf] layer 4 loaded
+layer=5 rank=0 experts=64/256
+layer=5 rank=0 experts=128/256
+layer=5 rank=0 experts=192/256
+layer=5 rank=0 experts=256/256
+[E0hf] layer 5 loaded
+[E0hf] assets loaded, free 15.61 GiB
+[E0hf] part (a) layer 0: PASS
+[E0hf] part (a) layer 1: PASS
+[E0hf] part (a) layer 2: PASS
+[E0hf] part (a) layer 3: PASS
+[E0hf] part (a) layer 4: PASS
+[E0hf] part (a) layer 5: PASS
+[E0hf] part (a) block boundary gate: PASS
+[E0hf] step 0 pos 8192 family normal captured=True graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.956e-02
+[E0hf] step 3 pos 8195 family ratio4_boundary captured=True graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.250e-01
+[E0hf] step 16 pos 8208 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=3.269e-01
+[E0hf] step 32 pos 8224 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=2.145e-02
+[E0hf] step 48 pos 8240 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.808e-01
+[E0hf] step 64 pos 8256 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.966e-01
+[E0hf] step 80 pos 8272 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=2.937e-02
+[E0hf] step 96 pos 8288 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=1.791e-02
+[E0hf] step 112 pos 8304 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=4.368e-01
+[E0hf] step 127 pos 8319 family ratio4_ratio128_boundary captured=True graph==eager:True chain==ref:True fused-vs-ref rms_rel=2.999e-02
+[E0hf] step 128 pos 8320 family normal captured=False graph==eager:True chain==ref:True fused-vs-ref rms_rel=3.583e-01
+[E0hf] part (b) stage stateful gate: PASS
+[E0hf] overall: PASS
+
+==================================================================
+=== e0hf-run-perf128-paired.log (titan064) ===
+==================================================================
+W0720 10:26:43.180000 148726 torch/distributed/run.py:851] 
+W0720 10:26:43.180000 148726 torch/distributed/run.py:851] *****************************************
+W0720 10:26:43.180000 148726 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 10:26:43.180000 148726 torch/distributed/run.py:851] *****************************************
+layer=0 rank=0 experts=64/256
+layer=0 rank=0 experts=128/256
+layer=0 rank=0 experts=192/256
+layer=0 rank=0 experts=256/256
+[E0hf] layer 0 loaded
+layer=1 rank=0 experts=64/256
+layer=1 rank=0 experts=128/256
+layer=1 rank=0 experts=192/256
+layer=1 rank=0 experts=256/256
+[E0hf] layer 1 loaded
+layer=2 rank=0 experts=64/256
+layer=2 rank=0 experts=128/256
+layer=2 rank=0 experts=192/256
+layer=2 rank=0 experts=256/256
+[E0hf] layer 2 loaded
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+[E0hf] layer 3 loaded
+layer=4 rank=0 experts=64/256
+layer=4 rank=0 experts=128/256
+layer=4 rank=0 experts=192/256
+layer=4 rank=0 experts=256/256
+[E0hf] layer 4 loaded
+layer=5 rank=0 experts=64/256
+layer=5 rank=0 experts=128/256
+layer=5 rank=0 experts=192/256
+layer=5 rank=0 experts=256/256
+[E0hf] layer 5 loaded
+[E0hf] assets loaded, free 9.19 GiB
+[E0hf] perf bl=128: ref 20655.0 us/step, fused 18103.1 us/step, delta(normal) 2590.2 us (235.5 us/boundary)
+[E0hf] overall: PASS
+
+==================================================================
+=== e0hf-run-perf512-paired.log (titan064) ===
+==================================================================
+W0720 10:27:44.496000 148913 torch/distributed/run.py:851] 
+W0720 10:27:44.496000 148913 torch/distributed/run.py:851] *****************************************
+W0720 10:27:44.496000 148913 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 10:27:44.496000 148913 torch/distributed/run.py:851] *****************************************
+layer=0 rank=0 experts=64/256
+layer=0 rank=0 experts=128/256
+layer=0 rank=0 experts=192/256
+layer=0 rank=0 experts=256/256
+[E0hf] layer 0 loaded
+layer=1 rank=0 experts=64/256
+layer=1 rank=0 experts=128/256
+layer=1 rank=0 experts=192/256
+layer=1 rank=0 experts=256/256
+[E0hf] layer 1 loaded
+layer=2 rank=0 experts=64/256
+layer=2 rank=0 experts=128/256
+layer=2 rank=0 experts=192/256
+layer=2 rank=0 experts=256/256
+[E0hf] layer 2 loaded
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+[E0hf] layer 3 loaded
+layer=4 rank=0 experts=64/256
+layer=4 rank=0 experts=128/256
+layer=4 rank=0 experts=192/256
+layer=4 rank=0 experts=256/256
+[E0hf] layer 4 loaded
+layer=5 rank=0 experts=64/256
+layer=5 rank=0 experts=128/256
+layer=5 rank=0 experts=192/256
+layer=5 rank=0 experts=256/256
+[E0hf] layer 5 loaded
+[E0hf] assets loaded, free 6.01 GiB
+[E0hf] perf bl=512: ref 61709.6 us/step, fused 55894.2 us/step, delta(normal) 6405.5 us (582.3 us/boundary)
+[E0hf] overall: PASS
+
+==================================================================
+=== e0hf-run-perf128.log (titan064) ===
+==================================================================
+W0720 10:15:11.367000 147550 torch/distributed/run.py:851] 
+W0720 10:15:11.367000 147550 torch/distributed/run.py:851] *****************************************
+W0720 10:15:11.367000 147550 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 10:15:11.367000 147550 torch/distributed/run.py:851] *****************************************
+layer=0 rank=0 experts=64/256
+layer=0 rank=0 experts=128/256
+layer=0 rank=0 experts=192/256
+layer=0 rank=0 experts=256/256
+[E0hf] layer 0 loaded
+layer=1 rank=0 experts=64/256
+layer=1 rank=0 experts=128/256
+layer=1 rank=0 experts=192/256
+layer=1 rank=0 experts=256/256
+[E0hf] layer 1 loaded
+layer=2 rank=0 experts=64/256
+layer=2 rank=0 experts=128/256
+layer=2 rank=0 experts=192/256
+layer=2 rank=0 experts=256/256
+[E0hf] layer 2 loaded
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+[E0hf] layer 3 loaded
+layer=4 rank=0 experts=64/256
+layer=4 rank=0 experts=128/256
+layer=4 rank=0 experts=192/256
+layer=4 rank=0 experts=256/256
+[E0hf] layer 4 loaded
+layer=5 rank=0 experts=64/256
+layer=5 rank=0 experts=128/256
+layer=5 rank=0 experts=192/256
+layer=5 rank=0 experts=256/256
+[E0hf] layer 5 loaded
+[E0hf] assets loaded, free 9.19 GiB
+[E0hf] perf bl=128: ref 21595.0 us/step, fused 19159.1 us/step, delta(normal) 2409.8 us (219.1 us/boundary)
+[E0hf] overall: PASS
+
+==================================================================
+=== e0hf-run-perf512.log (titan064) ===
+==================================================================
+W0720 10:16:08.633000 147738 torch/distributed/run.py:851] 
+W0720 10:16:08.633000 147738 torch/distributed/run.py:851] *****************************************
+W0720 10:16:08.633000 147738 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 10:16:08.633000 147738 torch/distributed/run.py:851] *****************************************
+layer=0 rank=0 experts=64/256
+layer=0 rank=0 experts=128/256
+layer=0 rank=0 experts=192/256
+layer=0 rank=0 experts=256/256
+[E0hf] layer 0 loaded
+layer=1 rank=0 experts=64/256
+layer=1 rank=0 experts=128/256
+layer=1 rank=0 experts=192/256
+layer=1 rank=0 experts=256/256
+[E0hf] layer 1 loaded
+layer=2 rank=0 experts=64/256
+layer=2 rank=0 experts=128/256
+layer=2 rank=0 experts=192/256
+layer=2 rank=0 experts=256/256
+[E0hf] layer 2 loaded
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+[E0hf] layer 3 loaded
+layer=4 rank=0 experts=64/256
+layer=4 rank=0 experts=128/256
+layer=4 rank=0 experts=192/256
+layer=4 rank=0 experts=256/256
+[E0hf] layer 4 loaded
+layer=5 rank=0 experts=64/256
+layer=5 rank=0 experts=128/256
+layer=5 rank=0 experts=192/256
+layer=5 rank=0 experts=256/256
+[E0hf] layer 5 loaded
+[E0hf] assets loaded, free 6.01 GiB
+[E0hf] perf bl=512: ref 62747.4 us/step, fused 60292.1 us/step, delta(normal) 2495.5 us (226.9 us/boundary)
+[E0hf] overall: PASS
+
+==================================================================
+=== e0hf-run-perf128-r3.log (titan064) ===
+==================================================================
+W0720 10:19:05.633000 147938 torch/distributed/run.py:851] 
+W0720 10:19:05.633000 147938 torch/distributed/run.py:851] *****************************************
+W0720 10:19:05.633000 147938 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 10:19:05.633000 147938 torch/distributed/run.py:851] *****************************************
+layer=0 rank=0 experts=64/256
+layer=0 rank=0 experts=128/256
+layer=0 rank=0 experts=192/256
+layer=0 rank=0 experts=256/256
+[E0hf] layer 0 loaded
+layer=1 rank=0 experts=64/256
+layer=1 rank=0 experts=128/256
+layer=1 rank=0 experts=192/256
+layer=1 rank=0 experts=256/256
+[E0hf] layer 1 loaded
+layer=2 rank=0 experts=64/256
+layer=2 rank=0 experts=128/256
+layer=2 rank=0 experts=192/256
+layer=2 rank=0 experts=256/256
+[E0hf] layer 2 loaded
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+[E0hf] layer 3 loaded
+layer=4 rank=0 experts=64/256
+layer=4 rank=0 experts=128/256
+layer=4 rank=0 experts=192/256
+layer=4 rank=0 experts=256/256
+[E0hf] layer 4 loaded
+layer=5 rank=0 experts=64/256
+layer=5 rank=0 experts=128/256
+layer=5 rank=0 experts=192/256
+layer=5 rank=0 experts=256/256
+[E0hf] layer 5 loaded
+[E0hf] assets loaded, free 8.04 GiB
+[E0hf] perf bl=128: ref 22694.7 us/step, fused 19236.3 us/step, delta(normal) 3500.3 us (318.2 us/boundary)
+[E0hf] overall: PASS
+
+==================================================================
+=== e0hf-run-perf512-r3.log (titan064) ===
+==================================================================
+W0720 10:20:01.416000 148130 torch/distributed/run.py:851] 
+W0720 10:20:01.416000 148130 torch/distributed/run.py:851] *****************************************
+W0720 10:20:01.416000 148130 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 10:20:01.416000 148130 torch/distributed/run.py:851] *****************************************
+layer=0 rank=0 experts=64/256
+layer=0 rank=0 experts=128/256
+layer=0 rank=0 experts=192/256
+layer=0 rank=0 experts=256/256
+[E0hf] layer 0 loaded
+layer=1 rank=0 experts=64/256
+layer=1 rank=0 experts=128/256
+layer=1 rank=0 experts=192/256
+layer=1 rank=0 experts=256/256
+[E0hf] layer 1 loaded
+layer=2 rank=0 experts=64/256
+layer=2 rank=0 experts=128/256
+layer=2 rank=0 experts=192/256
+layer=2 rank=0 experts=256/256
+[E0hf] layer 2 loaded
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+[E0hf] layer 3 loaded
+layer=4 rank=0 experts=64/256
+layer=4 rank=0 experts=128/256
+layer=4 rank=0 experts=192/256
+layer=4 rank=0 experts=256/256
+[E0hf] layer 4 loaded
+layer=5 rank=0 experts=64/256
+layer=5 rank=0 experts=128/256
+layer=5 rank=0 experts=192/256
+layer=5 rank=0 experts=256/256
+[E0hf] layer 5 loaded
+[E0hf] assets loaded, free 4.98 GiB
+[E0hf] perf bl=512: ref 60928.7 us/step, fused 54763.0 us/step, delta(normal) 6200.6 us (563.7 us/boundary)
+[E0hf] overall: PASS
+
+==================================================================
+=== e0sf-post-e0hf.log (regression: unchanged E0sf gate on refactored block/superstage) ===
+==================================================================
+W0720 10:31:21.160000 149141 torch/distributed/run.py:851] 
+W0720 10:31:21.160000 149141 torch/distributed/run.py:851] *****************************************
+W0720 10:31:21.160000 149141 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 10:31:21.160000 149141 torch/distributed/run.py:851] *****************************************
+layer=0 rank=0 experts=64/256
+layer=0 rank=0 experts=128/256
+layer=0 rank=0 experts=192/256
+layer=0 rank=0 experts=256/256
+[E0sf] layer 0 loaded
+layer=1 rank=0 experts=64/256
+layer=1 rank=0 experts=128/256
+layer=1 rank=0 experts=192/256
+layer=1 rank=0 experts=256/256
+[E0sf] layer 1 loaded
+layer=2 rank=0 experts=64/256
+layer=2 rank=0 experts=128/256
+layer=2 rank=0 experts=192/256
+layer=2 rank=0 experts=256/256
+[E0sf] layer 2 loaded
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+[E0sf] layer 3 loaded
+layer=4 rank=0 experts=64/256
+layer=4 rank=0 experts=128/256
+layer=4 rank=0 experts=192/256
+layer=4 rank=0 experts=256/256
+[E0sf] layer 4 loaded
+layer=5 rank=0 experts=64/256
+layer=5 rank=0 experts=128/256
+layer=5 rank=0 experts=192/256
+layer=5 rank=0 experts=256/256
+[E0sf] layer 5 loaded
+[E0sf] lanes built, free 15.49 GiB
+[E0sf] part (a) eager super-stage: PASS
+[E0sf] step 0 pos 8192 family normal captured=True bitwise=True max_abs=0.000e+00
+[E0sf] step 3 pos 8195 family ratio4_boundary captured=True bitwise=True max_abs=0.000e+00
+[E0sf] step 16 pos 8208 family normal captured=False bitwise=True max_abs=0.000e+00
+[E0sf] step 32 pos 8224 family normal captured=False bitwise=True max_abs=0.000e+00
+[E0sf] step 48 pos 8240 family normal captured=False bitwise=True max_abs=0.000e+00
+[E0sf] step 64 pos 8256 family normal captured=False bitwise=True max_abs=0.000e+00
+[E0sf] step 80 pos 8272 family normal captured=False bitwise=True max_abs=0.000e+00
+[E0sf] step 96 pos 8288 family normal captured=False bitwise=True max_abs=0.000e+00
+[E0sf] step 112 pos 8304 family normal captured=False bitwise=True max_abs=0.000e+00
+[E0sf] step 127 pos 8319 family ratio4_ratio128_boundary captured=True bitwise=True max_abs=0.000e+00
+[E0sf] step 128 pos 8320 family normal captured=False bitwise=True max_abs=0.000e+00
+[E0sf] part (b) stateful graph replay: PASS
+[E0sf] overall: PASS

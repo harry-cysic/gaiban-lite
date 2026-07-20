@@ -20,7 +20,13 @@ Ported from gaiban ``dsv4_direct/superstage.py`` (``TP4DecodeStage`` :108,
   layers add no boundary write at any position, so no fourth family exists).
 
 The gaiban ``attention_pre_backend`` / ``ffn_post_pre_backend`` fused-operator
-injection and the PP fragment surfaces are not part of this vertical.
+injection is superseded here by one optional ``hc_boundary_backend`` (E0hf):
+when set, the stateful graph body runs a boundary-fused chain in which every
+intra-layer (attention -> FFN) and inter-layer (FFN -> next attention) HC
+boundary goes through the backend's ``post_pre_norm`` op; the stage-first
+attention-side ``hc_pre`` and the stage-last tail ``hc_post`` have no fusion
+partner and stay eager.  With the default ``None`` the body is byte-for-byte
+the pre-E0hf per-block loop.  The PP fragment surfaces remain out of scope.
 """
 
 from __future__ import annotations
@@ -33,6 +39,7 @@ import torch
 
 from .attention import Ratio128StatefulDecodePlan
 from .block import BLOCK_HC_MULT, BLOCK_HIDDEN_SIZE, DirectDecodeBlock
+from .hyper_connections import hc_post
 from .model_contract import SUPPORTED_LAYER_SPECS
 from .ratio4_attention import Ratio4StatefulDecodePlan
 from .stateful_decode import (
@@ -144,7 +151,15 @@ class TP4DecodeStage:
         blocks: Sequence[DirectDecodeBlock],
         *,
         expected_layer_ids: Sequence[int] | None = None,
+        hc_boundary_backend: Any | None = None,
     ) -> None:
+        if hc_boundary_backend is not None and not callable(
+            getattr(hc_boundary_backend, "post_pre_norm", None)
+        ):
+            raise TypeError(
+                "hc_boundary_backend must expose a post_pre_norm operator"
+            )
+        self.hc_boundary_backend = hc_boundary_backend
         self.blocks = tuple(blocks)
         expected = (
             None if expected_layer_ids is None else tuple(expected_layer_ids)
@@ -1364,6 +1379,87 @@ class TP4DecodeStage:
         )
         self._validate_stateful_runtime_sync(plan)
 
+    def _forward_stateful_fused_chain(
+        self,
+        residual: torch.Tensor,
+        *,
+        input_ids_local: torch.Tensor,
+        plan: TP4StatefulDecodeSuperStagePlan,
+        graph_family: DecodeGraphFamily,
+        moe_slot: int,
+        stage_marker: Callable[[int | None, str], None] | None = None,
+    ) -> torch.Tensor:
+        """Boundary-fused stage chain (E0hf, C2g/A5F lineage).
+
+        Every HC boundary that has a fusion partner runs through the injected
+        backend's ``post_pre_norm``: the intra-layer boundary (attention
+        ``hc_post`` + FFN ``hc_pre`` + ``ffn_norm``) and the inter-layer
+        boundary (FFN ``hc_post`` + next layer's attention ``hc_pre`` +
+        ``attn_norm``).  The stage-first attention-side ``hc_pre`` and the
+        stage-last tail ``hc_post`` have no partner and stay eager.  With the
+        ``EagerHCBoundaryBackend`` this chain is bitwise identical to the
+        default per-block loop (same ops, same order, same dtypes).
+        """
+
+        backend = self.hc_boundary_backend
+        boundary_flags = family_boundary_flags(graph_family)
+        blocks = self.blocks
+        last_index = len(blocks) - 1
+        current_residual = residual
+        attention_hidden, post, comb = blocks[0].prepare_attention(residual)
+        output: torch.Tensor | None = None
+        for index, (layer_id, block, layer_plan) in enumerate(
+            zip(self.layer_ids, blocks, plan.layer_plans, strict=True)
+        ):
+            layer_marker = (
+                None
+                if stage_marker is None
+                else (lambda name, layer_id=layer_id: stage_marker(layer_id, name))
+            )
+            if layer_marker is not None:
+                layer_marker("block_start")
+            branch_output = block.run_stateful_attention(
+                attention_hidden,
+                attention_plan=layer_plan,
+                boundary_flags=boundary_flags,
+                stage_marker=layer_marker,
+            )
+            if layer_marker is not None:
+                layer_marker("attention_done")
+            after_attention, ffn_hidden, ffn_post, ffn_comb = block.ffn_boundary(
+                branch_output,
+                current_residual,
+                post,
+                comb,
+                backend=backend,
+            )
+            if layer_marker is not None:
+                layer_marker("ffn_prepare_done")
+            moe_arguments: dict[str, Any] = {"slot": moe_slot}
+            if block.route_kind == "hash":
+                moe_arguments["input_ids_local"] = input_ids_local
+            if layer_marker is not None:
+                moe_arguments["stage_marker"] = layer_marker
+            moe_output = block.moe.forward_tensor(ffn_hidden, **moe_arguments)
+            if index == last_index:
+                # Stage-tail hc_post has no fusion partner: stays eager.
+                output = hc_post(moe_output, after_attention, ffn_post, ffn_comb)
+            else:
+                current_residual, attention_hidden, post, comb = (
+                    blocks[index + 1].attention_boundary(
+                        moe_output,
+                        after_attention,
+                        ffn_post,
+                        ffn_comb,
+                        backend=backend,
+                    )
+                )
+            if layer_marker is not None:
+                layer_marker("block_done")
+        if output is None:
+            raise AssertionError("fused stateful chain produced no output")
+        return output
+
     def forward_stateful_decode_tensor_prevalidated(
         self,
         residual: torch.Tensor,
@@ -1403,28 +1499,42 @@ class TP4DecodeStage:
             )
             if stage_marker is not None:
                 stage_marker(None, "guard_done")
-            output = residual
             family_index = _STATEFUL_GRAPH_FAMILIES.index(graph_family)
             moe_slot = plan.graph_moe_slots[family_index]
-            for layer_id, block, layer_plan in zip(
-                self.layer_ids,
-                self.blocks,
-                plan.layer_plans,
-                strict=True,
-            ):
-                arguments = {
-                    "input_ids_local": (
-                        input_ids_local if block.route_kind == "hash" else None
-                    ),
-                    "attention_plan": layer_plan,
-                    "graph_family": graph_family,
-                    "moe_slot": moe_slot,
-                }
-                if stage_marker is not None:
-                    arguments["stage_marker"] = (
-                        lambda name, layer_id=layer_id: stage_marker(layer_id, name)
+            if self.hc_boundary_backend is not None:
+                output = self._forward_stateful_fused_chain(
+                    residual,
+                    input_ids_local=input_ids_local,
+                    plan=plan,
+                    graph_family=graph_family,
+                    moe_slot=moe_slot,
+                    stage_marker=stage_marker,
+                )
+            else:
+                output = residual
+                for layer_id, block, layer_plan in zip(
+                    self.layer_ids,
+                    self.blocks,
+                    plan.layer_plans,
+                    strict=True,
+                ):
+                    arguments = {
+                        "input_ids_local": (
+                            input_ids_local if block.route_kind == "hash" else None
+                        ),
+                        "attention_plan": layer_plan,
+                        "graph_family": graph_family,
+                        "moe_slot": moe_slot,
+                    }
+                    if stage_marker is not None:
+                        arguments["stage_marker"] = (
+                            lambda name, layer_id=layer_id: stage_marker(
+                                layer_id, name
+                            )
+                        )
+                    output = block.forward_stateful_decode_tensor(
+                        output, **arguments
                     )
-                output = block.forward_stateful_decode_tensor(output, **arguments)
             plan.output_buffer.copy_(output)
             if stage_marker is not None:
                 stage_marker(None, "output_copy_done")
@@ -1522,8 +1632,17 @@ TP4StatefulDecodeStagePlan = TP4StatefulDecodeSuperStagePlan
 class TP4DecodeSuperStage(TP4DecodeStage):
     """Adapter that requires the canonical Flash L0-L5 slice."""
 
-    def __init__(self, blocks: Sequence[DirectDecodeBlock]) -> None:
-        super().__init__(blocks, expected_layer_ids=SUPERSTAGE_LAYER_IDS)
+    def __init__(
+        self,
+        blocks: Sequence[DirectDecodeBlock],
+        *,
+        hc_boundary_backend: Any | None = None,
+    ) -> None:
+        super().__init__(
+            blocks,
+            expected_layer_ids=SUPERSTAGE_LAYER_IDS,
+            hc_boundary_backend=hc_boundary_backend,
+        )
 
 
 __all__ = [
