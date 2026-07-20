@@ -1,0 +1,295 @@
+{
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "config_contract": {
+    "hidden_size": 4096,
+    "moe_intermediate_size": 2048,
+    "n_routed_experts": 256,
+    "norm_topk_prob": true,
+    "num_experts_per_tok": 6,
+    "num_hash_layers": 3,
+    "routed_scaling_factor": 1.5,
+    "scoring_func": "sqrtsoftplus",
+    "swiglu_limit": 10.0
+  },
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "load_and_repack": 5.91596247209236,
+    "marlin_first_call": 2.4099957230500877,
+    "raw_checkpoint_oracle": 0.07903275615535676,
+    "shared_bf16_fallback_and_oracle": 0.14436904597096145,
+    "tp4moe_build": 0.0008125400636345148
+  },
+  "errors": [],
+  "experiment": "E0cf-tp4-moe-forward",
+  "host": "titan064",
+  "input_scale": 0.02,
+  "layer_id": 3,
+  "local_rank": 2,
+  "measurement_class": "correctness_only",
+  "memory": {
+    "allocated_gib": 0.8251900672912598,
+    "peak_allocated_gib": 0.88323974609375,
+    "peak_reserved_gib": 0.912109375,
+    "reserved_gib": 0.912109375
+  },
+  "metrics": {
+    "combined": {
+      "finite": true,
+      "max_abs": 8.20821151137352e-06,
+      "reference_rms": 0.0004874732403550297,
+      "rms_rel": 0.004008818881279287
+    },
+    "routed": {
+      "finite": true,
+      "max_abs": 6.015121471136808e-06,
+      "reference_rms": 0.00039531965740025043,
+      "rms_rel": 0.003814299377884103
+    },
+    "shared_bf16_fallback": {
+      "finite": true,
+      "max_abs": 3.949448000639677e-06,
+      "reference_rms": 0.0002660661411937326,
+      "rms_rel": 0.0036279834675550537
+    }
+  },
+  "ok": true,
+  "output_sha256": "559e00a4ff025871aab8eea2f9128157768abe9b308d0945ee50d882b92478e3",
+  "process_seconds": 10.074121534824371,
+  "rank": 2,
+  "reduce_scatter": {
+    "input_shape": [
+      4,
+      4096
+    ],
+    "output_shape": [
+      1,
+      4096
+    ],
+    "rank_order_metrics": {
+      "finite": true,
+      "max_abs": 1.52587890625e-05,
+      "reference_rms": 0.0005128855700604618,
+      "rms_rel": 0.003567108787039199
+    }
+  },
+  "resident": {
+    "identity": {
+      "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+      "intermediate_end": 1536,
+      "intermediate_start": 1024,
+      "layer_id": 3,
+      "rank": 2,
+      "world_size": 4
+    },
+    "load_seconds": 5.778858818812296,
+    "resident_bytes": 861931008,
+    "routed": {
+      "resident_bytes": 855638016,
+      "tensors": {
+        "w13_q": {
+          "dtype": "torch.int32",
+          "sample_sha256": "8c4850a8d8b9bca29755183bc99cd6e955c6403d42908bdeb9337a963adf76fd",
+          "shape": [
+            256,
+            256,
+            2048
+          ]
+        },
+        "w13_s": {
+          "dtype": "torch.float8_e8m0fnu",
+          "sample_sha256": "7552da91b1b052dfb00a251b0a34a5ab1fce7b28a2d695578c9e9b1d90a79ffd",
+          "shape": [
+            256,
+            128,
+            1024
+          ]
+        },
+        "w2_q": {
+          "dtype": "torch.int32",
+          "sample_sha256": "7437b481ffd24fd88582f27b886feea0fb98aad4f4c209befce0c7cf2bf1457b",
+          "shape": [
+            256,
+            32,
+            8192
+          ]
+        },
+        "w2_s": {
+          "dtype": "torch.float8_e8m0fnu",
+          "sample_sha256": "e2ff62d575e57cb42d96c8b1d4e932a248f5faaa2e41e603138e8b3a417125a7",
+          "shape": [
+            256,
+            16,
+            4096
+          ]
+        }
+      }
+    },
+    "sample_fingerprint": "aaef12f86c38ab94a0c73d3f3d16ba9d79e9ad292fd0d016d887f64bb1a973ff",
+    "shared": {
+      "resident_bytes": 6292992,
+      "tensors": {
+        "s1": {
+          "dtype": "torch.float32",
+          "sample_sha256": "aaae7da98d20e9e60ab68567cc872603c340acdf8e1fb4fba0ed60438c00d100",
+          "shape": [
+            4,
+            32
+          ]
+        },
+        "s2": {
+          "dtype": "torch.float32",
+          "sample_sha256": "375017e96a1d693afc5a803b4a2e16c3e88f92e0cc24ba00793187d96825c44a",
+          "shape": [
+            32,
+            4
+          ]
+        },
+        "s3": {
+          "dtype": "torch.float32",
+          "sample_sha256": "088dfb30135f355b7248a01d97204d9f84d8de0785a7a84d2d56d5a0c28c76e5",
+          "shape": [
+            4,
+            32
+          ]
+        },
+        "w1": {
+          "dtype": "torch.float8_e4m3fn",
+          "sample_sha256": "db9e2c14c898e121a9363c47f90649f147e70ce3199e3559c2b0ffb378999710",
+          "shape": [
+            512,
+            4096
+          ]
+        },
+        "w2": {
+          "dtype": "torch.float8_e4m3fn",
+          "sample_sha256": "98721e7118ce655d1465167f6f7a43a1ddc319dc8f5a6f59748f9f8d6d4e938d",
+          "shape": [
+            4096,
+            512
+          ]
+        },
+        "w3": {
+          "dtype": "torch.float8_e4m3fn",
+          "sample_sha256": "37d9e1541df9536241131d2f0a2967ae710ad124640f5ae744fa369bb532cd7c",
+          "shape": [
+            512,
+            4096
+          ]
+        }
+      }
+    }
+  },
+  "routing": {
+    "algorithm": "learned sqrtsoftplus; bias selection-only; normalized top-k",
+    "all_rank_digest_match": true,
+    "digest": "da32f8cbc51c27dc2b1a4529f31221f5fcf0ec1611a18a162baea8b098abd004:49fe8cbf1641cbc343fec347386f085d50dca881620086737b1b5fdb3a71c870",
+    "ids_row_zero": [
+      179,
+      55,
+      43,
+      91,
+      53,
+      16
+    ],
+    "top6_top7_margin_min": 0.000232696533203125,
+    "weight_sum_max": 1.5,
+    "weight_sum_min": 1.5,
+    "weights_row_zero": [
+      0.2521941661834717,
+      0.25183743238449097,
+      0.2539424002170563,
+      0.24879005551338196,
+      0.24698391556739807,
+      0.2462521195411682
+    ]
+  },
+  "rows_per_rank": 1,
+  "safetensors": "0.8.0",
+  "schema_version": 1,
+  "scope": "single-layer TP4 MoE component correctness; not full block, stage, or performance",
+  "seed": 20260720,
+  "torch": "2.11.0+cu130",
+  "tp4moe_output_sha256": "559e00a4ff025871aab8eea2f9128157768abe9b308d0945ee50d882b92478e3",
+  "tp4moe_runtime": {
+    "buffer_slot": 0,
+    "route_ids_match_manual": true,
+    "route_ids_row_zero": [
+      179,
+      55,
+      43,
+      91,
+      53,
+      16
+    ],
+    "route_margin_min": 0.000232696533203125,
+    "route_weights_row_zero": [
+      0.2521941661834717,
+      0.25183743238449097,
+      0.2539424002170563,
+      0.24879005551338196,
+      0.24698391556739807,
+      0.2462521195411682
+    ],
+    "shared_path": "bf16_dequant_correctness_fallback",
+    "vs_manual_reduce_scatter": {
+      "finite": true,
+      "max_abs": 0.0,
+      "reference_rms": 0.0005128795164637268,
+      "rms_rel": 0.0
+    },
+    "vs_rank_order_all_reduce": {
+      "finite": true,
+      "max_abs": 1.52587890625e-05,
+      "reference_rms": 0.0005128855700604618,
+      "rms_rel": 0.003567108787039199
+    }
+  },
+  "validations": [
+    {
+      "name": "all_intermediates_finite",
+      "passed": true
+    },
+    {
+      "name": "routed_rms_rel",
+      "observed": 0.003814299377884103,
+      "passed": true,
+      "threshold": 0.03
+    },
+    {
+      "name": "shared_bf16_fallback_rms_rel",
+      "observed": 0.0036279834675550537,
+      "passed": true,
+      "threshold": 0.02
+    },
+    {
+      "name": "combined_rms_rel",
+      "observed": 0.004008818881279287,
+      "passed": true,
+      "threshold": 0.03
+    },
+    {
+      "max_abs_threshold": 0.0001,
+      "name": "reduce_scatter_rank_order",
+      "observed_max_abs": 1.52587890625e-05,
+      "observed_rms_rel": 0.003567108787039199,
+      "passed": true,
+      "reference_rms": 0.0005128855700604618,
+      "rms_rel_threshold": 0.01
+    },
+    {
+      "max_abs_threshold": 0.0001,
+      "name": "tp4moe_runtime_vs_manual",
+      "observed_max_abs": 0.0,
+      "observed_rms_rel": 0.0,
+      "passed": true,
+      "rms_rel_threshold": 0.01
+    },
+    {
+      "name": "tp4moe_route_ids_match_manual",
+      "passed": true
+    }
+  ],
+  "vllm": "0.22.1",
+  "world": 4
+}

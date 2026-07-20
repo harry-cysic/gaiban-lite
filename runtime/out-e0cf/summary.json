@@ -1,0 +1,1205 @@
+{
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "experiment": "E0cf-tp4-moe-forward",
+  "layer_id": 3,
+  "measurement_class": "correctness_only",
+  "ok": true,
+  "ranks": [
+    {
+      "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+      "config_contract": {
+        "hidden_size": 4096,
+        "moe_intermediate_size": 2048,
+        "n_routed_experts": 256,
+        "norm_topk_prob": true,
+        "num_experts_per_tok": 6,
+        "num_hash_layers": 3,
+        "routed_scaling_factor": 1.5,
+        "scoring_func": "sqrtsoftplus",
+        "swiglu_limit": 10.0
+      },
+      "cuda": "13.0",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "load_and_repack": 5.940256322035566,
+        "marlin_first_call": 2.4098672678228468,
+        "raw_checkpoint_oracle": 0.07902573212049901,
+        "shared_bf16_fallback_and_oracle": 0.14433010201901197,
+        "tp4moe_build": 0.0008405728731304407
+      },
+      "errors": [],
+      "experiment": "E0cf-tp4-moe-forward",
+      "host": "titan064",
+      "input_scale": 0.02,
+      "layer_id": 3,
+      "local_rank": 0,
+      "measurement_class": "correctness_only",
+      "memory": {
+        "allocated_gib": 0.8251900672912598,
+        "peak_allocated_gib": 0.88323974609375,
+        "peak_reserved_gib": 0.912109375,
+        "reserved_gib": 0.912109375
+      },
+      "metrics": {
+        "combined": {
+          "finite": true,
+          "max_abs": 8.20821151137352e-06,
+          "reference_rms": 0.0004874732403550297,
+          "rms_rel": 0.004008818881279287
+        },
+        "routed": {
+          "finite": true,
+          "max_abs": 6.015121471136808e-06,
+          "reference_rms": 0.00039531965740025043,
+          "rms_rel": 0.003814299377884103
+        },
+        "shared_bf16_fallback": {
+          "finite": true,
+          "max_abs": 3.949448000639677e-06,
+          "reference_rms": 0.0002660661411937326,
+          "rms_rel": 0.0036279834675550537
+        }
+      },
+      "ok": true,
+      "output_sha256": "8a1af06ed7200e9c10315c81be5dfa1300118b23c66ee13ad128775cad67ae66",
+      "process_seconds": 10.116693499032408,
+      "rank": 0,
+      "reduce_scatter": {
+        "input_shape": [
+          4,
+          4096
+        ],
+        "output_shape": [
+          1,
+          4096
+        ],
+        "rank_order_metrics": {
+          "finite": true,
+          "max_abs": 1.52587890625e-05,
+          "reference_rms": 0.00048734399024397135,
+          "rms_rel": 0.0025499652803324356
+        }
+      },
+      "resident": {
+        "identity": {
+          "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+          "intermediate_end": 512,
+          "intermediate_start": 0,
+          "layer_id": 3,
+          "rank": 0,
+          "world_size": 4
+        },
+        "load_seconds": 5.719208281952888,
+        "resident_bytes": 861931008,
+        "routed": {
+          "resident_bytes": 855638016,
+          "tensors": {
+            "w13_q": {
+              "dtype": "torch.int32",
+              "sample_sha256": "af947b45b1ec15e1a4226aa2fa6128a1acdba30265e04f0b6b3c3169fb61c515",
+              "shape": [
+                256,
+                256,
+                2048
+              ]
+            },
+            "w13_s": {
+              "dtype": "torch.float8_e8m0fnu",
+              "sample_sha256": "c7cbacb9f4dfa0a9dc6aa646d6986e9b4e3ea3fa9cac8c007f6e4f2d33fc7b4c",
+              "shape": [
+                256,
+                128,
+                1024
+              ]
+            },
+            "w2_q": {
+              "dtype": "torch.int32",
+              "sample_sha256": "fea738c58986a38dd2d21a18ec0cb64c7666ee30bc3dc2d22a03b4fd5ce36daf",
+              "shape": [
+                256,
+                32,
+                8192
+              ]
+            },
+            "w2_s": {
+              "dtype": "torch.float8_e8m0fnu",
+              "sample_sha256": "e3357379a42865decd259eafd26740983016d027eb90d9d970f65369eef6a5ad",
+              "shape": [
+                256,
+                16,
+                4096
+              ]
+            }
+          }
+        },
+        "sample_fingerprint": "737fa8d2144c0caf6252912e36da67ff198ea5f1d29dc0c1849091bd096e1cc8",
+        "shared": {
+          "resident_bytes": 6292992,
+          "tensors": {
+            "s1": {
+              "dtype": "torch.float32",
+              "sample_sha256": "88d7aae7098335bd7b90ef05457041b72e6c315f87476d45725d18db05aca33e",
+              "shape": [
+                4,
+                32
+              ]
+            },
+            "s2": {
+              "dtype": "torch.float32",
+              "sample_sha256": "934eb5e08ba5bec4ac47b8a0881ae046be73f5cb134c7e5bd99213807a2b586f",
+              "shape": [
+                32,
+                4
+              ]
+            },
+            "s3": {
+              "dtype": "torch.float32",
+              "sample_sha256": "c84086d44ed5e907ae07e4e4c87e2e69b05454b5dccb1b8c38a52c88f85ab8fe",
+              "shape": [
+                4,
+                32
+              ]
+            },
+            "w1": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "dae4ce90ae5154490187dcce94d01c41e153d00483b0bcfa440ad3dcc8532c56",
+              "shape": [
+                512,
+                4096
+              ]
+            },
+            "w2": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "3e28e2856adeecce8be8380de0d855062cf2b3c6fb2d441882354ab34ffa7b34",
+              "shape": [
+                4096,
+                512
+              ]
+            },
+            "w3": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "5f075784527ebd5c2534f3a06b821473e552df94407f88f5f8a64d584d5e8e77",
+              "shape": [
+                512,
+                4096
+              ]
+            }
+          }
+        }
+      },
+      "routing": {
+        "algorithm": "learned sqrtsoftplus; bias selection-only; normalized top-k",
+        "all_rank_digest_match": true,
+        "digest": "da32f8cbc51c27dc2b1a4529f31221f5fcf0ec1611a18a162baea8b098abd004:49fe8cbf1641cbc343fec347386f085d50dca881620086737b1b5fdb3a71c870",
+        "ids_row_zero": [
+          179,
+          55,
+          43,
+          91,
+          53,
+          16
+        ],
+        "top6_top7_margin_min": 0.000232696533203125,
+        "weight_sum_max": 1.5,
+        "weight_sum_min": 1.5,
+        "weights_row_zero": [
+          0.2521941661834717,
+          0.25183743238449097,
+          0.2539424002170563,
+          0.24879005551338196,
+          0.24698391556739807,
+          0.2462521195411682
+        ]
+      },
+      "rows_per_rank": 1,
+      "safetensors": "0.8.0",
+      "schema_version": 1,
+      "scope": "single-layer TP4 MoE component correctness; not full block, stage, or performance",
+      "seed": 20260720,
+      "torch": "2.11.0+cu130",
+      "tp4moe_output_sha256": "8a1af06ed7200e9c10315c81be5dfa1300118b23c66ee13ad128775cad67ae66",
+      "tp4moe_runtime": {
+        "buffer_slot": 0,
+        "route_ids_match_manual": true,
+        "route_ids_row_zero": [
+          179,
+          55,
+          43,
+          91,
+          53,
+          16
+        ],
+        "route_margin_min": 0.000232696533203125,
+        "route_weights_row_zero": [
+          0.2521941661834717,
+          0.25183743238449097,
+          0.2539424002170563,
+          0.24879005551338196,
+          0.24698391556739807,
+          0.2462521195411682
+        ],
+        "row_zero_vs_fp32_oracle": {
+          "finite": true,
+          "max_abs": 1.0592397302389145e-05,
+          "reference_rms": 0.0004874732403550297,
+          "rms_rel": 0.00478680977298184
+        },
+        "shared_path": "bf16_dequant_correctness_fallback",
+        "vs_manual_reduce_scatter": {
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0004873093857895583,
+          "rms_rel": 0.0
+        },
+        "vs_rank_order_all_reduce": {
+          "finite": true,
+          "max_abs": 1.52587890625e-05,
+          "reference_rms": 0.00048734399024397135,
+          "rms_rel": 0.0025499652803324356
+        }
+      },
+      "validations": [
+        {
+          "name": "all_intermediates_finite",
+          "passed": true
+        },
+        {
+          "name": "routed_rms_rel",
+          "observed": 0.003814299377884103,
+          "passed": true,
+          "threshold": 0.03
+        },
+        {
+          "name": "shared_bf16_fallback_rms_rel",
+          "observed": 0.0036279834675550537,
+          "passed": true,
+          "threshold": 0.02
+        },
+        {
+          "name": "combined_rms_rel",
+          "observed": 0.004008818881279287,
+          "passed": true,
+          "threshold": 0.03
+        },
+        {
+          "max_abs_threshold": 0.0001,
+          "name": "reduce_scatter_rank_order",
+          "observed_max_abs": 1.52587890625e-05,
+          "observed_rms_rel": 0.0025499652803324356,
+          "passed": true,
+          "reference_rms": 0.00048734399024397135,
+          "rms_rel_threshold": 0.01
+        },
+        {
+          "max_abs_threshold": 0.0001,
+          "name": "tp4moe_runtime_vs_manual",
+          "observed_max_abs": 0.0,
+          "observed_rms_rel": 0.0,
+          "passed": true,
+          "rms_rel_threshold": 0.01
+        },
+        {
+          "name": "tp4moe_route_ids_match_manual",
+          "passed": true
+        },
+        {
+          "name": "tp4moe_row_zero_vs_fp32_oracle",
+          "observed": 0.00478680977298184,
+          "passed": true,
+          "threshold": 0.03
+        }
+      ],
+      "vllm": "0.22.1",
+      "world": 4
+    },
+    {
+      "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+      "config_contract": {
+        "hidden_size": 4096,
+        "moe_intermediate_size": 2048,
+        "n_routed_experts": 256,
+        "norm_topk_prob": true,
+        "num_experts_per_tok": 6,
+        "num_hash_layers": 3,
+        "routed_scaling_factor": 1.5,
+        "scoring_func": "sqrtsoftplus",
+        "swiglu_limit": 10.0
+      },
+      "cuda": "13.0",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "load_and_repack": 5.916087549878284,
+        "marlin_first_call": 2.409926010062918,
+        "raw_checkpoint_oracle": 0.07888515410013497,
+        "shared_bf16_fallback_and_oracle": 0.14456306607462466,
+        "tp4moe_build": 0.0008127898909151554
+      },
+      "errors": [],
+      "experiment": "E0cf-tp4-moe-forward",
+      "host": "titan064",
+      "input_scale": 0.02,
+      "layer_id": 3,
+      "local_rank": 1,
+      "measurement_class": "correctness_only",
+      "memory": {
+        "allocated_gib": 0.8251900672912598,
+        "peak_allocated_gib": 0.88323974609375,
+        "peak_reserved_gib": 0.912109375,
+        "reserved_gib": 0.912109375
+      },
+      "metrics": {
+        "combined": {
+          "finite": true,
+          "max_abs": 8.20821151137352e-06,
+          "reference_rms": 0.0004874732403550297,
+          "rms_rel": 0.004008818881279287
+        },
+        "routed": {
+          "finite": true,
+          "max_abs": 6.015121471136808e-06,
+          "reference_rms": 0.00039531965740025043,
+          "rms_rel": 0.003814299377884103
+        },
+        "shared_bf16_fallback": {
+          "finite": true,
+          "max_abs": 3.949448000639677e-06,
+          "reference_rms": 0.0002660661411937326,
+          "rms_rel": 0.0036279834675550537
+        }
+      },
+      "ok": true,
+      "output_sha256": "6e431d234e96543e67f6f091bfe18b14fb304b8bb4e962d5639ea37c9caf3dbf",
+      "process_seconds": 10.116334494901821,
+      "rank": 1,
+      "reduce_scatter": {
+        "input_shape": [
+          4,
+          4096
+        ],
+        "output_shape": [
+          1,
+          4096
+        ],
+        "rank_order_metrics": {
+          "finite": true,
+          "max_abs": 7.62939453125e-06,
+          "reference_rms": 0.0005056806257925928,
+          "rms_rel": 0.003456034672611665
+        }
+      },
+      "resident": {
+        "identity": {
+          "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+          "intermediate_end": 1024,
+          "intermediate_start": 512,
+          "layer_id": 3,
+          "rank": 1,
+          "world_size": 4
+        },
+        "load_seconds": 5.757851989939809,
+        "resident_bytes": 861931008,
+        "routed": {
+          "resident_bytes": 855638016,
+          "tensors": {
+            "w13_q": {
+              "dtype": "torch.int32",
+              "sample_sha256": "c4bd6ff96356b809ee3c63c04aa44117090b0d97fb8c40671f6a7162ef33976d",
+              "shape": [
+                256,
+                256,
+                2048
+              ]
+            },
+            "w13_s": {
+              "dtype": "torch.float8_e8m0fnu",
+              "sample_sha256": "13e59dec1cbdc1c2a28715fee50af03290ed059d2244a86de9085e657caf816b",
+              "shape": [
+                256,
+                128,
+                1024
+              ]
+            },
+            "w2_q": {
+              "dtype": "torch.int32",
+              "sample_sha256": "07f68f8a66b0b2fb3355b9ebace8e6681c8cc17691fe13ac4d52687ac95babd4",
+              "shape": [
+                256,
+                32,
+                8192
+              ]
+            },
+            "w2_s": {
+              "dtype": "torch.float8_e8m0fnu",
+              "sample_sha256": "29dc681924a2bf8e3b3d0a6f9a669e192a297149fc147a9340cbbf495eb750e2",
+              "shape": [
+                256,
+                16,
+                4096
+              ]
+            }
+          }
+        },
+        "sample_fingerprint": "ce712c0fa247da7b7f57d3db0cc9c10aff75526f61e934790083c3a654c40d67",
+        "shared": {
+          "resident_bytes": 6292992,
+          "tensors": {
+            "s1": {
+              "dtype": "torch.float32",
+              "sample_sha256": "8530473704cf5b67a46b36a69bdae67d9a6d7ea2725c1a7476284eb6118e1e34",
+              "shape": [
+                4,
+                32
+              ]
+            },
+            "s2": {
+              "dtype": "torch.float32",
+              "sample_sha256": "1c37e6c894a0da261e831503176275092a4844ea41c6bfbb915d406ec874f612",
+              "shape": [
+                32,
+                4
+              ]
+            },
+            "s3": {
+              "dtype": "torch.float32",
+              "sample_sha256": "f9bb29140e379a1d45cbfb5a0c3dfd80bec0b342956d414bd910d04370f09027",
+              "shape": [
+                4,
+                32
+              ]
+            },
+            "w1": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "c9f80586245456b2ceca50acb8469145a359fc918c35aceb9ba5a62e883a5c22",
+              "shape": [
+                512,
+                4096
+              ]
+            },
+            "w2": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "ad9aab3cf7c3250f77cd6664884e0e29724b974fb1e6a90cf12bb1eeb84ea89b",
+              "shape": [
+                4096,
+                512
+              ]
+            },
+            "w3": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "89a6c37f2c05fe890fe17bf62e69b926515e56b99e1bda2192796586db91355a",
+              "shape": [
+                512,
+                4096
+              ]
+            }
+          }
+        }
+      },
+      "routing": {
+        "algorithm": "learned sqrtsoftplus; bias selection-only; normalized top-k",
+        "all_rank_digest_match": true,
+        "digest": "da32f8cbc51c27dc2b1a4529f31221f5fcf0ec1611a18a162baea8b098abd004:49fe8cbf1641cbc343fec347386f085d50dca881620086737b1b5fdb3a71c870",
+        "ids_row_zero": [
+          179,
+          55,
+          43,
+          91,
+          53,
+          16
+        ],
+        "top6_top7_margin_min": 0.000232696533203125,
+        "weight_sum_max": 1.5,
+        "weight_sum_min": 1.5,
+        "weights_row_zero": [
+          0.2521941661834717,
+          0.25183743238449097,
+          0.2539424002170563,
+          0.24879005551338196,
+          0.24698391556739807,
+          0.2462521195411682
+        ]
+      },
+      "rows_per_rank": 1,
+      "safetensors": "0.8.0",
+      "schema_version": 1,
+      "scope": "single-layer TP4 MoE component correctness; not full block, stage, or performance",
+      "seed": 20260720,
+      "torch": "2.11.0+cu130",
+      "tp4moe_output_sha256": "6e431d234e96543e67f6f091bfe18b14fb304b8bb4e962d5639ea37c9caf3dbf",
+      "tp4moe_runtime": {
+        "buffer_slot": 0,
+        "route_ids_match_manual": true,
+        "route_ids_row_zero": [
+          179,
+          55,
+          43,
+          91,
+          53,
+          16
+        ],
+        "route_margin_min": 0.000232696533203125,
+        "route_weights_row_zero": [
+          0.2521941661834717,
+          0.25183743238449097,
+          0.2539424002170563,
+          0.24879005551338196,
+          0.24698391556739807,
+          0.2462521195411682
+        ],
+        "shared_path": "bf16_dequant_correctness_fallback",
+        "vs_manual_reduce_scatter": {
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0005056394729763269,
+          "rms_rel": 0.0
+        },
+        "vs_rank_order_all_reduce": {
+          "finite": true,
+          "max_abs": 7.62939453125e-06,
+          "reference_rms": 0.0005056806257925928,
+          "rms_rel": 0.003456034672611665
+        }
+      },
+      "validations": [
+        {
+          "name": "all_intermediates_finite",
+          "passed": true
+        },
+        {
+          "name": "routed_rms_rel",
+          "observed": 0.003814299377884103,
+          "passed": true,
+          "threshold": 0.03
+        },
+        {
+          "name": "shared_bf16_fallback_rms_rel",
+          "observed": 0.0036279834675550537,
+          "passed": true,
+          "threshold": 0.02
+        },
+        {
+          "name": "combined_rms_rel",
+          "observed": 0.004008818881279287,
+          "passed": true,
+          "threshold": 0.03
+        },
+        {
+          "max_abs_threshold": 0.0001,
+          "name": "reduce_scatter_rank_order",
+          "observed_max_abs": 7.62939453125e-06,
+          "observed_rms_rel": 0.003456034672611665,
+          "passed": true,
+          "reference_rms": 0.0005056806257925928,
+          "rms_rel_threshold": 0.01
+        },
+        {
+          "max_abs_threshold": 0.0001,
+          "name": "tp4moe_runtime_vs_manual",
+          "observed_max_abs": 0.0,
+          "observed_rms_rel": 0.0,
+          "passed": true,
+          "rms_rel_threshold": 0.01
+        },
+        {
+          "name": "tp4moe_route_ids_match_manual",
+          "passed": true
+        }
+      ],
+      "vllm": "0.22.1",
+      "world": 4
+    },
+    {
+      "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+      "config_contract": {
+        "hidden_size": 4096,
+        "moe_intermediate_size": 2048,
+        "n_routed_experts": 256,
+        "norm_topk_prob": true,
+        "num_experts_per_tok": 6,
+        "num_hash_layers": 3,
+        "routed_scaling_factor": 1.5,
+        "scoring_func": "sqrtsoftplus",
+        "swiglu_limit": 10.0
+      },
+      "cuda": "13.0",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "load_and_repack": 5.91596247209236,
+        "marlin_first_call": 2.4099957230500877,
+        "raw_checkpoint_oracle": 0.07903275615535676,
+        "shared_bf16_fallback_and_oracle": 0.14436904597096145,
+        "tp4moe_build": 0.0008125400636345148
+      },
+      "errors": [],
+      "experiment": "E0cf-tp4-moe-forward",
+      "host": "titan064",
+      "input_scale": 0.02,
+      "layer_id": 3,
+      "local_rank": 2,
+      "measurement_class": "correctness_only",
+      "memory": {
+        "allocated_gib": 0.8251900672912598,
+        "peak_allocated_gib": 0.88323974609375,
+        "peak_reserved_gib": 0.912109375,
+        "reserved_gib": 0.912109375
+      },
+      "metrics": {
+        "combined": {
+          "finite": true,
+          "max_abs": 8.20821151137352e-06,
+          "reference_rms": 0.0004874732403550297,
+          "rms_rel": 0.004008818881279287
+        },
+        "routed": {
+          "finite": true,
+          "max_abs": 6.015121471136808e-06,
+          "reference_rms": 0.00039531965740025043,
+          "rms_rel": 0.003814299377884103
+        },
+        "shared_bf16_fallback": {
+          "finite": true,
+          "max_abs": 3.949448000639677e-06,
+          "reference_rms": 0.0002660661411937326,
+          "rms_rel": 0.0036279834675550537
+        }
+      },
+      "ok": true,
+      "output_sha256": "559e00a4ff025871aab8eea2f9128157768abe9b308d0945ee50d882b92478e3",
+      "process_seconds": 10.074121534824371,
+      "rank": 2,
+      "reduce_scatter": {
+        "input_shape": [
+          4,
+          4096
+        ],
+        "output_shape": [
+          1,
+          4096
+        ],
+        "rank_order_metrics": {
+          "finite": true,
+          "max_abs": 1.52587890625e-05,
+          "reference_rms": 0.0005128855700604618,
+          "rms_rel": 0.003567108787039199
+        }
+      },
+      "resident": {
+        "identity": {
+          "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+          "intermediate_end": 1536,
+          "intermediate_start": 1024,
+          "layer_id": 3,
+          "rank": 2,
+          "world_size": 4
+        },
+        "load_seconds": 5.778858818812296,
+        "resident_bytes": 861931008,
+        "routed": {
+          "resident_bytes": 855638016,
+          "tensors": {
+            "w13_q": {
+              "dtype": "torch.int32",
+              "sample_sha256": "8c4850a8d8b9bca29755183bc99cd6e955c6403d42908bdeb9337a963adf76fd",
+              "shape": [
+                256,
+                256,
+                2048
+              ]
+            },
+            "w13_s": {
+              "dtype": "torch.float8_e8m0fnu",
+              "sample_sha256": "7552da91b1b052dfb00a251b0a34a5ab1fce7b28a2d695578c9e9b1d90a79ffd",
+              "shape": [
+                256,
+                128,
+                1024
+              ]
+            },
+            "w2_q": {
+              "dtype": "torch.int32",
+              "sample_sha256": "7437b481ffd24fd88582f27b886feea0fb98aad4f4c209befce0c7cf2bf1457b",
+              "shape": [
+                256,
+                32,
+                8192
+              ]
+            },
+            "w2_s": {
+              "dtype": "torch.float8_e8m0fnu",
+              "sample_sha256": "e2ff62d575e57cb42d96c8b1d4e932a248f5faaa2e41e603138e8b3a417125a7",
+              "shape": [
+                256,
+                16,
+                4096
+              ]
+            }
+          }
+        },
+        "sample_fingerprint": "aaef12f86c38ab94a0c73d3f3d16ba9d79e9ad292fd0d016d887f64bb1a973ff",
+        "shared": {
+          "resident_bytes": 6292992,
+          "tensors": {
+            "s1": {
+              "dtype": "torch.float32",
+              "sample_sha256": "aaae7da98d20e9e60ab68567cc872603c340acdf8e1fb4fba0ed60438c00d100",
+              "shape": [
+                4,
+                32
+              ]
+            },
+            "s2": {
+              "dtype": "torch.float32",
+              "sample_sha256": "375017e96a1d693afc5a803b4a2e16c3e88f92e0cc24ba00793187d96825c44a",
+              "shape": [
+                32,
+                4
+              ]
+            },
+            "s3": {
+              "dtype": "torch.float32",
+              "sample_sha256": "088dfb30135f355b7248a01d97204d9f84d8de0785a7a84d2d56d5a0c28c76e5",
+              "shape": [
+                4,
+                32
+              ]
+            },
+            "w1": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "db9e2c14c898e121a9363c47f90649f147e70ce3199e3559c2b0ffb378999710",
+              "shape": [
+                512,
+                4096
+              ]
+            },
+            "w2": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "98721e7118ce655d1465167f6f7a43a1ddc319dc8f5a6f59748f9f8d6d4e938d",
+              "shape": [
+                4096,
+                512
+              ]
+            },
+            "w3": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "37d9e1541df9536241131d2f0a2967ae710ad124640f5ae744fa369bb532cd7c",
+              "shape": [
+                512,
+                4096
+              ]
+            }
+          }
+        }
+      },
+      "routing": {
+        "algorithm": "learned sqrtsoftplus; bias selection-only; normalized top-k",
+        "all_rank_digest_match": true,
+        "digest": "da32f8cbc51c27dc2b1a4529f31221f5fcf0ec1611a18a162baea8b098abd004:49fe8cbf1641cbc343fec347386f085d50dca881620086737b1b5fdb3a71c870",
+        "ids_row_zero": [
+          179,
+          55,
+          43,
+          91,
+          53,
+          16
+        ],
+        "top6_top7_margin_min": 0.000232696533203125,
+        "weight_sum_max": 1.5,
+        "weight_sum_min": 1.5,
+        "weights_row_zero": [
+          0.2521941661834717,
+          0.25183743238449097,
+          0.2539424002170563,
+          0.24879005551338196,
+          0.24698391556739807,
+          0.2462521195411682
+        ]
+      },
+      "rows_per_rank": 1,
+      "safetensors": "0.8.0",
+      "schema_version": 1,
+      "scope": "single-layer TP4 MoE component correctness; not full block, stage, or performance",
+      "seed": 20260720,
+      "torch": "2.11.0+cu130",
+      "tp4moe_output_sha256": "559e00a4ff025871aab8eea2f9128157768abe9b308d0945ee50d882b92478e3",
+      "tp4moe_runtime": {
+        "buffer_slot": 0,
+        "route_ids_match_manual": true,
+        "route_ids_row_zero": [
+          179,
+          55,
+          43,
+          91,
+          53,
+          16
+        ],
+        "route_margin_min": 0.000232696533203125,
+        "route_weights_row_zero": [
+          0.2521941661834717,
+          0.25183743238449097,
+          0.2539424002170563,
+          0.24879005551338196,
+          0.24698391556739807,
+          0.2462521195411682
+        ],
+        "shared_path": "bf16_dequant_correctness_fallback",
+        "vs_manual_reduce_scatter": {
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0005128795164637268,
+          "rms_rel": 0.0
+        },
+        "vs_rank_order_all_reduce": {
+          "finite": true,
+          "max_abs": 1.52587890625e-05,
+          "reference_rms": 0.0005128855700604618,
+          "rms_rel": 0.003567108787039199
+        }
+      },
+      "validations": [
+        {
+          "name": "all_intermediates_finite",
+          "passed": true
+        },
+        {
+          "name": "routed_rms_rel",
+          "observed": 0.003814299377884103,
+          "passed": true,
+          "threshold": 0.03
+        },
+        {
+          "name": "shared_bf16_fallback_rms_rel",
+          "observed": 0.0036279834675550537,
+          "passed": true,
+          "threshold": 0.02
+        },
+        {
+          "name": "combined_rms_rel",
+          "observed": 0.004008818881279287,
+          "passed": true,
+          "threshold": 0.03
+        },
+        {
+          "max_abs_threshold": 0.0001,
+          "name": "reduce_scatter_rank_order",
+          "observed_max_abs": 1.52587890625e-05,
+          "observed_rms_rel": 0.003567108787039199,
+          "passed": true,
+          "reference_rms": 0.0005128855700604618,
+          "rms_rel_threshold": 0.01
+        },
+        {
+          "max_abs_threshold": 0.0001,
+          "name": "tp4moe_runtime_vs_manual",
+          "observed_max_abs": 0.0,
+          "observed_rms_rel": 0.0,
+          "passed": true,
+          "rms_rel_threshold": 0.01
+        },
+        {
+          "name": "tp4moe_route_ids_match_manual",
+          "passed": true
+        }
+      ],
+      "vllm": "0.22.1",
+      "world": 4
+    },
+    {
+      "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+      "config_contract": {
+        "hidden_size": 4096,
+        "moe_intermediate_size": 2048,
+        "n_routed_experts": 256,
+        "norm_topk_prob": true,
+        "num_experts_per_tok": 6,
+        "num_hash_layers": 3,
+        "routed_scaling_factor": 1.5,
+        "scoring_func": "sqrtsoftplus",
+        "swiglu_limit": 10.0
+      },
+      "cuda": "13.0",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "load_and_repack": 5.916035580914468,
+        "marlin_first_call": 2.409914998104796,
+        "raw_checkpoint_oracle": 0.07899501407518983,
+        "shared_bf16_fallback_and_oracle": 0.1444500209763646,
+        "tp4moe_build": 0.0008098350372165442
+      },
+      "errors": [],
+      "experiment": "E0cf-tp4-moe-forward",
+      "host": "titan064",
+      "input_scale": 0.02,
+      "layer_id": 3,
+      "local_rank": 3,
+      "measurement_class": "correctness_only",
+      "memory": {
+        "allocated_gib": 0.8251900672912598,
+        "peak_allocated_gib": 0.88323974609375,
+        "peak_reserved_gib": 0.912109375,
+        "reserved_gib": 0.912109375
+      },
+      "metrics": {
+        "combined": {
+          "finite": true,
+          "max_abs": 8.20821151137352e-06,
+          "reference_rms": 0.0004874732403550297,
+          "rms_rel": 0.004008818881279287
+        },
+        "routed": {
+          "finite": true,
+          "max_abs": 6.015121471136808e-06,
+          "reference_rms": 0.00039531965740025043,
+          "rms_rel": 0.003814299377884103
+        },
+        "shared_bf16_fallback": {
+          "finite": true,
+          "max_abs": 3.949448000639677e-06,
+          "reference_rms": 0.0002660661411937326,
+          "rms_rel": 0.0036279834675550537
+        }
+      },
+      "ok": true,
+      "output_sha256": "f3fdf6e1a8eba4373e6a235b09fd6408e41160fa63e33679fe55d72b8a272251",
+      "process_seconds": 10.06878267112188,
+      "rank": 3,
+      "reduce_scatter": {
+        "input_shape": [
+          4,
+          4096
+        ],
+        "output_shape": [
+          1,
+          4096
+        ],
+        "rank_order_metrics": {
+          "finite": true,
+          "max_abs": 1.52587890625e-05,
+          "reference_rms": 0.0005355593166314065,
+          "rms_rel": 0.002408969977833
+        }
+      },
+      "resident": {
+        "identity": {
+          "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+          "intermediate_end": 2048,
+          "intermediate_start": 1536,
+          "layer_id": 3,
+          "rank": 3,
+          "world_size": 4
+        },
+        "load_seconds": 5.823880983982235,
+        "resident_bytes": 861931008,
+        "routed": {
+          "resident_bytes": 855638016,
+          "tensors": {
+            "w13_q": {
+              "dtype": "torch.int32",
+              "sample_sha256": "b4a76e4746a4ca184d6dec422529cb1a317ff191643159633b52b27cc7c73f3e",
+              "shape": [
+                256,
+                256,
+                2048
+              ]
+            },
+            "w13_s": {
+              "dtype": "torch.float8_e8m0fnu",
+              "sample_sha256": "eaf2f1b7a9faa5b9734fec1be952598b43c6e24b5cc52904f180dcaca61b78a6",
+              "shape": [
+                256,
+                128,
+                1024
+              ]
+            },
+            "w2_q": {
+              "dtype": "torch.int32",
+              "sample_sha256": "69f2e886da306f3a645638d3d144737a6cfd6c2be65ca4eb706682247eaf0562",
+              "shape": [
+                256,
+                32,
+                8192
+              ]
+            },
+            "w2_s": {
+              "dtype": "torch.float8_e8m0fnu",
+              "sample_sha256": "ce59a19bf35a2163672c13fb24fdd512ae0b607d750c8c82701ad4dc5d6b9d58",
+              "shape": [
+                256,
+                16,
+                4096
+              ]
+            }
+          }
+        },
+        "sample_fingerprint": "2b6dbb799c7fd3a3b708fd60a27c2d3af67c204b270a7cc8c84cdd7a3f79b403",
+        "shared": {
+          "resident_bytes": 6292992,
+          "tensors": {
+            "s1": {
+              "dtype": "torch.float32",
+              "sample_sha256": "701390a8d8f6f0469a1592b9bed71a82b565bba3076e54b300f0a7786b19d3ac",
+              "shape": [
+                4,
+                32
+              ]
+            },
+            "s2": {
+              "dtype": "torch.float32",
+              "sample_sha256": "8d16712cf616d52541fb834973d05e674ee5081950531327ce3327dc71ccc66b",
+              "shape": [
+                32,
+                4
+              ]
+            },
+            "s3": {
+              "dtype": "torch.float32",
+              "sample_sha256": "9cfe07a7d4c35a0bd8445e9fbd4f07d996b519cbf1c202bb4a94b2e258f141aa",
+              "shape": [
+                4,
+                32
+              ]
+            },
+            "w1": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "0d0872035aad476f2f73d0ac2df1d0349a56a4f7013b4dc5c032b34c10cfc125",
+              "shape": [
+                512,
+                4096
+              ]
+            },
+            "w2": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "045727d6bdbd55785494c6186ec261cc87801928bb58c322b393dfaa22f09366",
+              "shape": [
+                4096,
+                512
+              ]
+            },
+            "w3": {
+              "dtype": "torch.float8_e4m3fn",
+              "sample_sha256": "86b65c1aaff8918a6c1819dd308abcb519939532413ebd1fdbd520bc503e9bb2",
+              "shape": [
+                512,
+                4096
+              ]
+            }
+          }
+        }
+      },
+      "routing": {
+        "algorithm": "learned sqrtsoftplus; bias selection-only; normalized top-k",
+        "all_rank_digest_match": true,
+        "digest": "da32f8cbc51c27dc2b1a4529f31221f5fcf0ec1611a18a162baea8b098abd004:49fe8cbf1641cbc343fec347386f085d50dca881620086737b1b5fdb3a71c870",
+        "ids_row_zero": [
+          179,
+          55,
+          43,
+          91,
+          53,
+          16
+        ],
+        "top6_top7_margin_min": 0.000232696533203125,
+        "weight_sum_max": 1.5,
+        "weight_sum_min": 1.5,
+        "weights_row_zero": [
+          0.2521941661834717,
+          0.25183743238449097,
+          0.2539424002170563,
+          0.24879005551338196,
+          0.24698391556739807,
+          0.2462521195411682
+        ]
+      },
+      "rows_per_rank": 1,
+      "safetensors": "0.8.0",
+      "schema_version": 1,
+      "scope": "single-layer TP4 MoE component correctness; not full block, stage, or performance",
+      "seed": 20260720,
+      "torch": "2.11.0+cu130",
+      "tp4moe_output_sha256": "f3fdf6e1a8eba4373e6a235b09fd6408e41160fa63e33679fe55d72b8a272251",
+      "tp4moe_runtime": {
+        "buffer_slot": 0,
+        "route_ids_match_manual": true,
+        "route_ids_row_zero": [
+          179,
+          55,
+          43,
+          91,
+          53,
+          16
+        ],
+        "route_margin_min": 0.000232696533203125,
+        "route_weights_row_zero": [
+          0.2521941661834717,
+          0.25183743238449097,
+          0.2539424002170563,
+          0.24879005551338196,
+          0.24698391556739807,
+          0.2462521195411682
+        ],
+        "shared_path": "bf16_dequant_correctness_fallback",
+        "vs_manual_reduce_scatter": {
+          "finite": true,
+          "max_abs": 0.0,
+          "reference_rms": 0.0005355689208954573,
+          "rms_rel": 0.0
+        },
+        "vs_rank_order_all_reduce": {
+          "finite": true,
+          "max_abs": 1.52587890625e-05,
+          "reference_rms": 0.0005355593166314065,
+          "rms_rel": 0.002408969977833
+        }
+      },
+      "validations": [
+        {
+          "name": "all_intermediates_finite",
+          "passed": true
+        },
+        {
+          "name": "routed_rms_rel",
+          "observed": 0.003814299377884103,
+          "passed": true,
+          "threshold": 0.03
+        },
+        {
+          "name": "shared_bf16_fallback_rms_rel",
+          "observed": 0.0036279834675550537,
+          "passed": true,
+          "threshold": 0.02
+        },
+        {
+          "name": "combined_rms_rel",
+          "observed": 0.004008818881279287,
+          "passed": true,
+          "threshold": 0.03
+        },
+        {
+          "max_abs_threshold": 0.0001,
+          "name": "reduce_scatter_rank_order",
+          "observed_max_abs": 1.52587890625e-05,
+          "observed_rms_rel": 0.002408969977833,
+          "passed": true,
+          "reference_rms": 0.0005355593166314065,
+          "rms_rel_threshold": 0.01
+        },
+        {
+          "max_abs_threshold": 0.0001,
+          "name": "tp4moe_runtime_vs_manual",
+          "observed_max_abs": 0.0,
+          "observed_rms_rel": 0.0,
+          "passed": true,
+          "rms_rel_threshold": 0.01
+        },
+        {
+          "name": "tp4moe_route_ids_match_manual",
+          "passed": true
+        }
+      ],
+      "vllm": "0.22.1",
+      "world": 4
+    }
+  ],
+  "rows_per_rank": 1,
+  "schema_version": 1,
+  "scope": "single-layer TP4 MoE component correctness; not full block, stage, or performance",
+  "world": 4
+}

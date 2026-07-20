@@ -1,0 +1,57 @@
+# E0cf V4-Flash TP4 MoE forward oracle gate — titan064 run log
+# date: 2026-07-20T08:23Z
+# host: titan064 (8x RTX 4090, CUDA 13.2), venv ~/Workspace/venvs/sglang
+#       (torch 2.11.0+cu130, vllm 0.22.1)
+# workdir: titan064:~/e0f-runtime (rsync of gaiban-lite/runtime/)
+# command:
+#   export CUDA_HOME=/usr/local/cuda-13.2; PATH=$CUDA_HOME/bin:$PATH; LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+#   ~/Workspace/venvs/sglang/bin/torchrun --standalone --nproc_per_node=4 \
+#     e0cf_tp4_moe_forward.py --stage-root ~/Workspace/DeepSeek-V4-Flash --out-dir out-e0cf
+#
+# Result: PASS (exit 0), all 4 ranks ok. Full JSON in runtime/out-e0cf/.
+
+== torchrun stdout/stderr ==
+W0720 08:23:35 torch/distributed/run.py:851] Setting OMP_NUM_THREADS=1 (default)
+layer=3 rank=0 experts=64/256
+layer=3 rank=0 experts=128/256
+layer=3 rank=0 experts=192/256
+layer=3 rank=0 experts=256/256
+PASS E0cf TP4 MoE component correctness
+EXIT=0
+
+== identity ==
+checkpoint_id: 49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31
+  (matches loader-smoke-titan064.log; differs from e0ef's e33d9526... because
+   inspect_stage_checkpoint hashes only the shard headers of the inspected
+   layer set — same weights, scope-dependent id)
+layer: 3 (first learned-router layer, num_hash_layers=3)
+geometry: hidden 4096, moe_intermediate 2048 (itp 512/rank), 256 experts,
+  topk 6, route_scale 1.5, swiglu clamp 10.0, TP4
+resident MoE bytes/rank: 861,931,008 (== EXPECTED_LAYER_RESIDENT_BYTES)
+rows_per_rank: 1 (4 global rows), seed 20260720, input_scale 0.02
+load+repack: 5.9 s/rank; peak allocated 0.88 GiB/rank
+
+== validations (all ranks identical unless noted; gaiban E0c tolerances) ==
+all_intermediates_finite                          PASS
+routed_rms_rel        0.0038143  <= 0.03          PASS  (max_abs 6.0e-06)
+shared_bf16_fallback  0.0036280  <= 0.02          PASS  (max_abs 3.9e-06)
+combined_rms_rel      0.0040088  <= 0.03          PASS  (max_abs 8.2e-06)
+reduce_scatter_rank_order  rms_rel 0.0024-0.0036 <= 0.01,
+                           max_abs 7.6e-06..1.5e-05 <= 1e-4   PASS (per rank)
+tp4moe_runtime_vs_manual   rms_rel 0.0, max_abs 0.0           PASS (bitwise
+  identical on every rank: private _fused_marlin_moe + deterministic
+  align + torch.sum reproduces the public fused_marlin_moe path exactly)
+tp4moe_route_ids_match_manual                     PASS (all ranks)
+tp4moe_row_zero_vs_fp32_oracle (rank 0)
+                      0.0047868  <= 0.03          PASS
+
+== routing (row 0, identical on all ranks; digest match across ranks) ==
+ids:     [179, 55, 43, 91, 53, 16]
+weights: [0.252194, 0.251837, 0.253942, 0.248790, 0.246984, 0.246252]
+weight row sums: 1.5 exactly (route_scale 1.5); top6/top7 margin_min 2.327e-4
+
+== deterministic align under Flash geometry (256 experts) ==
+rows=4, topk=6, experts=256 -> _marlin_block_size_m = 8 (unchanged from Pro:
+selection loop hits 4*6/256/8 = 0.0117 < 0.9). max_padded_tokens =
+min(24*8, 24 + 256*7) = 192 (num_assignments < num_experts branch).
+deterministic_moe_align_block_size is fully parameterized; no code change.

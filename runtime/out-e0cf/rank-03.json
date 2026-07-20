@@ -1,0 +1,295 @@
+{
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "config_contract": {
+    "hidden_size": 4096,
+    "moe_intermediate_size": 2048,
+    "n_routed_experts": 256,
+    "norm_topk_prob": true,
+    "num_experts_per_tok": 6,
+    "num_hash_layers": 3,
+    "routed_scaling_factor": 1.5,
+    "scoring_func": "sqrtsoftplus",
+    "swiglu_limit": 10.0
+  },
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "load_and_repack": 5.916035580914468,
+    "marlin_first_call": 2.409914998104796,
+    "raw_checkpoint_oracle": 0.07899501407518983,
+    "shared_bf16_fallback_and_oracle": 0.1444500209763646,
+    "tp4moe_build": 0.0008098350372165442
+  },
+  "errors": [],
+  "experiment": "E0cf-tp4-moe-forward",
+  "host": "titan064",
+  "input_scale": 0.02,
+  "layer_id": 3,
+  "local_rank": 3,
+  "measurement_class": "correctness_only",
+  "memory": {
+    "allocated_gib": 0.8251900672912598,
+    "peak_allocated_gib": 0.88323974609375,
+    "peak_reserved_gib": 0.912109375,
+    "reserved_gib": 0.912109375
+  },
+  "metrics": {
+    "combined": {
+      "finite": true,
+      "max_abs": 8.20821151137352e-06,
+      "reference_rms": 0.0004874732403550297,
+      "rms_rel": 0.004008818881279287
+    },
+    "routed": {
+      "finite": true,
+      "max_abs": 6.015121471136808e-06,
+      "reference_rms": 0.00039531965740025043,
+      "rms_rel": 0.003814299377884103
+    },
+    "shared_bf16_fallback": {
+      "finite": true,
+      "max_abs": 3.949448000639677e-06,
+      "reference_rms": 0.0002660661411937326,
+      "rms_rel": 0.0036279834675550537
+    }
+  },
+  "ok": true,
+  "output_sha256": "f3fdf6e1a8eba4373e6a235b09fd6408e41160fa63e33679fe55d72b8a272251",
+  "process_seconds": 10.06878267112188,
+  "rank": 3,
+  "reduce_scatter": {
+    "input_shape": [
+      4,
+      4096
+    ],
+    "output_shape": [
+      1,
+      4096
+    ],
+    "rank_order_metrics": {
+      "finite": true,
+      "max_abs": 1.52587890625e-05,
+      "reference_rms": 0.0005355593166314065,
+      "rms_rel": 0.002408969977833
+    }
+  },
+  "resident": {
+    "identity": {
+      "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+      "intermediate_end": 2048,
+      "intermediate_start": 1536,
+      "layer_id": 3,
+      "rank": 3,
+      "world_size": 4
+    },
+    "load_seconds": 5.823880983982235,
+    "resident_bytes": 861931008,
+    "routed": {
+      "resident_bytes": 855638016,
+      "tensors": {
+        "w13_q": {
+          "dtype": "torch.int32",
+          "sample_sha256": "b4a76e4746a4ca184d6dec422529cb1a317ff191643159633b52b27cc7c73f3e",
+          "shape": [
+            256,
+            256,
+            2048
+          ]
+        },
+        "w13_s": {
+          "dtype": "torch.float8_e8m0fnu",
+          "sample_sha256": "eaf2f1b7a9faa5b9734fec1be952598b43c6e24b5cc52904f180dcaca61b78a6",
+          "shape": [
+            256,
+            128,
+            1024
+          ]
+        },
+        "w2_q": {
+          "dtype": "torch.int32",
+          "sample_sha256": "69f2e886da306f3a645638d3d144737a6cfd6c2be65ca4eb706682247eaf0562",
+          "shape": [
+            256,
+            32,
+            8192
+          ]
+        },
+        "w2_s": {
+          "dtype": "torch.float8_e8m0fnu",
+          "sample_sha256": "ce59a19bf35a2163672c13fb24fdd512ae0b607d750c8c82701ad4dc5d6b9d58",
+          "shape": [
+            256,
+            16,
+            4096
+          ]
+        }
+      }
+    },
+    "sample_fingerprint": "2b6dbb799c7fd3a3b708fd60a27c2d3af67c204b270a7cc8c84cdd7a3f79b403",
+    "shared": {
+      "resident_bytes": 6292992,
+      "tensors": {
+        "s1": {
+          "dtype": "torch.float32",
+          "sample_sha256": "701390a8d8f6f0469a1592b9bed71a82b565bba3076e54b300f0a7786b19d3ac",
+          "shape": [
+            4,
+            32
+          ]
+        },
+        "s2": {
+          "dtype": "torch.float32",
+          "sample_sha256": "8d16712cf616d52541fb834973d05e674ee5081950531327ce3327dc71ccc66b",
+          "shape": [
+            32,
+            4
+          ]
+        },
+        "s3": {
+          "dtype": "torch.float32",
+          "sample_sha256": "9cfe07a7d4c35a0bd8445e9fbd4f07d996b519cbf1c202bb4a94b2e258f141aa",
+          "shape": [
+            4,
+            32
+          ]
+        },
+        "w1": {
+          "dtype": "torch.float8_e4m3fn",
+          "sample_sha256": "0d0872035aad476f2f73d0ac2df1d0349a56a4f7013b4dc5c032b34c10cfc125",
+          "shape": [
+            512,
+            4096
+          ]
+        },
+        "w2": {
+          "dtype": "torch.float8_e4m3fn",
+          "sample_sha256": "045727d6bdbd55785494c6186ec261cc87801928bb58c322b393dfaa22f09366",
+          "shape": [
+            4096,
+            512
+          ]
+        },
+        "w3": {
+          "dtype": "torch.float8_e4m3fn",
+          "sample_sha256": "86b65c1aaff8918a6c1819dd308abcb519939532413ebd1fdbd520bc503e9bb2",
+          "shape": [
+            512,
+            4096
+          ]
+        }
+      }
+    }
+  },
+  "routing": {
+    "algorithm": "learned sqrtsoftplus; bias selection-only; normalized top-k",
+    "all_rank_digest_match": true,
+    "digest": "da32f8cbc51c27dc2b1a4529f31221f5fcf0ec1611a18a162baea8b098abd004:49fe8cbf1641cbc343fec347386f085d50dca881620086737b1b5fdb3a71c870",
+    "ids_row_zero": [
+      179,
+      55,
+      43,
+      91,
+      53,
+      16
+    ],
+    "top6_top7_margin_min": 0.000232696533203125,
+    "weight_sum_max": 1.5,
+    "weight_sum_min": 1.5,
+    "weights_row_zero": [
+      0.2521941661834717,
+      0.25183743238449097,
+      0.2539424002170563,
+      0.24879005551338196,
+      0.24698391556739807,
+      0.2462521195411682
+    ]
+  },
+  "rows_per_rank": 1,
+  "safetensors": "0.8.0",
+  "schema_version": 1,
+  "scope": "single-layer TP4 MoE component correctness; not full block, stage, or performance",
+  "seed": 20260720,
+  "torch": "2.11.0+cu130",
+  "tp4moe_output_sha256": "f3fdf6e1a8eba4373e6a235b09fd6408e41160fa63e33679fe55d72b8a272251",
+  "tp4moe_runtime": {
+    "buffer_slot": 0,
+    "route_ids_match_manual": true,
+    "route_ids_row_zero": [
+      179,
+      55,
+      43,
+      91,
+      53,
+      16
+    ],
+    "route_margin_min": 0.000232696533203125,
+    "route_weights_row_zero": [
+      0.2521941661834717,
+      0.25183743238449097,
+      0.2539424002170563,
+      0.24879005551338196,
+      0.24698391556739807,
+      0.2462521195411682
+    ],
+    "shared_path": "bf16_dequant_correctness_fallback",
+    "vs_manual_reduce_scatter": {
+      "finite": true,
+      "max_abs": 0.0,
+      "reference_rms": 0.0005355689208954573,
+      "rms_rel": 0.0
+    },
+    "vs_rank_order_all_reduce": {
+      "finite": true,
+      "max_abs": 1.52587890625e-05,
+      "reference_rms": 0.0005355593166314065,
+      "rms_rel": 0.002408969977833
+    }
+  },
+  "validations": [
+    {
+      "name": "all_intermediates_finite",
+      "passed": true
+    },
+    {
+      "name": "routed_rms_rel",
+      "observed": 0.003814299377884103,
+      "passed": true,
+      "threshold": 0.03
+    },
+    {
+      "name": "shared_bf16_fallback_rms_rel",
+      "observed": 0.0036279834675550537,
+      "passed": true,
+      "threshold": 0.02
+    },
+    {
+      "name": "combined_rms_rel",
+      "observed": 0.004008818881279287,
+      "passed": true,
+      "threshold": 0.03
+    },
+    {
+      "max_abs_threshold": 0.0001,
+      "name": "reduce_scatter_rank_order",
+      "observed_max_abs": 1.52587890625e-05,
+      "observed_rms_rel": 0.002408969977833,
+      "passed": true,
+      "reference_rms": 0.0005355593166314065,
+      "rms_rel_threshold": 0.01
+    },
+    {
+      "max_abs_threshold": 0.0001,
+      "name": "tp4moe_runtime_vs_manual",
+      "observed_max_abs": 0.0,
+      "observed_rms_rel": 0.0,
+      "passed": true,
+      "rms_rel_threshold": 0.01
+    },
+    {
+      "name": "tp4moe_route_ids_match_manual",
+      "passed": true
+    }
+  ],
+  "vllm": "0.22.1",
+  "world": 4
+}
