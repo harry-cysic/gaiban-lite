@@ -1,0 +1,190 @@
+# E0ff V4-Flash layer-2 ratio-4 attention+indexer+hash-gate oracle gate — titan064 run log
+# date: 2026-07-20T08:12:20Z
+# host: titan064 (8x RTX 4090, CUDA 13.2), venv ~/Workspace/venvs/sglang
+# workdir: titan064:~/e0f-runtime (rsync of gaiban-lite/runtime/)
+# command:
+#   export CUDA_HOME=/usr/local/cuda-13.2; PATH=$CUDA_HOME/bin:$PATH; LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+#   ~/Workspace/venvs/sglang/bin/torchrun --standalone --nproc_per_node=4 \
+#     e0ff_ratio4_attention_oracle.py --stage-root ~/Workspace/DeepSeek-V4-Flash --out-dir out-e0ff
+# note: frozen seed 20260717 was screened on titan064 (seeds 20260711..20260716 each
+#   produced one single-code E2M1 flip in the dual-formulation index-query lattice,
+#   swapping one near-tied top-k entry; see EXPECTED_SEED comment in the harness).
+#   Metrics were bitwise identical across two consecutive official runs.
+
+== torchrun stdout/stderr ==
+W0720 08:12:01.072000 143395 torch/distributed/run.py:851] 
+W0720 08:12:01.072000 143395 torch/distributed/run.py:851] *****************************************
+W0720 08:12:01.072000 143395 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 08:12:01.072000 143395 torch/distributed/run.py:851] *****************************************
+EXIT=0
+
+== out-e0ff/README.md ==
+# E0ff V4-Flash TP4 layer-2 ratio-4 semantic gate
+
+Status: **PASS**
+
+This is a ratio-4 transition-component semantic diagnostic for the
+DeepSeek-V4-Flash geometry (hidden 4096, 64 heads, index_topk 512),
+not a latency run.
+Attention uses B=1 per rank over positions 8192..8195 from a nonzero
+independent QAT-valid state. Hash routing separately uses B=60 per rank
+and a selected-six-only FP64 oracle over 240 deterministically scanned
+checkpoint token IDs (route_scale 1.5, 256 experts).
+Each attention phase is teacher-forced from the independently prepared
+BF16-operand control state; that control alone supplies the acceptance gate.
+The control has independent state/ratio-4 math but shares the torch CUDA
+BF16 GEMM backend with the candidate; it is not an independent GEMM kernel.
+A raw-FP32 dequantized-checkpoint lane starts from the same state and is
+retained as non-gating attribution, including complete score/route witness.
+Raw-FP32 prior limits all passed: `True`; top-k classifications: `{'exact': 16, 'ordering_only': 0, 'set_change': 0}`; minimum overlap: `512/512`.
+The nonzero QAT-valid seed is a random algebraic state, not proof that it
+is reachable from an actual 8192-token prompt history.
+
+No autonomous rollout, prompt, full-sequence, full-layer, pipeline, cluster
+end-to-end, performance, or checkpoint-native FP8 GEMM claim is made.
+
+Checkpoint: `b3d44d9f14e59b1be0f108fd91e4a9a171650795e03a48dc8c47957cf40d22d9`
+Implementation: `8227ef4c36d80fb66316fcaca7702af29b3ec37c65a712f10f7a6099224fa5f7`
+
+== summary metrics (out-e0ff/summary.json) ==
+accepted: True
+checkpoint: b3d44d9f14e59b1be0f108fd91e4a9a171650795e03a48dc8c47957cf40d22d9
+block_contract: 5fe789349693e7ee6deb0df363a4a41397266005c4b29287b1cad6330b3e946a
+implementation: 8227ef4c36d80fb66316fcaca7702af29b3ec37c65a712f10f7a6099224fa5f7
+
+== control stage metrics (rms_rel_max / limit, all-rank max) ==
+   phase0.branch: rms_rel_max=9.148662e-04 row_rms_rel_max=9.148662e-04 limit=0.01 row_limit=0.024 accepted=True
+   phase0.index_adjusted_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.index_projected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.index_projected_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.index_query: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase0.index_scores: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase0.index_weights: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase0.inverse_rotated: rms_rel_max=4.839637e-05 row_rms_rel_max=7.051469e-04 limit=0.008 row_limit=0.02 accepted=True
+   phase0.main_adjusted_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.main_projected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.main_projected_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.output_lora: rms_rel_max=3.346136e-04 row_rms_rel_max=1.020839e-03 limit=0.01 row_limit=0.024 accepted=True
+   phase0.query: rms_rel_max=4.331273e-05 row_rms_rel_max=3.465387e-04 limit=0.005 row_limit=0.02 accepted=True
+   phase0.query_lora: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase0.raw_latent: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase0.selected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase0.sparse_control: rms_rel_max=4.827539e-05 row_rms_rel_max=5.741993e-04 limit=0.003 row_limit=0.012 accepted=True
+   phase0.sparse_output: rms_rel_max=4.839497e-05 row_rms_rel_max=7.051154e-04 limit=0.008 row_limit=0.02 accepted=True
+   phase0.state.compressed: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase0.state.index_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.state.index_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.state.indexer_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase0.state.main_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.state.main_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase0.state.raw: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase1.branch: rms_rel_max=7.311680e-04 row_rms_rel_max=7.311680e-04 limit=0.01 row_limit=0.024 accepted=True
+   phase1.index_adjusted_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.index_projected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.index_projected_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.index_query: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase1.index_scores: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase1.index_weights: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase1.inverse_rotated: rms_rel_max=1.291024e-05 row_rms_rel_max=1.078655e-03 limit=0.008 row_limit=0.02 accepted=True
+   phase1.main_adjusted_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.main_projected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.main_projected_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.output_lora: rms_rel_max=1.626607e-04 row_rms_rel_max=1.192028e-03 limit=0.01 row_limit=0.024 accepted=True
+   phase1.query: rms_rel_max=6.919237e-05 row_rms_rel_max=3.460807e-04 limit=0.005 row_limit=0.02 accepted=True
+   phase1.query_lora: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase1.raw_latent: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase1.selected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase1.sparse_control: rms_rel_max=2.488658e-06 row_rms_rel_max=3.273593e-04 limit=0.003 row_limit=0.012 accepted=True
+   phase1.sparse_output: rms_rel_max=1.233587e-05 row_rms_rel_max=1.033272e-03 limit=0.008 row_limit=0.02 accepted=True
+   phase1.state.compressed: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase1.state.index_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.state.index_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.state.indexer_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase1.state.main_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.state.main_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase1.state.raw: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase2.branch: rms_rel_max=9.589010e-04 row_rms_rel_max=9.589010e-04 limit=0.01 row_limit=0.024 accepted=True
+   phase2.index_adjusted_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.index_projected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.index_projected_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.index_query: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase2.index_scores: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase2.index_weights: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase2.inverse_rotated: rms_rel_max=4.544551e-05 row_rms_rel_max=1.348082e-03 limit=0.008 row_limit=0.02 accepted=True
+   phase2.main_adjusted_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.main_projected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.main_projected_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.output_lora: rms_rel_max=3.234997e-04 row_rms_rel_max=1.502504e-03 limit=0.01 row_limit=0.024 accepted=True
+   phase2.query: rms_rel_max=1.743272e-04 row_rms_rel_max=1.383746e-03 limit=0.005 row_limit=0.02 accepted=True
+   phase2.query_lora: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase2.raw_latent: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase2.selected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase2.sparse_control: rms_rel_max=4.497611e-05 row_rms_rel_max=6.834706e-04 limit=0.003 row_limit=0.012 accepted=True
+   phase2.sparse_output: rms_rel_max=4.500418e-05 row_rms_rel_max=1.313306e-03 limit=0.008 row_limit=0.02 accepted=True
+   phase2.state.compressed: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase2.state.index_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.state.index_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.state.indexer_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase2.state.main_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.state.main_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase2.state.raw: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase3.branch: rms_rel_max=3.641833e-04 row_rms_rel_max=3.641833e-04 limit=0.01 row_limit=0.024 accepted=True
+   phase3.index_adjusted_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.index_compression_finalized: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase3.index_compression_pooled: rms_rel_max=9.098897e-08 row_rms_rel_max=9.098897e-08 limit=5e-05 row_limit=0.0002 accepted=True
+   phase3.index_overlap_logits: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.index_overlap_values: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.index_projected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.index_projected_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.index_query: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase3.index_scores: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase3.index_weights: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase3.inverse_rotated: rms_rel_max=4.910490e-06 row_rms_rel_max=4.531557e-04 limit=0.008 row_limit=0.02 accepted=True
+   phase3.main_adjusted_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.main_compression_finalized: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase3.main_compression_pooled: rms_rel_max=8.583981e-08 row_rms_rel_max=8.583981e-08 limit=5e-05 row_limit=0.0002 accepted=True
+   phase3.main_overlap_logits: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.main_overlap_values: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.main_projected_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.main_projected_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.output_lora: rms_rel_max=3.272203e-05 row_rms_rel_max=9.108431e-04 limit=0.01 row_limit=0.024 accepted=True
+   phase3.query: rms_rel_max=4.325103e-05 row_rms_rel_max=3.452181e-04 limit=0.005 row_limit=0.02 accepted=True
+   phase3.query_lora: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase3.raw_latent: rms_rel_max=2.360198e-06 row_rms_rel_max=2.360198e-06 limit=0.003 row_limit=0.012 accepted=True
+   phase3.selected_kv: rms_rel_max=1.014866e-06 row_rms_rel_max=2.360198e-06 limit=0.003 row_limit=0.012 accepted=True
+   phase3.sparse_control: rms_rel_max=1.454893e-06 row_rms_rel_max=2.421337e-04 limit=0.003 row_limit=0.012 accepted=True
+   phase3.sparse_output: rms_rel_max=4.674942e-06 row_rms_rel_max=4.544067e-04 limit=0.008 row_limit=0.02 accepted=True
+   phase3.state.compressed: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase3.state.index_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.state.index_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.state.indexer_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=0.003 row_limit=0.012 accepted=True
+   phase3.state.main_kv: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.state.main_score: rms_rel_max=0.000000e+00 row_rms_rel_max=0.000000e+00 limit=2e-05 row_limit=8e-05 accepted=True
+   phase3.state.raw: rms_rel_max=1.121643e-06 row_rms_rel_max=2.360198e-06 limit=0.003 row_limit=0.012 accepted=True
+
+== gate exact checks: 148 / 148 true ==
+
+== raw-FP32 attribution (non-gating) ==
+   prior_limits_all_passed: True
+   topk: {'classification_counts': {'exact': 16, 'ordering_only': 0, 'set_change': 0}, 'jaccard_min': 1.0, 'overlap_count_min': 512, 'score_delta_linf_max': 0.0}
+   capture checks: 40 / 40 true
+
+== hash gate ==
+   routing_weights: rms_rel_max=6.267489e-08 row_rms_rel_max=1.377118e-07 limit=2e-05 row_limit=8e-05 accepted=True
+   selected_scores: rms_rel_max=2.901968e-08 row_rms_rel_max=4.469252e-08 limit=2e-05 row_limit=8e-05 accepted=True
+   exact: {'global_ids_unique': True, 'input_immutable': True, 'routing_ids': True, 'routing_ids_abi': True, 'row_sum': True, 'strictly_positive': True, 'table_ids': True}
+   token_ids_consistent: True
+   global routing: rows [240, 6] row_unique True ids_in_range True expert_coverage 256 / 256
+   expert_count_histogram: {'1': 7, '10': 6, '11': 6, '12': 1, '13': 1, '14': 1, '2': 14, '3': 24, '4': 49, '5': 40, '6': 37, '7': 29, '8': 22, '9': 19}
+
+== rank-0 memory ==
+   {'allocated_bytes': 1208669696, 'peak_allocated_bytes': 1467203584, 'peak_reserved_bytes': 1503657984, 'reserved_bytes': 1503657984}
+== weights (rank-0) ==
+   bf16_control_attention_resident_bytes: 273183488
+   candidate_attention_resident_bytes: 273183488
+   loaded_routed_expert_bytes: 0
+   loaded_shared_expert_bytes: 0
+   raw_fp32_attention_resident_bytes: 504394496
+   replicated_block_resident_bytes: 148336216
+   route_kind: hash
+   profile_checks all true: True
