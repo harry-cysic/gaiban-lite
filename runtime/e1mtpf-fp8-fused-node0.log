@@ -1,0 +1,65 @@
+W0720 18:52:27.352000 170077 torch/distributed/run.py:851] 
+W0720 18:52:27.352000 170077 torch/distributed/run.py:851] *****************************************
+W0720 18:52:27.352000 170077 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 18:52:27.352000 170077 torch/distributed/run.py:851] *****************************************
+[E1MTPF] layer=0 rank=0 experts=64/256
+[E1MTPF] layer=0 rank=0 experts=128/256
+[E1MTPF] layer=0 rank=0 experts=192/256
+[E1MTPF] layer=0 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 0 material loaded
+[E1MTPF] layer=1 rank=0 experts=64/256
+[E1MTPF] layer=1 rank=0 experts=128/256
+[E1MTPF] layer=1 rank=0 experts=192/256
+[E1MTPF] layer=1 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 1 material loaded
+[E1MTPF] layer=2 rank=0 experts=64/256
+[E1MTPF] layer=2 rank=0 experts=128/256
+[E1MTPF] layer=2 rank=0 experts=192/256
+[E1MTPF] layer=2 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 2 material loaded
+[E1MTPF] layer=3 rank=0 experts=64/256
+[E1MTPF] layer=3 rank=0 experts=128/256
+[E1MTPF] layer=3 rank=0 experts=192/256
+[E1MTPF] layer=3 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 3 material loaded
+[E1MTPF] layer=4 rank=0 experts=64/256
+[E1MTPF] layer=4 rank=0 experts=128/256
+[E1MTPF] layer=4 rank=0 experts=192/256
+[E1MTPF] layer=4 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 4 material loaded
+[E1MTPF] layer=5 rank=0 experts=64/256
+[E1MTPF] layer=5 rank=0 experts=128/256
+[E1MTPF] layer=5 rank=0 experts=192/256
+[E1MTPF] layer=5 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 5 material loaded
+[E1MTPF] layer=6 rank=0 experts=64/256
+[E1MTPF] layer=6 rank=0 experts=128/256
+[E1MTPF] layer=6 rank=0 experts=192/256
+[E1MTPF] layer=6 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 6 material loaded
+[E1MTPF] layer=7 rank=0 experts=64/256
+[E1MTPF] layer=7 rank=0 experts=128/256
+[E1MTPF] layer=7 rank=0 experts=192/256
+[E1MTPF] layer=7 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 7 material loaded
+[E1MTPF] layer=8 rank=0 experts=64/256
+[E1MTPF] layer=8 rank=0 experts=128/256
+[E1MTPF] layer=8 rank=0 experts=192/256
+[E1MTPF] layer=8 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 8 material loaded
+[E1MTPF] layer=9 rank=0 experts=64/256
+[E1MTPF] layer=9 rank=0 experts=128/256
+[E1MTPF] layer=9 rank=0 experts=192/256
+[E1MTPF] layer=9 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 9 material loaded
+[E1MTPF] layer=10 rank=0 experts=64/256
+[E1MTPF] layer=10 rank=0 experts=128/256
+[E1MTPF] layer=10 rank=0 experts=192/256
+[E1MTPF] layer=10 rank=0 experts=256/256
+[E1MTPF] stage 0 layer 10 material loaded
+[E1MTPF] baseline: p50 208.0 ms (repeats [208.52197997737676, 207.9581250436604, 207.6736210146919])
+[E1MTPF] fused_accept: p50 316.8 ms (repeats [316.5002119494602, 316.81184004992247, 316.75781798548996])
+[E1MTPF] fused_reject: p50 307.1 ms (repeats [307.1486745029688, 306.3324565300718, 305.9657100820914])
+[E1MTPF] chained_accept: p50 298.8 ms (repeats [298.6512869829312, 298.76578447874635, 298.8854590803385])
+[E1MTPF] chained_reject: p50 288.0 ms (repeats [287.5155848450959, 288.21392299141735, 287.3149609658867])
+[E1MTPF] overall: PASS

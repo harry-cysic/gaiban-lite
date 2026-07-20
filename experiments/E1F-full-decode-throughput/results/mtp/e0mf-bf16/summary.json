@@ -1,0 +1,347 @@
+{
+  "accepted": true,
+  "checkpoint_id": "22e39d72d72670f53045d1f0e2d13028f70a2bcfee5b71029b55536d7794a64f",
+  "diagnostics_rank0": {
+    "decode_pos096.argmax_agreement": true,
+    "decode_pos096.candidate_argmax": 17935,
+    "decode_pos096.route_margin_min": 0.020987510681152344,
+    "decode_pos097.argmax_agreement": true,
+    "decode_pos097.candidate_argmax": 3809,
+    "decode_pos097.route_margin_min": 0.01854991912841797,
+    "decode_pos098.argmax_agreement": true,
+    "decode_pos098.candidate_argmax": 5712,
+    "decode_pos098.route_margin_min": 0.0040760040283203125,
+    "prefill.argmax_agreement": true,
+    "prefill.candidate_argmax": 223
+  },
+  "errors": [],
+  "exact_checks_all": {
+    "decode_pos096.hc_attn_post_comb_exact": true,
+    "decode_pos096.hc_ffn_post_comb_exact": true,
+    "decode_pos096.moe_local_input_capture_equal": true,
+    "decode_pos096.route_ids_match_oracle": true,
+    "decode_pos096.state.next_position": true,
+    "decode_pos096.twin_logits_bitwise": true,
+    "decode_pos097.hc_attn_post_comb_exact": true,
+    "decode_pos097.hc_ffn_post_comb_exact": true,
+    "decode_pos097.moe_local_input_capture_equal": true,
+    "decode_pos097.route_ids_match_oracle": true,
+    "decode_pos097.state.next_position": true,
+    "decode_pos097.twin_logits_bitwise": true,
+    "decode_pos098.hc_attn_post_comb_exact": true,
+    "decode_pos098.hc_ffn_post_comb_exact": true,
+    "decode_pos098.moe_local_input_capture_equal": true,
+    "decode_pos098.route_ids_match_oracle": true,
+    "decode_pos098.state.next_position": true,
+    "decode_pos098.twin_logits_bitwise": true,
+    "prefill.hc_attn_post_comb_exact": true,
+    "prefill.hc_ffn_post_comb_exact": true,
+    "prefill.moe_local_input_capture_equal": true,
+    "prefill.state.next_position": true,
+    "prefill.twin_logits_bitwise": true
+  },
+  "experiment": "E0mf-mtp-block-oracle",
+  "implementation_sha256": "7cefc20814209baf917337daa8df8f5805434aa17019f0b649ee252b4c13b0aa",
+  "kv_dtype": "bf16",
+  "measurement_class": "semantic_correctness_gate",
+  "schema_version": 1,
+  "semantic_contract": {
+    "attention": "window ratio-0, no-YaRN base rope_theta 10000 (E0wf lane)",
+    "block": "mtp.0 (layer id 43)",
+    "bridge": "enorm(embed(ids)) -> e_proj; hnorm(hc hidden) -> h_proj; sum",
+    "head": "shared head.weight through MTP-owned hc_head (sigmoid) + norm",
+    "logits": "last-position fp32 (ParallelHead.get_logits :716)",
+    "measurement_scope": "semantic_correctness_not_performance",
+    "model": "deepseek-v4-flash",
+    "reference": "model.py MTPBlock :738-766 + Transformer :789-793",
+    "router": "learned noaux_tc (43 >= num_hash_layers)"
+  },
+  "stage_metrics_worst": {
+    "decode_pos096.after_attention": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016852131223702553
+    },
+    "decode_pos096.attn_branch": {
+      "accepted": true,
+      "declared_limit": 0.04,
+      "rms_rel_max": 0.015777062339428164
+    },
+    "decode_pos096.attn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.002479906671792859
+    },
+    "decode_pos096.block_output": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.001661411601447655
+    },
+    "decode_pos096.bridged": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0029265008130506228
+    },
+    "decode_pos096.enorm_embedded": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016536575184057946
+    },
+    "decode_pos096.ffn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.002335961029972201
+    },
+    "decode_pos096.final_norm": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0023761446317939203
+    },
+    "decode_pos096.hc_head_collapsed": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0017097166305312377
+    },
+    "decode_pos096.hnorm_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016660035965089237
+    },
+    "decode_pos096.logits": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.001918309152694766
+    },
+    "decode_pos096.moe_local": {
+      "accepted": true,
+      "declared_limit": 0.03,
+      "rms_rel_max": 0.007967915678086053
+    },
+    "decode_pos096.route_weights": {
+      "accepted": true,
+      "declared_limit": 2e-05,
+      "rms_rel_max": 0.0
+    },
+    "decode_pos096.state.raw": {
+      "accepted": true,
+      "declared_limit": 0.02,
+      "rms_rel_max": 0.010114268566516609
+    },
+    "decode_pos097.after_attention": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016781579782497369
+    },
+    "decode_pos097.attn_branch": {
+      "accepted": true,
+      "declared_limit": 0.04,
+      "rms_rel_max": 0.012416792470230826
+    },
+    "decode_pos097.attn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.002389970873042285
+    },
+    "decode_pos097.block_output": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0017780211717081883
+    },
+    "decode_pos097.bridged": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.002936346502085584
+    },
+    "decode_pos097.enorm_embedded": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016923330149570702
+    },
+    "decode_pos097.ffn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0023743806473419367
+    },
+    "decode_pos097.final_norm": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.002660635328796984
+    },
+    "decode_pos097.hc_head_collapsed": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0017790457872470327
+    },
+    "decode_pos097.hnorm_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016896514991460697
+    },
+    "decode_pos097.logits": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0024126414282549234
+    },
+    "decode_pos097.moe_local": {
+      "accepted": true,
+      "declared_limit": 0.03,
+      "rms_rel_max": 0.0060337839589736444
+    },
+    "decode_pos097.route_weights": {
+      "accepted": true,
+      "declared_limit": 2e-05,
+      "rms_rel_max": 0.0
+    },
+    "decode_pos097.state.raw": {
+      "accepted": true,
+      "declared_limit": 0.02,
+      "rms_rel_max": 0.010063649046949816
+    },
+    "decode_pos098.after_attention": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016648282246557887
+    },
+    "decode_pos098.attn_branch": {
+      "accepted": true,
+      "declared_limit": 0.04,
+      "rms_rel_max": 0.01290772310016991
+    },
+    "decode_pos098.attn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0023558628103320027
+    },
+    "decode_pos098.block_output": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0018072003567156903
+    },
+    "decode_pos098.bridged": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0029516154961326847
+    },
+    "decode_pos098.enorm_embedded": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016613639775748476
+    },
+    "decode_pos098.ffn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0023780262033701615
+    },
+    "decode_pos098.final_norm": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.002372971025443679
+    },
+    "decode_pos098.hc_head_collapsed": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0017177744594092637
+    },
+    "decode_pos098.hnorm_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016711895121957004
+    },
+    "decode_pos098.logits": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.002117094169826307
+    },
+    "decode_pos098.moe_local": {
+      "accepted": true,
+      "declared_limit": 0.03,
+      "rms_rel_max": 0.005604501513717033
+    },
+    "decode_pos098.route_weights": {
+      "accepted": true,
+      "declared_limit": 2e-05,
+      "rms_rel_max": 0.0
+    },
+    "decode_pos098.state.raw": {
+      "accepted": true,
+      "declared_limit": 0.02,
+      "rms_rel_max": 0.010014437288841502
+    },
+    "prefill.after_attention": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016592034826157643
+    },
+    "prefill.attn_branch": {
+      "accepted": true,
+      "declared_limit": 0.04,
+      "rms_rel_max": 0.01598736589731648
+    },
+    "prefill.attn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0023446855862669317
+    },
+    "prefill.block_output": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.001674986495517856
+    },
+    "prefill.bridged": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0031138463766658495
+    },
+    "prefill.enorm_embedded": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016629804472186784
+    },
+    "prefill.ffn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0023502694359009485
+    },
+    "prefill.final_norm": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.002340138015708322
+    },
+    "prefill.hc_head_collapsed": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016602539650843312
+    },
+    "prefill.hnorm_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.0016599289508306683
+    },
+    "prefill.logits": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "rms_rel_max": 0.002218116919894981
+    },
+    "prefill.state.raw": {
+      "accepted": true,
+      "declared_limit": 0.02,
+      "rms_rel_max": 0.010166518300919492
+    }
+  },
+  "workload": {
+    "decode_steps": 3,
+    "limits": {
+      "branch": 0.04,
+      "bridge": 0.012,
+      "hc_stage": 0.012,
+      "head_stage": 0.012,
+      "logits": 0.012,
+      "moe_combined": 0.03,
+      "route_weights": 2e-05,
+      "state_raw": 0.02
+    },
+    "max_seq_len": 256,
+    "prefill_len": 96,
+    "seed": 20260721
+  }
+}

@@ -1,0 +1,843 @@
+{
+  "accepted": true,
+  "block_resident_bytes": 146068332,
+  "checkpoint_id": "22e39d72d72670f53045d1f0e2d13028f70a2bcfee5b71029b55536d7794a64f",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "decode_pos096": 0.18328242585994303,
+    "decode_pos097": 0.14347543218173087,
+    "decode_pos098": 0.13614018610678613,
+    "load": 6.545861303107813,
+    "prefill": 2.9825799730606377,
+    "process": 10.383708767825738
+  },
+  "diagnostics": {
+    "decode_pos096.argmax_agreement": true,
+    "decode_pos096.candidate_argmax": 10042,
+    "decode_pos096.route_margin_min": 0.020987510681152344,
+    "decode_pos097.argmax_agreement": true,
+    "decode_pos097.candidate_argmax": 1766,
+    "decode_pos097.route_margin_min": 0.01854991912841797,
+    "decode_pos098.argmax_agreement": true,
+    "decode_pos098.candidate_argmax": 869,
+    "decode_pos098.route_margin_min": 0.0040760040283203125,
+    "prefill.argmax_agreement": true,
+    "prefill.candidate_argmax": 551
+  },
+  "errors": [],
+  "exact_checks": {
+    "decode_pos096.hc_attn_post_comb_exact": true,
+    "decode_pos096.hc_ffn_post_comb_exact": true,
+    "decode_pos096.moe_local_input_capture_equal": true,
+    "decode_pos096.route_ids_match_oracle": true,
+    "decode_pos096.state.next_position": true,
+    "decode_pos096.twin_logits_bitwise": true,
+    "decode_pos097.hc_attn_post_comb_exact": true,
+    "decode_pos097.hc_ffn_post_comb_exact": true,
+    "decode_pos097.moe_local_input_capture_equal": true,
+    "decode_pos097.route_ids_match_oracle": true,
+    "decode_pos097.state.next_position": true,
+    "decode_pos097.twin_logits_bitwise": true,
+    "decode_pos098.hc_attn_post_comb_exact": true,
+    "decode_pos098.hc_ffn_post_comb_exact": true,
+    "decode_pos098.moe_local_input_capture_equal": true,
+    "decode_pos098.route_ids_match_oracle": true,
+    "decode_pos098.state.next_position": true,
+    "decode_pos098.twin_logits_bitwise": true,
+    "prefill.hc_attn_post_comb_exact": true,
+    "prefill.hc_ffn_post_comb_exact": true,
+    "prefill.moe_local_input_capture_equal": true,
+    "prefill.state.next_position": true,
+    "prefill.twin_logits_bitwise": true
+  },
+  "experiment": "E0mf-mtp-block-oracle",
+  "host": "titan064",
+  "implementation_sha256": "7cefc20814209baf917337daa8df8f5805434aa17019f0b649ee252b4c13b0aa",
+  "inputs": {
+    "decode_pos096": {
+      "hidden_sha256": "9f559e5e54b5b05a702ffdb965a8187dbfb6040b25488771b201f44ca76e0fd9",
+      "ids_sha256": "6506ef3e6b7ec958f310c289b598536d993d79e1985914bb2706d9d65325a7a5"
+    },
+    "decode_pos097": {
+      "hidden_sha256": "ad5b6505c6175ed67e8b7bc6f78b73003c124b8bbe807aca3aea8e26a3508c58",
+      "ids_sha256": "87ac1bbabe154943728174bf670c090ef3b72b03d1b4bdb36a832cb4f3318176"
+    },
+    "decode_pos098": {
+      "hidden_sha256": "72f54bc451ce3ea39c35ce352a0b0b7f39a9bbc15d950c228aa0bbbf6808852e",
+      "ids_sha256": "46b939c73c514ff0497006e0b2908d5a9cd0774dab5b57e443a3a03e8489935e"
+    },
+    "prefill": {
+      "hidden_sha256": "59bd86fdfa3b4d08e9ca37bcdce9c9241383b7519206e30b8358531ead60597b",
+      "ids_sha256": "6cd907a2ec956838098c54ebbffc77b03688b37dc9a4eba8ec00921bf7aeb6c4"
+    }
+  },
+  "kv_dtype": "bf16",
+  "measurement_class": "semantic_correctness_gate",
+  "moe_evidence": {
+    "checkpoint_id": "22e39d72d72670f53045d1f0e2d13028f70a2bcfee5b71029b55536d7794a64f",
+    "kind": "mtp_window",
+    "kv_dtype": "bf16",
+    "layer_id": 43,
+    "moe_resident_bytes": 861931008,
+    "moe_slots_per_shape": 1,
+    "registered_global_rows": [
+      4,
+      384
+    ],
+    "route_kind": "learned",
+    "tp_collective": {
+      "backend": "nccl",
+      "global_rank": 1,
+      "global_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "local_rank": 1,
+      "validated_live": true,
+      "world_size": 4
+    }
+  },
+  "rank": 1,
+  "schema_version": 1,
+  "semantic_contract": {
+    "attention": "window ratio-0, no-YaRN base rope_theta 10000 (E0wf lane)",
+    "block": "mtp.0 (layer id 43)",
+    "bridge": "enorm(embed(ids)) -> e_proj; hnorm(hc hidden) -> h_proj; sum",
+    "head": "shared head.weight through MTP-owned hc_head (sigmoid) + norm",
+    "logits": "last-position fp32 (ParallelHead.get_logits :716)",
+    "measurement_scope": "semantic_correctness_not_performance",
+    "model": "deepseek-v4-flash",
+    "reference": "model.py MTPBlock :738-766 + Transformer :789-793",
+    "router": "learned noaux_tc (43 >= num_hash_layers)"
+  },
+  "stage_metrics": {
+    "decode_pos096.after_attention": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.012547969818115234,
+      "rms_rel": 0.0016505269576460263,
+      "row_rms_rel_max": 0.0016858938615769148,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos096.attn_branch": {
+      "accepted": true,
+      "declared_limit": 0.04,
+      "finite": true,
+      "max_abs": 0.25,
+      "rms_rel": 0.015777062339428164,
+      "row_rms_rel_max": 0.015777062624692917,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos096.attn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0015937387943267822,
+      "rms_rel": 0.0024517381862250876,
+      "row_rms_rel_max": 0.0024517381098121405,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos096.block_output": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.025087356567382812,
+      "rms_rel": 0.0016453701018682568,
+      "row_rms_rel_max": 0.001685181981883943,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos096.bridged": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.005449652671813965,
+      "rms_rel": 0.0029232772401562935,
+      "row_rms_rel_max": 0.0029921771492809057,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos096.enorm_embedded": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.00048661231994628906,
+      "rms_rel": 0.0016480082107066458,
+      "row_rms_rel_max": 0.0016480082413181663,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos096.ffn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.007269740104675293,
+      "rms_rel": 0.0023236415676995384,
+      "row_rms_rel_max": 0.002323641674593091,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos096.final_norm": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.009751319885253906,
+      "rms_rel": 0.0021786417712179344,
+      "row_rms_rel_max": 0.0021786417346447706,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos096.hc_head_collapsed": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.04864311218261719,
+      "rms_rel": 0.0017097166305312377,
+      "row_rms_rel_max": 0.0017097166273742914,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos096.hnorm_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0016018152236938477,
+      "rms_rel": 0.0016660035965089237,
+      "row_rms_rel_max": 0.0016920830821618438,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos096.logits": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0659637451171875,
+      "rms_rel": 0.0015417002544005024,
+      "row_rms_rel_max": 0.0015417002141475677,
+      "shape": [
+        1,
+        129280
+      ]
+    },
+    "decode_pos096.moe_local": {
+      "accepted": true,
+      "declared_limit": 0.03,
+      "finite": true,
+      "max_abs": 0.040770530700683594,
+      "rms_rel": 0.004318006768773541,
+      "row_rms_rel_max": 0.004318006802350283,
+      "shape": [
+        1,
+        4096
+      ]
+    },
+    "decode_pos096.route_weights": {
+      "accepted": true,
+      "declared_limit": 2e-05,
+      "finite": true,
+      "max_abs": 0.0,
+      "rms_rel": 0.0,
+      "row_rms_rel_max": 0.0,
+      "shape": [
+        4,
+        6
+      ]
+    },
+    "decode_pos096.state.raw": {
+      "accepted": true,
+      "declared_limit": 0.02,
+      "finite": true,
+      "max_abs": 0.5,
+      "rms_rel": 0.009991469738113799,
+      "row_rms_rel_max": 0.019826550036668777,
+      "shape": [
+        1,
+        128,
+        512
+      ]
+    },
+    "decode_pos097.after_attention": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.007788181304931641,
+      "rms_rel": 0.0016731384030236763,
+      "row_rms_rel_max": 0.0016954320017248392,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos097.attn_branch": {
+      "accepted": true,
+      "declared_limit": 0.04,
+      "finite": true,
+      "max_abs": 0.25,
+      "rms_rel": 0.011829863959534441,
+      "row_rms_rel_max": 0.011829864233732224,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos097.attn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0018007159233093262,
+      "rms_rel": 0.002389970873042285,
+      "row_rms_rel_max": 0.0023899709340184927,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos097.block_output": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.11069488525390625,
+      "rms_rel": 0.0017780211717081883,
+      "row_rms_rel_max": 0.001918900408782065,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos097.bridged": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0058356523513793945,
+      "rms_rel": 0.002884834321093822,
+      "row_rms_rel_max": 0.0028957717586308718,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos097.enorm_embedded": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.00048114359378814697,
+      "rms_rel": 0.0016708081725945129,
+      "row_rms_rel_max": 0.0016708081820979714,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos097.ffn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.008095145225524902,
+      "rms_rel": 0.002314854748361567,
+      "row_rms_rel_max": 0.002314854646101594,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos097.final_norm": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.026618480682373047,
+      "rms_rel": 0.002660635328796984,
+      "row_rms_rel_max": 0.002660635393112898,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos097.hc_head_collapsed": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.07828521728515625,
+      "rms_rel": 0.0017742051958266252,
+      "row_rms_rel_max": 0.0017742052441462874,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos097.hnorm_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0009743273258209229,
+      "rms_rel": 0.00164793804584073,
+      "row_rms_rel_max": 0.0016776202246546745,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos097.logits": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.10988807678222656,
+      "rms_rel": 0.0024126414282549234,
+      "row_rms_rel_max": 0.0024126414209604263,
+      "shape": [
+        1,
+        129280
+      ]
+    },
+    "decode_pos097.moe_local": {
+      "accepted": true,
+      "declared_limit": 0.03,
+      "finite": true,
+      "max_abs": 0.1397418975830078,
+      "rms_rel": 0.004096755266982404,
+      "row_rms_rel_max": 0.004096755292266607,
+      "shape": [
+        1,
+        4096
+      ]
+    },
+    "decode_pos097.route_weights": {
+      "accepted": true,
+      "declared_limit": 2e-05,
+      "finite": true,
+      "max_abs": 0.0,
+      "rms_rel": 0.0,
+      "row_rms_rel_max": 0.0,
+      "shape": [
+        4,
+        6
+      ]
+    },
+    "decode_pos097.state.raw": {
+      "accepted": true,
+      "declared_limit": 0.02,
+      "finite": true,
+      "max_abs": 0.5,
+      "rms_rel": 0.009941870339147575,
+      "row_rms_rel_max": 0.019826550036668777,
+      "shape": [
+        1,
+        128,
+        512
+      ]
+    },
+    "decode_pos098.after_attention": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.013394832611083984,
+      "rms_rel": 0.0016639951837220694,
+      "row_rms_rel_max": 0.0017008341383188963,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos098.attn_branch": {
+      "accepted": true,
+      "declared_limit": 0.04,
+      "finite": true,
+      "max_abs": 0.21875,
+      "rms_rel": 0.01253082689770563,
+      "row_rms_rel_max": 0.012530826963484287,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos098.attn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0019125938415527344,
+      "rms_rel": 0.00235558066027089,
+      "row_rms_rel_max": 0.002355580683797598,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos098.block_output": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.05768013000488281,
+      "rms_rel": 0.0015883276879099328,
+      "row_rms_rel_max": 0.0016441867919638753,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos098.bridged": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.006186723709106445,
+      "rms_rel": 0.0029193780903109126,
+      "row_rms_rel_max": 0.0029753888957202435,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos098.enorm_embedded": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.00048206746578216553,
+      "rms_rel": 0.0016451801933604166,
+      "row_rms_rel_max": 0.0016451801639050245,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos098.ffn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.00769197940826416,
+      "rms_rel": 0.0023247708957132673,
+      "row_rms_rel_max": 0.0023247709032148123,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos098.final_norm": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.015810489654541016,
+      "rms_rel": 0.0021933050537220047,
+      "row_rms_rel_max": 0.002193304942920804,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos098.hc_head_collapsed": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.06064796447753906,
+      "rms_rel": 0.0016728968034032852,
+      "row_rms_rel_max": 0.0016728967893868685,
+      "shape": [
+        1,
+        1,
+        4096
+      ]
+    },
+    "decode_pos098.hnorm_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0009735822677612305,
+      "rms_rel": 0.001668513042591937,
+      "row_rms_rel_max": 0.0016769408248364925,
+      "shape": [
+        1,
+        1,
+        4,
+        4096
+      ]
+    },
+    "decode_pos098.logits": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.08617973327636719,
+      "rms_rel": 0.00179419125265961,
+      "row_rms_rel_max": 0.0017941913101822138,
+      "shape": [
+        1,
+        129280
+      ]
+    },
+    "decode_pos098.moe_local": {
+      "accepted": true,
+      "declared_limit": 0.03,
+      "finite": true,
+      "max_abs": 0.16379642486572266,
+      "rms_rel": 0.005089630748040231,
+      "row_rms_rel_max": 0.005089630838483572,
+      "shape": [
+        1,
+        4096
+      ]
+    },
+    "decode_pos098.route_weights": {
+      "accepted": true,
+      "declared_limit": 2e-05,
+      "finite": true,
+      "max_abs": 0.0,
+      "rms_rel": 0.0,
+      "row_rms_rel_max": 0.0,
+      "shape": [
+        4,
+        6
+      ]
+    },
+    "decode_pos098.state.raw": {
+      "accepted": true,
+      "declared_limit": 0.02,
+      "finite": true,
+      "max_abs": 0.5,
+      "rms_rel": 0.009891259194953386,
+      "row_rms_rel_max": 0.019826550036668777,
+      "shape": [
+        1,
+        128,
+        512
+      ]
+    },
+    "prefill.after_attention": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.043853759765625,
+      "rms_rel": 0.0016551209104273996,
+      "row_rms_rel_max": 0.0017609682399779558,
+      "shape": [
+        1,
+        96,
+        4,
+        4096
+      ]
+    },
+    "prefill.attn_branch": {
+      "accepted": true,
+      "declared_limit": 0.04,
+      "finite": true,
+      "max_abs": 1.0,
+      "rms_rel": 0.01598736589731648,
+      "row_rms_rel_max": 0.020704016089439392,
+      "shape": [
+        1,
+        96,
+        4096
+      ]
+    },
+    "prefill.attn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0024014413356781006,
+      "rms_rel": 0.0023391016749922293,
+      "row_rms_rel_max": 0.002429497428238392,
+      "shape": [
+        1,
+        96,
+        4096
+      ]
+    },
+    "prefill.block_output": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.12120437622070312,
+      "rms_rel": 0.001658807446382673,
+      "row_rms_rel_max": 0.0019570922013372183,
+      "shape": [
+        1,
+        96,
+        4,
+        4096
+      ]
+    },
+    "prefill.bridged": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.014033317565917969,
+      "rms_rel": 0.003104561916144046,
+      "row_rms_rel_max": 0.0032830655109137297,
+      "shape": [
+        1,
+        96,
+        4,
+        4096
+      ]
+    },
+    "prefill.enorm_embedded": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.0009495317935943604,
+      "rms_rel": 0.0016551875242384899,
+      "row_rms_rel_max": 0.001718971529044211,
+      "shape": [
+        1,
+        96,
+        4096
+      ]
+    },
+    "prefill.ffn_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.013649702072143555,
+      "rms_rel": 0.0023436328007212766,
+      "row_rms_rel_max": 0.002469587605446577,
+      "shape": [
+        1,
+        96,
+        4096
+      ]
+    },
+    "prefill.final_norm": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.028961181640625,
+      "rms_rel": 0.002340138015708322,
+      "row_rms_rel_max": 0.0027950017247349024,
+      "shape": [
+        1,
+        96,
+        4096
+      ]
+    },
+    "prefill.hc_head_collapsed": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.11920547485351562,
+      "rms_rel": 0.00165872016984152,
+      "row_rms_rel_max": 0.002021357649937272,
+      "shape": [
+        1,
+        96,
+        4096
+      ]
+    },
+    "prefill.hnorm_hidden": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.001865088939666748,
+      "rms_rel": 0.0016581694948715005,
+      "row_rms_rel_max": 0.0017263813642784953,
+      "shape": [
+        1,
+        96,
+        4,
+        4096
+      ]
+    },
+    "prefill.logits": {
+      "accepted": true,
+      "declared_limit": 0.012,
+      "finite": true,
+      "max_abs": 0.06586432456970215,
+      "rms_rel": 0.001708217887086828,
+      "row_rms_rel_max": 0.0017082178965210915,
+      "shape": [
+        1,
+        129280
+      ]
+    },
+    "prefill.state.raw": {
+      "accepted": true,
+      "declared_limit": 0.02,
+      "finite": true,
+      "max_abs": 0.5,
+      "rms_rel": 0.010044254447498839,
+      "row_rms_rel_max": 0.019826550036668777,
+      "shape": [
+        1,
+        128,
+        512
+      ]
+    }
+  },
+  "torch": "2.11.0+cu130",
+  "workload": {
+    "decode_steps": 3,
+    "limits": {
+      "branch": 0.04,
+      "bridge": 0.012,
+      "hc_stage": 0.012,
+      "head_stage": 0.012,
+      "logits": 0.012,
+      "moe_combined": 0.03,
+      "route_weights": 2e-05,
+      "state_raw": 0.02
+    },
+    "max_seq_len": 256,
+    "prefill_len": 96,
+    "seed": 20260721
+  },
+  "world": 4
+}

@@ -1,0 +1,454 @@
+{
+  "accepted": true,
+  "arm_results": {
+    "mtp_free": [
+      {
+        "acceptance_rate": 1.0,
+        "accepted_rounds": 1,
+        "arm": "mtp_free",
+        "effective_ms_per_token": 146.8115559546277,
+        "emitted_tokens": [
+          51119,
+          1
+        ],
+        "mode": "chained",
+        "n_tokens": 2,
+        "prompt_index": 0,
+        "prompt_len": 16,
+        "round_ms_mean": 293.6231119092554,
+        "round_ms_p50": 293.6231119092554,
+        "round_records": [
+          {
+            "accepted": true,
+            "round_ms": 293.6231119092554,
+            "tokens": 2,
+            "verify_ms": 269.2141260486096
+          }
+        ],
+        "rounds": 1,
+        "step_ms_mean": null,
+        "step_ms_p50": null,
+        "tokens_generated": 3,
+        "verify_ms_mean": 269.2141260486096
+      }
+    ],
+    "mtp_fused": [
+      {
+        "acceptance_rate": 1.0,
+        "accepted_rounds": 1,
+        "arm": "mtp_fused",
+        "effective_ms_per_token": 151.27163450233638,
+        "emitted_tokens": [
+          51119,
+          1
+        ],
+        "mode": "fused",
+        "n_tokens": 2,
+        "prompt_index": 0,
+        "prompt_len": 16,
+        "round_ms_mean": 302.54326900467277,
+        "round_ms_p50": 302.54326900467277,
+        "round_records": [
+          {
+            "accepted": true,
+            "round_ms": 302.54326900467277,
+            "tokens": 2,
+            "verify_ms": 280.2397389896214
+          }
+        ],
+        "rounds": 1,
+        "step_ms_mean": null,
+        "step_ms_p50": null,
+        "tokens_generated": 3,
+        "verify_ms_mean": 280.2397389896214
+      }
+    ],
+    "mtp_teacher": [
+      {
+        "arm": "mtp_teacher",
+        "compare_steps": 2,
+        "decode_ms_mean": 53.29268821515143,
+        "draft_acceptance_rate": 1.0,
+        "draft_accepted": 1,
+        "draft_events": 1,
+        "draft_golden_hits": 1,
+        "first_mismatch": null,
+        "matched": 2,
+        "mismatches": [],
+        "predicted_tokens": [
+          51119,
+          1
+        ],
+        "prompt_index": 0,
+        "prompt_len": 16,
+        "steps": [
+          {
+            "golden": 51119,
+            "golden_deficit": 0.0,
+            "match": true,
+            "predicted": 51119,
+            "step": 0,
+            "top1_logit": 39.103004455566406,
+            "top2_gap": 9.698352813720703
+          },
+          {
+            "golden": 1,
+            "golden_deficit": 0.0,
+            "match": true,
+            "predicted": 1,
+            "step": 1,
+            "top1_logit": 39.184852600097656,
+            "top2_gap": 11.987627029418945
+          }
+        ]
+      }
+    ],
+    "off_free": [
+      {
+        "arm": "off_free",
+        "emitted_tokens": [
+          51119,
+          1
+        ],
+        "mode": "off",
+        "n_tokens": 2,
+        "prompt_index": 0,
+        "prompt_len": 16,
+        "step_ms_mean": 210.47826600261033,
+        "step_ms_p50": 210.47826600261033
+      }
+    ],
+    "off_teacher": [
+      {
+        "arm": "off_teacher",
+        "compare_steps": 2,
+        "decode_ms_mean": 2658.43253582716,
+        "draft_acceptance_rate": null,
+        "draft_accepted": 0,
+        "draft_events": 0,
+        "draft_golden_hits": 0,
+        "first_mismatch": null,
+        "matched": 2,
+        "mismatches": [],
+        "predicted_tokens": [
+          51119,
+          1
+        ],
+        "prompt_index": 0,
+        "prompt_len": 16,
+        "steps": [
+          {
+            "golden": 51119,
+            "golden_deficit": 0.0,
+            "match": true,
+            "predicted": 51119,
+            "step": 0,
+            "top1_logit": 39.103004455566406,
+            "top2_gap": 9.698352813720703
+          },
+          {
+            "golden": 1,
+            "golden_deficit": 0.0,
+            "match": true,
+            "predicted": 1,
+            "step": 1,
+            "top1_logit": 39.184852600097656,
+            "top2_gap": 11.987627029418945
+          }
+        ]
+      }
+    ]
+  },
+  "arms": [
+    "off_teacher",
+    "mtp_teacher",
+    "off_free",
+    "mtp_free",
+    "mtp_fused"
+  ],
+  "checkpoint_id": "33fd3df002d0b44ce4fd3c95d5dd1220e9bf4e050f677314aee519da68952e91",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "arm_mtp_free": 0.6874055480584502,
+    "arm_mtp_fused": 0.6889779979828745,
+    "arm_mtp_teacher": 0.45571785303764045,
+    "arm_off_free": 0.5782551430165768,
+    "arm_off_teacher": 10.832925199065357,
+    "load": 13.159649448934942,
+    "process": 30.560616047121584
+  },
+  "errors": [],
+  "experiment": "E0mtp2e-mtp-draft-verify-golden-gate",
+  "global_row_shapes": {
+    "main": [
+      4,
+      8,
+      64
+    ],
+    "mtp": [
+      4,
+      60
+    ]
+  },
+  "hc_backend": "fused",
+  "host": "titan065",
+  "indexer_kv_dtype": "bf16",
+  "kv_dtype": "fp8",
+  "local_rank": 6,
+  "measurement_class": "semantic_e2e_golden_token_gate_plus_eager_timing",
+  "memory_after_load": {
+    "free_bytes": 6872236032,
+    "total_bytes": 25252724736
+  },
+  "memory_at_end": {
+    "free_bytes": 6817710080,
+    "total_bytes": 25252724736
+  },
+  "mtp_layer_id": 43,
+  "placement": {
+    "accepted": true,
+    "ranks": [
+      {
+        "host": "titan064",
+        "local_rank": 0,
+        "rank": 0,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 1,
+        "rank": 1,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 2,
+        "rank": 2,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 3,
+        "rank": 3,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 4,
+        "rank": 4,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 5,
+        "rank": 5,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 6,
+        "rank": 6,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 7,
+        "rank": 7,
+        "stage": 1
+      },
+      {
+        "host": "titan065",
+        "local_rank": 0,
+        "rank": 8,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 1,
+        "rank": 9,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 2,
+        "rank": 10,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 3,
+        "rank": 11,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 4,
+        "rank": 12,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 5,
+        "rank": 13,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 6,
+        "rank": 14,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 7,
+        "rank": 15,
+        "stage": 3
+      }
+    ],
+    "stage_hosts": {
+      "0": [
+        "titan064"
+      ],
+      "1": [
+        "titan064"
+      ],
+      "2": [
+        "titan065"
+      ],
+      "3": [
+        "titan065"
+      ]
+    }
+  },
+  "rank": 14,
+  "schema_version": 1,
+  "stage": 3,
+  "stage_layer_ids": {
+    "0": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "1": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "2": [
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "3": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42
+    ]
+  },
+  "summary": {
+    "mtp_free_vs_off_free": {
+      "acceptance_rate": 1.0,
+      "accepted_rounds": 1,
+      "all_equal": true,
+      "per_prompt": [
+        {
+          "acceptance_rate": 1.0,
+          "diverged_positions": 0,
+          "equal": true,
+          "prompt_index": 0
+        }
+      ],
+      "rounds": 1
+    },
+    "mtp_fused_effective_ms_per_token": 151.27163450233638,
+    "mtp_fused_round_ms_mean": 302.54326900467277,
+    "mtp_fused_vs_off_free": {
+      "acceptance_rate": 1.0,
+      "accepted_rounds": 1,
+      "all_equal": true,
+      "per_prompt": [
+        {
+          "acceptance_rate": 1.0,
+          "diverged_positions": 0,
+          "equal": true,
+          "prompt_index": 0
+        }
+      ],
+      "rounds": 1
+    },
+    "mtp_teacher_acceptance": {
+      "accepted": 1,
+      "events": 1,
+      "per_prompt": [
+        {
+          "accepted": 1,
+          "events": 1,
+          "prompt_index": 0,
+          "rate": 1.0
+        }
+      ],
+      "rate": 1.0
+    },
+    "mtp_teacher_golden": {
+      "matched": 2,
+      "total": 2
+    },
+    "off_free_step_ms_mean": 210.47826600261033,
+    "off_teacher_golden": {
+      "matched": 2,
+      "total": 2
+    },
+    "teacher_streams_identical": true
+  },
+  "tokenizer_preflight": {
+    "accepted": true,
+    "eos_token_id": 1
+  },
+  "torch": "2.11.0+cu130",
+  "tp_group_binding": {
+    "backend": "nccl",
+    "global_rank": 14,
+    "global_ranks": [
+      12,
+      13,
+      14,
+      15
+    ],
+    "local_rank": 2,
+    "validated_live": true,
+    "world_size": 4
+  },
+  "tp_rank": 2,
+  "world": 16
+}

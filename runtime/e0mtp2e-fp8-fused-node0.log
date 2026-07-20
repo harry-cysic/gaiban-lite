@@ -1,0 +1,159 @@
+W0720 18:44:52.536000 169508 torch/distributed/run.py:851] 
+W0720 18:44:52.536000 169508 torch/distributed/run.py:851] *****************************************
+W0720 18:44:52.536000 169508 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 18:44:52.536000 169508 torch/distributed/run.py:851] *****************************************
+[E0mtp2e] placement {0: ['titan064'], 1: ['titan064'], 2: ['titan065'], 3: ['titan065']}
+[transformers] Unrecognized keys in `rope_parameters` for 'rope_type'='default': {'attention_factor'}
+[E0mtp2e] layer=0 rank=0 experts=64/256
+[E0mtp2e] layer=0 rank=0 experts=128/256
+[E0mtp2e] layer=0 rank=0 experts=192/256
+[E0mtp2e] layer=0 rank=0 experts=256/256
+[E0mtp2e] stage 0 layer 0 material loaded
+[E0mtp2e] layer=1 rank=0 experts=64/256
+[E0mtp2e] layer=1 rank=0 experts=128/256
+[E0mtp2e] layer=1 rank=0 experts=192/256
+[E0mtp2e] layer=1 rank=0 experts=256/256
+[E0mtp2e] stage 0 layer 1 material loaded
+[E0mtp2e] layer=2 rank=0 experts=64/256
+[E0mtp2e] layer=11 rank=0 experts=64/256
+[E0mtp2e] layer=2 rank=0 experts=128/256
+[E0mtp2e] layer=11 rank=0 experts=128/256
+[E0mtp2e] layer=2 rank=0 experts=192/256
+[E0mtp2e] layer=2 rank=0 experts=256/256
+[E0mtp2e] layer=11 rank=0 experts=192/256
+[E0mtp2e] stage 0 layer 2 material loaded
+[E0mtp2e] layer=11 rank=0 experts=256/256
+[E0mtp2e] stage 1 layer 11 material loaded
+[E0mtp2e] layer=3 rank=0 experts=64/256
+[E0mtp2e] layer=3 rank=0 experts=128/256
+[E0mtp2e] layer=12 rank=0 experts=64/256
+[E0mtp2e] layer=3 rank=0 experts=192/256
+[E0mtp2e] layer=12 rank=0 experts=128/256
+[E0mtp2e] layer=3 rank=0 experts=256/256
+[E0mtp2e] stage 0 layer 3 material loaded
+[E0mtp2e] layer=12 rank=0 experts=192/256
+[E0mtp2e] layer=12 rank=0 experts=256/256
+[E0mtp2e] stage 1 layer 12 material loaded
+[E0mtp2e] layer=4 rank=0 experts=64/256
+[E0mtp2e] layer=4 rank=0 experts=128/256
+[E0mtp2e] layer=13 rank=0 experts=64/256
+[E0mtp2e] layer=4 rank=0 experts=192/256
+[E0mtp2e] layer=13 rank=0 experts=128/256
+[E0mtp2e] layer=4 rank=0 experts=256/256
+[E0mtp2e] stage 0 layer 4 material loaded
+[E0mtp2e] layer=13 rank=0 experts=192/256
+[E0mtp2e] layer=13 rank=0 experts=256/256
+[E0mtp2e] layer=5 rank=0 experts=64/256
+[E0mtp2e] stage 1 layer 13 material loaded
+[E0mtp2e] layer=5 rank=0 experts=128/256
+[E0mtp2e] layer=5 rank=0 experts=192/256
+[E0mtp2e] layer=14 rank=0 experts=64/256
+[E0mtp2e] layer=5 rank=0 experts=256/256
+[E0mtp2e] layer=14 rank=0 experts=128/256
+[E0mtp2e] stage 0 layer 5 material loaded
+[E0mtp2e] layer=14 rank=0 experts=192/256
+[E0mtp2e] layer=14 rank=0 experts=256/256
+[E0mtp2e] layer=6 rank=0 experts=64/256
+[E0mtp2e] stage 1 layer 14 material loaded
+[E0mtp2e] layer=6 rank=0 experts=128/256
+[E0mtp2e] layer=6 rank=0 experts=192/256
+[E0mtp2e] layer=15 rank=0 experts=64/256
+[E0mtp2e] layer=6 rank=0 experts=256/256
+[E0mtp2e] layer=15 rank=0 experts=128/256
+[E0mtp2e] stage 0 layer 6 material loaded
+[E0mtp2e] layer=15 rank=0 experts=192/256
+[E0mtp2e] layer=7 rank=0 experts=64/256
+[E0mtp2e] layer=15 rank=0 experts=256/256
+[E0mtp2e] stage 1 layer 15 material loaded
+[E0mtp2e] layer=7 rank=0 experts=128/256
+[E0mtp2e] layer=7 rank=0 experts=192/256
+[E0mtp2e] layer=16 rank=0 experts=64/256
+[E0mtp2e] layer=7 rank=0 experts=256/256
+[E0mtp2e] stage 0 layer 7 material loaded
+[E0mtp2e] layer=16 rank=0 experts=128/256
+[E0mtp2e] layer=16 rank=0 experts=192/256
+[E0mtp2e] layer=8 rank=0 experts=64/256
+[E0mtp2e] layer=16 rank=0 experts=256/256
+[E0mtp2e] stage 1 layer 16 material loaded
+[E0mtp2e] layer=8 rank=0 experts=128/256
+[E0mtp2e] layer=8 rank=0 experts=192/256
+[E0mtp2e] layer=17 rank=0 experts=64/256
+[E0mtp2e] layer=8 rank=0 experts=256/256
+[E0mtp2e] stage 0 layer 8 material loaded
+[E0mtp2e] layer=17 rank=0 experts=128/256
+[E0mtp2e] layer=17 rank=0 experts=192/256
+[E0mtp2e] layer=9 rank=0 experts=64/256
+[E0mtp2e] layer=17 rank=0 experts=256/256
+[E0mtp2e] layer=9 rank=0 experts=128/256
+[E0mtp2e] stage 1 layer 17 material loaded
+[E0mtp2e] layer=9 rank=0 experts=192/256
+[E0mtp2e] layer=9 rank=0 experts=256/256
+[E0mtp2e] layer=18 rank=0 experts=64/256
+[E0mtp2e] stage 0 layer 9 material loaded
+[E0mtp2e] layer=18 rank=0 experts=128/256
+[E0mtp2e] layer=18 rank=0 experts=192/256
+[E0mtp2e] layer=10 rank=0 experts=64/256
+[E0mtp2e] layer=18 rank=0 experts=256/256
+[E0mtp2e] layer=10 rank=0 experts=128/256
+[E0mtp2e] stage 1 layer 18 material loaded
+[E0mtp2e] layer=10 rank=0 experts=192/256
+[E0mtp2e] layer=10 rank=0 experts=256/256
+[E0mtp2e] layer=19 rank=0 experts=64/256
+[E0mtp2e] stage 0 layer 10 material loaded
+[E0mtp2e] layer=19 rank=0 experts=128/256
+[E0mtp2e] stage 0 loaded (free 8.31 GiB, 11s)
+[E0mtp2e] layer=19 rank=0 experts=192/256
+[E0mtp2e] layer=19 rank=0 experts=256/256
+[E0mtp2e] stage 1 layer 19 material loaded
+[E0mtp2e] layer=20 rank=0 experts=64/256
+[E0mtp2e] layer=20 rank=0 experts=128/256
+[E0mtp2e] layer=20 rank=0 experts=192/256
+[E0mtp2e] layer=20 rank=0 experts=256/256
+[E0mtp2e] stage 1 layer 20 material loaded
+[E0mtp2e] layer=21 rank=0 experts=64/256
+[E0mtp2e] layer=21 rank=0 experts=128/256
+[E0mtp2e] layer=21 rank=0 experts=192/256
+[E0mtp2e] layer=21 rank=0 experts=256/256
+[E0mtp2e] stage 1 layer 21 material loaded
+[E0mtp2e] stage 1 loaded (free 9.25 GiB, 12s)
+[E0mtp2e][off_teacher] prompt 0: {'matched': 2, 'compare_steps': 2}
+[E0mtp2e][off_teacher] prompt 1: {'matched': 28, 'compare_steps': 29}
+[E0mtp2e][off_teacher] prompt 2: {'matched': 128, 'compare_steps': 128}
+[E0mtp2e][off_teacher] prompt 3: {'matched': 124, 'compare_steps': 128}
+[E0mtp2e][off_teacher] prompt 4: {'matched': 12, 'compare_steps': 13}
+[E0mtp2e][off_teacher] prompt 5: {'matched': 22, 'compare_steps': 22}
+[E0mtp2e][off_teacher] prompt 6: {'matched': 31, 'compare_steps': 32}
+[E0mtp2e][off_teacher] prompt 7: {'matched': 120, 'compare_steps': 128}
+[E0mtp2e][mtp_teacher] prompt 0: {'matched': 2, 'compare_steps': 2, 'draft_acceptance_rate': 1.0}
+[E0mtp2e][mtp_teacher] prompt 1: {'matched': 28, 'compare_steps': 29, 'draft_acceptance_rate': 0.75}
+[E0mtp2e][mtp_teacher] prompt 2: {'matched': 128, 'compare_steps': 128, 'draft_acceptance_rate': 0.9448818897637795}
+[E0mtp2e][mtp_teacher] prompt 3: {'matched': 124, 'compare_steps': 128, 'draft_acceptance_rate': 0.8661417322834646}
+[E0mtp2e][mtp_teacher] prompt 4: {'matched': 12, 'compare_steps': 13, 'draft_acceptance_rate': 0.8333333333333334}
+[E0mtp2e][mtp_teacher] prompt 5: {'matched': 22, 'compare_steps': 22, 'draft_acceptance_rate': 0.9047619047619048}
+[E0mtp2e][mtp_teacher] prompt 6: {'matched': 31, 'compare_steps': 32, 'draft_acceptance_rate': 0.9032258064516129}
+[E0mtp2e][mtp_teacher] prompt 7: {'matched': 120, 'compare_steps': 128, 'draft_acceptance_rate': 0.7637795275590551}
+[E0mtp2e][off_free] prompt 0: {'step_ms_mean': 206.78592403419316}
+[E0mtp2e][off_free] prompt 1: {'step_ms_mean': 214.64168037553983}
+[E0mtp2e][off_free] prompt 2: {'step_ms_mean': 214.416892176098}
+[E0mtp2e][off_free] prompt 3: {'step_ms_mean': 213.92397758528944}
+[E0mtp2e][off_free] prompt 4: {'step_ms_mean': 213.82011896154532}
+[E0mtp2e][off_free] prompt 5: {'step_ms_mean': 213.12909535620184}
+[E0mtp2e][off_free] prompt 6: {'step_ms_mean': 213.93007512444692}
+[E0mtp2e][off_free] prompt 7: {'step_ms_mean': 213.84195591814407}
+[E0mtp2e][mtp_free] prompt 0: {'acceptance_rate': 1.0, 'rounds': 1, 'round_ms_mean': 282.6397770550102, 'effective_ms_per_token': 141.3198885275051}
+[E0mtp2e][mtp_free] prompt 1: {'acceptance_rate': 0.8125, 'rounds': 16, 'round_ms_mean': 295.71739249513485, 'effective_ms_per_token': 163.15442344559165}
+[E0mtp2e][mtp_free] prompt 2: {'acceptance_rate': 1.0, 'rounds': 64, 'round_ms_mean': 297.95832145100576, 'effective_ms_per_token': 148.97916072550288}
+[E0mtp2e][mtp_free] prompt 3: {'acceptance_rate': 0.8955223880597015, 'rounds': 67, 'round_ms_mean': 295.4317774317825, 'effective_ms_per_token': 155.85770935377502}
+[E0mtp2e][mtp_free] prompt 4: {'acceptance_rate': 0.625, 'rounds': 8, 'round_ms_mean': 292.80225036200136, 'effective_ms_per_token': 180.18600022277008}
+[E0mtp2e][mtp_free] prompt 5: {'acceptance_rate': 0.9090909090909091, 'rounds': 11, 'round_ms_mean': 294.178267094222, 'effective_ms_per_token': 154.09337800173532}
+[E0mtp2e][mtp_free] prompt 6: {'acceptance_rate': 0.9375, 'rounds': 16, 'round_ms_mean': 297.64800873817876, 'effective_ms_per_token': 153.62477870357614}
+[E0mtp2e][mtp_free] prompt 7: {'acceptance_rate': 0.7162162162162162, 'rounds': 74, 'round_ms_mean': 294.9959295864746, 'effective_ms_per_token': 171.88739204251274}
+[E0mtp2e][mtp_fused] prompt 0: {'acceptance_rate': 1.0, 'rounds': 1, 'round_ms_mean': 300.47131585888565, 'effective_ms_per_token': 150.23565792944282}
+[E0mtp2e][mtp_fused] prompt 1: {'acceptance_rate': 0.6111111111111112, 'rounds': 18, 'round_ms_mean': 309.4239691272378, 'effective_ms_per_token': 192.05625669966483}
+[E0mtp2e][mtp_fused] prompt 2: {'acceptance_rate': 1.0, 'rounds': 64, 'round_ms_mean': 314.1569361978327, 'effective_ms_per_token': 157.07846809891635}
+[E0mtp2e][mtp_fused] prompt 3: {'acceptance_rate': 0.8676470588235294, 'rounds': 68, 'round_ms_mean': 312.64902704724057, 'effective_ms_per_token': 167.4026286552154}
+[E0mtp2e][mtp_fused] prompt 4: {'acceptance_rate': 0.625, 'rounds': 8, 'round_ms_mean': 309.5357129932381, 'effective_ms_per_token': 190.48351568814653}
+[E0mtp2e][mtp_fused] prompt 5: {'acceptance_rate': 0.9090909090909091, 'rounds': 11, 'round_ms_mean': 310.55272908203983, 'effective_ms_per_token': 162.67047713821134}
+[E0mtp2e][mtp_fused] prompt 6: {'acceptance_rate': 0.9375, 'rounds': 16, 'round_ms_mean': 315.08216954534873, 'effective_ms_per_token': 162.62305524921226}
+[E0mtp2e][mtp_fused] prompt 7: {'acceptance_rate': 0.7066666666666667, 'rounds': 75, 'round_ms_mean': 311.4491758433481, 'effective_ms_per_token': 182.48975147071178}
+[E0mtp2e] overall: PASS

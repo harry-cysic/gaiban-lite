@@ -1,0 +1,144 @@
+{
+  "accepted": true,
+  "checkpoint_id": "33fd3df002d0b44ce4fd3c95d5dd1220e9bf4e050f677314aee519da68952e91",
+  "ctx": 2048,
+  "effective_model": {
+    "baseline_step_p50_ms": 208.03552854340523,
+    "chained": {
+      "accept_round_p50_ms": 298.83694159798324,
+      "per_alpha": {
+        "0.50": {
+          "effective_ms_per_token": 195.61284520508102,
+          "speedup_vs_baseline": 1.0635064804936518
+        },
+        "0.60": {
+          "effective_ms_per_token": 184.06425160355866,
+          "speedup_vs_baseline": 1.1302332024334438
+        },
+        "0.66": {
+          "effective_ms_per_token": 177.80296591598628,
+          "speedup_vs_baseline": 1.1700340737943828
+        },
+        "0.70": {
+          "effective_ms_per_token": 173.87431607280365,
+          "speedup_vs_baseline": 1.1964707223135693
+        },
+        "0.80": {
+          "effective_ms_per_token": 164.81659560102142,
+          "speedup_vs_baseline": 1.2622244003086056
+        },
+        "0.86": {
+          "effective_ms_per_token": 159.8494585681086,
+          "speedup_vs_baseline": 1.3014465635788535
+        },
+        "0.90": {
+          "effective_ms_per_token": 156.7123193894268,
+          "speedup_vs_baseline": 1.3274995185697007
+        },
+        "1.00": {
+          "effective_ms_per_token": 149.41847079899162,
+          "speedup_vs_baseline": 1.3923012826390753
+        }
+      },
+      "reject_round_p50_ms": 288.0015940172598
+    },
+    "fused": {
+      "accept_round_p50_ms": 316.75781798548996,
+      "per_alpha": {
+        "0.50": {
+          "effective_ms_per_token": 207.94456735408554,
+          "speedup_vs_baseline": 1.0004374299866408
+        },
+        "0.60": {
+          "effective_ms_per_token": 195.5531527637504,
+          "speedup_vs_baseline": 1.0638311149845532
+        },
+        "0.66": {
+          "effective_ms_per_token": 188.83491593766507,
+          "speedup_vs_baseline": 1.1016793558034486
+        },
+        "0.70": {
+          "effective_ms_per_token": 184.61955165463118,
+          "speedup_vs_baseline": 1.126833678659227
+        },
+        "0.80": {
+          "effective_ms_per_token": 174.90079511319183,
+          "speedup_vs_baseline": 1.1894487295427636
+        },
+        "0.86": {
+          "effective_ms_per_token": 169.57115442917674,
+          "speedup_vs_baseline": 1.226833238493364
+        },
+        "0.90": {
+          "effective_ms_per_token": 166.20506557611455,
+          "speedup_vs_baseline": 1.2516798319130302
+        },
+        "1.00": {
+          "effective_ms_per_token": 158.37890899274498,
+          "speedup_vs_baseline": 1.313530506469993
+        }
+      },
+      "reject_round_p50_ms": 307.07588407676667
+    }
+  },
+  "errors": [],
+  "experiment": "E1MTPF-mtp-verify-round-bench",
+  "hc_backend": "fused",
+  "kv_dtype": "fp8",
+  "phases": {
+    "baseline": {
+      "mean_ms": 216.0652957080553,
+      "p50_ms": 208.03552854340523,
+      "p95_ms": 240.9296960104257,
+      "repeat_p50_ms": [
+        208.52197997737676,
+        207.9581250436604,
+        207.6736210146919
+      ]
+    },
+    "chained_accept": {
+      "mean_ms": 298.0617723505323,
+      "p50_ms": 298.83694159798324,
+      "p95_ms": 313.19351214915514,
+      "repeat_p50_ms": [
+        298.6512869829312,
+        298.76578447874635,
+        298.8854590803385
+      ],
+      "verify_p50_ms": 111.98412696830928
+    },
+    "chained_reject": {
+      "mean_ms": 287.6597751878823,
+      "p50_ms": 288.0015940172598,
+      "p95_ms": 303.15609090030193,
+      "repeat_p50_ms": [
+        287.5155848450959,
+        288.21392299141735,
+        287.3149609658867
+      ],
+      "verify_p50_ms": 111.79011256899685
+    },
+    "fused_accept": {
+      "mean_ms": 316.43547923925024,
+      "p50_ms": 316.75781798548996,
+      "p95_ms": 334.7327990923077,
+      "repeat_p50_ms": [
+        316.5002119494602,
+        316.81184004992247,
+        316.75781798548996
+      ],
+      "verify_p50_ms": 76.73204352613539
+    },
+    "fused_reject": {
+      "mean_ms": 306.24960214830935,
+      "p50_ms": 307.07588407676667,
+      "p95_ms": 324.09777701832354,
+      "repeat_p50_ms": [
+        307.1486745029688,
+        306.3324565300718,
+        305.9657100820914
+      ],
+      "verify_p50_ms": 77.0389880053699
+    }
+  }
+}

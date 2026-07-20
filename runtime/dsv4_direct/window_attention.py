@@ -43,12 +43,15 @@ from .static_kv import LATENT_DIM, WINDOW_SIZE
 from .static_window_kv import StaticWindowKV
 
 
-# Flash pure sliding-window physical layers: compress_ratio == 0 and not the
-# MTP block (model_contract.FROZEN_COMPRESS_RATIOS => layers 0 and 1).
+# Flash pure sliding-window layers: compress_ratio == 0
+# (model_contract.FROZEN_COMPRESS_RATIOS => layers 0 and 1) plus the MTP
+# block (mtp.0, layer id 43), whose Attention is the same ratio-0
+# sliding-window type (reference model.py MTPBlock -> Block -> Attention with
+# compress_ratios[43] == 0: no compressor, no indexer, no-YaRN base RoPE).
 SUPPORTED_WINDOW_LAYER_IDS = tuple(
     layer_id
     for layer_id, specification in SUPPORTED_LAYER_SPECS.items()
-    if specification["compress_ratio"] == 0 and not specification["is_mtp"]
+    if specification["compress_ratio"] == 0
 )
 
 

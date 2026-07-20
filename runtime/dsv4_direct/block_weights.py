@@ -20,11 +20,13 @@ from .checkpoint import (
     DTYPE_BYTES,
     CheckpointContractError,
     TensorSpec,
+    layer_prefix,
     load_weight_map,
     read_safetensors_header,
 )
 from .model_contract import (
     MODEL_LAYER_IDS,
+    MTP_LAYER_ID,
     ModelContractError,
     SUPPORTED_LAYER_SPECS,
     validate_model_layer_config,
@@ -32,7 +34,8 @@ from .model_contract import (
 
 
 SUPPORTED_LAYER_ID = 3
-SUPPORTED_LAYER_IDS = MODEL_LAYER_IDS
+# Physical decode layers plus the MTP block (checkpoint prefix mtp.0).
+SUPPORTED_LAYER_IDS = MODEL_LAYER_IDS + (MTP_LAYER_ID,)
 SUPPORTED_TP_SIZE = 4
 SUPPORTED_COMPRESS_RATIOS = {
     layer_id: int(specification["compress_ratio"])
@@ -97,6 +100,28 @@ class ResidentAttentionWeights:
 
 
 @dataclass
+class ResidentMTPWeights:
+    """mtp.0-only tensors (reference model.py MTPBlock :738-755).
+
+    ``e_proj``/``h_proj`` are the FP8 bridge projections; ``enorm``/``hnorm``
+    normalize the embedding and the incoming HC hidden; ``norm`` is the MTP
+    block's own terminal RMSNorm before the *shared* head projection; the
+    ``hc_head_*`` parameters collapse the four HC streams with the sigmoid
+    form of ``ParallelHead.hc_head`` (model.py:728-735) using MTP-owned
+    parameters (model.py:750-752, :765).
+    """
+
+    e_proj: QuantizedLinearWeights
+    h_proj: QuantizedLinearWeights
+    enorm: torch.Tensor
+    hnorm: torch.Tensor
+    norm: torch.Tensor
+    hc_head_fn: torch.Tensor
+    hc_head_base: torch.Tensor
+    hc_head_scale: torch.Tensor
+
+
+@dataclass
 class ResidentHyperConnectionWeights:
     attn_fn: torch.Tensor
     attn_base: torch.Tensor
@@ -138,9 +163,10 @@ class ResidentBlockWeights:
     hyper_connection: ResidentHyperConnectionWeights
     gate: ResidentGateWeights
     load_seconds: float
+    mtp: ResidentMTPWeights | None = None
 
     def named_tensors(self) -> dict[str, torch.Tensor]:
-        layer = f"layers.{self.layer_id}"
+        layer = layer_prefix(self.layer_id)
         attn = f"{layer}.attn"
         compressor = f"{attn}.compressor"
         tensors = {
@@ -194,6 +220,21 @@ class ResidentBlockWeights:
             tensors[f"{layer}.ffn.gate.bias"] = self.gate.bias
         if self.gate.tid2eid is not None:
             tensors[f"{layer}.ffn.gate.tid2eid"] = self.gate.tid2eid
+        if self.mtp is not None:
+            tensors.update(
+                {
+                    f"{layer}.e_proj.weight": self.mtp.e_proj.weight,
+                    f"{layer}.e_proj.scale": self.mtp.e_proj.scale,
+                    f"{layer}.h_proj.weight": self.mtp.h_proj.weight,
+                    f"{layer}.h_proj.scale": self.mtp.h_proj.scale,
+                    f"{layer}.enorm.weight": self.mtp.enorm,
+                    f"{layer}.hnorm.weight": self.mtp.hnorm,
+                    f"{layer}.norm.weight": self.mtp.norm,
+                    f"{layer}.hc_head_fn": self.mtp.hc_head_fn,
+                    f"{layer}.hc_head_base": self.mtp.hc_head_base,
+                    f"{layer}.hc_head_scale": self.mtp.hc_head_scale,
+                }
+            )
         return tensors
 
     @property
@@ -361,7 +402,7 @@ def expected_block_tensor_specs(
         out_features=hidden, in_features=o_features
     )
 
-    layer = f"layers.{layer_id}"
+    layer = layer_prefix(layer_id)
     attn = f"{layer}.attn"
     compressor = f"{attn}.compressor"
     mix_hc = (2 + hc_mult) * hc_mult
@@ -451,6 +492,29 @@ def expected_block_tensor_specs(
         result[f"{layer}.ffn.gate.tid2eid"] = ExpectedBlockTensor(
             (vocab, topk), ("I64",)
         )
+    if bool(SUPPORTED_LAYER_SPECS[layer_id]["is_mtp"]):
+        e_proj, e_proj_scale = _fp8_linear_specs(
+            out_features=hidden, in_features=hidden
+        )
+        h_proj, h_proj_scale = _fp8_linear_specs(
+            out_features=hidden, in_features=hidden
+        )
+        result.update(
+            {
+                f"{layer}.e_proj.weight": e_proj,
+                f"{layer}.e_proj.scale": e_proj_scale,
+                f"{layer}.h_proj.weight": h_proj,
+                f"{layer}.h_proj.scale": h_proj_scale,
+                f"{layer}.enorm.weight": ExpectedBlockTensor((hidden,), ("BF16",)),
+                f"{layer}.hnorm.weight": ExpectedBlockTensor((hidden,), ("BF16",)),
+                f"{layer}.norm.weight": ExpectedBlockTensor((hidden,), ("BF16",)),
+                f"{layer}.hc_head_fn": ExpectedBlockTensor(
+                    (hc_mult, hc_dim), ("F32",)
+                ),
+                f"{layer}.hc_head_base": ExpectedBlockTensor((hc_mult,), ("F32",)),
+                f"{layer}.hc_head_scale": ExpectedBlockTensor((1,), ("F32",)),
+            }
+        )
     return result
 
 
@@ -493,7 +557,8 @@ def validate_replicated_block_contract(
     if expected:
         compress_ratio = _layer_compress_ratio(config, layer_id)
         route_kind = _layer_route_kind(config, layer_id)
-    gate_prefix = f"layers.{layer_id}.ffn.gate"
+    prefix = layer_prefix(layer_id)
+    gate_prefix = f"{prefix}.ffn.gate"
     forbidden_gate_tensor = None
     if route_kind == "hash":
         forbidden_gate_tensor = f"{gate_prefix}.bias"
@@ -506,14 +571,14 @@ def validate_replicated_block_contract(
     forbidden_prefixes: list[tuple[str, str]] = []
     if compress_ratio == 128:
         forbidden_prefixes.append(
-            (f"layers.{layer_id}.attn.indexer.", "ratio-128")
+            (f"{prefix}.attn.indexer.", "ratio-128")
         )
     elif compress_ratio == 0:
         forbidden_prefixes.append(
-            (f"layers.{layer_id}.attn.indexer.", "sliding-window")
+            (f"{prefix}.attn.indexer.", "sliding-window")
         )
         forbidden_prefixes.append(
-            (f"layers.{layer_id}.attn.compressor.", "sliding-window")
+            (f"{prefix}.attn.compressor.", "sliding-window")
         )
     for prefix, kind in forbidden_prefixes:
         for name in sorted(tensors):
@@ -600,9 +665,9 @@ def inspect_replicated_block_contract(
     # shard-resolution mechanism in the Flash runtime); merge the headers of
     # every involved file, filtered to this layer's namespace.
     weight_map, _ = load_weight_map(stage_root)
-    layer_prefix = f"layers.{layer_id}."
+    key_prefix = layer_prefix(layer_id) + "."
     files = sorted(
-        {filename for key, filename in weight_map.items() if key.startswith(layer_prefix)}
+        {filename for key, filename in weight_map.items() if key.startswith(key_prefix)}
     )
     if not files:
         raise CheckpointContractError(
@@ -613,7 +678,7 @@ def inspect_replicated_block_contract(
     for filename in files:
         shard_tensors, shard_metadata = read_safetensors_header(stage_root / filename)
         for name, spec in shard_tensors.items():
-            if name.startswith(layer_prefix):
+            if name.startswith(key_prefix):
                 tensors[name] = spec
         file_metadata.append(shard_metadata)
     result = validate_replicated_block_contract(
@@ -667,9 +732,10 @@ def load_replicated_block_weights(
 
     target = torch.device(device)
     weight_map, _ = load_weight_map(Path(stage_root).expanduser().resolve())
-    layer = f"layers.{layer_id}"
+    layer = layer_prefix(layer_id)
     attn = f"{layer}.attn"
     compressor = f"{attn}.compressor"
+    is_mtp = bool(SUPPORTED_LAYER_SPECS[layer_id]["is_mtp"])
     started = time.perf_counter()
     with ShardReader(Path(stage_root).expanduser().resolve(), weight_map) as reader:
         def get(name: str) -> torch.Tensor:
@@ -758,6 +824,24 @@ def load_replicated_block_weights(
                 ),
             ),
             load_seconds=0.0,
+            mtp=(
+                ResidentMTPWeights(
+                    e_proj=QuantizedLinearWeights(
+                        get(f"{layer}.e_proj.weight"), get(f"{layer}.e_proj.scale")
+                    ),
+                    h_proj=QuantizedLinearWeights(
+                        get(f"{layer}.h_proj.weight"), get(f"{layer}.h_proj.scale")
+                    ),
+                    enorm=get(f"{layer}.enorm.weight"),
+                    hnorm=get(f"{layer}.hnorm.weight"),
+                    norm=get(f"{layer}.norm.weight"),
+                    hc_head_fn=get(f"{layer}.hc_head_fn"),
+                    hc_head_base=get(f"{layer}.hc_head_base"),
+                    hc_head_scale=get(f"{layer}.hc_head_scale"),
+                )
+                if is_mtp
+                else None
+            ),
         )
     result.load_seconds = time.perf_counter() - started
     if result.resident_bytes != contract["expected_resident_bytes"]:
@@ -777,6 +861,7 @@ __all__ = [
     "ResidentGateWeights",
     "ResidentHyperConnectionWeights",
     "ResidentIndexerWeights",
+    "ResidentMTPWeights",
     "ResidentRatio128CompressorWeights",
     "SUPPORTED_COMPRESS_RATIOS",
     "SUPPORTED_LAYER_ID",

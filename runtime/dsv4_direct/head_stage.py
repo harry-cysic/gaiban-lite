@@ -183,6 +183,38 @@ def embed_hc_residual(
     return hidden.unsqueeze(2).repeat(1, 1, HC_MULT, 1).contiguous()
 
 
+def hc_head_collapse_tensors(
+    residual: torch.Tensor,
+    *,
+    hc_head_fn: torch.Tensor,
+    hc_head_base: torch.Tensor,
+    hc_head_scale: torch.Tensor,
+    norm_eps: float,
+    hc_eps: float,
+) -> torch.Tensor:
+    """Sigmoid HC stream collapse (reference ParallelHead.hc_head :728-735).
+
+    Shared by the top-level head (top-level ``hc_head_*`` parameters) and the
+    MTP block (its own ``hc_head_*`` parameters, model.py:750-752 + :765).
+    """
+
+    if residual.ndim != 4 or residual.shape[2:] != (HC_MULT, EMBED_DIM):
+        raise HeadStageError(
+            f"hc_head residual must be [b, s, {HC_MULT}, {EMBED_DIM}]"
+        )
+    dtype = residual.dtype
+    flattened = residual.flatten(2).float()
+    inverse_rms = torch.rsqrt(
+        flattened.square().mean(dim=-1, keepdim=True) + norm_eps
+    )
+    mixes = F.linear(flattened, hc_head_fn) * inverse_rms
+    pre = torch.sigmoid(mixes * hc_head_scale + hc_head_base) + hc_eps
+    collapsed = torch.sum(
+        pre.unsqueeze(-1) * flattened.view(residual.shape), dim=2
+    )
+    return collapsed.to(dtype)
+
+
 def hc_head_collapse(material: EmbedHeadMaterial, residual: torch.Tensor) -> torch.Tensor:
     """Collapse the four HC streams (reference ParallelHead.hc_head :728-735)."""
 
@@ -192,24 +224,14 @@ def hc_head_collapse(material: EmbedHeadMaterial, residual: torch.Tensor) -> tor
         or material.hc_head_scale is None
     ):
         raise HeadStageError("this rank did not load the hc_head parameters")
-    if residual.ndim != 4 or residual.shape[2:] != (HC_MULT, EMBED_DIM):
-        raise HeadStageError(
-            f"hc_head residual must be [b, s, {HC_MULT}, {EMBED_DIM}]"
-        )
-    dtype = residual.dtype
-    flattened = residual.flatten(2).float()
-    inverse_rms = torch.rsqrt(
-        flattened.square().mean(dim=-1, keepdim=True) + material.norm_eps
+    return hc_head_collapse_tensors(
+        residual,
+        hc_head_fn=material.hc_head_fn,
+        hc_head_base=material.hc_head_base,
+        hc_head_scale=material.hc_head_scale,
+        norm_eps=material.norm_eps,
+        hc_eps=material.hc_eps,
     )
-    mixes = F.linear(flattened, material.hc_head_fn) * inverse_rms
-    pre = (
-        torch.sigmoid(mixes * material.hc_head_scale + material.hc_head_base)
-        + material.hc_eps
-    )
-    collapsed = torch.sum(
-        pre.unsqueeze(-1) * flattened.view(residual.shape), dim=2
-    )
-    return collapsed.to(dtype)
 
 
 def final_norm(material: EmbedHeadMaterial, hidden: torch.Tensor) -> torch.Tensor:
@@ -240,6 +262,24 @@ def head_logits(material: EmbedHeadMaterial, residual: torch.Tensor) -> torch.Te
     return F.linear(normed[:, -1].float(), material.head_weight)
 
 
+def head_logits_all(
+    material: EmbedHeadMaterial, residual: torch.Tensor
+) -> torch.Tensor:
+    """HC collapse -> final norm -> fp32 logits for **every** position.
+
+    Same math as :func:`head_logits` without the last-position slice
+    (reference model.py:716 slices because generate.py only ever consumes the
+    final position; the MTP verify step needs both verified positions).
+    Returns ``[batch, sequence, vocab]`` fp32.
+    """
+
+    if material.head_weight is None:
+        raise HeadStageError("this rank did not load the head projection")
+    collapsed = hc_head_collapse(material, residual)
+    normed = final_norm(material, collapsed)
+    return F.linear(normed.float(), material.head_weight)
+
+
 __all__ = [
     "EMBED_DIM",
     "EMBED_VOCAB",
@@ -249,6 +289,8 @@ __all__ = [
     "embed_hc_residual",
     "final_norm",
     "hc_head_collapse",
+    "hc_head_collapse_tensors",
     "head_logits",
+    "head_logits_all",
     "load_embed_head_material",
 ]
