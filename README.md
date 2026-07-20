@@ -66,7 +66,11 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   132/132 逐位×4 stage；复制口径 bl=192 实测 920 tok/s closed-loop；由实测
   stage 时间换算 DP+满流水 **12.7–13.4k @B_global=512、14.9–15.5k @768**——
   修正后模型 ~14k 获实测支持，原始带 15–25k 下沿在 768 运营点可及）。
-  待兑现（换算→实测）：真 DP-attention 序列切分 + ≥4 microbatch 流水交织；
-  再往上：MTP ~1.5×、handoff overlap、chunked prefill、serving。
+  真 DP-attention 已实现并过 gate（E0dpf：runtime 集合序本就是 DP 形态，
+  真 DP=喂不同序列+KV/4；graph 132/132 逐位，漂移在复制口径自有 lane 噪声带内；
+  **DP 实测 max-stage replay 坐实换算分母**：B_global=512 达成 103–104%、768 达成
+  100%；serial closed-loop 实测 3259/3679 tok/s；KV 杠杆兑现，8K 折扣实测 ~11%，
+  768+8K 差 222MiB OOM）。待兑现：≥4 microbatch 流水交织（3.7k serial →
+  ~15k 实测）；再往上：MTP ~1.5×、handoff overlap、chunked prefill、serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
