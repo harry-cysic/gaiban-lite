@@ -1,0 +1,54 @@
+# E0wf window-attention oracle run on titan064 (2026-07-20)
+# command: CUDA_HOME=/usr/local/cuda-13.2 ~/Workspace/venvs/sglang/bin/torchrun \
+#   --standalone --nproc_per_node=4 e0wf_window_attention_oracle.py \
+#   --stage-root ~/Workspace/DeepSeek-V4-Flash --out-dir out-e0wf
+# exit status: 0 (PASS)
+# host=titan064 device=NVIDIA GeForce RTX 4090 torch=2.11.0+cu130
+# checkpoint_id=1ae890a2f545e4be6f8f2d52fe34169848a2fc0f9f2c03dca7c2218b005f025a
+# implementation_sha256=ec749f40b1304855510df099fbb02767bf5055c087c693863bfe465053243c85
+# block_contract_id=25fd331b53b51ff29cb5048a671779c11cd58171b114ff19041d5037f6e875d4
+# accepted=True identity_checks={'all_ranks_match': True} errors=0
+
+case prefill128_decode4: accepted_ranks=[0, 1, 2, 3] exact_checks_all=True (10 checks)
+  attention_kv     worst_rms_rel=1.047755e-02 limit=0.02 accepted=True at=prefill.attention_kv
+  branch           worst_rms_rel=1.241584e-02 limit=0.04 accepted=True at=prefill.branch
+  inverse_rotated  worst_rms_rel=1.199083e-02 limit=0.03 accepted=True at=prefill.inverse_rotated
+  output_lora      worst_rms_rel=1.250275e-02 limit=0.035 accepted=True at=prefill.output_lora
+  query            worst_rms_rel=4.711768e-03 limit=0.02 accepted=True at=prefill.query
+  query_lora       worst_rms_rel=3.002396e-03 limit=0.012 accepted=True at=prefill.query_lora
+  raw_latent       worst_rms_rel=1.047755e-02 limit=0.012 accepted=True at=prefill.raw_latent
+  sparse_control   worst_rms_rel=2.766221e-05 limit=0.003 accepted=True at=decode_pos131.sparse_control
+  sparse_output    worst_rms_rel=1.198567e-02 limit=0.03 accepted=True at=prefill.sparse_output
+  state.raw        worst_rms_rel=1.047755e-02 limit=0.02 accepted=True at=prefill.state.raw
+
+case prefill200_decode4: accepted_ranks=[0, 1, 2, 3] exact_checks_all=True (10 checks)
+  attention_kv     worst_rms_rel=1.063368e-02 limit=0.02 accepted=True at=prefill.attention_kv
+  branch           worst_rms_rel=1.312486e-02 limit=0.04 accepted=True at=prefill.branch
+  inverse_rotated  worst_rms_rel=1.266897e-02 limit=0.03 accepted=True at=prefill.inverse_rotated
+  output_lora      worst_rms_rel=1.322052e-02 limit=0.035 accepted=True at=prefill.output_lora
+  query            worst_rms_rel=4.719241e-03 limit=0.02 accepted=True at=prefill.query
+  query_lora       worst_rms_rel=2.985706e-03 limit=0.012 accepted=True at=prefill.query_lora
+  raw_latent       worst_rms_rel=1.063368e-02 limit=0.012 accepted=True at=prefill.raw_latent
+  sparse_control   worst_rms_rel=2.466908e-05 limit=0.003 accepted=True at=prefill.sparse_control
+  sparse_output    worst_rms_rel=1.266275e-02 limit=0.03 accepted=True at=prefill.sparse_output
+  state.raw        worst_rms_rel=1.058053e-02 limit=0.02 accepted=True at=prefill.state.raw
+
+case prefill96_decode34_ring_cross: accepted_ranks=[0, 1, 2, 3] exact_checks_all=True (70 checks)
+  attention_kv     worst_rms_rel=1.039991e-02 limit=0.02 accepted=True at=prefill.attention_kv
+  branch           worst_rms_rel=1.248198e-02 limit=0.04 accepted=True at=prefill.branch
+  inverse_rotated  worst_rms_rel=1.204448e-02 limit=0.03 accepted=True at=prefill.inverse_rotated
+  output_lora      worst_rms_rel=1.261038e-02 limit=0.035 accepted=True at=prefill.output_lora
+  query            worst_rms_rel=4.699197e-03 limit=0.02 accepted=True at=prefill.query
+  query_lora       worst_rms_rel=2.984374e-03 limit=0.012 accepted=True at=prefill.query_lora
+  raw_latent       worst_rms_rel=1.039991e-02 limit=0.012 accepted=True at=prefill.raw_latent
+  sparse_control   worst_rms_rel=1.013528e-04 limit=0.003 accepted=True at=decode_pos127.sparse_control
+  sparse_output    worst_rms_rel=1.203914e-02 limit=0.03 accepted=True at=prefill.sparse_output
+  state.raw        worst_rms_rel=1.039991e-02 limit=0.02 accepted=True at=prefill.state.raw
+
+case wall seconds (rank 0): {"case.prefill128_decode4": 1.38, "case.prefill200_decode4": 2.09, "case.prefill96_decode34_ring_cross": 2.26, "load_and_prepare": 0.17, "process": 6.08}
+
+---- torchrun stdout/stderr ----
+W0720 08:36:27.370000 144305 torch/distributed/run.py:851] 
+W0720 08:36:27.370000 144305 torch/distributed/run.py:851] *****************************************
+W0720 08:36:27.370000 144305 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 08:36:27.370000 144305 torch/distributed/run.py:851] *****************************************
