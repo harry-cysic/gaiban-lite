@@ -41,7 +41,10 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   契约层已移植并在真实分片上通过（`runtime/dsv4_direct/`，7 层型 PASS + 4 阴性
   对照）；加载层已移植并 smoke 通过（滑窗/ratio-4/ratio-128 × rank，itp 切片 +
   Marlin repack，MoE 常驻 862 MB/层/rank ≈ 9.3 GiB/11 层，与容量模型吻合）。
-  进行中：attention/block 前向移植 + 单层 canary 对拍 reference。
+  前向四竖条全部移植完成并过真实权重 oracle gate：ratio-128（E0ef）、
+  ratio-4/indexer topk 512（E0ff，148/148 exact）、TP4 MoE（E0cf，runtime 与
+  手工 Marlin 路径位级一致）、滑窗层型 L0/L1（E0wf，Flash 新层类，无-YaRN RoPE +
+  环形 KV）。进行中：DirectDecodeBlock 三层型装配 + E0d 式整层 gate。
   含 stage 级 CUDA graph 与 C2g HC 边界融合；D5 式逐层 canary 对拍 D0 oracle。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
