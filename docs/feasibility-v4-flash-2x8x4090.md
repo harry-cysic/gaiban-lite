@@ -270,6 +270,9 @@ PP stage 落位时 IB 边界 stage 优先排 socket1。
   （外网入口 earth.s.cysic.work:2226 仅供外网的开发工作站使用。）
 - 机器均在中国大陆：**pip 走 huaweicloud 镜像**（已写入两台
   `~/.config/pip/pip.conf`）；GitHub 下载经本地工作站中转（FHT 构建脚本模式）。
+- 开发工作站（外网）的 ssh 访问 titan 均经 **ProxyJump earth** 中转；已配置别名
+  `titan064`/`titan065`（与 IP 形式等价、共享 ControlMaster 复用连接，
+  复用后单命令延迟 ~0.27s vs 首连 ~2.7s）。
 
 ### B.2 软件栈（venv `~/Workspace/venvs/sglang`，两台一致，导入全套验证通过）
 
