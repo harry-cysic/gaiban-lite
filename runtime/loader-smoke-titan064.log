@@ -1,0 +1,8 @@
+checkpoint_id=49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31
+{"status": "PASS", "layer": 0, "rank": 0, "attn_kind": "window", "route_kind": "hash", "block_bytes": 118429528, "moe_bytes": 861931008, "moe_load_seconds": 5.9, "failures": []}
+{"status": "PASS", "layer": 0, "rank": 3, "attn_kind": "window", "route_kind": "hash", "block_bytes": 118429528, "moe_bytes": 861931008, "moe_load_seconds": 0.9, "failures": []}
+{"status": "PASS", "layer": 2, "rank": 0, "attn_kind": "ratio4", "route_kind": "hash", "block_bytes": 148336216, "moe_bytes": 861931008, "moe_load_seconds": 0.9, "failures": []}
+{"status": "PASS", "layer": 2, "rank": 3, "attn_kind": "ratio4", "route_kind": "hash", "block_bytes": 148336216, "moe_bytes": 861931008, "moe_load_seconds": 0.9, "failures": []}
+{"status": "PASS", "layer": 3, "rank": 0, "attn_kind": "ratio128", "route_kind": "learned", "block_bytes": 120876888, "moe_bytes": 861931008, "moe_load_seconds": 1.0, "failures": []}
+{"status": "PASS", "layer": 3, "rank": 3, "attn_kind": "ratio128", "route_kind": "learned", "block_bytes": 120876888, "moe_bytes": 861931008, "moe_load_seconds": 0.9, "failures": []}
+SMOKE PASS

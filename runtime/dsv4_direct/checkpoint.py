@@ -400,8 +400,13 @@ def _config_contract(config: dict[str, Any], tp_size: int) -> dict[str, Any]:
     return {"ok": not errors, "errors": errors, "tp_slices": slices}
 
 
-def _load_weight_map(stage_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
-    """Load model.safetensors.index.json and return (weight_map, meta)."""
+def load_weight_map(stage_root: Path) -> tuple[dict[str, str], dict[str, Any]]:
+    """Load model.safetensors.index.json and return (weight_map, meta).
+
+    This is the only shard-resolution mechanism in the Flash runtime: tensors
+    are located through the index weight_map, never through assumed
+    layer -> shard numbering.
+    """
 
     index_path = stage_root / "model.safetensors.index.json"
     with index_path.open("rb") as handle:
@@ -442,7 +447,7 @@ def inspect_stage_checkpoint(
     config_result = _config_contract(config, tp_size)
     errors = list(config_result["errors"])
 
-    weight_map, index_result = _load_weight_map(stage_root)
+    weight_map, index_result = load_weight_map(stage_root)
     file_to_keys: dict[str, set[str]] = {}
     for key, filename in weight_map.items():
         file_to_keys.setdefault(filename, set()).add(key)
