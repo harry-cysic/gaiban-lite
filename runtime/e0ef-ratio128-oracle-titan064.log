@@ -1,0 +1,169 @@
+# E0ef V4-Flash ratio-128 attention oracle gate — titan064 run log
+# date: 2026-07-20T07:50:49Z
+# host: titan064 (8x RTX 4090, CUDA 13.2), venv ~/Workspace/venvs/sglang
+# workdir: titan064:~/e0f-runtime (rsync of gaiban-lite/runtime/)
+# command:
+#   export CUDA_HOME=/usr/local/cuda-13.2; PATH=$CUDA_HOME/bin:$PATH; LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+#   ~/Workspace/venvs/sglang/bin/torchrun --standalone --nproc_per_node=4 \
+#     e0ef_ratio128_attention_oracle.py --stage-root ~/Workspace/DeepSeek-V4-Flash --out-dir out-e0ef
+
+== torchrun stdout/stderr ==
+W0720 07:49:45.637000 142268 torch/distributed/run.py:851] 
+W0720 07:49:45.637000 142268 torch/distributed/run.py:851] *****************************************
+W0720 07:49:45.637000 142268 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0720 07:49:45.637000 142268 torch/distributed/run.py:851] *****************************************
+EXIT=0
+
+== out-e0ef/README.md ==
+# E0ef V4-Flash TP4 ratio-128 attention oracle
+
+Experiment: `E0ef-ratio128-attention-oracle`
+
+Status: **PASS**
+
+This is a real-checkpoint semantic correctness gate, not a performance run.
+It compares the direct BF16 control against an independent raw-checkpoint
+FP32 projection, compressor, RoPE, QDQ, sparse-softmax, and output oracle.
+
+NoPE semantics are fixed to intended E4M3/UE8M0 QAT. Exact checks cover
+top-k indices, next position, compression presence, and compressed-row count.
+
+Checkpoint: `e33d9526298d9d5c5bc5ffa563fd0b6b84f724c79fa29877b103541750ae95b4`
+Implementation: `002959b38ef677c1432f095c01518e0ca68be149225df4096c3ace0540523ca5`
+
+- `prefill128_decode128`: PASS; worst rms_rel `prefill.output_lora=0.0129709` (limit `0.035`)
+- `prefill127_decode127_boundary`: PASS; worst rms_rel `prefill.output_lora=0.0131901` (limit `0.035`)
+
+== summary aggregates (rms_rel_max vs limit per stage, all ranks) and rank0 rms_rel/row_rms_rel_max/max_abs ==
+accepted: True
+checkpoint_id: e33d9526298d9d5c5bc5ffa563fd0b6b84f724c79fa29877b103541750ae95b4
+block_contract_id: 8830881a121919c6e7824bfe4a0ed009a3efab70e7c2ad36b9faa1611a3c477f
+implementation_sha256: 002959b38ef677c1432f095c01518e0ca68be149225df4096c3ace0540523ca5
+identity_checks: {'all_ranks_match': True}
+world: 4 errors: []
+== prefill127_decode127_boundary accepted_ranks=[0, 1, 2, 3]
+   exact_checks all-pass: True
+   decode.attention_kv: rms_rel_max=1.033132e-02 limit=2.0e-02 accepted=True
+   decode.branch: rms_rel_max=9.291531e-03 limit=4.0e-02 accepted=True
+   decode.compression_finalized: rms_rel_max=0.000000e+00 limit=2.0e-02 accepted=True
+   decode.compression_pooled: rms_rel_max=0.000000e+00 limit=5.0e-05 accepted=True
+   decode.inverse_rotated: rms_rel_max=8.880085e-03 limit=3.0e-02 accepted=True
+   decode.output_lora: rms_rel_max=9.422821e-03 limit=3.5e-02 accepted=True
+   decode.projected_kv: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   decode.projected_score: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   decode.query: rms_rel_max=3.085995e-03 limit=2.0e-02 accepted=True
+   decode.query_lora: rms_rel_max=0.000000e+00 limit=1.2e-02 accepted=True
+   decode.raw_latent: rms_rel_max=0.000000e+00 limit=1.2e-02 accepted=True
+   decode.sparse_control: rms_rel_max=2.504985e-05 limit=3.0e-03 accepted=True
+   decode.sparse_output: rms_rel_max=8.874190e-03 limit=3.0e-02 accepted=True
+   decode.state.compressed: rms_rel_max=0.000000e+00 limit=2.0e-02 accepted=True
+   decode.state.raw: rms_rel_max=1.033852e-02 limit=2.0e-02 accepted=True
+   prefill.attention_kv: rms_rel_max=1.037938e-02 limit=2.0e-02 accepted=True
+   prefill.branch: rms_rel_max=1.290547e-02 limit=4.0e-02 accepted=True
+   prefill.inverse_rotated: rms_rel_max=1.214870e-02 limit=3.0e-02 accepted=True
+   prefill.output_lora: rms_rel_max=1.319008e-02 limit=3.5e-02 accepted=True
+   prefill.projected_kv: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   prefill.projected_score: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   prefill.query: rms_rel_max=4.661763e-03 limit=2.0e-02 accepted=True
+   prefill.query_lora: rms_rel_max=2.840295e-03 limit=1.2e-02 accepted=True
+   prefill.raw_latent: rms_rel_max=1.037938e-02 limit=1.2e-02 accepted=True
+   prefill.sparse_control: rms_rel_max=3.110022e-05 limit=3.0e-03 accepted=True
+   prefill.sparse_output: rms_rel_max=1.214483e-02 limit=3.0e-02 accepted=True
+   prefill.state.compressed: rms_rel_max=0.000000e+00 limit=2.0e-02 accepted=True
+   prefill.state.compressor_kv: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   prefill.state.compressor_score: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   prefill.state.raw: rms_rel_max=1.037938e-02 limit=2.0e-02 accepted=True
+== prefill128_decode128 accepted_ranks=[0, 1, 2, 3]
+   exact_checks all-pass: True
+   decode.attention_kv: rms_rel_max=1.016322e-02 limit=2.0e-02 accepted=True
+   decode.branch: rms_rel_max=9.887908e-03 limit=4.0e-02 accepted=True
+   decode.inverse_rotated: rms_rel_max=9.189974e-03 limit=3.0e-02 accepted=True
+   decode.output_lora: rms_rel_max=9.775908e-03 limit=3.5e-02 accepted=True
+   decode.projected_kv: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   decode.projected_score: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   decode.query: rms_rel_max=3.321089e-03 limit=2.0e-02 accepted=True
+   decode.query_lora: rms_rel_max=3.332863e-05 limit=1.2e-02 accepted=True
+   decode.raw_latent: rms_rel_max=0.000000e+00 limit=1.2e-02 accepted=True
+   decode.sparse_control: rms_rel_max=4.450213e-05 limit=3.0e-03 accepted=True
+   decode.sparse_output: rms_rel_max=9.184519e-03 limit=3.0e-02 accepted=True
+   decode.state.compressed: rms_rel_max=0.000000e+00 limit=2.0e-02 accepted=True
+   decode.state.compressor_kv: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   decode.state.compressor_score: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   decode.state.raw: rms_rel_max=1.017111e-02 limit=2.0e-02 accepted=True
+   prefill.attention_kv: rms_rel_max=1.021555e-02 limit=2.0e-02 accepted=True
+   prefill.branch: rms_rel_max=1.271996e-02 limit=4.0e-02 accepted=True
+   prefill.compression_finalized: rms_rel_max=0.000000e+00 limit=2.0e-02 accepted=True
+   prefill.compression_pooled: rms_rel_max=0.000000e+00 limit=5.0e-05 accepted=True
+   prefill.inverse_rotated: rms_rel_max=1.237330e-02 limit=3.0e-02 accepted=True
+   prefill.output_lora: rms_rel_max=1.297089e-02 limit=3.5e-02 accepted=True
+   prefill.projected_kv: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   prefill.projected_score: rms_rel_max=0.000000e+00 limit=2.0e-05 accepted=True
+   prefill.query: rms_rel_max=4.652626e-03 limit=2.0e-02 accepted=True
+   prefill.query_lora: rms_rel_max=2.846000e-03 limit=1.2e-02 accepted=True
+   prefill.raw_latent: rms_rel_max=1.022348e-02 limit=1.2e-02 accepted=True
+   prefill.sparse_control: rms_rel_max=3.943389e-05 limit=3.0e-03 accepted=True
+   prefill.sparse_output: rms_rel_max=1.236888e-02 limit=3.0e-02 accepted=True
+   prefill.state.compressed: rms_rel_max=0.000000e+00 limit=2.0e-02 accepted=True
+   prefill.state.raw: rms_rel_max=1.022348e-02 limit=2.0e-02 accepted=True
+== rank0 per-stage max_abs (case prefill128_decode128)
+   decode.attention_kv: rms_rel=9.866666e-03 row_rms_rel_max=2.205810e-02 max_abs=2.500000e-01
+   decode.branch: rms_rel=9.887908e-03 row_rms_rel_max=9.887908e-03 max_abs=1.562500e-02
+   decode.inverse_rotated: rms_rel=9.189974e-03 row_rms_rel_max=1.533720e-02 max_abs=1.123047e-02
+   decode.output_lora: rms_rel=9.775908e-03 row_rms_rel_max=1.388335e-02 max_abs=7.812500e-03
+   decode.projected_kv: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.projected_score: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.query: rms_rel=3.304407e-03 row_rms_rel_max=5.639187e-03 max_abs=3.125000e-02
+   decode.query_lora: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.raw_latent: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.sparse_control: rms_rel=7.186090e-06 row_rms_rel_max=7.559181e-05 max_abs=1.220703e-04
+   decode.sparse_output: rms_rel=9.184519e-03 row_rms_rel_max=1.532372e-02 max_abs=1.123047e-02
+   decode.state.compressed: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.state.compressor_kv: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.state.compressor_score: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.state.raw: rms_rel=9.875040e-03 row_rms_rel_max=2.205810e-02 max_abs=2.500000e-01
+   prefill.attention_kv: rms_rel=9.902061e-03 row_rms_rel_max=2.205810e-02 max_abs=2.500000e-01
+   prefill.branch: rms_rel=1.250346e-02 row_rms_rel_max=2.294859e-02 max_abs=1.132812e-01
+   prefill.compression_finalized: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.compression_pooled: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.inverse_rotated: rms_rel=1.175242e-02 row_rms_rel_max=3.600462e-02 max_abs=2.343750e-01
+   prefill.output_lora: rms_rel=1.271920e-02 row_rms_rel_max=3.496434e-02 max_abs=3.125000e-02
+   prefill.projected_kv: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.projected_score: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.query: rms_rel=4.650820e-03 row_rms_rel_max=7.649529e-03 max_abs=9.375000e-02
+   prefill.query_lora: rms_rel=2.826006e-03 row_rms_rel_max=3.206486e-03 max_abs=9.765625e-04
+   prefill.raw_latent: rms_rel=9.910466e-03 row_rms_rel_max=2.205810e-02 max_abs=2.500000e-01
+   prefill.sparse_control: rms_rel=2.472486e-05 row_rms_rel_max=9.564418e-04 max_abs=3.906250e-03
+   prefill.sparse_output: rms_rel=1.174751e-02 row_rms_rel_max=3.593952e-02 max_abs=2.343750e-01
+   prefill.state.compressed: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.state.raw: rms_rel=9.910466e-03 row_rms_rel_max=2.205810e-02 max_abs=2.500000e-01
+== rank0 per-stage max_abs (case prefill127_decode127_boundary)
+   decode.attention_kv: rms_rel=9.932734e-03 row_rms_rel_max=1.943122e-02 max_abs=2.500000e-01
+   decode.branch: rms_rel=9.030483e-03 row_rms_rel_max=9.030483e-03 max_abs=1.562500e-02
+   decode.compression_finalized: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.compression_pooled: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.inverse_rotated: rms_rel=8.524768e-03 row_rms_rel_max=1.424759e-02 max_abs=1.074219e-02
+   decode.output_lora: rms_rel=8.959017e-03 row_rms_rel_max=1.290807e-02 max_abs=5.859375e-03
+   decode.projected_kv: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.projected_score: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.query: rms_rel=3.022987e-03 row_rms_rel_max=5.309161e-03 max_abs=6.250000e-02
+   decode.query_lora: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.raw_latent: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.sparse_control: rms_rel=1.284152e-05 row_rms_rel_max=1.338042e-04 max_abs=2.441406e-04
+   decode.sparse_output: rms_rel=8.514338e-03 row_rms_rel_max=1.423176e-02 max_abs=1.074219e-02
+   decode.state.compressed: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   decode.state.raw: rms_rel=9.939767e-03 row_rms_rel_max=1.943122e-02 max_abs=2.500000e-01
+   prefill.attention_kv: rms_rel=9.978888e-03 row_rms_rel_max=1.943122e-02 max_abs=2.500000e-01
+   prefill.branch: rms_rel=1.242888e-02 row_rms_rel_max=1.921797e-02 max_abs=9.765625e-02
+   prefill.inverse_rotated: rms_rel=1.167828e-02 row_rms_rel_max=2.981597e-02 max_abs=2.500000e-01
+   prefill.output_lora: rms_rel=1.269217e-02 row_rms_rel_max=2.691961e-02 max_abs=3.125000e-02
+   prefill.projected_kv: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.projected_score: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.query: rms_rel=4.631911e-03 row_rms_rel_max=7.807098e-03 max_abs=1.250000e-01
+   prefill.query_lora: rms_rel=2.827816e-03 row_rms_rel_max=3.215758e-03 max_abs=9.765625e-04
+   prefill.raw_latent: rms_rel=9.978888e-03 row_rms_rel_max=1.943122e-02 max_abs=2.500000e-01
+   prefill.sparse_control: rms_rel=2.615841e-05 row_rms_rel_max=1.021813e-03 max_abs=3.906250e-03
+   prefill.sparse_output: rms_rel=1.167418e-02 row_rms_rel_max=2.982732e-02 max_abs=2.500000e-01
+   prefill.state.compressed: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.state.compressor_kv: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.state.compressor_score: rms_rel=0.000000e+00 row_rms_rel_max=0.000000e+00 max_abs=0.000000e+00
+   prefill.state.raw: rms_rel=9.978889e-03 row_rms_rel_max=1.943122e-02 max_abs=2.500000e-01
