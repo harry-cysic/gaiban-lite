@@ -33,8 +33,13 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   全部收益甚微或改判**——eager fused MHC −3%、W8A16 投影中性、fused indexer 属
   prefill 杠杆。decode 回收路径修订为：C2g tilelang HC 边界融合（Phase 2 运行时）、
   decode 形状 fused index score（候选新 kernel）、全 stage 单 graph；MTP（Phase 4）
-  另计 ~1.5×。
+  另计 ~1.5×。其中 **C2g 已单独量化**
+  （[`A5F`](experiments/A5F-hc-boundary-fusion/README.md)：decode 形状 B=512 下
+  2.92×、省 461 µs/边界，数值 1 ulp bf16）——满接入估计回收 ~10 ms/stage，
+  12.5k → ~15–16k，回到预估带内。
 - 下一阶段（Phase 2）：**dsv4_direct 移植 Flash 层表**（单机 TP4×PP2 → 双机 PP4），
+  契约层已移植并在真实分片上通过（`runtime/dsv4_direct/`，7 层型 PASS + 4 阴性
+  对照）；加载层（block_weights/marlin_moe itp）移植进行中。
   含 stage 级 CUDA graph 与 C2g HC 边界融合；D5 式逐层 canary 对拍 D0 oracle。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
