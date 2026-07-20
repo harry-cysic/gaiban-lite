@@ -234,6 +234,8 @@ fused HC 边界融合放行（与 eager 同分率）。
 closed-loop（serial 单 microbatch）最高 920 tok/s@bl=192；真 DP-attention 序列切分与
 ≥4 microbatch 交织实现后方可作为 E2E 实测吞吐引用。
 
+**吞吐-容量前沿与模型二次修正（E1IF/前沿扫描，同日追加）**：4-microbatch 交织流水（无串扰逐位 gate，瓶颈 stage busy 93.7%）实测前沿：ctx 2048 时 bl_mb 32/48/64 → 5885/7368/8570 tok/s（bl 96 OOM）；ctx 8192 时 bl_mb 32/40 → 5693/6392 tok/s（bl 48 OOM）。**8K/bf16-KV decode-only 实测天花板 ≈6.4k output tok/s（B_total=640，容量限而非算力限）**。§5.2 预估带 15–25k 依赖的两个假设被实测证伪：(1) t_stage 随 B 线性缩放（实测强次线性：bl=32 的 replay 20.3 ms 为 bl=128 的 36.6 ms 的 55% 而非 25%，权重流固定成本主导）；(2) KV 容量核算未计满流水需 4 个 microbatch 的 KV 同驻（B_global=512 吞吐点实际需 2048 条在飞，8K bf16 KV 不可行）。证据链：E1F（t_stage–bl 曲线）→ E1IF（交织无串扰、busy 占比）→ 前沿扫描（OOM 判界），均 3 轮重复、绑定 checkpoint/环境/拓扑。回收杠杆（§4.4/§5.4 自列，待 Flash 几何验证）：FP8 KV（×2 行数）投影 8K ≈10–11k；MTP（~1.5×）→ **~15–16k，原带下沿在两杠杆齐备时可及**；短 ctx 运营另有余量（2K 实测 8.6k）。详细数据：experiments/E1F-full-decode-throughput/README.md。
+
 ## 6. 风险清单
 
 | 风险 | 等级 | 缓解 |
