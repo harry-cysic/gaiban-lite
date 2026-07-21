@@ -1,0 +1,120 @@
+{
+  "accepted": false,
+  "argv": [
+    "e7f_handoff_gate.py",
+    "--stage-root",
+    "/home/cysic/Workspace/DeepSeek-V4-Flash",
+    "--out-dir",
+    "out-e7f-break-ratio4-skip",
+    "--break-handoff",
+    "ratio4-skip"
+  ],
+  "attention_modes": {
+    "0": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    },
+    "1": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    },
+    "2": {
+      "compressor_cast_mode": "ref",
+      "index_score_mode": "ref",
+      "indexer_qat_mode": "ref",
+      "prefill_sparse_backend": "torch"
+    },
+    "3": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    }
+  },
+  "attention_tp": {
+    "0": {
+      "local_num_heads": 16,
+      "local_o_groups": 2,
+      "tp_rank": 2,
+      "tp_size": 4,
+      "wo_b_shape": [
+        4096,
+        2048
+      ]
+    },
+    "1": {
+      "local_num_heads": 16,
+      "local_o_groups": 2,
+      "tp_rank": 2,
+      "tp_size": 4,
+      "wo_b_shape": [
+        4096,
+        2048
+      ]
+    },
+    "2": {
+      "local_num_heads": 16,
+      "local_o_groups": 2,
+      "tp_rank": 2,
+      "tp_size": 4,
+      "wo_b_shape": [
+        4096,
+        2048
+      ]
+    },
+    "3": {
+      "local_num_heads": 16,
+      "local_o_groups": 2,
+      "tp_rank": 2,
+      "tp_size": 4,
+      "wo_b_shape": [
+        4096,
+        2048
+      ]
+    }
+  },
+  "checkpoint_id": "136990854bb02eaa84731ece8ee5725a77631624b3edfcae2d16a78eed89fca3",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [
+    {
+      "message": "decode start_pos does not match ratio-4 state",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e7f_handoff_gate.py\", line 401, in main\n    plan = candidate_stage.prepare_decode_plan(position)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/superstage.py\", line 421, in prepare_decode_plan\n    plan = attention.prepare_decode_plan(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/ratio4_attention.py\", line 805, in prepare_decode_plan\n    raise ValueError(\"decode start_pos does not match ratio-4 state\")\nValueError: decode start_pos does not match ratio-4 state\n",
+      "type": "ValueError"
+    }
+  ],
+  "experiment": "E7F-prefill-decode-state-handoff",
+  "global_row_shapes": [
+    4,
+    1024
+  ],
+  "host": "titan065",
+  "layer_kinds": {
+    "0": "window",
+    "1": "window",
+    "2": "ratio4",
+    "3": "ratio128"
+  },
+  "load_seconds": 8.207894143182784,
+  "prefill_end_positions": {
+    "2": 256
+  },
+  "prefill_seconds": 2.1142289461568,
+  "rank": 2,
+  "requested": {
+    "attention_tp_shard": true,
+    "break_handoff": "ratio4-skip",
+    "decode_steps": 16,
+    "indexer_kv_dtype": "bf16",
+    "kv_dtype": "bf16",
+    "layers": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "max_seq_len": 1024,
+    "prefill_len": 256
+  },
+  "schema_version": 1,
+  "steps": [],
+  "torch": "2.11.0+cu130",
+  "world": 4
+}
