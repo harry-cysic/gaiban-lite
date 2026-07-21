@@ -1,0 +1,23 @@
+{
+ "experiment": "C2F-attention-kernel",
+ "gpu": "NVIDIA GeForce RTX 4090",
+ "heads": 64,
+ "head_dim": 512,
+ "candidates": 640,
+ "head_chunk": 16,
+ "numerics": {
+  "seqlen": 512,
+  "rel_fro": 0.0019309223862364888,
+  "max_abs": 0.0001220703125
+ },
+ "throughput": {
+  "seqlen": 8192,
+  "kv_rows": 2176,
+  "row_block": 1024,
+  "torch_ms": 106.074,
+  "tilelang_ms": 16.356,
+  "speedup": 6.485,
+  "torch_peak_gib": 3.5,
+  "tilelang_peak_gib": 1.59
+ }
+}
