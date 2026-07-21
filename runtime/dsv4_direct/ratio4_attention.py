@@ -404,27 +404,35 @@ def fp4_quant_dequant(value: torch.Tensor, *, group_size: int = 32) -> torch.Ten
     normalized = (grouped / scale).clamp(-6.0, 6.0)
     magnitude = normalized.abs()
     # Midpoint comparisons encode round-to-nearest-even for the E2M1 levels.
+    # Scalar branches, not *_like tensors.  The materialised form allocated
+    # eight full-size constants here; at an 8192-token prefill that is ~32 MiB
+    # apiece of nothing but repeated scalars, and it is what pushed stage 0
+    # over its 24 GiB wall.  torch.where broadcasts Python scalars directly.
+    # The innermost branch stays a full_like so the chain's dtype is anchored
+    # by the tensor rather than by weak-scalar promotion.  Verified bitwise
+    # identical to the materialised form over float32/float64/bf16/fp16,
+    # including every exact level boundary.
     snapped = torch.where(
         magnitude <= 0.25,
-        torch.zeros_like(magnitude),
+        0.0,
         torch.where(
             magnitude < 0.75,
-            torch.full_like(magnitude, 0.5),
+            0.5,
             torch.where(
                 magnitude <= 1.25,
-                torch.ones_like(magnitude),
+                1.0,
                 torch.where(
                     magnitude < 1.75,
-                    torch.full_like(magnitude, 1.5),
+                    1.5,
                     torch.where(
                         magnitude <= 2.5,
-                        torch.full_like(magnitude, 2.0),
+                        2.0,
                         torch.where(
                             magnitude < 3.5,
-                            torch.full_like(magnitude, 3.0),
+                            3.0,
                             torch.where(
                                 magnitude <= 5.0,
-                                torch.full_like(magnitude, 4.0),
+                                4.0,
                                 torch.full_like(magnitude, 6.0),
                             ),
                         ),
