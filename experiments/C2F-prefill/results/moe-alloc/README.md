@@ -290,3 +290,22 @@ torch P=17,022 → T = **1,711**;tilelang P=25,308 → T = **2,322**(原折算 2
 `moe_collective_selfcheck`)、`runtime/c2f_moe_collective_probe.py`、
 `runtime/c2f_moe_combine_gate.py`、launcher `run_c2f_moe_alloc.sh` +
 4 个 C2F launcher 的 `NCCL_P2P_LEVEL=SYS`。
+
+## 附:全仓 launcher 审计——decode 侧结论不受影响(主会话核实)
+
+`NCCL_P2P_LEVEL=SYS` 的缺失是否波及既有 decode 数字?逐个 launcher 审计
+(`runtime/*.sh`,23 个):
+
+- **19 个显式设置**(含所有 decode/E2E 双机 launcher:`run_e1f_dual.sh`、
+  `run_e1f_dp_dual.sh`、`run_e1if_dual.sh`、`run_e1if_kv_dual.sh`、
+  `run_e1if_ws_dual.sh`、`run_e0qf_dual.sh`、`run_e0e2e*`、`run_e1mtp*` 等)。
+- **2 个前沿扫描脚本**(`run_e1if_fp8_frontier.sh`、`run_e1if_ws_frontier.sh`)
+  自身未设,但**均委托**给上面带 SYS 的 dual launcher(第 18 行分别调用
+  `run_e1if_kv_dual.sh` / `run_e1if_ws_dual.sh`)→ **实际带 P2P**。
+- **2 个 gate 脚本**(`run_ws_gates.sh`、`run_e0mf_titan.sh`)未设:gate 是
+  同一次运行内两臂互比,传输选择只影响速度不影响判定;`run_e0mf_titan.sh`
+  已被本竖条显式标记(其冻结产物即在无 P2P 下产生)。
+
+**结论:decode 侧的全部头条数字(8K 前沿 6392→7523→8733、2K 8570/9656、
+E1F B 扫描、MTP 与 DP 竖条)均在 P2P 生效下测得,不需重估**;本次 SHM 回退
+的影响域仅限 C2F prefill 的 20/21 竖条测量,已在本目录修正。
