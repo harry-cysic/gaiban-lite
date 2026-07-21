@@ -99,6 +99,7 @@ def load_embed_head_material(
     checkpoint_id: str,
     load_embed: bool,
     load_head: bool,
+    embed_device: torch.device | str | None = None,
 ) -> EmbedHeadMaterial:
     """Load the top-level checkpoint tensors through the index weight_map."""
 
@@ -131,8 +132,15 @@ def load_embed_head_material(
             return reader.get_tensor(name).to(device=target).contiguous()
 
         if load_embed:
+            # embed_device lets stage 0 park the table off-GPU.  It is 1010 MiB
+            # and is read once per prefill by a gather, so it is the cheapest
+            # GiB to give back when the stage does not fit; see embed_tokens().
+            embed_target = target if embed_device is None else embed_device
             embed_weight = check(
-                "embed.weight", get("embed.weight"), (EMBED_VOCAB, EMBED_DIM), torch.bfloat16
+                "embed.weight",
+                reader.get_tensor("embed.weight").to(device=embed_target).contiguous(),
+                (EMBED_VOCAB, EMBED_DIM),
+                torch.bfloat16,
             )
         if load_head:
             # Checkpoint stores head/norm in BF16; the reference widens both
@@ -179,7 +187,15 @@ def embed_hc_residual(
         raise HeadStageError("embedding input_ids must be [batch, sequence] int64")
     if int(input_ids.min()) < 0 or int(input_ids.max()) >= EMBED_VOCAB:
         raise HeadStageError("embedding input_ids outside the vocabulary")
-    hidden = F.embedding(input_ids, material.embed_weight)
+    # The table may be held off-device (embed_device="cpu") when stage 0 cannot
+    # spare its 1010 MiB.  Gathering on the table's own device and moving only
+    # the gathered rows is bitwise identical to gathering on-device: embedding
+    # is pure indexing, so no arithmetic is performed in either placement.
+    table = material.embed_weight
+    if table.device != input_ids.device:
+        hidden = F.embedding(input_ids.to(table.device), table).to(input_ids.device)
+    else:
+        hidden = F.embedding(input_ids, table)
     return hidden.unsqueeze(2).repeat(1, 1, HC_MULT, 1).contiguous()
 
 

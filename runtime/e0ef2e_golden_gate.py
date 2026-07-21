@@ -708,6 +708,14 @@ def main() -> int:
         action="store_true",
         help="E6F variant A: shard the attention o-path across TP4 (not bitwise)",
     )
+    parser.add_argument(
+        "--embed-device", default=None,
+        help=(
+            "device for the 1010 MiB embedding table (e.g. 'cpu').  Stage 0 "
+            "OOMs loading it at --max-seq-len 8320; the lookup is a pure "
+            "gather so an off-device table is bitwise identical."
+        ),
+    )
     parser.add_argument("--progress-every", type=int, default=64)
     parser.add_argument(
         "--kv-dtype",
@@ -1001,6 +1009,7 @@ def main() -> int:
                 checkpoint_id=result["checkpoint_id"],
                 load_embed=True,
                 load_head=False,
+                embed_device=args.embed_device,
             )
         elif stage == STAGE_COUNT - 1:
             head_material = load_embed_head_material(
