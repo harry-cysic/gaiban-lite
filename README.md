@@ -90,7 +90,17 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   失步臂分歧归因到 Marlin 批组成 ULP 敏感,任何投机形态共有)。
   **当前实测最优:8K 8733、2K 9656 output tok/s**。带下沿 15k 的剩余差距
   ~1.7×@8K,候选:seqlen-2 融合 verify(需先解无损)、MTP head GEMM 优化
-  (10ms/轮)、KV 行宽、handoff overlap、短 ctx 运营 → chunked prefill/serving。
+  (10ms/轮)、KV 行宽、handoff overlap、短 ctx 运营。
+- Prefill(C2F + 重归因):**dense-BF16 MoE 路线证伪**(慢 4–17×;Marlin 在
+  prefill 已跑到 135 TFLOPS ≈ 4090 BF16 峰值 82%,C2F 的 "MFU 11.5%" 归因有误),
+  且用 C2F 自己的脚本复跑发现**基线被低估 41–45%**:baseline **15.0k**、
+  全开(W4A8+fused indexer)**16.6k** input tok/s/stage(差额全部在 MoE 桶,
+  归因为 fp32 临时量的分配器抖动,已记为可修缺陷 ≈ +32%)。修正后的 prefill
+  归因:**attention 58%**(ratio-4 41% + ratio-128 17%)、MoE 24%、HC 16% ——
+  **prefill 由 attention 主导**,而 runtime 至今用 torch masked-einsum 正确性
+  实现,reference 的 tilelang sparse kernel 从未接入。单池 T 投影 **1.68k**
+  (原 1.2k);够到 3.2–4.2k 带需 P≈40k,路径 = attention 换真 kernel(3× 则
+  ~27k)+ prefill HC 融合 + MoE 临时量预分配。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
 - **Prefill 基线与杠杆已实测**
