@@ -16,20 +16,21 @@ echo "== sync runtime to titan064 =="
 ssh titan064 'mkdir -p ~/e0f-runtime'
 rsync -a --exclude __pycache__ dsv4_direct c2f_prefill_stage_bench.py titan064:e0f-runtime/
 
-ENV_BASE='export CUDA_HOME=/usr/local/cuda-13.2; export PATH=$CUDA_HOME/bin:$PATH; export LD_LIBRARY_PATH=$CUDA_HOME/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}; export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True; export NCCL_P2P_LEVEL=SYS'
+ENV_BASE='export CUDA_HOME=/usr/local/cuda-13.2; export PATH=$CUDA_HOME/bin:$PATH; export LD_LIBRARY_PATH=$CUDA_HOME/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}; export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True; export NCCL_P2P_LEVEL=SYS'"; ${C2F_EXTRA_ENV:-:}"
 
 echo "== nvidia-smi before =="
 ssh titan064 'nvidia-smi --query-gpu=index,memory.used --format=csv,noheader'
 
 echo "== C2F prefill bench (4 ranks, chunk=$CHUNK moe=$MOE indexer=$IDX $*) =="
 rc=0
-ssh titan064 "cd ~/e0f-runtime && $ENV_BASE; $TR --standalone --nproc_per_node=4 c2f_prefill_stage_bench.py --stage-root ~/Workspace/DeepSeek-V4-Flash --out-dir out-c2f --chunk $CHUNK --moe-mode $MOE --indexer $IDX $*" \
+OUT_DIR=${C2F_OUT_DIR:-out-c2f}
+ssh titan064 "cd ~/e0f-runtime && $ENV_BASE; $TR --standalone --nproc_per_node=4 c2f_prefill_stage_bench.py --stage-root ~/Workspace/DeepSeek-V4-Flash --out-dir $OUT_DIR --chunk $CHUNK --moe-mode $MOE --indexer $IDX $*" \
   2>&1 | tee "$TAG-titan064.log" || rc=$?
 echo "== bench exit code: $rc =="
 
 echo "== fetch results =="
-mkdir -p out-c2f
-rsync -a "titan064:e0f-runtime/out-c2f/" out-c2f/ || true
+mkdir -p "$OUT_DIR"
+rsync -a "titan064:e0f-runtime/$OUT_DIR/" "$OUT_DIR/" || true
 
 echo "== nvidia-smi after =="
 ssh titan064 'nvidia-smi --query-gpu=index,memory.used --format=csv,noheader'

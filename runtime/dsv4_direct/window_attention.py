@@ -31,6 +31,8 @@ import torch.nn.functional as F
 from .attention import (
     apply_rotary_emb,
     fp8_quant_dequant,
+    kv_fp8_qat,
+    resolve_kv_qat_mode,
     precompute_freqs_cis,
     rms_norm,
     torch_sparse_attention,
@@ -416,6 +418,8 @@ class WindowTorchAttention:
         nope_quant_mode: Literal[
             "qat_intended_e4m3", "reference_executable_bf16"
         ] = "qat_intended_e4m3",
+        *,
+        kv_qat_mode: str | None = None,
     ) -> None:
         config.validate()
         layer_identity = (config.layer_id, weights.layer_id, state.layer_id)
@@ -461,6 +465,8 @@ class WindowTorchAttention:
         ):
             raise ValueError(f"unsupported NoPE quant mode {nope_quant_mode}")
         self.nope_quant_mode = nope_quant_mode
+        # E5F: KV-latent FP8 QAT implementation; default "ref" until gated.
+        self.kv_qat_mode = resolve_kv_qat_mode(kv_qat_mode)
         # No-YaRN table: with original_seq_len == 0 the correction branch of
         # precompute_freqs_cis is skipped (attention.py:455, mirroring the
         # reference model.py:221 guard), so this is the plain base-10000
@@ -479,7 +485,7 @@ class WindowTorchAttention:
     def _nope_control(self, value: torch.Tensor) -> torch.Tensor:
         if self.nope_quant_mode == "reference_executable_bf16":
             return value
-        return fp8_quant_dequant(value, group_size=64)
+        return kv_fp8_qat(value, mode=self.kv_qat_mode, group_size=64)
 
     def prepare_decode_plan(self, start_pos: int) -> WindowDecodePlan:
         """Validate state once and materialize a fixed full-ring decode plan.

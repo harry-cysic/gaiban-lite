@@ -8,6 +8,7 @@ a performance path.
 from __future__ import annotations
 
 import math
+import os
 from dataclasses import dataclass
 from typing import Any, Callable, Literal, Mapping, MutableMapping, Protocol
 
@@ -511,6 +512,78 @@ def fp8_quant_dequant(
     return (quantized.float() * scale).reshape_as(value).to(value.dtype)
 
 
+def resolve_kv_qat_mode(explicit: str | None) -> str:
+    """Resolve the KV-latent FP8 QAT implementation (E5F).
+
+    Default is ``fused``.  The kernel is bitwise identical to the eager chain
+    at every level checked -- 18/18 self-check cases, 480 in-layer steps, and a
+    D0L long gate that reproduces the frozen 494/512 with the same max
+    ``top2_gap`` and the same first-mismatch record on all eight prompts -- and
+    it buys +2.30% single-stream decode.  Prefill is unaffected within noise
+    (E5F: 1.9897 -> 1.9922 s stage pass, ratio-128 component wall identical),
+    which had to be checked because ratio-128 and window layers reach this
+    chain through the same ``_nope_control`` in their prefill path.
+    ``DSV4_KV_FP8_QAT=ref`` restores the unfused chain.
+    """
+
+    resolved = (
+        explicit
+        if explicit is not None
+        else (os.environ.get("DSV4_KV_FP8_QAT", "").strip() or "fused")
+    )
+    if resolved not in ("ref", "fused"):
+        raise ValueError(f"kv_qat_mode must be ref/fused, got {resolved!r}")
+    return resolved
+
+
+def kv_fp8_qat_prefix(
+    tensor: torch.Tensor, width: int, *, mode: str, group_size: int = 64
+) -> torch.Tensor:
+    """``tensor[..., :width] = fp8_quant_dequant(tensor[..., :width])`` (E5F).
+
+    The fused path writes the strided prefix in place, which is what the eager
+    idiom does too, so no gather/scatter pair is introduced.  Anything the
+    kernel does not support -- a different group size, a non-contiguous
+    tensor, a width that is not a multiple of 64 -- falls back to the eager
+    chain rather than failing, so the switch can never change behaviour by
+    silently not applying.
+    """
+
+    from .ops.kv_fp8_qat import FP8_GROUP, fused_kv_fp8_qat_prefix_
+
+    if (
+        mode == "fused"
+        and group_size == FP8_GROUP
+        and width % FP8_GROUP == 0
+        and tensor.dtype == torch.bfloat16
+        and tensor.is_cuda
+        and tensor.is_contiguous()
+    ):
+        return fused_kv_fp8_qat_prefix_(tensor, width)
+    tensor[..., :width] = fp8_quant_dequant(
+        tensor[..., :width], group_size=group_size
+    )
+    return tensor
+
+
+def kv_fp8_qat(
+    value: torch.Tensor, *, mode: str, group_size: int = 64
+) -> torch.Tensor:
+    """Whole-tensor form of the same dispatch (E5F)."""
+
+    from .ops.kv_fp8_qat import FP8_GROUP, fused_kv_fp8_qat
+
+    if (
+        mode == "fused"
+        and group_size == FP8_GROUP
+        and value.shape[-1] % FP8_GROUP == 0
+        and value.dtype == torch.bfloat16
+        and value.is_cuda
+    ):
+        return fused_kv_fp8_qat(value)
+    return fp8_quant_dequant(value, group_size=group_size)
+
+
 def window_topk_indices(
     *,
     batch_size: int,
@@ -819,6 +892,7 @@ class Ratio128TorchAttention:
             "qat_intended_e4m3", "reference_executable_bf16"
         ] = "qat_intended_e4m3",
         *,
+        kv_qat_mode: str | None = None,
         sparse_attention_backend: Ratio128SparseAttentionBackend | None = None,
         projection_backend: AttentionProjectionBackend | None = None,
     ) -> None:
@@ -866,6 +940,8 @@ class Ratio128TorchAttention:
         ):
             raise ValueError(f"unsupported NoPE quant mode {nope_quant_mode}")
         self.nope_quant_mode = nope_quant_mode
+        # E5F: KV-latent FP8 QAT implementation; default "ref" until gated.
+        self.kv_qat_mode = resolve_kv_qat_mode(kv_qat_mode)
         if sparse_attention_backend is not None and not callable(
             sparse_attention_backend
         ):
@@ -894,7 +970,7 @@ class Ratio128TorchAttention:
     def _nope_control(self, value: torch.Tensor) -> torch.Tensor:
         if self.nope_quant_mode == "reference_executable_bf16":
             return value
-        return fp8_quant_dequant(value, group_size=64)
+        return kv_fp8_qat(value, mode=self.kv_qat_mode, group_size=64)
 
     def _compress_finalizer(
         self, pooled: torch.Tensor, group_starts: torch.Tensor
@@ -1776,6 +1852,9 @@ __all__ = [
     "apply_rotary_emb",
     "compressed_topk_indices",
     "fp8_quant_dequant",
+    "kv_fp8_qat",
+    "kv_fp8_qat_prefix",
+    "resolve_kv_qat_mode",
     "precompute_freqs_cis",
     "prepare_attention_weights",
     "rms_norm",

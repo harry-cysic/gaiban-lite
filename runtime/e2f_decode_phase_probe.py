@@ -246,6 +246,11 @@ def apply_ab_variant(lane: Any, variant: str) -> list[int]:
             if getattr(attention, "indexer_qat_mode", None) is not None:
                 attention.indexer_qat_mode = "fused"
                 applied.append(int(layer_id))
+        elif variant == "kv_fp8_fused":
+            # every layer type runs the KV-latent FP8 QAT chain
+            if getattr(attention, "kv_qat_mode", None) is not None:
+                attention.kv_qat_mode = "fused"
+                applied.append(int(layer_id))
         else:
             raise ValueError(f"unknown A/B variant {variant!r}")
     return applied
@@ -305,7 +310,7 @@ def main() -> int:
         "--ab-variant",
         type=str,
         default="qat_fused",
-        choices=("qat_fused", "none"),
+        choices=("qat_fused", "kv_fp8_fused", "none"),
         help=(
             "the treatment applied to lane B in --mode ab; 'none' is the "
             "control arm -- two identical lanes, which must read equal"

@@ -26,6 +26,8 @@ from .attention import (
     _validate_attention_projection_backend,
     apply_rotary_emb,
     fp8_quant_dequant,
+    kv_fp8_qat_prefix,
+    resolve_kv_qat_mode,
     precompute_freqs_cis,
     rms_norm,
     window_topk_indices,
@@ -524,6 +526,7 @@ class Ratio4TorchAttention:
         sparse_attention_backend: Ratio4SparseAttentionBackend | None = None,
         projection_backend: AttentionProjectionBackend | None = None,
         indexer_qat_mode: str | None = None,
+        kv_qat_mode: str | None = None,
     ) -> None:
         config.validate()
         resolved_qat = (
@@ -571,6 +574,8 @@ class Ratio4TorchAttention:
         # +2.31% single-stream (27.740 -> 28.381 tok/s), so it is the default.
         # DSV4_INDEXER_QAT_DECODE=ref restores the unfused chain.
         self.indexer_qat_mode = resolved_qat
+        # E5F: the KV-latent FP8 QAT chain, default "ref" until gated.
+        self.kv_qat_mode = resolve_kv_qat_mode(kv_qat_mode)
         if sparse_attention_backend is not None and not callable(
             sparse_attention_backend
         ):
@@ -955,8 +960,8 @@ class Ratio4TorchAttention:
         value[..., -cfg.rope_dim :] = apply_rotary_emb(
             value[..., -cfg.rope_dim :], frequencies
         )
-        value[..., : -cfg.rope_dim] = fp8_quant_dequant(
-            value[..., : -cfg.rope_dim], group_size=64
+        kv_fp8_qat_prefix(
+            value, value.shape[-1] - cfg.rope_dim, mode=self.kv_qat_mode
         )
         return value.contiguous()
 
@@ -1098,8 +1103,8 @@ class Ratio4TorchAttention:
         raw_latent[..., -cfg.rope_dim :] = apply_rotary_emb(
             raw_latent[..., -cfg.rope_dim :], frequencies
         )
-        raw_latent[..., : -cfg.rope_dim] = fp8_quant_dequant(
-            raw_latent[..., : -cfg.rope_dim], group_size=64
+        kv_fp8_qat_prefix(
+            raw_latent, raw_latent.shape[-1] - cfg.rope_dim, mode=self.kv_qat_mode
         )
         if stage_marker is not None:
             stage_marker("raw_kv_done")
@@ -1366,8 +1371,8 @@ class Ratio4TorchAttention:
         raw_latent[..., -cfg.rope_dim :] = apply_rotary_emb(
             raw_latent[..., -cfg.rope_dim :], plan.frequencies
         )
-        raw_latent[..., : -cfg.rope_dim] = fp8_quant_dequant(
-            raw_latent[..., : -cfg.rope_dim], group_size=64
+        kv_fp8_qat_prefix(
+            raw_latent, raw_latent.shape[-1] - cfg.rope_dim, mode=self.kv_qat_mode
         )
         state.raw[:, plan.raw_slot].copy_(state._quantize_rows(raw_latent[:, 0]))
         if state.raw_rope is not None:

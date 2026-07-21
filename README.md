@@ -20,7 +20,7 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
 | 聚合 decode @2K | **9,656** tok/s | 同上，bl128×mb2 | E1IF/MTP |
 | prefill | **28,622** input tok/s | 16 卡、whole-8192、tilelang 稀疏核 + 融合 QAT 核 | C2F/C4F |
 | 混合单池 8K/1K | T=**2,538** tok/s | 裸引擎折算 | — |
-| 单路 decode | **28.4** tok/s（+MTP ~39） | 16 卡、B=1、graph、融合 QAT 核 | E1F/MTP/E4F |
+| 单路 decode | **29.1** tok/s（+MTP ~40） | 16 卡、B=1、graph、两个融合 QAT 核 | E1F/MTP/E4F/E5F |
 
 单路那一格已有完整归因（E2F）：36.3 ms/token = 投影字节 14.0 + 固定
 elementwise 尾巴 12.1 + 其余图内 4.5 + head 2.6 + 16-rank 固定偏移 2.3
@@ -44,8 +44,7 @@ attention 权重在每个 TP rank 上是完整副本（DP-attention），占 12.
   attention TP4 分片 + FP8 常驻后模型装得下（余 1.13 GiB），
   故客户口径的标准版五行须**逐行**重算容量，见 TARGET §7.7。
 - **最大空白**（按 TARGET §2 优先级）:elementwise 尾巴折叠（decode 侧最大单一
-  可攻项，39.5%，每步固定成本；E4F 已取下第一块 +2.31%，其余按区域已定位、
-  按链未拆解）、attention TP4 分片（M4 延迟目标与 8 卡可行性的共同前提）、
+  可攻项，39.5%，每步固定成本；E4F+E5F 已取下两块共 +4.74%，其余按链未拆解）、attention TP4 分片（M4 延迟目标与 8 卡可行性的共同前提）、
   M5 长上下文（零覆盖）、serving 折扣验证。
 
 ### 实验索引
@@ -54,5 +53,5 @@ attention 权重在每个 TP rank 上是完整副本（DP-attention），占 12.
 B1·B2 标定 | A0 契约 | D0·D0L golden oracle | A3F·A4F·A5F·A6F kernel |
 C1F 集成 block | E1F 吞吐与容量前沿 | C2F·C3F·C4F prefill |
 E2F B=1 decode 延迟 profile | E3F 8 卡容量判决 |
-E4F decode 融合 indexer QAT 核 |
+E4F·E5F decode 融合 QAT 核（indexer / KV latent） |
 `runtime/` 是 direct runtime 与全部门脚本（非安装包，靠 rsync 到 titan 运行）。

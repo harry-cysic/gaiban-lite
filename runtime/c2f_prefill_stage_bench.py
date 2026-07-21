@@ -717,6 +717,14 @@ def main() -> int:
         # The MoE bimodality was NCCL transport selection, not the allocator:
         # without NCCL_P2P_LEVEL=SYS the TP4 collectives fall back to SHM.
         "nccl_p2p_level": os.environ.get("NCCL_P2P_LEVEL", ""),
+        # E5F: same lesson as the allocator line above, one vertical later --
+        # an env-gated variant that fails to reach the process is
+        # indistinguishable from one that does nothing.  Record both what was
+        # asked for and (below, once the lane exists) what the layers actually
+        # resolved to.
+        "dsv4_kv_fp8_qat_env": os.environ.get("DSV4_KV_FP8_QAT", ""),
+        "dsv4_indexer_qat_decode_env": os.environ.get("DSV4_INDEXER_QAT_DECODE", ""),
+        "resolved_attention_modes": None,
         "nccl_version": ".".join(str(v) for v in torch.cuda.nccl.version()),
         "errors": [],
     }
@@ -933,7 +941,7 @@ def main() -> int:
             sparse_backend: str | None = None,
             hc_backend: Any | None = "default",
         ) -> PrefillLane:
-            return PrefillLane(
+            lane = PrefillLane(
                 materials,
                 device=device,
                 index_score_mode=index_score_mode,
@@ -944,6 +952,16 @@ def main() -> int:
                     hc_boundary_backend if hc_backend == "default" else hc_backend
                 ),
             )
+            if result.get("resolved_attention_modes") is None:
+                result["resolved_attention_modes"] = {
+                    str(material.layer_id): {
+                        key: getattr(attention, key)
+                        for key in ("kv_qat_mode", "indexer_qat_mode")
+                        if hasattr(attention, key)
+                    }
+                    for material, attention in lane.layers
+                }
+            return lane
 
         def make_residual(iteration: int) -> torch.Tensor:
             generator = torch.Generator(device=device)

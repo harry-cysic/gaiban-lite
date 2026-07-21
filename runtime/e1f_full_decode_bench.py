@@ -917,7 +917,12 @@ def main() -> int:
         result["attention_modes"] = {
             str(layer_id): {
                 key: getattr(block.attention, key)
-                for key in ("indexer_qat_mode", "index_score_mode")
+                for key in (
+                    "indexer_qat_mode",
+                    "kv_qat_mode",
+                    "index_score_mode",
+                    "nope_quant_mode",
+                )
                 if hasattr(block.attention, key)
             }
             for layer_id, block in zip(
