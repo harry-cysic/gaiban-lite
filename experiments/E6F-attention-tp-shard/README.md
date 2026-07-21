@@ -164,6 +164,85 @@ E2F 逐张量实测各 67.109 MB），所以改法一字不差地照搬：
 顺带一个省事的地方：这两个文件的 sink 视图用的是 `query.shape[2]` 而不是
 `cfg.num_heads`，所以自动跟随局部 head 数，不用改。
 
+## step 5：整个 stage 分片跑起来了（含 CUDA graph 捕图）
+
+`physical_stage` 加 `attention_tp_shard`（默认 False）。**在 build 时切片**，
+而不是在实例化时——切片的全部意义就是字节数，若把未切与已切两份同时留在显存里
+就白做了。注意这让 `material.prepared` 成为**已切**的权重；prefill bench 的
+ratio-4 走 `Ratio4FullPositionAttention`、从未切的 build 里取，不受影响。
+`new_attention()` 复用 **MoE 的 TP 组**做 o-path all-reduce——同样是那 4 个 rank，
+多开一个 communicator 既费显存又多一个可能接错的东西。
+
+titan065，单机 4 卡，stage 0（11 层，三种层型齐全），B=1，3 轮×160 步，
+**同一 session 内的一对**：
+
+| 项 | 未分片 | 分片（变体 A） | 差 |
+|---|---:|---:|---:|
+| normal replay p50 | 7.1612 ms | **5.3621 ms** | **−25.1%** |
+| ratio4_boundary | 7.7123 | 5.9161 | −23.3% |
+| ratio4_ratio128_boundary | 8.1349 | 6.3124 | −22.4% |
+| 轮间离散 | — | 0.08–0.29% | — |
+
+**设计note 预测净 −1.95 ms/stage，实测 −1.80 ms（92%）。**
+
+同时回答了三个悬着的问题：
+1. **all-reduce 能在 CUDA graph 捕图内跑**（MoE 早有先例，但 attention 侧是
+   头一次）——三个图族全部捕获成功；
+2. **三种层型一起工作**；
+3. 见证 `attention_tp_shard: true` 落在 artifact 里。
+
+### 更重要的坑：**速度对了，容量没对**
+
+分片跑通、快了 25% 之后，`mem_get_info` 的 free 只多了 0.38 GiB。
+`mem_get_info` 报的是**设备空闲**内存，而 caching allocator 不还给驱动，
+所以它会低估驻留下降——于是给探针加了 `torch.cuda.memory_allocated`
+（这才是"权重有没有变小"的正确度量）。结果：
+
+| 臂 | allocated（after_load） | 省下 |
+|---|---:|---:|
+| 未分片 | 12.851 GiB | — |
+| 分片（`.contiguous()`，有 bug） | 12.335 | **0.516**（只有 1/3） |
+| 分片（`.clone()`，已修） | **11.304** | **1.547** |
+
+11 层 stage 的预期节省是 **1.547 GiB**——修好之后**一分不差地对上**。
+（速度不受影响：修完仍是 5.348 ms，与修前的 5.362 同一水平，
+因为 GEMM 本来读的就只是切片。）
+
+**根因**：`.contiguous()` 对**行切片是空操作**——连续张量的行切片本身就是连续的，
+于是返回一个**视图，其 storage 是整个父张量**。所以 `wq_b` / `wo_a` /
+`attn_sink` 三个切片都还钉着完整的父张量；只有 `wo_b` 是**列**切片、
+`.contiguous()` 真的复制了。实测验证：
+
+```
+row slice .contiguous() shares parent storage: True
+  storage held: 134.2 MB for a 33.6 MB tensor
+column slice .contiguous() copies: True
+```
+
+**算一下就完全对上**：只有 `wo_b` 省下 50.3 MB/层 × 11 层 = 553 MB
+= **0.515 GiB**，与实测的 0.516 一分不差。
+
+**这个 bug 最危险的地方是它只坏一半**：GEMM 只读切片，所以**速度收益全额出现**
+（−25% 千真万确）；而分配器仍持有全部字节，**容量收益静默地没有发生**。
+两个指标解耦，只有容量指标能发现它——而整个 8 卡可行性论证正压在容量上。
+修法是 `.clone(memory_format=torch.contiguous_format)`。
+
+### 另一个坑：只改了一半的 reshape
+
+第一次跑直接崩在 `window_attention.py:966`：
+`shape '[8, 1024, 4096]' is invalid for input of size 8388608`。
+我的批量替换只匹配了两行式的 `grouped` reshape，而这两个文件里的 `wo_a`
+reshape 是**三行式**（中间夹着 `cfg.o_lora_rank`），没被匹配到。
+ratio-4 之所以没事，是因为它的 `wo_a` 块是我单独替换的。
+
+**值得记的是它为什么没被更早发现**：step 3 的 4-rank 测试只覆盖 ratio-4，
+而这两处漏改在 ratio-128 与滑窗层里。**单层测试按构造无法发现层型覆盖问题**
+——这正是 stage 级集成测试存在的理由。
+
+另：`specdec.py` / `verify2.py` / `ratio4_fullpos.py` 里还有同形状的全局
+reshape，它们拿的是**未切**权重所以现在是对的；但若把已切 stage 接给 MTP，
+会以同样的 shape 错误**响亮地失败**（不是静默出错）——可接受，但已记在此。
+
 ## 已落地的 runtime 改动（默认不改变行为）
 
 | 改动 | 说明 |

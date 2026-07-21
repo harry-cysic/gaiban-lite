@@ -376,6 +376,14 @@ def shard_window_attention_weights(
     ``attn_sink`` by head.  The three o-path tensors have the **same shapes on
     all three layer types** (67.109 MB each, E2F per-tensor measurement), so
     the split is the same one E6F step 1 and 2 verified on ratio-4.
+
+    Slices are ``clone``d, not ``contiguous``d.  A row slice of a contiguous
+    tensor is *already* contiguous, so ``.contiguous()`` returns a **view whose
+    storage is the whole parent** -- the GEMMs then read only the slice (so the
+    speed win appears in full) while the allocator still holds every byte (so
+    the capacity win silently does not).  Measured: with ``.contiguous()`` an
+    11-layer stage shed 0.516 GiB instead of the expected 1.547 -- exactly the
+    ``wo_b`` column slice alone, which is the one slice that really copies.
     """
 
     if tp_size == 1:
@@ -385,21 +393,23 @@ def shard_window_attention_weights(
     head_rows = heads * config.head_dim
     lora_cols = groups * config.o_lora_rank
 
-    wq_b = prepared.wq_b[tp_rank * head_rows : (tp_rank + 1) * head_rows].contiguous()
+    wq_b = prepared.wq_b[
+        tp_rank * head_rows : (tp_rank + 1) * head_rows
+    ].clone(memory_format=torch.contiguous_format)
     wo_a3 = prepared.wo_a.reshape(
         config.o_groups, config.o_lora_rank, config.group_width
     )
     wo_a = (
         wo_a3[tp_rank * groups : (tp_rank + 1) * groups]
         .reshape(lora_cols, config.group_width)
-        .contiguous()
+        .clone(memory_format=torch.contiguous_format)
     )
     wo_b = prepared.wo_b[
         :, tp_rank * lora_cols : (tp_rank + 1) * lora_cols
-    ].contiguous()
+    ].clone(memory_format=torch.contiguous_format)
     attn_sink = prepared.attn_sink[
         tp_rank * heads : (tp_rank + 1) * heads
-    ].contiguous()
+    ].clone(memory_format=torch.contiguous_format)
     return replace(
         prepared, wq_b=wq_b, wo_a=wo_a, wo_b=wo_b, attn_sink=attn_sink
     )
@@ -739,9 +749,9 @@ class WindowTorchAttention:
             cfg.group_width,
         )
         wo_a = self.weights.wo_a.reshape(
-            cfg.o_groups,
+            cfg.local_o_groups,
             cfg.o_lora_rank,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.group_width,
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
         return self._tp_reduce_output(
@@ -964,9 +974,9 @@ class WindowTorchAttention:
             cfg.group_width,
         )
         wo_a = self.weights.wo_a.reshape(
-            cfg.o_groups,
+            cfg.local_o_groups,
             cfg.o_lora_rank,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.group_width,
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
         final_output = self._tp_reduce_output(
@@ -1128,9 +1138,9 @@ class WindowTorchAttention:
             cfg.group_width,
         )
         wo_a = self.weights.wo_a.reshape(
-            cfg.o_groups,
+            cfg.local_o_groups,
             cfg.o_lora_rank,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.group_width,
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
         record("output_lora", projected)

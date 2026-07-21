@@ -129,7 +129,12 @@ max_seq，捕获自己的 CUDA graph 族。模式内需要的是**槽位回收**
    （indexer QAT 链，+2.31% 单路，逐位）**，验证了"减少核数≈减少时间"的机制，
    但换算效率约 73%（融合核自身也要时间）。尾巴的绝大部分仍在：
    attention 区 77%、MoE 区 23%，按区域已定位、按链未拆解。见 §7.4。
-3. **attention TP4 分片（A 档）+ 评估 FP8 常驻**——设计分析已完成
+3. **attention TP4 分片（A 档）+ 评估 FP8 常驻**——**A 档已实现并跑通**
+   （E6F step 5，单机 4 卡 stage 0，含 CUDA graph 捕图）：
+   **per-stage replay 7.161 → 5.362 ms（−25.1%，诊断量）**，
+   **每卡驻留 12.851 → 11.304 GiB（省 1.547 GiB，与设计预测一分不差）**。
+   ⚠️ 尚未过 D0L 软门，**不得进入任何 headline 实测列**（§9.13：headline 是
+   部署档位整系统的 tok/s，上面两个是诊断量与容量账）。设计分析见
    （[`design-attention-tp4-sharding.md`](design-attention-tp4-sharding.md)）：
    **先做 head-only 分片**（几何干净：o_groups=8 与 TP4 整除、每 rank 恰好 2 组；
    **不新增集合通信**；2.49× 字节，是 M4 带宽收益的大头）；容量所需的

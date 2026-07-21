@@ -33,7 +33,7 @@ policy, exactly as in the E0sf/E0df gates.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -44,6 +44,7 @@ from .attention import (
     Ratio128AttentionConfig,
     Ratio128TorchAttention,
     prepare_attention_weights,
+    shard_ratio128_attention_weights,
 )
 from .block import DirectDecodeBlock, DirectPreMoEBlockFragment
 from .block_weights import ResidentBlockWeights, load_replicated_block_weights
@@ -52,6 +53,7 @@ from .moe_runtime import TP4MoE, TP4MoEConfig
 from .ops.marlin_moe import load_resident_moe_layer
 from .ratio4_attention import (
     Ratio4AttentionConfig,
+    shard_ratio4_attention_weights,
     Ratio4TorchAttention,
     prepare_ratio4_attention_weights,
 )
@@ -62,6 +64,7 @@ from .window_attention import (
     WindowAttentionConfig,
     WindowTorchAttention,
     prepare_window_attention_weights,
+    shard_window_attention_weights,
 )
 
 
@@ -211,6 +214,18 @@ class PhysicalLayerMaterial:
             kv_dtype=self.kv_dtype,
         )
 
+    def _attention_tp_group(self) -> Any:
+        """The TP group for the o-path all-reduce, or None when unsharded.
+
+        Reuses the MoE's group rather than making a second one: it is the same
+        four ranks, and a duplicate communicator would cost memory and add a
+        second thing that can be wired wrong.
+        """
+
+        if getattr(self.attention_config, "tp_size", 1) == 1:
+            return None
+        return self.moe.group
+
     def new_attention(self, state: PhysicalLayerState) -> Any:
         if self.kind == "window":
             if not isinstance(state, StaticWindowKV):
@@ -220,11 +235,17 @@ class PhysicalLayerMaterial:
                 self.prepared,
                 state,
                 nope_quant_mode=NOPE_QUANT_MODE,
+                tp_group=self._attention_tp_group(),
             )
         if self.kind == "ratio4":
             if not isinstance(state, StaticRatio4KV):
                 raise PhysicalStageBuildError("ratio-4 layer requires StaticRatio4KV")
-            return Ratio4TorchAttention(self.attention_config, self.prepared, state)
+            return Ratio4TorchAttention(
+                self.attention_config,
+                self.prepared,
+                state,
+                tp_group=self._attention_tp_group(),
+            )
         if not isinstance(state, StaticLayerKV):
             raise PhysicalStageBuildError("ratio-128 layer requires StaticLayerKV")
         return Ratio128TorchAttention(
@@ -232,6 +253,7 @@ class PhysicalLayerMaterial:
             self.prepared,
             state,
             nope_quant_mode=NOPE_QUANT_MODE,
+            tp_group=self._attention_tp_group(),
         )
 
     def new_block(
@@ -279,6 +301,7 @@ def build_physical_layer_material(
     max_seq_len: int,
     global_row_shapes: tuple[int, ...],
     slots_per_shape: int = 4,
+    attention_tp_shard: bool = False,
     progress_every: int = 64,
     progress: Callable[[str], None] | None = None,
     kv_dtype: str = "bf16",
@@ -388,9 +411,33 @@ def build_physical_layer_material(
         )
         prepared = prepare_attention_weights(raw_block.attention, **identity)
 
+    # E6F variant A: shard the o-path here rather than at instantiation, so the
+    # unsharded copy is never resident alongside the sharded one -- the whole
+    # point of sharding is the byte count, and holding both would defeat it.
+    # Note this makes ``material.prepared`` the *sharded* weights for this
+    # build; the prefill bench builds ratio-4 through Ratio4FullPositionAttention
+    # from an unsharded build, so it is unaffected.
+    if attention_tp_shard:
+        attention_config = replace(
+            attention_config, tp_size=EXPECTED_TP_SIZE, tp_rank=tp_rank
+        )
+        attention_config.validate()
+        shard_fn = {
+            "window": shard_window_attention_weights,
+            "ratio4": shard_ratio4_attention_weights,
+            "ratio128": shard_ratio128_attention_weights,
+        }[kind]
+        prepared = shard_fn(
+            prepared,
+            tp_rank=tp_rank,
+            tp_size=EXPECTED_TP_SIZE,
+            config=replace(attention_config, tp_size=1, tp_rank=0),
+        )
+
     evidence = {
         "layer_id": layer_id,
         "kind": kind,
+        "attention_tp_shard": bool(attention_tp_shard),
         "route_kind": route_kind,
         "checkpoint_id": checkpoint_id,
         "moe_resident_bytes": int(moe_resident.resident_bytes),
@@ -457,6 +504,7 @@ def build_physical_stage(
     max_seq_len: int,
     global_row_shapes: tuple[int, ...],
     slots_per_shape: int = 4,
+    attention_tp_shard: bool = False,
     progress_every: int = 64,
     progress: Callable[[str], None] | None = None,
     kv_dtype: str = "bf16",
@@ -503,6 +551,7 @@ def build_physical_stage(
                 max_seq_len=max_seq_len,
                 global_row_shapes=global_row_shapes,
                 slots_per_shape=slots_per_shape,
+                attention_tp_shard=attention_tp_shard,
                 progress_every=progress_every,
                 progress=progress,
                 kv_dtype=kv_dtype,

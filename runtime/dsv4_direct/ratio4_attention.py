@@ -486,6 +486,14 @@ def shard_ratio4_attention_weights(
     ``wkv`` and the whole indexer chain produce state that **every** rank
     needs, so slicing them would require gathering it back (design note
     variant C, which E6F showed buys no latency).
+
+    Slices are ``clone``d, not ``contiguous``d.  A row slice of a contiguous
+    tensor is *already* contiguous, so ``.contiguous()`` returns a **view whose
+    storage is the whole parent** -- the GEMMs then read only the slice (so the
+    speed win appears in full) while the allocator still holds every byte (so
+    the capacity win silently does not).  Measured: with ``.contiguous()`` an
+    11-layer stage shed 0.516 GiB instead of the expected 1.547 -- exactly the
+    ``wo_b`` column slice alone, which is the one slice that really copies.
     """
 
     if tp_size == 1:
@@ -495,21 +503,23 @@ def shard_ratio4_attention_weights(
     head_rows = heads * config.head_dim
     lora_cols = groups * config.o_lora_rank
 
-    wq_b = prepared.wq_b[tp_rank * head_rows : (tp_rank + 1) * head_rows].contiguous()
+    wq_b = prepared.wq_b[
+        tp_rank * head_rows : (tp_rank + 1) * head_rows
+    ].clone(memory_format=torch.contiguous_format)
     wo_a3 = prepared.wo_a.reshape(
         config.o_groups, config.o_lora_rank, config.group_width
     )
     wo_a = (
         wo_a3[tp_rank * groups : (tp_rank + 1) * groups]
         .reshape(lora_cols, config.group_width)
-        .contiguous()
+        .clone(memory_format=torch.contiguous_format)
     )
     wo_b = prepared.wo_b[
         :, tp_rank * lora_cols : (tp_rank + 1) * lora_cols
-    ].contiguous()
+    ].clone(memory_format=torch.contiguous_format)
     attn_sink = prepared.attn_sink[
         tp_rank * heads : (tp_rank + 1) * heads
-    ].contiguous()
+    ].clone(memory_format=torch.contiguous_format)
     return replace(
         prepared, wq_b=wq_b, wo_a=wo_a, wo_b=wo_b, attn_sink=attn_sink
     )

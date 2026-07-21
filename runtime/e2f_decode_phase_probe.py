@@ -292,6 +292,14 @@ def main() -> int:
         ),
     )
     parser.add_argument(
+        "--attention-tp-shard",
+        action="store_true",
+        help=(
+            "E6F variant A: shard the attention o-path across the TP4 group. "
+            "Adds one all-reduce per layer inside the captured graph."
+        ),
+    )
+    parser.add_argument(
         "--cuda-profiler-range",
         action="store_true",
         help="wrap the timed segments in cudaProfilerStart/Stop for nsys",
@@ -405,6 +413,7 @@ def main() -> int:
         "steps_per_round": steps_per_round,
         "mode": args.mode,
         "mark_level": args.mark_level,
+        "attention_tp_shard": bool(args.attention_tp_shard),
         "nccl_env": {
             key: os.environ.get(key)
             for key in ("NCCL_P2P_LEVEL", "NCCL_IB_DISABLE", "NCCL_SOCKET_IFNAME")
@@ -425,6 +434,12 @@ def main() -> int:
         result["memory"][label] = {
             "free_bytes": int(free_bytes),
             "total_bytes": int(total_bytes),
+            # mem_get_info reports *free device* memory, which the caching
+            # allocator does not give back -- so it understates a residency
+            # reduction.  allocated_bytes is what actually answers "did the
+            # weights get smaller", which is the whole point of sharding.
+            "allocated_bytes": int(torch.cuda.memory_allocated(device)),
+            "reserved_bytes": int(torch.cuda.memory_reserved(device)),
         }
 
     try:
@@ -488,6 +503,7 @@ def main() -> int:
                 # mode ab runs two graph lanes over shared MoE objects, so the
                 # slot budget has to cover both families sets plus the eager slot
                 slots_per_shape=(8 if args.mode == "ab" else 4),
+                attention_tp_shard=args.attention_tp_shard,
                 kv_dtype=args.kv_dtype,
                 indexer_kv_dtype=args.kv_dtype,
                 progress=(
