@@ -23,11 +23,16 @@ MASTER=10.234.1.64
 PORT=29659
 TR='~/Workspace/venvs/sglang/bin/torchrun'
 PY='~/Workspace/venvs/sglang/bin/python'
-ORACLE_SRC=../experiments/D0L-long-prompt-oracle/results/oracle-long.json
+# Overridable so a run can be gated against an extended golden without
+# editing the script; defaults to the frozen 8-prompt / 512-position set.
+ORACLE_SRC=${D0L_ORACLE:-../experiments/D0L-long-prompt-oracle/results/oracle-long.json}
 OUT="out-e0l2e-$TAG"
 
 # Longest D0L prompt 4096 + 64 compared decode steps - 1 = 4159 -> 4224 (x128).
-MAX_SEQ_LEN=4224
+# Sized for the frozen 8-prompt set (longest 4096).  The extended golden
+# adds 8192-token prompts, which need >= 8255, so it is overridable rather
+# than silently too small -- the gate does check and refuse, loudly.
+MAX_SEQ_LEN=${D0L_MAX_SEQ_LEN:-4224}
 MAX_STEPS=64
 
 echo "== sync runtime + reference kernel + long golden oracle to both nodes =="

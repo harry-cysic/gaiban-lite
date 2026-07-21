@@ -17,7 +17,23 @@ E4F（decode 侧融合 indexer QAT 核）。E2F/E3F 已完整落盘并 commit；
 E2F/E3F 的两个结论改了 TARGET：335 tok/s 单用户天花板被证伪（真值 76.2，因
 DP-attention 复制 attention 权重），8 卡 TP4×PP2 装不下 43 层（M7 证伪、M4 回 16 卡）。
 
-### 1.3 E4F 进行中的状态
+### 1.3 本轮竖条一览（E2F → D0L 扩展）
+
+| 竖条 | 结果 | 状态 |
+|---|---|---|
+| **E2F** | B=1 decode profile；证伪 335 tok/s 天花板（真值 76.2） | 已落盘 |
+| **E3F** | 8 卡当前形态装不下；M7 证伪 | 已落盘（结论范围后经收敛） |
+| **E4F** | 融合 indexer QAT 核，逐位，+2.31% | **已设默认** |
+| **E5F** | 融合 KV-latent FP8 QAT 核，逐位，+2.30% | **已设默认** |
+| **E6F** | attention TP4 分片（变体 A）：decode **+34.5%**、prefill **+13.6%**、每卡省 1.547 GiB | **实现完成但 D0L 软门 FAIL（491/512），默认关闭、不可发布** |
+| **D0L 扩展** | `hc_post` 沿 s 分块（逐位），8192 档解锁，512 → **640** 比较位 | 已落盘 |
+
+**当前正在做的事**：用 640 位新 golden 重跑未分片基线，确立新参照，
+再以同一参照重测 E6F——因为"494/512 掉 3 位算不算噪声"用 8 条 prompt 回答不了。
+
+⚠️ **E6F 的三个数字都不在实测列**（TARGET §9.13 + 未过门）。
+
+### 1.4 E4F 的历史状态（已完成，保留供追溯）
 
 - `runtime/dsv4_direct/ratio4_attention.py` 已加 `indexer_qat_mode`（默认 `ref`，
   env `DSV4_INDEXER_QAT_DECODE` 可覆盖），两个 decode 调用点走 `_indexer_qat()`。
