@@ -16,7 +16,7 @@ echo "== sync runtime to titan064 =="
 ssh titan064 'mkdir -p ~/e0f-runtime'
 rsync -a --exclude __pycache__ dsv4_direct c2f_prefill_stage_bench.py titan064:e0f-runtime/
 
-ENV_BASE='export CUDA_HOME=/usr/local/cuda-13.2; export PATH=$CUDA_HOME/bin:$PATH; export LD_LIBRARY_PATH=$CUDA_HOME/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}; export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True'
+ENV_BASE='export CUDA_HOME=/usr/local/cuda-13.2; export PATH=$CUDA_HOME/bin:$PATH; export LD_LIBRARY_PATH=$CUDA_HOME/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}; export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True; export NCCL_P2P_LEVEL=SYS'
 
 echo "== nvidia-smi before =="
 ssh titan064 'nvidia-smi --query-gpu=index,memory.used --format=csv,noheader'

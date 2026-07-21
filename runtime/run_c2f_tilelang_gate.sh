@@ -14,7 +14,7 @@ ssh "$HOST" 'mkdir -p ~/e0f-runtime/reference/inference'
 rsync -a --exclude __pycache__ dsv4_direct c2f_tilelang_sparse_gate.py "$HOST:e0f-runtime/"
 rsync -a ../reference/inference/kernel.py "$HOST:e0f-runtime/reference/inference/"
 
-ENV_BASE='export CUDA_HOME=/usr/local/cuda-13.2; export PATH=$CUDA_HOME/bin:$PATH; export LD_LIBRARY_PATH=$CUDA_HOME/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}; export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True'
+ENV_BASE='export CUDA_HOME=/usr/local/cuda-13.2; export PATH=$CUDA_HOME/bin:$PATH; export LD_LIBRARY_PATH=$CUDA_HOME/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}; export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True; export NCCL_P2P_LEVEL=SYS'
 
 echo "== nvidia-smi before =="
 ssh "$HOST" 'nvidia-smi --query-gpu=index,memory.used --format=csv,noheader'

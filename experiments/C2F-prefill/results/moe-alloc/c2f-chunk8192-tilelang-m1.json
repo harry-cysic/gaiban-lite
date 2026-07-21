@@ -1,0 +1,110 @@
+{
+  "allocator_backend": "native",
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "chunk": 8192,
+  "component_walls_s": {
+    "attention_ratio128": 0.15864066313952208,
+    "attention_ratio4": 0.3611017274670303,
+    "hc": 0.3134061312302947,
+    "moe": 0.4321706797927618,
+    "norm": 0.03214779985137284,
+    "total_instrumented": 1.2984368589241058
+  },
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "C2F-prefill-stage-bench",
+  "fuse_min_seqlen": 1024,
+  "global_rows": 32768,
+  "host": "titan064",
+  "indexer": "fused",
+  "input_scale": 0.02,
+  "input_tok_s_per_lane": 6328.126908640144,
+  "input_tok_s_per_stage_dp4": 25312.507634560578,
+  "iters": 5,
+  "koujing": "single-shot prefill at start_pos=0, B=1/lane, 4 DP lanes with distinct sequences; input tok/s/stage = 4*chunk / stage wall; host walls around torch.cuda.synchronize; eager, no CUDA graph, no PP handoff",
+  "layers": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "load_seconds": 14.456034637987614,
+  "max_memory_allocated_bytes": 21914060800,
+  "max_memory_reserved_bytes": 22013804544,
+  "measurement_class": "open_loop_single_stage_prefill",
+  "moe_collective_selfcheck": {
+    "all_gather_bus_gbps": 23.614005940651616,
+    "all_gather_p50_ms": 8.525728015229106,
+    "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
+    "payload_bytes": 268435456,
+    "reduce_scatter_bus_gbps": 22.348514337225232,
+    "reduce_scatter_p50_ms": 9.008500026538968
+  },
+  "moe_mode": "w4a8",
+  "moe_resident_bytes_layer0": 861931008,
+  "nccl_p2p_level": "SYS",
+  "nccl_version": "2.28.9",
+  "ok": true,
+  "per_rank_errors": [
+    [],
+    [],
+    [],
+    []
+  ],
+  "per_rank_max_memory_allocated_bytes": [
+    21914060800,
+    21914060800,
+    21914060800,
+    21914060800
+  ],
+  "per_rank_ok": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "pipeline16_projection_tok_s": 25312.507634560578,
+  "pytorch_cuda_alloc_conf": "expandable_segments:True",
+  "rank": 0,
+  "ref_score_row_block_unit_check": {
+    "bitwise_equal": true
+  },
+  "ring_wrap_unit_check": {
+    "1031": true,
+    "128": true,
+    "130": true,
+    "2048": true,
+    "96": true,
+    "pass": true
+  },
+  "row_block": 1024,
+  "schema_version": 1,
+  "seed": 20260721,
+  "sliced_sparse_unit_check": {
+    "bitwise_equal": true
+  },
+  "sparse_backend": "tilelang",
+  "sparse_head_chunk": 16,
+  "stage_pass_wall_mean_s": 1.294496587617323,
+  "stage_pass_wall_p50_s": 1.2945378811564296,
+  "stage_pass_walls_s": [
+    1.2945378811564296,
+    1.2941874430980533,
+    1.2948908279649913,
+    1.294541773851961,
+    1.2943250120151788
+  ],
+  "torch": "2.11.0+cu130",
+  "triton": "3.6.0",
+  "vllm": "0.22.1",
+  "warmup": 2,
+  "world": 4
+}

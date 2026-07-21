@@ -76,6 +76,65 @@ HC_MULT = 4
 FP8 = torch.float8_e4m3fn
 
 
+# --------------------------------------------------------------------------
+# allocator probe (22nd vertical): direct evidence for the prefill MoE
+# bimodality.  Monotone counters are reported as per-call deltas; gauges are
+# reported as absolute values before/after each MoE call.
+
+ALLOC_COUNTERS = (
+    "num_alloc_retries",
+    "num_ooms",
+    "num_device_alloc",
+    "num_device_free",
+    "num_sync_all_streams",
+)
+ALLOC_GAUGES = (
+    "allocated_bytes.all.current",
+    "reserved_bytes.all.current",
+    "active_bytes.all.current",
+    "inactive_split_bytes.all.current",
+    "requested_bytes.all.current",
+    "segment.all.current",
+    "allocation.all.current",
+)
+
+
+def alloc_snapshot(device: torch.device) -> dict[str, int]:
+    stats = torch.cuda.memory_stats(device)
+    snapshot = {key: int(stats.get(key, -1)) for key in ALLOC_COUNTERS}
+    snapshot.update({key: int(stats.get(key, -1)) for key in ALLOC_GAUGES})
+    free_bytes, total_bytes = torch.cuda.mem_get_info(device)
+    snapshot["driver_free_bytes"] = int(free_bytes)
+    snapshot["driver_total_bytes"] = int(total_bytes)
+    return snapshot
+
+
+class MoEAllocProbe:
+    """stage_marker hook: per-phase wall + allocator counters for one call."""
+
+    def __init__(self, device: torch.device) -> None:
+        self.device = device
+        self.marks: list[dict[str, Any]] = []
+        self.previous = time.perf_counter()
+
+    def __call__(self, name: str) -> None:
+        torch.cuda.synchronize(self.device)
+        now = time.perf_counter()
+        stats = torch.cuda.memory_stats(self.device)
+        self.marks.append(
+            {
+                "phase": name,
+                "wall_ms": (now - self.previous) * 1e3,
+                "num_alloc_retries": int(stats.get("num_alloc_retries", -1)),
+                "num_device_alloc": int(stats.get("num_device_alloc", -1)),
+                "num_device_free": int(stats.get("num_device_free", -1)),
+                "reserved_bytes": int(stats.get("reserved_bytes.all.current", -1)),
+                "allocated_bytes": int(stats.get("allocated_bytes.all.current", -1)),
+            }
+        )
+        self.previous = now
+
+
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -139,6 +198,8 @@ class PrefillLane:
         start_pos: int = 0,
         component_walls: dict[str, float] | None = None,
         device: torch.device | None = None,
+        alloc_records: list[dict[str, Any]] | None = None,
+        alloc_phase_layers: tuple[int, ...] = (),
     ) -> torch.Tensor:
         """Eager 11-layer chain (== e0ef2e StageLane._layer_eager order)."""
 
@@ -154,7 +215,42 @@ class PrefillLane:
             )
             return value
 
-        for material, attention in self.layers:
+        def call_moe(layer_index: int, hidden: torch.Tensor) -> torch.Tensor:
+            if alloc_records is None:
+                return material.moe.forward_tensor(hidden, slot=0)
+            torch.cuda.synchronize(device)
+            before = alloc_snapshot(device)
+            probe = (
+                MoEAllocProbe(device)
+                if layer_index in alloc_phase_layers
+                else None
+            )
+            started = time.perf_counter()
+            value = material.moe.forward_tensor(
+                hidden, slot=0, stage_marker=probe
+            )
+            torch.cuda.synchronize(device)
+            call_wall = time.perf_counter() - started
+            after = alloc_snapshot(device)
+            record: dict[str, Any] = {
+                "layer_index": layer_index,
+                "kind": material.kind,
+                "call_wall_ms": call_wall * 1e3,
+            }
+            for key in ALLOC_COUNTERS:
+                record[f"delta_{key}"] = after[key] - before[key]
+                record[f"total_{key}"] = after[key]
+            for key in ALLOC_GAUGES:
+                record[f"before_{key}"] = before[key]
+                record[f"after_{key}"] = after[key]
+            record["before_driver_free_bytes"] = before["driver_free_bytes"]
+            record["after_driver_free_bytes"] = after["driver_free_bytes"]
+            if probe is not None:
+                record["phases"] = probe.marks
+            alloc_records.append(record)
+            return value
+
+        for layer_index, (material, attention) in enumerate(self.layers):
             hc = material.raw_block.hyper_connection
             hidden, post, comb = timed(
                 "hc",
@@ -201,7 +297,7 @@ class PrefillLane:
             )
             moe_output = timed(
                 "moe",
-                lambda: material.moe.forward_tensor(hidden, slot=0),
+                lambda: call_moe(layer_index, hidden),
             )
             residual = timed(
                 "hc", lambda: hc_post(moe_output, residual, post, comb)
@@ -347,6 +443,16 @@ def main() -> int:
         "(torch vs tilelang, identical residual) -- the ratio-4 prefill gate, "
         "which has no single-layer oracle",
     )
+    parser.add_argument(
+        "--alloc-probe", action="store_true",
+        help="22nd vertical: extra passes recording per-MoE-call allocator "
+        "counters (num_alloc_retries / num_device_alloc / num_device_free) "
+        "plus per-phase marks, to attribute the prefill MoE bimodality",
+    )
+    parser.add_argument(
+        "--alloc-probe-passes", type=int, default=2,
+        help="how many probe passes to record (the first is cold)",
+    )
     parser.add_argument("--gate-indexer", action="store_true")
     parser.add_argument("--gate-w4a8", action="store_true")
     parser.add_argument("--progress-every", type=int, default=128)
@@ -414,6 +520,15 @@ def main() -> int:
         "warmup": args.warmup,
         "seed": args.seed,
         "input_scale": args.input_scale,
+        # 22nd vertical: the fast/slow MoE runs were indistinguishable in the
+        # recorded metadata, so the allocator configuration is now always
+        # recorded (it is the first thing to check when the bimodality moves).
+        "pytorch_cuda_alloc_conf": os.environ.get("PYTORCH_CUDA_ALLOC_CONF", ""),
+        "allocator_backend": torch.cuda.get_allocator_backend(),
+        # The MoE bimodality was NCCL transport selection, not the allocator:
+        # without NCCL_P2P_LEVEL=SYS the TP4 collectives fall back to SHM.
+        "nccl_p2p_level": os.environ.get("NCCL_P2P_LEVEL", ""),
+        "nccl_version": ".".join(str(v) for v in torch.cuda.nccl.version()),
         "errors": [],
     }
 
@@ -421,6 +536,55 @@ def main() -> int:
         if world != EXPECTED_TP_SIZE:
             raise ValueError("bench requires exactly 4 ranks (single TP4 stage)")
         tp_group = dist.new_group(ranks=list(range(EXPECTED_TP_SIZE)), backend="nccl")
+
+        # ---- MoE collective self-check (22nd vertical) ------------------
+        # The prefill MoE bucket is ~40% NCCL even on the fast path, and the
+        # SHM fallback is silent.  Measure the two MoE collectives at the real
+        # shapes so every result carries its own transport evidence.
+        probe_local = torch.zeros(
+            LOCAL_BATCH * chunk, HIDDEN, dtype=torch.bfloat16, device=device
+        )
+        probe_gathered = torch.zeros(
+            global_rows, HIDDEN, dtype=torch.bfloat16, device=device
+        )
+        probe_reduced = torch.zeros_like(probe_local)
+        collective_walls = {"all_gather": [], "reduce_scatter": []}
+        for probe_iteration in range(5):
+            torch.cuda.synchronize(device)
+            dist.barrier()
+            started = time.perf_counter()
+            dist.all_gather_into_tensor(probe_gathered, probe_local, group=tp_group)
+            torch.cuda.synchronize(device)
+            if probe_iteration >= 2:
+                collective_walls["all_gather"].append(time.perf_counter() - started)
+            dist.barrier()
+            started = time.perf_counter()
+            dist.reduce_scatter_tensor(
+                probe_reduced, probe_gathered, op=dist.ReduceOp.SUM, group=tp_group
+            )
+            torch.cuda.synchronize(device)
+            if probe_iteration >= 2:
+                collective_walls["reduce_scatter"].append(
+                    time.perf_counter() - started
+                )
+        payload = probe_gathered.numel() * probe_gathered.element_size()
+        bus_bytes = (EXPECTED_TP_SIZE - 1) / EXPECTED_TP_SIZE * payload
+        result["moe_collective_selfcheck"] = {
+            "payload_bytes": int(payload),
+            "all_gather_p50_ms": statistics.median(collective_walls["all_gather"]) * 1e3,
+            "all_gather_bus_gbps": bus_bytes
+            / statistics.median(collective_walls["all_gather"])
+            / 1e9,
+            "reduce_scatter_p50_ms": statistics.median(
+                collective_walls["reduce_scatter"]
+            )
+            * 1e3,
+            "reduce_scatter_bus_gbps": bus_bytes
+            / statistics.median(collective_walls["reduce_scatter"])
+            / 1e9,
+            "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
+        }
+        del probe_local, probe_gathered, probe_reduced
 
         envelope_holder: list[Any] = [None]
         if rank == 0:
@@ -572,6 +736,42 @@ def main() -> int:
         component_walls["total_instrumented"] = time.perf_counter() - started
         result["component_walls_s"] = component_walls
         del lane, residual
+
+        # ---------------- allocator probe pass (optional) ----------------
+        if args.alloc_probe:
+            probe_passes = []
+            for probe_index in range(max(1, args.alloc_probe_passes)):
+                lane = make_lane(args.indexer)
+                residual = make_residual(40_000 + probe_index)
+                alloc_records: list[dict[str, Any]] = []
+                probe_walls: dict[str, float] = {}
+                torch.cuda.synchronize(device)
+                dist.barrier()
+                started = time.perf_counter()
+                lane.forward(
+                    residual,
+                    start_pos=0,
+                    component_walls=probe_walls,
+                    device=device,
+                    alloc_records=alloc_records,
+                    # phase marks on one ratio-4 and one ratio-128 layer
+                    alloc_phase_layers=(0, 1),
+                )
+                torch.cuda.synchronize(device)
+                probe_walls["total_instrumented"] = time.perf_counter() - started
+                probe_passes.append(
+                    {
+                        "pass_index": probe_index,
+                        "component_walls_s": probe_walls,
+                        "moe_calls": alloc_records,
+                    }
+                )
+                del lane, residual
+            result["alloc_probe"] = {
+                "form": "per-MoE-call allocator counters; monotone counters "
+                "are per-call deltas, gauges are absolute before/after",
+                "passes": probe_passes,
+            }
 
         # ---------------- prefill sparse-core A/B gate (optional) --------
         # The ratio-4 prefill path has no single-layer oracle (e0ff is frozen

@@ -1593,9 +1593,15 @@ class TP4MoE:
                 )
                 if stage_marker is not None:
                     stage_marker("moe_shared_done")
-                buffers.combined.copy_(
-                    (routed.float() + shared.float()).to(torch.bfloat16)
-                )
+                # Elementwise BF16 add straight into the reduce-scatter input.
+                # ATen's CUDA add promotes BF16 to opmath_t = float, adds in
+                # FP32 and rounds once on store, so this is *bitwise* identical
+                # to the earlier `(routed.float() + shared.float()).to(bf16)`
+                # form -- verified exhaustively over all 2**32 ordered BF16
+                # pairs by `c2f_moe_combine_gate.py` (0 mismatches) -- while
+                # dropping the three FP32 [global_rows, hidden] temporaries
+                # (1.61 GiB of transient allocation per call at chunk 8192).
+                torch.add(routed, shared, out=buffers.combined)
                 if stage_marker is not None:
                     stage_marker("moe_combine_done")
                 stage_digests = {}

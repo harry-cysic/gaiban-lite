@@ -1,0 +1,35 @@
+{
+  "accepted": true,
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "exhaustive_bf16_pairs": {
+    "bit_mismatches": 0,
+    "bit_mismatches_finite_inputs": 0,
+    "bitwise_identical": true,
+    "bitwise_identical_on_finite_inputs": true,
+    "expected_pairs": 4294967296,
+    "pairs_checked": 4294967296
+  },
+  "exhaustive_seconds": 0.6249984041787684,
+  "experiment": "C2F-moe-combine-gate",
+  "form": "torch.add(routed, shared, out=combined) vs combined.copy_((routed.float() + shared.float()).to(bfloat16))",
+  "host": "titan065",
+  "ok": true,
+  "schema_version": 1,
+  "shape_timing": {
+    "bf16_add_out": {
+      "ms": 0.869266944937408,
+      "peak_transient_bytes": 0
+    },
+    "bitwise_identical_at_shape": true,
+    "fp32_temporaries": {
+      "ms": 4.966890451032668,
+      "peak_transient_bytes": 1610612736
+    },
+    "hidden": 4096,
+    "rows": 32768,
+    "speedup": 5.713883957005074
+  },
+  "torch": "2.11.0+cu130"
+}

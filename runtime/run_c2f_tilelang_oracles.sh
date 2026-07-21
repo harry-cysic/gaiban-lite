@@ -16,7 +16,7 @@ rsync -a --exclude __pycache__ dsv4_direct \
   e0ef_ratio128_attention_oracle.py e0wf_window_attention_oracle.py "$HOST:e0f-runtime/"
 rsync -a ../reference/inference/kernel.py "$HOST:e0f-runtime/reference/inference/"
 
-ENV_BASE="export CUDA_HOME=/usr/local/cuda-13.2; export PATH=\$CUDA_HOME/bin:\$PATH; export LD_LIBRARY_PATH=\$CUDA_HOME/lib64\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}; export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True; export DSV4_PREFILL_SPARSE_BACKEND=$BACKEND"
+ENV_BASE="export CUDA_HOME=/usr/local/cuda-13.2; export PATH=\$CUDA_HOME/bin:\$PATH; export LD_LIBRARY_PATH=\$CUDA_HOME/lib64\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}; export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True; export NCCL_P2P_LEVEL=SYS; export DSV4_PREFILL_SPARSE_BACKEND=$BACKEND"
 
 echo "== nvidia-smi before =="
 ssh "$HOST" 'nvidia-smi --query-gpu=index,memory.used --format=csv,noheader'
