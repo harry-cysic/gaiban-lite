@@ -750,8 +750,12 @@ def main() -> int:
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
     torch.cuda.set_device(local_rank)
     device = torch.device("cuda", local_rank)
+    # 30 min, not 120: no single collective here legitimately takes even a
+    # minute (stage load is ~12s, the 8192 prefill a few minutes), so a long
+    # wait always means a rank-mismatch deadlock.  The timeout is the backstop
+    # that turns that into a crash instead of an indefinite hang.
     dist.init_process_group(
-        "nccl", device_id=device, timeout=timedelta(minutes=120)
+        "nccl", device_id=device, timeout=timedelta(minutes=30)
     )
     rank = dist.get_rank()
     world = dist.get_world_size()
@@ -1224,6 +1228,16 @@ def main() -> int:
             )
         )
     except Exception:
+        # Announce immediately.  A rank that fails here skips every collective
+        # the healthy ranks are still queued on, so the run does not crash --
+        # it deadlocks, and the only symptom is that stdout stops.  Diagnosing
+        # that from the outside costs ~20 minutes and a py-spy dump; printing
+        # the traceback the moment it is caught costs nothing.
+        print(
+            f"[E0e2e][rank {rank}] FAILED (run will now deadlock on the next "
+            f"collective -- kill it):\n{traceback.format_exc()}",
+            flush=True,
+        )
         result["errors"].append(traceback.format_exc())
         result["accepted"] = False
     result["diagnostic_seconds"]["process"] = time.perf_counter() - started
