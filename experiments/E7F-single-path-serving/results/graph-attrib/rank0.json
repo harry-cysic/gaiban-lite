@@ -1,0 +1,594 @@
+{
+  "accepted": true,
+  "argv": [
+    "e7f_handoff_gate.py",
+    "--stage-root",
+    "/home/cysic/Workspace/DeepSeek-V4-Flash",
+    "--out-dir",
+    "out-e7f-attrib",
+    "--prefill-len",
+    "2048",
+    "--max-seq-len",
+    "3072"
+  ],
+  "attention_modes": {
+    "0": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    },
+    "1": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    },
+    "2": {
+      "compressor_cast_mode": "ref",
+      "index_score_mode": "ref",
+      "indexer_qat_mode": "ref",
+      "prefill_sparse_backend": "torch"
+    },
+    "3": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    }
+  },
+  "attention_tp": {
+    "0": {
+      "local_num_heads": 16,
+      "local_o_groups": 2,
+      "tp_rank": 0,
+      "tp_size": 4,
+      "wo_b_shape": [
+        4096,
+        2048
+      ]
+    },
+    "1": {
+      "local_num_heads": 16,
+      "local_o_groups": 2,
+      "tp_rank": 0,
+      "tp_size": 4,
+      "wo_b_shape": [
+        4096,
+        2048
+      ]
+    },
+    "2": {
+      "local_num_heads": 16,
+      "local_o_groups": 2,
+      "tp_rank": 0,
+      "tp_size": 4,
+      "wo_b_shape": [
+        4096,
+        2048
+      ]
+    },
+    "3": {
+      "local_num_heads": 16,
+      "local_o_groups": 2,
+      "tp_rank": 0,
+      "tp_size": 4,
+      "wo_b_shape": [
+        4096,
+        2048
+      ]
+    }
+  },
+  "checkpoint_id": "136990854bb02eaa84731ece8ee5725a77631624b3edfcae2d16a78eed89fca3",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "E7F-prefill-decode-state-handoff",
+  "global_row_shapes": [
+    4,
+    8192
+  ],
+  "graph_capture_order": [
+    "normal",
+    "ratio4_boundary"
+  ],
+  "graph_families": [
+    "normal",
+    "normal",
+    "normal",
+    "ratio4_boundary",
+    "normal",
+    "normal",
+    "normal",
+    "ratio4_boundary",
+    "normal",
+    "normal",
+    "normal",
+    "ratio4_boundary",
+    "normal",
+    "normal",
+    "normal",
+    "ratio4_boundary"
+  ],
+  "graph_mismatched_positions": [],
+  "graph_steps": [
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2048,
+      "step": 0,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2049,
+      "step": 1,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2050,
+      "step": 2,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2051,
+      "step": 3,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0009765625,
+      "mean_abs": 3.716801802511327e-05,
+      "position": 2052,
+      "step": 4,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2053,
+      "step": 5,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2054,
+      "step": 6,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2055,
+      "step": 7,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2056,
+      "step": 8,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2057,
+      "step": 9,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0009765625,
+      "mean_abs": 3.603916411520913e-05,
+      "position": 2058,
+      "step": 10,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2059,
+      "step": 11,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0009765625,
+      "mean_abs": 3.839183409581892e-05,
+      "position": 2060,
+      "step": 12,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2061,
+      "step": 13,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.00146484375,
+      "mean_abs": 5.016678187530488e-05,
+      "position": 2062,
+      "step": 14,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2063,
+      "step": 15,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    }
+  ],
+  "host": "titan065",
+  "layer_kinds": {
+    "0": "window",
+    "1": "window",
+    "2": "ratio4",
+    "3": "ratio128"
+  },
+  "load_seconds": 7.9502369039691985,
+  "mismatched_positions": [],
+  "prefill_end_positions": {
+    "2": 2048
+  },
+  "prefill_seconds": 2.3433379740454257,
+  "rank": 0,
+  "requested": {
+    "attention_tp_shard": true,
+    "break_handoff": "none",
+    "decode_steps": 16,
+    "graph_arm": true,
+    "indexer_kv_dtype": "bf16",
+    "kv_dtype": "bf16",
+    "layers": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "max_seq_len": 3072,
+    "prefill_len": 2048
+  },
+  "schema_version": 1,
+  "stateful_eager_steps": [
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2048,
+      "step": 0
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2049,
+      "step": 1
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2050,
+      "step": 2
+    },
+    {
+      "bitwise": true,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2051,
+      "step": 3
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0009765625,
+      "mean_abs": 3.716801802511327e-05,
+      "position": 2052,
+      "step": 4
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2053,
+      "step": 5
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2054,
+      "step": 6
+    },
+    {
+      "bitwise": true,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2055,
+      "step": 7
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2056,
+      "step": 8
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2057,
+      "step": 9
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0009765625,
+      "mean_abs": 3.603916411520913e-05,
+      "position": 2058,
+      "step": 10
+    },
+    {
+      "bitwise": true,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2059,
+      "step": 11
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0009765625,
+      "mean_abs": 3.839183409581892e-05,
+      "position": 2060,
+      "step": 12
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2061,
+      "step": 13
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.00146484375,
+      "mean_abs": 5.016678187530488e-05,
+      "position": 2062,
+      "step": 14
+    },
+    {
+      "bitwise": true,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2063,
+      "step": 15
+    }
+  ],
+  "steps": [
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2048,
+      "step": 0
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2049,
+      "step": 1
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2050,
+      "step": 2
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2051,
+      "step": 3
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2052,
+      "step": 4
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2053,
+      "step": 5
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2054,
+      "step": 6
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2055,
+      "step": 7
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2056,
+      "step": 8
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2057,
+      "step": 9
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2058,
+      "step": 10
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2059,
+      "step": 11
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2060,
+      "step": 12
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2061,
+      "step": 13
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2062,
+      "step": 14
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2063,
+      "step": 15
+    }
+  ],
+  "torch": "2.11.0+cu130",
+  "world": 4
+}

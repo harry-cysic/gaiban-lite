@@ -64,10 +64,22 @@ import torch
 import torch.distributed as dist
 
 import e0ef2e_golden_gate as gate
+from e1f_full_decode_bench import (
+    EAGER_MOE_SLOT,
+    GRAPH_MOE_SLOTS,
+    GRAPH_MOE_SLOT_TUPLE,
+    forward_eager_prevalidated,
+)
 from dsv4_direct.checkpoint import inspect_stage_checkpoint
 from dsv4_direct.hc_boundary_backend import resolve_hc_boundary_backend
 from dsv4_direct.mode_witness import collect_attention_modes
 from dsv4_direct.physical_stage import build_physical_stage
+from dsv4_direct.stateful_decode import (
+    DecodeGraphFamily,
+    StatefulDecodeCursor,
+    build_decode_schedule,
+)
+from dsv4_direct.stateful_graph import capture_stateful_graph, replay_stateful_graph
 from dsv4_direct.static_ratio4_kv import StaticRatio4KV
 from dsv4_direct.superstage import TP4DecodeStage
 
@@ -189,6 +201,12 @@ def main() -> int:
     )
     parser.add_argument("--hc-backend", type=str, default="default")
     parser.add_argument(
+        "--graph-arm",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="also decode the handed-off state through captured graphs",
+    )
+    parser.add_argument(
         "--break-handoff",
         type=str,
         default="none",
@@ -231,6 +249,7 @@ def main() -> int:
             "max_seq_len": int(args.max_seq_len),
             "kv_dtype": args.kv_dtype,
             "break_handoff": args.break_handoff,
+            "graph_arm": bool(args.graph_arm),
             "indexer_kv_dtype": args.indexer_kv_dtype,
         },
         "rank": rank,
@@ -279,7 +298,7 @@ def main() -> int:
             checkpoint_id=checkpoint["checkpoint_id"],
             max_seq_len=int(args.max_seq_len),
             global_row_shapes=global_row_shapes,
-            slots_per_shape=1,
+            slots_per_shape=4,
             attention_tp_shard=bool(args.attention_tp_shard),
             kv_dtype=args.kv_dtype,
             indexer_kv_dtype=args.indexer_kv_dtype,
@@ -426,7 +445,165 @@ def main() -> int:
                 mismatched.append(position)
 
         result["mismatched_positions"] = mismatched
-        result["accepted"] = not mismatched and bool(result["steps"])
+
+        # --------------------------------------------------------------
+        # arm G: the same handed-off state, decoded through captured graphs.
+        #
+        # E0sf already showed graph == eager for a *seeded* state, so this arm
+        # is about provenance only: a prefilled state has to survive warmup,
+        # restore and capture the same way a manufactured one does.  It runs
+        # against arm R, not against arm C, so a break shows up as
+        # "graph disagrees with the reference lane" rather than being masked by
+        # comparing two things that share the same handoff.
+        graph_mismatched: list[int] = []
+        if args.graph_arm:
+            def restore_handoff() -> None:
+                for (material, _), state in zip(lane.layers, states, strict=True):
+                    if material.kind == "ratio4":
+                        install_ratio4(state, ratio4_snapshots[material.layer_id])
+                    else:
+                        restore_static_state(
+                            state, static_snapshots[material.layer_id]
+                        )
+
+            restore_handoff()
+            stop_position = prefill_len + decode_steps
+            cursor = StatefulDecodeCursor(
+                start_position=prefill_len, device=device
+            )
+            stateful_plan = candidate_stage.prepare_stateful_decode_plan(
+                cursor,
+                start_position=prefill_len,
+                stop_position=stop_position,
+                graph_moe_slots=GRAPH_MOE_SLOT_TUPLE,
+            )
+            schedule = build_decode_schedule(prefill_len, decode_steps)
+            result["graph_families"] = [step.family.value for step in schedule]
+
+            def reset_cycle() -> None:
+                restore_handoff()
+                cursor.reset(prefill_len)
+                stateful_plan.expected_position.fill_(prefill_len)
+                stateful_plan.stop_position_tensor.fill_(stop_position)
+
+            def warm_cycle(*, graph_slots: bool) -> None:
+                for index, step in enumerate(schedule):
+                    residual, ids = step_inputs[index]
+                    stateful_plan.input_residual_buffer.copy_(residual)
+                    stateful_plan.input_ids_buffer.copy_(ids)
+                    forward_eager_prevalidated(
+                        candidate_stage,
+                        stateful_plan,
+                        graph_family=step.family,
+                        moe_slot=(
+                            GRAPH_MOE_SLOTS[step.family]
+                            if graph_slots
+                            else EAGER_MOE_SLOT
+                        ),
+                    )
+                    cursor.advance_host(step.family)
+                torch.cuda.synchronize(device)
+
+            # E1a27/E1F warmup: once on the default stream with the eager slot,
+            # once on the capture stream with the family slots, so every
+            # captured kernel and slot buffer is already warm.
+            capture_stream = torch.cuda.Stream(device=device)
+            warm_cycle(graph_slots=False)
+            reset_cycle()
+            with torch.cuda.stream(capture_stream):
+                warm_cycle(graph_slots=True)
+            torch.cuda.synchronize(device)
+            reset_cycle()
+            global_rows = EXPECTED_TP_SIZE * LOCAL_BATCH
+            for slot in GRAPH_MOE_SLOT_TUPLE:
+                for moe in candidate_stage.moes:
+                    moe.reset_free_slot_completion_event(global_rows, slot)
+
+            # Arm S: the *stateful eager* path on the same handed-off state.
+            #
+            # Without this arm a graph-vs-arm-R mismatch is unattributable: arm
+            # R and arm C both run the non-stateful decode implementation,
+            # while the graph runs the stateful one, so a disagreement could be
+            # capture OR a legitimate sum-order difference between two decode
+            # implementations (9.6).  Arm S isolates that: graph vs S is the
+            # E0sf comparison (same implementation, must be bitwise), S vs R is
+            # the implementation difference.
+            stateful_eager_outputs: list[torch.Tensor] = []
+            for index, step in enumerate(schedule):
+                residual, ids = step_inputs[index]
+                stateful_plan.input_residual_buffer.copy_(residual)
+                stateful_plan.input_ids_buffer.copy_(ids)
+                output = forward_eager_prevalidated(
+                    candidate_stage,
+                    stateful_plan,
+                    graph_family=step.family,
+                    moe_slot=EAGER_MOE_SLOT,
+                )
+                torch.cuda.synchronize(device)
+                stateful_eager_outputs.append(output.clone())
+            result["stateful_eager_steps"] = [
+                dict(
+                    error_metrics(stateful_eager_outputs[index], reference_outputs[index]),
+                    step=index,
+                    position=step.position,
+                    family=step.family.value,
+                )
+                for index, step in enumerate(schedule)
+            ]
+            reset_cycle()
+            for slot in GRAPH_MOE_SLOT_TUPLE:
+                for moe in candidate_stage.moes:
+                    moe.reset_free_slot_completion_event(global_rows, slot)
+
+            graphs: dict[DecodeGraphFamily, Any] = {}
+            pools = {
+                family: torch.cuda.graph_pool_handle()
+                for family in DecodeGraphFamily
+            }
+            capture_order: list[str] = []
+            graph_steps: list[dict[str, Any]] = []
+            for index, step in enumerate(schedule):
+                residual, ids = step_inputs[index]
+                stateful_plan.input_residual_buffer.copy_(residual)
+                stateful_plan.input_ids_buffer.copy_(ids)
+                if step.family not in graphs:
+                    graphs[step.family] = capture_stateful_graph(
+                        candidate_stage,
+                        stateful_plan,
+                        graph_family=step.family,
+                        capture_stream=capture_stream,
+                        pool=pools[step.family],
+                    )
+                    capture_order.append(step.family.value)
+                output = replay_stateful_graph(
+                    graphs[step.family],
+                    stateful_plan,
+                    graph_family=step.family,
+                )
+                torch.cuda.synchronize(device)
+                metrics = error_metrics(output, reference_outputs[index])
+                metrics["step"] = index
+                metrics["position"] = step.position
+                metrics["family"] = step.family.value
+                # The gate's real graph criterion: same implementation, so this
+                # one must be bitwise.  vs_reference is reported for context but
+                # spans two decode implementations.
+                metrics["vs_stateful_eager"] = error_metrics(
+                    output, stateful_eager_outputs[index]
+                )
+                graph_steps.append(metrics)
+                if not metrics["vs_stateful_eager"]["bitwise"]:
+                    graph_mismatched.append(step.position)
+            result["graph_steps"] = graph_steps
+            result["graph_capture_order"] = capture_order
+            result["graph_mismatched_positions"] = graph_mismatched
+
+        result["accepted"] = (
+            not mismatched
+            and not graph_mismatched
+            and bool(result["steps"])
+            and (not args.graph_arm or bool(result.get("graph_steps")))
+        )
 
     except Exception as error:  # noqa: BLE001 - a rank-local failure must be loud
         result["errors"].append(
@@ -440,7 +617,8 @@ def main() -> int:
     if rank == 0:
         print(
             f"[E7F] handoff accepted={result['accepted']} "
-            f"mismatched={result.get('mismatched_positions')}",
+            f"eager_mismatched={result.get('mismatched_positions')} "
+            f"graph_mismatched={result.get('graph_mismatched_positions')}",
             flush=True,
         )
     dist.barrier()

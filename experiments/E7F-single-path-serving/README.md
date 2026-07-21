@@ -147,5 +147,82 @@ arm C 的 decode 块走 E4F 设为默认的 `fused`。两者仍然逐位，与 E
 4. **prefill 只有 256**，没测 4096/8192 档与 chunked prefill；
 5. 未跑 `--no-attention-tp-shard` 对照臂（分片是已放行默认，故先测默认）。
 
+### 步 2.5：捕图不是问题；但**图路径只在 ctx ≥ 2047 存在**
+
+给门加了图臂（capture + replay）后，第一次跑（prefill 256）**硬失败**：
+
+```
+ValueError: stateful ratio-4 decode requires a saturated fixed index top-k
+```
+
+出处 `ratio4_attention.py:956`：
+`minimum_candidates = (start_position + 1) // COMPRESS_RATIO`，要求 `≥ cfg.index_topk`。
+Flash 的 `index_topk = 512`（config.json）、`COMPRESS_RATIO = 4`，
+故 **start_position ≥ 2047**。
+
+这正是 E1F 的 `start_position < 2047` 断言（`e1f_full_decode_bench.py:653`），
+其 docstring 第 49 行也早写明"ratio-4 index saturation needs >= 2047"。
+**约束本身不是新的**；新的是它对交付的含义（见下"对 Phase 1 的影响"）。
+
+⚠️ 机制：图要求固定形状，而 top-k 的候选数在饱和前随位置变化
+（非 stateful 路径用 `index_topk_count = min(cfg.index_topk, compressed_after)`
+吸收了这个变化，`ratio4_attention.py:873`）。三个图族里**没有**未饱和族。
+
+### 步 2.5 结果（prefill 2048、max_seq 3072、4 卡、分片默认）
+
+artifact：`results/graph-attrib/rank{0..3}.json`（`results/graph-2048/` 是加归因臂前的同配置跑）。
+
+四条臂，同一个交接后的状态：
+
+| 比较 | 结果 |
+|---|---|
+| arm C（**非** stateful decode）vs arm R（prefill lane 续跑） | **16/16 逐位** |
+| arm S（stateful eager）vs arm R | **12/16**，失配位 2052 / 2058 / 2060 / 2062，`max_abs` **1.46e-3** |
+| arm G（**捕图** replay）vs arm R | 失配位**与 arm S 完全相同** |
+| **arm G vs arm S（E0sf 判据：同实现）** | **16/16 逐位，`max_abs` 0.0** |
+
+**归因结论：那 4 个失配与捕图无关、也与交接无关。**
+arm G 和 arm S 逐位相同，说明捕图对一个 **prefill 来的**状态与对合成状态一样精确
+（E0sf 的结论在新 provenance 下成立）；失配整个来自
+**stateful 与非 stateful 两条 decode 实现之间**的差异——两臂吃的是同一个状态。
+
+⚠️ **该差异的机制未归因，不要猜**。我最初猜是融合 HC 边界，
+**这个猜测是错的**：本次 `--hc-backend default`，而
+`resolve_hc_boundary_backend("default")` 返回 **None**（`hc_boundary_backend.py:289`），
+即根本没有融合链，两臂都走逐块路径。所以差异在
+`block.forward_decode_tensor` 与 `block.forward_stateful_decode_tensor` 之间，
+**具体是哪个算子的求和序，尚未定位**。
+量级 1.46e-3 在 bf16 上约 1 ULP（幅值 ~0.2–0.4 处），与"同数学、异求和序"相容，
+但**相容不等于已证**。
+
+### 一个此前没人比过的对子
+
+据我检索，**stateful 与非 stateful decode 从未被直接对拍过**：
+`e0sf` / `e0kf` 比的是 stateful graph vs stateful eager（同实现），
+`e0e2e_ratio4_selfcheck` 比的是 fullpos vs **非** stateful `forward_decode_tensor`。
+本门是第一次把这两条接在一起比，于是看见了这 ≤1 ULP 的差。
+
+**这不推翻任何冻结数字**——E1F 的 bitwise 132/132 比的正是 graph vs stateful eager，
+本门在该对子上也拿到 0.0。但它有一个对 Phase 1 要紧的推论：
+**D0L 的质量证据跑在非 stateful 路径上（`e0ef2e`），而 serving 要跑 stateful 图路径，
+两者不是同一份代码，且已实测不逐位。**
+所以步 3"真实 prompt 经图路径对 golden token"**不是走过场，是必需的**。
+
+## 对 Phase 1 的影响（TARGET §10）
+
+1. **已放行的单路 39.2 tok/s 是 ctx ≥ 2048 的数字**——E1F 的
+   `--start-position 2048` 是饱和阈值，不是随手选的。TARGET §2 的 M4 实测列
+   记了"16 卡口径、分片默认后、p50 25.49 ms、bitwise 132/132"，**没有记上下文长度**。
+2. **短 prompt 请求今天没有快路径**。ctx < 2047 时只有非 stateful 的 eager 路径，
+   而 TARGET §4.3 的冻结事实是 B=1 eager **210 ms/步** vs graph 36.3 ms。
+   一个 200 token prompt 生成 100 token，全部落在未饱和区。
+3. 因此 §10 Phase 1 工作项表把"最小单路 serving"写成 HTTP + tokenizer + 请求循环，
+   **少了一项前置**：未饱和区的图路径（或等价的快路径）。
+   候选解法（均未做、未评估）：把候选集 pad 到 `index_topk`（须先证与 reference
+   语义一致）；为未饱和区单独立一个图族；或接受短 prompt 走 eager（按上面的算术，
+   这等于放弃短 prompt 的单路指标）。
+
 **下一步是步 3**：16 卡、真实 D0L prompt、prefill → 交接 → **捕图** → decode，
-判据是生成 token 与冻结 golden 一致。它同时了结上面第 1、2、3 条。
+判据是生成 token 与冻结 golden 一致。它同时了结前面第 1、2、3 条限制。
+⚠️ 步 3 的 prompt 必须 ≥ 2047 才走得上图路径；D0L v2 里有 2×8192 与若干 4096 档，
+可用。**短 prompt 那一格要等上面第 3 条解决**。
