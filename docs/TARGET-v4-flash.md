@@ -210,8 +210,21 @@ kernel 开发（写、微基准、kernel 级逐位门）多为单卡，可在另
 
 ### 7.3 M5 长上下文完全未测
 128K/512K/1M 的容量、吞吐、以及"25 路 1M 会话并发"均无数据。这是双机方案的
-核心卖点之一。注意 reference 侧 oracle 上限为 4096 token（见 §8），长 ctx 的
-正确性验证需另设方案。
+核心卖点之一。
+
+**前置障碍：reference 侧 golden 上限只有 4096 token**（见 §8），且**与权重放在
+哪台机器无关**——根因是 `model.py:685` 的 `hc_post` 广播 `[b,s,hc,hc,d]` fp32
+= 256 KiB/token，8192 需要恰好 2.00 GiB 的**单次分配**。没有更长的 golden，
+长 ctx 的正确性就没有模型级背书。
+
+**已识别的解法（未做）**：`hc_post` 在 token 维上逐行独立，**沿 s 分块计算是
+数学精确的**（不是近似）。改动只在 reference 侧评测 harness，不触碰 runtime 语义，
+也不影响任何已冻结的 golden。叠加已发现的 `n_mtp_layers` 冗余（省 0.52 GiB，
+见 §8）后，长 prompt golden 的天花板应能显著抬高。**这是 M5 正确性验证的前置
+小任务，建议先于 M5 性能实验完成**——否则 M5 只能产出无质量背书的性能数字。
+
+生成新 golden 需要 reference MP=8 权重（`~/Workspace/DeepSeek-V4-Flash-mp8/`，
+两台 titan 均已具备）；跑已冻结的门则不需要，golden 是 JSON。
 
 ### 7.4 已知可回收的性能
 - **vLLM fused HC 在 ≥1024 行数值错误**（rel_fro 2.3e-4 → 1.07e-1，公有 API 无法
