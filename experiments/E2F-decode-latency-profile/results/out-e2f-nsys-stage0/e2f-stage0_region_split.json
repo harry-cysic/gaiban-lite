@@ -1,0 +1,118 @@
+{
+  "MoE": {
+    "by_category": {
+      "MoE: Marlin fp4": {
+        "kernels_per_layer": 2.0,
+        "share_of_region": 0.21548363219252373,
+        "us_per_layer": 35.90971784232365
+      },
+      "collective: NCCL": {
+        "kernels_per_layer": 2.2697095435684647,
+        "share_of_region": 0.1394049730558375,
+        "us_per_layer": 23.23143153526971
+      },
+      "dense projection: cutlass GEMM": {
+        "kernels_per_layer": 3.0,
+        "share_of_region": 0.11691990721764328,
+        "us_per_layer": 19.484360995850626
+      },
+      "dense projection: fp32 SGEMM": {
+        "kernels_per_layer": 1.0,
+        "share_of_region": 0.032430724347869,
+        "us_per_layer": 5.404485477178423
+      },
+      "elementwise: copy": {
+        "kernels_per_layer": 9.0,
+        "share_of_region": 0.09301660830877069,
+        "us_per_layer": 15.500946058091285
+      },
+      "elementwise: other": {
+        "kernels_per_layer": 37.46058091286307,
+        "share_of_region": 0.22754460154893888,
+        "us_per_layer": 37.91964315352697
+      },
+      "elementwise: reduce": {
+        "kernels_per_layer": 6.0,
+        "share_of_region": 0.054348611494074515,
+        "us_per_layer": 9.05703734439834
+      },
+      "index / gather / scatter": {
+        "kernels_per_layer": 0.2697095435684647,
+        "share_of_region": 0.0030668583638850566,
+        "us_per_layer": 0.5110829875518672
+      },
+      "other": {
+        "kernels_per_layer": 10.0,
+        "share_of_region": 0.05508535368281208,
+        "us_per_layer": 9.179813278008298
+      },
+      "sort / topk": {
+        "kernels_per_layer": 3.4605809128630707,
+        "share_of_region": 0.06269872978764525,
+        "us_per_layer": 10.448560165975104
+      }
+    },
+    "kernels_per_layer": 74.46058091286307,
+    "us_per_layer": 166.64707883817425
+  },
+  "attention+HC": {
+    "by_category": {
+      "dense projection: cublas GEMV": {
+        "kernels_per_layer": 7.556016597510373,
+        "share_of_region": 0.38139270581535645,
+        "us_per_layer": 208.7508838174274
+      },
+      "dense projection: cutlass GEMM": {
+        "kernels_per_layer": 1.0,
+        "share_of_region": 0.14541944703649676,
+        "us_per_layer": 79.59365145228216
+      },
+      "dense projection: fp32 SGEMM": {
+        "kernels_per_layer": 2.5435684647302903,
+        "share_of_region": 0.016705109837412295,
+        "us_per_layer": 9.143348547717842
+      },
+      "elementwise: copy": {
+        "kernels_per_layer": 24.593360995850624,
+        "share_of_region": 0.07768786136632937,
+        "us_per_layer": 42.52155186721992
+      },
+      "elementwise: other": {
+        "kernels_per_layer": 141.02489626556016,
+        "share_of_region": 0.2669848850826293,
+        "us_per_layer": 146.13108713692944
+      },
+      "elementwise: reduce": {
+        "kernels_per_layer": 15.020746887966805,
+        "share_of_region": 0.04584965489844135,
+        "us_per_layer": 25.095278008298756
+      },
+      "fused tilelang (HC / sparse attn)": {
+        "kernels_per_layer": 3.8257261410788383,
+        "share_of_region": 0.024915661084347663,
+        "us_per_layer": 13.637298755186723
+      },
+      "index / gather / scatter": {
+        "kernels_per_layer": 2.7344398340248963,
+        "share_of_region": 0.0071691556092405555,
+        "us_per_layer": 3.923954356846473
+      },
+      "other": {
+        "kernels_per_layer": 11.5850622406639,
+        "share_of_region": 0.02039791791830706,
+        "us_per_layer": 11.164564315352695
+      },
+      "sort / topk": {
+        "kernels_per_layer": 0.9128630705394191,
+        "share_of_region": 0.0134776013514392,
+        "us_per_layer": 7.376809128630705
+      }
+    },
+    "kernels_per_layer": 210.7966804979253,
+    "us_per_layer": 547.3384273858921
+  },
+  "elementwise_us_per_layer": {
+    "MoE": 62.477626556016595,
+    "attention+HC": 213.7479170124481
+  }
+}

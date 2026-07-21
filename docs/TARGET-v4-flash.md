@@ -296,6 +296,15 @@ routed experts 的 17.53 GiB 已是 FP4 且已分片，无压缩余地。
   eager 逐元素核（71 种核型、平均 1.18 µs、无单一主犯），共 3.06 ms/replay，
   **每步固定**（B=1→B=8 核数 1,980→1,983、时间仅 +17%）。四级流水下 12.1 ms/token。
   这是 decode 侧当前最大的单一可攻项，且**对 M4 与小 microbatch 吞吐同时有效**。
+  **尾巴按核数收费不按字节收费**（平均 1.03–1.73 µs，都在 4090 最小 kernel 时长
+  附近），所以任何减少核数的融合几乎 1:1 换成时间。区域定位：**77% 在 attention
+  体内**（213.8 µs/层、180.6 核/层），23% 在 MoE 区（62.5 µs/层）。
+- **indexer QAT 链在 B=1 值 4.3% of replay**（E2F，330 µs/replay = step 的 3.6%）：
+  ratio-4 层比 ratio-128 层多 **68 个 kernel**，细相位表独立读数 ~66 µs/层非 GEMV，
+  两者吻合。**§2 此前的先验估算"只值 0.2–0.4%"低了一个数量级**——这正是当初
+  要求"用 profile 定夺而不是直接启用"的理由。C4F 已有 kernel/层级双逐位过门的
+  融合核；**decode 侧收益机制与 prefill 不同**（不是省带宽，是省 68 次 kernel
+  启动），90.5× 不可直接折算，须另测。
 - **shared expert 走 BF16 反量化副本**（E2F）：`moe_runtime.py` 的
   `shared_path = "bf16_dequant_correctness_fallback"`，FP8 常驻副本同时存在但热路径
   不读。改用 FP8 可省 6.291 MB/层 = 270 MB/token（总字节的 2.2%），需质量门。
