@@ -12,7 +12,7 @@ from __future__ import annotations
 import math
 import os
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Iterator, Mapping, Protocol
 
 import torch
@@ -68,6 +68,28 @@ class Ratio4AttentionConfig:
     original_seq_len: int
     max_seq_len: int
     layer_id: int = 2
+    # E6F attention TP sharding (variant A: the o-path only).  The frozen
+    # fields above stay **global** -- they describe the model, and validate()
+    # still holds them to Flash's geometry.  These two describe which slice of
+    # it this rank computes, so a sharding mistake shows up as a config error
+    # rather than as a silent numeric one.
+    tp_size: int = 1
+    tp_rank: int = 0
+
+    @property
+    def local_num_heads(self) -> int:
+        return self.num_heads // self.tp_size
+
+    @property
+    def local_o_groups(self) -> int:
+        return self.o_groups // self.tp_size
+
+    @property
+    def group_width(self) -> int:
+        """Values per o_group -- a **global** quantity: sharding takes whole
+        groups, it never narrows one."""
+
+        return self.num_heads * self.head_dim // self.o_groups
 
     @classmethod
     def from_model_config(
@@ -161,6 +183,20 @@ class Ratio4AttentionConfig:
             raise ValueError("max_seq_len must be a multiple of four and at least 128")
         if self.num_heads % self.o_groups:
             raise ValueError("attention heads must divide output groups")
+        if (
+            not isinstance(self.tp_size, int)
+            or isinstance(self.tp_size, bool)
+            or self.tp_size < 1
+            or not isinstance(self.tp_rank, int)
+            or isinstance(self.tp_rank, bool)
+            or self.tp_rank not in range(self.tp_size)
+        ):
+            raise ValueError("tp_rank must be in range(tp_size) and tp_size >= 1")
+        if self.num_heads % self.tp_size or self.o_groups % self.tp_size:
+            raise ValueError(
+                f"attention TP split must be exact: {self.num_heads} heads and "
+                f"{self.o_groups} groups over tp_size {self.tp_size}"
+            )
         if self.rope_dim <= 0 or self.rope_dim > INDEX_DIM or self.rope_dim % 2:
             raise ValueError("rope_dim must be positive, even, and at most 128")
         for value in (self.norm_eps, self.rope_theta, self.rope_factor):
@@ -429,6 +465,53 @@ def overlap_pool(
         dim=1,
     )
     return (values * scores.softmax(dim=1)).sum(dim=1, keepdim=True)
+
+
+def shard_ratio4_attention_weights(
+    prepared: PreparedRatio4AttentionWeights,
+    *,
+    tp_rank: int,
+    tp_size: int,
+    config: Ratio4AttentionConfig,
+) -> PreparedRatio4AttentionWeights:
+    """Slice the o-path tensors for one TP rank (E6F variant A).
+
+    Sharded: ``wq_b`` by head rows, ``wo_a`` by o_group, ``wo_b`` by the
+    matching **input columns**, ``attn_sink`` by head.  Rank ``r`` owns heads
+    ``[16r, 16r+16)``, which on Flash's geometry is exactly o_groups
+    ``[2r, 2r+2)`` -- 8 heads per group, verified in E6F step 1.
+
+    Everything else is left whole on purpose: the compressor, ``wq_a``,
+    ``wkv`` and the whole indexer chain produce state that **every** rank
+    needs, so slicing them would require gathering it back (design note
+    variant C, which E6F showed buys no latency).
+    """
+
+    if tp_size == 1:
+        return prepared
+    heads = config.num_heads // tp_size
+    groups = config.o_groups // tp_size
+    head_rows = heads * config.head_dim
+    lora_cols = groups * config.o_lora_rank
+
+    wq_b = prepared.wq_b[tp_rank * head_rows : (tp_rank + 1) * head_rows].contiguous()
+    wo_a3 = prepared.wo_a.reshape(
+        config.o_groups, config.o_lora_rank, config.group_width
+    )
+    wo_a = (
+        wo_a3[tp_rank * groups : (tp_rank + 1) * groups]
+        .reshape(lora_cols, config.group_width)
+        .contiguous()
+    )
+    wo_b = prepared.wo_b[
+        :, tp_rank * lora_cols : (tp_rank + 1) * lora_cols
+    ].contiguous()
+    attn_sink = prepared.attn_sink[
+        tp_rank * heads : (tp_rank + 1) * heads
+    ].contiguous()
+    return replace(
+        prepared, wq_b=wq_b, wo_a=wo_a, wo_b=wo_b, attn_sink=attn_sink
+    )
 
 
 def prepare_ratio4_attention_weights(
@@ -1083,7 +1166,7 @@ class Ratio4TorchAttention:
             )
             projected_wq_b = query_projections.wq_b
         query = projected_wq_b.reshape(
-            plan.batch_size, 1, cfg.num_heads, cfg.head_dim
+            plan.batch_size, 1, cfg.local_num_heads, cfg.head_dim
         )
         query *= torch.rsqrt(
             query.square().mean(dim=-1, keepdim=True) + cfg.norm_eps
@@ -1225,7 +1308,7 @@ class Ratio4TorchAttention:
                 attention_scores = torch.einsum(
                     "bshd,bskd->bshk", query.float(), selected
                 ) * (cfg.head_dim**-0.5)
-            sink = weights.attn_sink.float().view(1, 1, cfg.num_heads, 1)
+            sink = weights.attn_sink.float().view(1, 1, cfg.local_num_heads, 1)
             maximum = torch.maximum(
                 attention_scores.amax(dim=-1, keepdim=True), sink
             )
@@ -1270,15 +1353,15 @@ class Ratio4TorchAttention:
         grouped = sparse_output.reshape(
             plan.batch_size,
             1,
-            cfg.o_groups,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.local_o_groups,
+            cfg.group_width,
         )
         if stage_marker is not None:
             stage_marker("output_transform_done")
         wo_a = weights.wo_a.reshape(
-            cfg.o_groups,
+            cfg.local_o_groups,
             cfg.o_lora_rank,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.group_width,
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
         output_lora = projected.flatten(2)
@@ -1353,7 +1436,7 @@ class Ratio4TorchAttention:
             )
             projected_wq_b = query_projections.wq_b
         query = projected_wq_b.reshape(
-            plan.batch_size, 1, cfg.num_heads, cfg.head_dim
+            plan.batch_size, 1, cfg.local_num_heads, cfg.head_dim
         )
         query *= torch.rsqrt(
             query.square().mean(dim=-1, keepdim=True) + cfg.norm_eps
@@ -1500,7 +1583,7 @@ class Ratio4TorchAttention:
                 attention_scores = torch.einsum(
                     "bshd,bskd->bshk", query.float(), selected
                 ) * (cfg.head_dim**-0.5)
-            sink = weights.attn_sink.float().view(1, 1, cfg.num_heads, 1)
+            sink = weights.attn_sink.float().view(1, 1, cfg.local_num_heads, 1)
             maximum = torch.maximum(
                 attention_scores.amax(dim=-1, keepdim=True), sink
             )
@@ -1541,13 +1624,13 @@ class Ratio4TorchAttention:
         grouped = inverse_rotated.reshape(
             plan.batch_size,
             1,
-            cfg.o_groups,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.local_o_groups,
+            cfg.group_width,
         )
         wo_a = weights.wo_a.reshape(
-            cfg.o_groups,
+            cfg.local_o_groups,
             cfg.o_lora_rank,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.group_width,
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
         output_lora = projected.flatten(2)
@@ -1637,4 +1720,5 @@ __all__ = [
     "hadamard_transform",
     "overlap_pool",
     "prepare_ratio4_attention_weights",
+    "shard_ratio4_attention_weights",
 ]

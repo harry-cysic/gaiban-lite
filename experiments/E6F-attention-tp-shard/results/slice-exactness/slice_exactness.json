@@ -1,0 +1,45 @@
+{
+  "accepted": true,
+  "checks": [
+    {
+      "bitwise": true,
+      "name": "wq_b concat == full"
+    },
+    {
+      "bitwise": true,
+      "name": "wo_b concat == full (columns)"
+    },
+    {
+      "bitwise": true,
+      "name": "attn_sink concat == full"
+    },
+    {
+      "bitwise": true,
+      "name": "wo_a concat == full (groups)"
+    },
+    {
+      "bitwise": true,
+      "mismatching_slices": 0,
+      "name": "wq_b sliced projection == slice of full projection",
+      "trials": 64,
+      "worst_abs_diff": 0.0
+    }
+  ],
+  "conclusion": "whole-layer delta == step 1 o-path delta",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "E6F-attention-tp-shard",
+  "head_independence_by_construction": {
+    "h_reduced": false,
+    "indexer_reduces_h_via": "scores.sum(dim=2)",
+    "indexer_sharded_in_variant_A": false,
+    "indexer_subscript": "bshd,btd->bsht",
+    "main_attention_subscripts": [
+      "bshd,bskd->bshk",
+      "bshk,bskd->bshd"
+    ]
+  },
+  "host": "titan065",
+  "layer": 4,
+  "step": "slice_exactness"
+}
