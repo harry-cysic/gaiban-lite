@@ -1,0 +1,2588 @@
+{
+  "accepted": true,
+  "checkpoint_id": "75c125cc9806171d31a28c30858dd26910596694dc5351f6d2d4375d42e2d07a",
+  "device_name": "NVIDIA GeForce RTX 4090",
+  "elapsed_s": 2.652998400852084,
+  "errors": [],
+  "experiment": "C3F-chunked-prefill-single-layer-gate",
+  "gemm_shape_probe": {
+    "compressor_wkv_fp32": {
+      "2x512": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 1.4901161193847656e-07,
+        "mismatched_elements": 959551,
+        "nonfinite_layout_match": true,
+        "rms_rel": 4.058749709656695e-07
+      },
+      "4x256": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 1.564621925354004e-07,
+        "mismatched_elements": 955278,
+        "nonfinite_layout_match": true,
+        "rms_rel": 4.009138763194642e-07
+      },
+      "8x128": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 1.4901161193847656e-07,
+        "mismatched_elements": 959551,
+        "nonfinite_layout_match": true,
+        "rms_rel": 4.058749709656695e-07
+      },
+      "tiny_lead_1_1_1022": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 6.332993507385254e-08,
+        "mismatched_elements": 1842,
+        "nonfinite_layout_match": true,
+        "rms_rel": 1.7536633478698604e-08
+      },
+      "uneven_1000_24": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 1.043081283569336e-07,
+        "mismatched_elements": 22515,
+        "nonfinite_layout_match": true,
+        "rms_rel": 6.158322918281556e-08
+      },
+      "uneven_130_894": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 1.564621925354004e-07,
+        "mismatched_elements": 958606,
+        "nonfinite_layout_match": true,
+        "rms_rel": 4.072373656072159e-07
+      },
+      "uneven_3_1021": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 6.51925802230835e-08,
+        "mismatched_elements": 2813,
+        "nonfinite_layout_match": true,
+        "rms_rel": 2.1360499147249357e-08
+      },
+      "uneven_517_507": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 1.4901161193847656e-07,
+        "mismatched_elements": 959688,
+        "nonfinite_layout_match": true,
+        "rms_rel": 4.0612275142848375e-07
+      },
+      "uneven_999_25": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 1.043081283569336e-07,
+        "mismatched_elements": 23453,
+        "nonfinite_layout_match": true,
+        "rms_rel": 6.287260134740791e-08
+      },
+      "whole": {
+        "bitwise": true,
+        "elements": 1048576,
+        "max_abs": 0.0,
+        "mismatched_elements": 0,
+        "nonfinite_layout_match": true,
+        "rms_rel": 0.0
+      }
+    },
+    "wq_a_bf16": {
+      "2x512": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 0.00048828125,
+        "mismatched_elements": 409,
+        "nonfinite_layout_match": true,
+        "rms_rel": 6.019621650921181e-05
+      },
+      "4x256": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 0.0009765625,
+        "mismatched_elements": 421658,
+        "nonfinite_layout_match": true,
+        "rms_rel": 0.002667647320777178
+      },
+      "8x128": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 0.0009765625,
+        "mismatched_elements": 421658,
+        "nonfinite_layout_match": true,
+        "rms_rel": 0.002667647320777178
+      },
+      "tiny_lead_1_1_1022": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 9.5367431640625e-07,
+        "mismatched_elements": 1,
+        "nonfinite_layout_match": true,
+        "rms_rel": 2.9982775373582626e-08
+      },
+      "uneven_1000_24": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 0.00048828125,
+        "mismatched_elements": 10145,
+        "nonfinite_layout_match": true,
+        "rms_rel": 0.0003946549550164491
+      },
+      "uneven_130_894": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 0.00048828125,
+        "mismatched_elements": 53914,
+        "nonfinite_layout_match": true,
+        "rms_rel": 0.000942886108532548
+      },
+      "uneven_3_1021": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 0.00048828125,
+        "mismatched_elements": 1277,
+        "nonfinite_layout_match": true,
+        "rms_rel": 0.00014043814735487103
+      },
+      "uneven_517_507": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 0.0009765625,
+        "mismatched_elements": 255419,
+        "nonfinite_layout_match": true,
+        "rms_rel": 0.0024935321416705847
+      },
+      "uneven_999_25": {
+        "bitwise": false,
+        "elements": 1048576,
+        "max_abs": 0.00048828125,
+        "mismatched_elements": 10567,
+        "nonfinite_layout_match": true,
+        "rms_rel": 0.0004020879860036075
+      },
+      "whole": {
+        "bitwise": true,
+        "elements": 1048576,
+        "max_abs": 0.0,
+        "mismatched_elements": 0,
+        "nonfinite_layout_match": true,
+        "rms_rel": 0.0
+      }
+    }
+  },
+  "layers": {
+    "ratio128": {
+      "all_bitwise": false,
+      "kind": "ratio128",
+      "records": [
+        {
+          "bitwise": true,
+          "branch": {
+            "bitwise": true,
+            "elements": 4194304,
+            "max_abs": 0.0,
+            "mismatched_elements": 0,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0
+          },
+          "branch_rms_rel": 0.0,
+          "max_abs": 0.0,
+          "schedule": "whole",
+          "segments": [
+            1024
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.109375,
+            "mismatched_elements": 3580865,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.012303398922085762
+          },
+          "branch_rms_rel": 0.012303398922085762,
+          "max_abs": 0.25,
+          "schedule": "2x512",
+          "segments": [
+            512,
+            512
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6183,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.010178369469940662
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.109375,
+            "mismatched_elements": 3597990,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.012605460360646248
+          },
+          "branch_rms_rel": 0.012605460360646248,
+          "max_abs": 0.25,
+          "schedule": "4x256",
+          "segments": [
+            256,
+            256,
+            256,
+            256
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6183,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.010178369469940662
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.078125,
+            "mismatched_elements": 3577679,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.012106657959520817
+          },
+          "branch_rms_rel": 0.012106657959520817,
+          "max_abs": 0.125,
+          "schedule": "8x128",
+          "segments": [
+            128,
+            128,
+            128,
+            128,
+            128,
+            128,
+            128,
+            128
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.125,
+              "mismatched_elements": 6545,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.009770599193871021
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.0390625,
+            "mismatched_elements": 122315,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0013592747272923589
+          },
+          "branch_rms_rel": 0.0013592747272923589,
+          "max_abs": 0.25,
+          "schedule": "uneven_1000_24",
+          "segments": [
+            1000,
+            24
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 1224,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.004137775860726833
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.0390625,
+            "mismatched_elements": 125124,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0013687192695215344
+          },
+          "branch_rms_rel": 0.0013687192695215344,
+          "max_abs": 0.25,
+          "schedule": "uneven_999_25",
+          "segments": [
+            999,
+            25
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 1277,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.004172162618488073
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.09375,
+            "mismatched_elements": 3592548,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.012348358519375324
+          },
+          "branch_rms_rel": 0.012348358519375324,
+          "max_abs": 0.25,
+          "schedule": "uneven_517_507",
+          "segments": [
+            517,
+            507
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6183,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.010178369469940662
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.078125,
+            "mismatched_elements": 322686,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0034887001384049654
+          },
+          "branch_rms_rel": 0.0034887001384049654,
+          "max_abs": 0.078125,
+          "schedule": "uneven_3_1021",
+          "segments": [
+            3,
+            1021
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.078125,
+            "mismatched_elements": 2296434,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.00743423867970705
+          },
+          "branch_rms_rel": 0.00743423867970705,
+          "max_abs": 0.078125,
+          "schedule": "uneven_130_894",
+          "segments": [
+            130,
+            894
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.03125,
+            "mismatched_elements": 2715,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0003650458820629865
+          },
+          "branch_rms_rel": 0.0003650458820629865,
+          "max_abs": 0.03125,
+          "schedule": "tiny_lead_1_1_1022",
+          "segments": [
+            1,
+            1,
+            1022
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        }
+      ],
+      "seqlen": 1024,
+      "worst_branch_rms_rel": 0.012605460360646248,
+      "worst_max_abs": 0.25
+    },
+    "ratio4": {
+      "all_bitwise": false,
+      "kind": "ratio4",
+      "records": [
+        {
+          "bitwise": true,
+          "branch": {
+            "bitwise": true,
+            "elements": 4194304,
+            "max_abs": 0.0,
+            "mismatched_elements": 0,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0
+          },
+          "branch_rms_rel": 0.0,
+          "max_abs": 0.0,
+          "schedule": "whole",
+          "segments": [
+            1024
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 131072,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "index_kv_state": {
+              "bitwise": true,
+              "elements": 1024,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "index_score_state": {
+              "bitwise": true,
+              "elements": 1024,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_score_state": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.0625,
+            "mismatched_elements": 3284510,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.008685372769832611
+          },
+          "branch_rms_rel": 0.008685372769832611,
+          "max_abs": 0.25,
+          "schedule": "2x512",
+          "segments": [
+            512,
+            512
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": false,
+              "elements": 131072,
+              "max_abs": 0.0078125,
+              "mismatched_elements": 2,
+              "nonfinite_layout_match": true,
+              "rms_rel": 2.499192487448454e-05
+            },
+            "index_kv_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 3.166496753692627e-08,
+              "mismatched_elements": 836,
+              "nonfinite_layout_match": true,
+              "rms_rel": 1.7476929770054994e-07
+            },
+            "index_score_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 518,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.2857120519101954e-08
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 7.82310962677002e-08,
+              "mismatched_elements": 3779,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.070875831985177e-07
+            },
+            "main_score_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 2330,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.671782332683506e-08
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6316,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.010824580676853657
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.046875,
+            "mismatched_elements": 3340566,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.009113527834415436
+          },
+          "branch_rms_rel": 0.009113527834415436,
+          "max_abs": 0.25,
+          "schedule": "4x256",
+          "segments": [
+            256,
+            256,
+            256,
+            256
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": false,
+              "elements": 131072,
+              "max_abs": 0.0078125,
+              "mismatched_elements": 3,
+              "nonfinite_layout_match": true,
+              "rms_rel": 2.518641485949047e-05
+            },
+            "index_kv_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 4.842877388000488e-08,
+              "mismatched_elements": 884,
+              "nonfinite_layout_match": true,
+              "rms_rel": 1.9287391239686258e-07
+            },
+            "index_score_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 569,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.3202583671918546e-08
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 8.568167686462402e-08,
+              "mismatched_elements": 3749,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.038233782921452e-07
+            },
+            "main_score_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 2304,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.5992426695183894e-08
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6316,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.010824580676853657
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.046875,
+            "mismatched_elements": 3325626,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.008854384534060955
+          },
+          "branch_rms_rel": 0.008854384534060955,
+          "max_abs": 0.125,
+          "schedule": "8x128",
+          "segments": [
+            128,
+            128,
+            128,
+            128,
+            128,
+            128,
+            128,
+            128
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": false,
+              "elements": 131072,
+              "max_abs": 0.0078125,
+              "mismatched_elements": 2,
+              "nonfinite_layout_match": true,
+              "rms_rel": 2.499192487448454e-05
+            },
+            "index_kv_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 3.725290298461914e-08,
+              "mismatched_elements": 863,
+              "nonfinite_layout_match": true,
+              "rms_rel": 1.8323281381071865e-07
+            },
+            "index_score_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 544,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.868421044079696e-08
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 7.82310962677002e-08,
+              "mismatched_elements": 3779,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.070875831985177e-07
+            },
+            "main_score_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 2330,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.671782332683506e-08
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.125,
+              "mismatched_elements": 6608,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.009613357484340668
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.01953125,
+            "mismatched_elements": 103053,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0011928307358175516
+          },
+          "branch_rms_rel": 0.0011928307358175516,
+          "max_abs": 0.125,
+          "schedule": "uneven_1000_24",
+          "segments": [
+            1000,
+            24
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": false,
+              "elements": 131072,
+              "max_abs": 0.0009765625,
+              "mismatched_elements": 1,
+              "nonfinite_layout_match": true,
+              "rms_rel": 3.1239844702213304e-06
+            },
+            "index_kv_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 5.960464477539063e-08,
+              "mismatched_elements": 879,
+              "nonfinite_layout_match": true,
+              "rms_rel": 2.0883405227323237e-07
+            },
+            "index_score_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 577,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.184848461681213e-08
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 8.940696716308594e-08,
+              "mismatched_elements": 3774,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.086131184521946e-07
+            },
+            "main_score_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 1.341104507446289e-07,
+              "mismatched_elements": 2312,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.6596871189640297e-08
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.125,
+              "mismatched_elements": 1323,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.004617299884557724
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.01953125,
+            "mismatched_elements": 117898,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0012169915717095137
+          },
+          "branch_rms_rel": 0.0012169915717095137,
+          "max_abs": 0.125,
+          "schedule": "uneven_999_25",
+          "segments": [
+            999,
+            25
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": false,
+              "elements": 131072,
+              "max_abs": 0.0009765625,
+              "mismatched_elements": 1,
+              "nonfinite_layout_match": true,
+              "rms_rel": 3.1239844702213304e-06
+            },
+            "index_kv_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 5.960464477539063e-08,
+              "mismatched_elements": 879,
+              "nonfinite_layout_match": true,
+              "rms_rel": 2.0883405227323237e-07
+            },
+            "index_score_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 577,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.184848461681213e-08
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 8.940696716308594e-08,
+              "mismatched_elements": 3774,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.086131184521946e-07
+            },
+            "main_score_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 1.341104507446289e-07,
+              "mismatched_elements": 2312,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.6596871189640297e-08
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.125,
+              "mismatched_elements": 1373,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.004653595387935638
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.0546875,
+            "mismatched_elements": 3329657,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.00931558758020401
+          },
+          "branch_rms_rel": 0.00931558758020401,
+          "max_abs": 0.25,
+          "schedule": "uneven_517_507",
+          "segments": [
+            517,
+            507
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": false,
+              "elements": 131072,
+              "max_abs": 0.0078125,
+              "mismatched_elements": 2,
+              "nonfinite_layout_match": true,
+              "rms_rel": 2.499192487448454e-05
+            },
+            "index_kv_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 3.166496753692627e-08,
+              "mismatched_elements": 836,
+              "nonfinite_layout_match": true,
+              "rms_rel": 1.7476929770054994e-07
+            },
+            "index_score_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 518,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.2857120519101954e-08
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 7.82310962677002e-08,
+              "mismatched_elements": 3779,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.070875831985177e-07
+            },
+            "main_score_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 2330,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.671782332683506e-08
+            },
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6316,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.010824580676853657
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.03125,
+            "mismatched_elements": 253343,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0019203554838895798
+          },
+          "branch_rms_rel": 0.0019203554838895798,
+          "max_abs": 0.03125,
+          "schedule": "uneven_3_1021",
+          "segments": [
+            3,
+            1021
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 131072,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "index_kv_state": {
+              "bitwise": true,
+              "elements": 1024,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "index_score_state": {
+              "bitwise": true,
+              "elements": 1024,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_score_state": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.0625,
+            "mismatched_elements": 2047050,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.005930321291089058
+          },
+          "branch_rms_rel": 0.005930321291089058,
+          "max_abs": 0.0625,
+          "schedule": "uneven_130_894",
+          "segments": [
+            130,
+            894
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": false,
+              "elements": 131072,
+              "max_abs": 6.103515625e-05,
+              "mismatched_elements": 2,
+              "nonfinite_layout_match": true,
+              "rms_rel": 2.0125808930515632e-07
+            },
+            "index_kv_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 3.725290298461914e-08,
+              "mismatched_elements": 861,
+              "nonfinite_layout_match": true,
+              "rms_rel": 1.9295053732548695e-07
+            },
+            "index_score_state": {
+              "bitwise": false,
+              "elements": 1024,
+              "max_abs": 1.1920928955078125e-07,
+              "mismatched_elements": 534,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.730319602685995e-08
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 8.195638656616211e-08,
+              "mismatched_elements": 3773,
+              "nonfinite_layout_match": true,
+              "rms_rel": 4.047758466185769e-07
+            },
+            "main_score_state": {
+              "bitwise": false,
+              "elements": 4096,
+              "max_abs": 1.341104507446289e-07,
+              "mismatched_elements": 2305,
+              "nonfinite_layout_match": true,
+              "rms_rel": 5.763395449775999e-08
+            },
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.03125,
+            "mismatched_elements": 2942,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0003041407326236367
+          },
+          "branch_rms_rel": 0.0003041407326236367,
+          "max_abs": 0.03125,
+          "schedule": "tiny_lead_1_1_1022",
+          "segments": [
+            1,
+            1,
+            1022
+          ],
+          "state": {
+            "compressed": {
+              "bitwise": true,
+              "elements": 131072,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "index_kv_state": {
+              "bitwise": true,
+              "elements": 1024,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "index_score_state": {
+              "bitwise": true,
+              "elements": 1024,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "indexer_kv": {
+              "bitwise": true,
+              "elements": 32768,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_kv_state": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "main_score_state": {
+              "bitwise": true,
+              "elements": 4096,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            },
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        }
+      ],
+      "seqlen": 1024,
+      "worst_branch_rms_rel": 0.00931558758020401,
+      "worst_max_abs": 0.25
+    },
+    "window": {
+      "all_bitwise": false,
+      "kind": "window",
+      "records": [
+        {
+          "bitwise": true,
+          "branch": {
+            "bitwise": true,
+            "elements": 4194304,
+            "max_abs": 0.0,
+            "mismatched_elements": 0,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0
+          },
+          "branch_rms_rel": 0.0,
+          "max_abs": 0.0,
+          "schedule": "whole",
+          "segments": [
+            1024
+          ],
+          "state": {
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.0625,
+            "mismatched_elements": 3551253,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.01159685105085373
+          },
+          "branch_rms_rel": 0.01159685105085373,
+          "max_abs": 0.25,
+          "schedule": "2x512",
+          "segments": [
+            512,
+            512
+          ],
+          "state": {
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6247,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.01040322333574295
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.0625,
+            "mismatched_elements": 3564959,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.011835761368274689
+          },
+          "branch_rms_rel": 0.011835761368274689,
+          "max_abs": 0.25,
+          "schedule": "4x256",
+          "segments": [
+            256,
+            256,
+            256,
+            256
+          ],
+          "state": {
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6247,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.01040322333574295
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.09765625,
+            "mismatched_elements": 3544406,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.01168874092400074
+          },
+          "branch_rms_rel": 0.01168874092400074,
+          "max_abs": 0.25,
+          "schedule": "8x128",
+          "segments": [
+            128,
+            128,
+            128,
+            128,
+            128,
+            128,
+            128,
+            128
+          ],
+          "state": {
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6516,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.010094568133354187
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.0234375,
+            "mismatched_elements": 79072,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.001320212846621871
+          },
+          "branch_rms_rel": 0.001320212846621871,
+          "max_abs": 0.125,
+          "schedule": "uneven_1000_24",
+          "segments": [
+            1000,
+            24
+          ],
+          "state": {
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.125,
+              "mismatched_elements": 1265,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.004556997679173946
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.02459716796875,
+            "mismatched_elements": 82579,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0013602462131530046
+          },
+          "branch_rms_rel": 0.0013602462131530046,
+          "max_abs": 0.125,
+          "schedule": "uneven_999_25",
+          "segments": [
+            999,
+            25
+          ],
+          "state": {
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.125,
+              "mismatched_elements": 1317,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.004649689886718988
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.0703125,
+            "mismatched_elements": 3568531,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.011924633756279945
+          },
+          "branch_rms_rel": 0.011924633756279945,
+          "max_abs": 0.25,
+          "schedule": "uneven_517_507",
+          "segments": [
+            517,
+            507
+          ],
+          "state": {
+            "ring": {
+              "bitwise": false,
+              "elements": 65536,
+              "max_abs": 0.25,
+              "mismatched_elements": 6247,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.01040322333574295
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.091796875,
+            "mismatched_elements": 339612,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.0036090691573917866
+          },
+          "branch_rms_rel": 0.0036090691573917866,
+          "max_abs": 0.091796875,
+          "schedule": "uneven_3_1021",
+          "segments": [
+            3,
+            1021
+          ],
+          "state": {
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.078125,
+            "mismatched_elements": 2053171,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.006709557957947254
+          },
+          "branch_rms_rel": 0.006709557957947254,
+          "max_abs": 0.078125,
+          "schedule": "uneven_130_894",
+          "segments": [
+            130,
+            894
+          ],
+          "state": {
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        },
+        {
+          "bitwise": false,
+          "branch": {
+            "bitwise": false,
+            "elements": 4194304,
+            "max_abs": 0.015625,
+            "mismatched_elements": 2609,
+            "nonfinite_layout_match": true,
+            "rms_rel": 0.00022143477690406144
+          },
+          "branch_rms_rel": 0.00022143477690406144,
+          "max_abs": 0.015625,
+          "schedule": "tiny_lead_1_1_1022",
+          "segments": [
+            1,
+            1,
+            1022
+          ],
+          "state": {
+            "ring": {
+              "bitwise": true,
+              "elements": 65536,
+              "max_abs": 0.0,
+              "mismatched_elements": 0,
+              "nonfinite_layout_match": true,
+              "rms_rel": 0.0
+            }
+          }
+        }
+      ],
+      "seqlen": 1024,
+      "worst_branch_rms_rel": 0.011924633756279945,
+      "worst_max_abs": 0.25
+    }
+  },
+  "layers_bitwise": false,
+  "measurement_class": "semantic_correctness_gate",
+  "peak_allocated_gib": 2.050808906555176,
+  "schema_version": 1,
+  "seed": 20260721,
+  "state_machine": {
+    "all_bitwise": true,
+    "records": [
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_main",
+        "pooled": {
+          "bitwise": true,
+          "elements": 281600,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "whole",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          2200
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_main",
+        "pooled": {
+          "bitwise": true,
+          "elements": 281600,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "2seg",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          1100,
+          1100
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_main",
+        "pooled": {
+          "bitwise": true,
+          "elements": 281600,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "4seg",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          550,
+          550,
+          550,
+          550
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_main",
+        "pooled": {
+          "bitwise": true,
+          "elements": 281600,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "8seg",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          275,
+          275,
+          275,
+          275,
+          275,
+          275,
+          275,
+          275
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_main",
+        "pooled": {
+          "bitwise": true,
+          "elements": 281600,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_1000_1096_104",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          1000,
+          1096,
+          104
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_main",
+        "pooled": {
+          "bitwise": true,
+          "elements": 281600,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_999_1201",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          999,
+          1201
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_main",
+        "pooled": {
+          "bitwise": true,
+          "elements": 281600,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_1_2199",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          1,
+          2199
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_main",
+        "pooled": {
+          "bitwise": true,
+          "elements": 281600,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_129_2071",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          129,
+          2071
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_main",
+        "pooled": {
+          "bitwise": true,
+          "elements": 281600,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_5_7_11_2177",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 4096,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          5,
+          7,
+          11,
+          2177
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_index",
+        "pooled": {
+          "bitwise": true,
+          "elements": 70400,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "whole",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          2200
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_index",
+        "pooled": {
+          "bitwise": true,
+          "elements": 70400,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "2seg",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          1100,
+          1100
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_index",
+        "pooled": {
+          "bitwise": true,
+          "elements": 70400,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "4seg",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          550,
+          550,
+          550,
+          550
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_index",
+        "pooled": {
+          "bitwise": true,
+          "elements": 70400,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "8seg",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          275,
+          275,
+          275,
+          275,
+          275,
+          275,
+          275,
+          275
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_index",
+        "pooled": {
+          "bitwise": true,
+          "elements": 70400,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_1000_1096_104",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          1000,
+          1096,
+          104
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_index",
+        "pooled": {
+          "bitwise": true,
+          "elements": 70400,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_999_1201",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          999,
+          1201
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_index",
+        "pooled": {
+          "bitwise": true,
+          "elements": 70400,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_1_2199",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          1,
+          2199
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_index",
+        "pooled": {
+          "bitwise": true,
+          "elements": 70400,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_129_2071",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          129,
+          2071
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio4_index",
+        "pooled": {
+          "bitwise": true,
+          "elements": 70400,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 550,
+        "schedule": "uneven_5_7_11_2177",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 1024,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          5,
+          7,
+          11,
+          2177
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio128",
+        "pooled": {
+          "bitwise": true,
+          "elements": 8704,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 17,
+        "schedule": "whole",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          2200
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio128",
+        "pooled": {
+          "bitwise": true,
+          "elements": 8704,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 17,
+        "schedule": "2seg",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          1100,
+          1100
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio128",
+        "pooled": {
+          "bitwise": true,
+          "elements": 8704,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 17,
+        "schedule": "4seg",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          550,
+          550,
+          550,
+          550
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio128",
+        "pooled": {
+          "bitwise": true,
+          "elements": 8704,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 17,
+        "schedule": "8seg",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          275,
+          275,
+          275,
+          275,
+          275,
+          275,
+          275,
+          275
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio128",
+        "pooled": {
+          "bitwise": true,
+          "elements": 8704,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 17,
+        "schedule": "uneven_1000_1096_104",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          1000,
+          1096,
+          104
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio128",
+        "pooled": {
+          "bitwise": true,
+          "elements": 8704,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 17,
+        "schedule": "uneven_999_1201",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          999,
+          1201
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio128",
+        "pooled": {
+          "bitwise": true,
+          "elements": 8704,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 17,
+        "schedule": "uneven_1_2199",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          1,
+          2199
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio128",
+        "pooled": {
+          "bitwise": true,
+          "elements": 8704,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 17,
+        "schedule": "uneven_129_2071",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          129,
+          2071
+        ]
+      },
+      {
+        "bitwise": true,
+        "kv_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "layer": "ratio128",
+        "pooled": {
+          "bitwise": true,
+          "elements": 8704,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "pooled_rows": 17,
+        "schedule": "uneven_5_7_11_2177",
+        "score_state_live": {
+          "bitwise": true,
+          "elements": 12288,
+          "max_abs": 0.0,
+          "mismatched_elements": 0,
+          "nonfinite_layout_match": true,
+          "rms_rel": 0.0
+        },
+        "segments": [
+          5,
+          7,
+          11,
+          2177
+        ]
+      }
+    ],
+    "stream_length": 2200
+  },
+  "state_machine_bitwise": true,
+  "torch_version": "2.11.0+cu130"
+}

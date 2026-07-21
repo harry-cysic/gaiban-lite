@@ -90,6 +90,10 @@ from .ops.tilelang_sparse import (
     prefill_sparse_core,
     resolve_prefill_sparse_backend,
 )
+from .chunked_prefill import (
+    chunk_window_topk_indices,
+    overlap_chunk_compress,
+)
 
 
 class Ratio4FullPositionError(ValueError):
@@ -380,6 +384,59 @@ class Ratio4FullPositionAttention:
         kv_state[:, :COMPRESS_RATIO].copy_(kv_state[:, COMPRESS_RATIO:])
         score_state[:, :COMPRESS_RATIO].copy_(score_state[:, COMPRESS_RATIO:])
 
+    def _chunk_compress(
+        self,
+        projected_kv: torch.Tensor,
+        projected_score: torch.Tensor,
+        ape: torch.Tensor,
+        *,
+        kv_state: torch.Tensor,
+        score_state: torch.Tensor,
+        output_dim: int,
+        finalizer,
+        output_cache: torch.Tensor,
+        output_cache_rope: torch.Tensor | None = None,
+        start_pos: int,
+    ) -> int:
+        """Incremental overlap compression for one prefill chunk (25th vertical).
+
+        State machine in ``chunked_prefill.overlap_chunk_compress``; this only
+        finalizes and stores, using the same finalizer/quantizer as the frozen
+        prefill (:342-346) and decode (:373-379) paths so the stored rows are
+        produced by an identical op chain.
+        """
+
+        pooled, row_offset, starts = overlap_chunk_compress(
+            projected_kv,
+            projected_score,
+            ape,
+            kv_state=kv_state,
+            score_state=score_state,
+            start_pos=start_pos,
+            output_dim=output_dim,
+            ratio=COMPRESS_RATIO,
+        )
+        if pooled is None:
+            return 0
+        rows = len(starts)
+        # model.py:364 (`freqs_cis[0:cutoff:ratio]`) and model.py:366
+        # (`freqs_cis[start_pos+1-ratio]`) are the same rule: index by group
+        # start position.
+        finalized = finalizer(
+            pooled,
+            self.freqs_cis[
+                COMPRESS_RATIO * row_offset : COMPRESS_RATIO * (row_offset + rows) : COMPRESS_RATIO
+            ],
+        )
+        output_cache[:, row_offset : row_offset + rows].copy_(
+            quantize_latent_rows(finalized, output_cache.dtype)
+        )
+        if output_cache_rope is not None:
+            output_cache_rope[:, row_offset : row_offset + rows].copy_(
+                finalized[..., -LATENT_ROPE_DIM:]
+            )
+        return rows
+
     # ------------------------------------------------------------------
     # indexer score backends (C2F prefill vertical)
 
@@ -547,10 +604,11 @@ class Ratio4FullPositionAttention:
                 f"start_pos {start_pos} != state next position {self.next_position}"
             )
         batch, seqlen, _ = hidden.shape
-        if start_pos == 0:
-            pass  # prefill accepts any seqlen within capacity (ring wrap below)
-        elif seqlen != 1:
-            raise Ratio4FullPositionError("decode requires exactly one token")
+        # 25th vertical: multi-token input at start_pos > 0 is incremental
+        # (chunked) prefill.  ``start_pos == 0`` (whole-sequence prefill) and
+        # the single-token decode step keep their frozen paths unchanged; the
+        # chunk branch is new and derived (see chunked_prefill.py).
+        is_chunk = start_pos > 0 and seqlen > 1
         if start_pos + seqlen > cfg.max_seq_len:
             raise Ratio4FullPositionError("input exceeds the state capacity")
 
@@ -644,6 +702,74 @@ class Ratio4FullPositionAttention:
                 ),
                 dim=1,
             )
+        elif is_chunk:
+            # ---- incremental prefill chunk [start_pos, start_pos + seqlen) ----
+            # Compression first (model.py:525 runs the compressor before
+            # sparse_attn, so this chunk's own rows are visible to its own
+            # queries under the causal bound below).
+            main_rows = self._chunk_compress(
+                main_projected,
+                main_score,
+                weights.compressor_ape,
+                kv_state=self.main_kv_state,
+                score_state=self.main_score_state,
+                output_dim=LATENT_DIM,
+                finalizer=self._finalize_main,
+                output_cache=self.compressed,
+                output_cache_rope=self.compressed_rope,
+                start_pos=start_pos,
+            )
+            index_rows = self._chunk_compress(
+                index_projected,
+                index_score,
+                weights.index_compressor_ape,
+                kv_state=self.index_kv_state,
+                score_state=self.index_score_state,
+                output_dim=INDEX_DIM,
+                finalizer=self._finalize_index,
+                output_cache=self.indexer_kv,
+                start_pos=start_pos,
+            )
+            if main_rows != index_rows:
+                raise AssertionError("main/index compressors disagree on row count")
+            compressed_count = (start_pos + seqlen) // COMPRESS_RATIO
+            # Union layout [ring(128) | chunk(seqlen) | compressed]: the chunk's
+            # queries need absolute raw positions [start_pos-127, start_pos+seqlen),
+            # which no single 128-slot ring can hold.  Built *before* the ring
+            # advances, so the snapshot still carries the previous chunk's rows.
+            offset = WINDOW_SIZE + seqlen
+            compressed_rope = self.compressed_rope
+            attention_kv = torch.cat(
+                (
+                    self._dequantized(self.raw, self.raw_rope),
+                    self._quantize_dequantize_rows(raw_latent),
+                    self._dequantized(
+                        self.compressed[:, :compressed_count],
+                        None
+                        if compressed_rope is None
+                        else compressed_rope[:, :compressed_count],
+                    ),
+                ),
+                dim=1,
+            )
+            # Ring advance (model.py:518-523 placement, written per absolute
+            # position): only the last <= window rows of the chunk survive, so
+            # the slot indices stay unique.
+            kept = min(seqlen, WINDOW_SIZE)
+            end = start_pos + seqlen
+            ring_slots = torch.arange(
+                end - kept, end, device=self.device
+            ).remainder(WINDOW_SIZE)
+            ring_rows = raw_latent[:, seqlen - kept :]
+            self.raw.index_copy_(
+                1, ring_slots, self._quantize_rows(ring_rows).contiguous()
+            )
+            if self.raw_rope is not None:
+                self.raw_rope.index_copy_(
+                    1,
+                    ring_slots,
+                    ring_rows[..., -LATENT_ROPE_DIM:].contiguous(),
+                )
         else:
             phase = start_pos % COMPRESS_RATIO
             boundary = phase == COMPRESS_RATIO - 1
@@ -717,10 +843,16 @@ class Ratio4FullPositionAttention:
             index_kv = self.indexer_kv[:, :compressed_count]
             mask_add = None
             visible = None
-            if start_pos == 0:
-                # causal row visibility over compressed rows (model.py:424-426)
+            if start_pos == 0 or is_chunk:
+                # Causal row visibility over compressed rows (model.py:424-426),
+                # written in absolute positions so a chunk uses the same bound:
+                # query at absolute p sees rows [0, (p+1)//ratio).  At
+                # start_pos == 0 this is the reference expression verbatim.
                 visible = (
-                    torch.arange(1, seqlen + 1, device=hidden.device) // COMPRESS_RATIO
+                    torch.arange(
+                        start_pos + 1, start_pos + seqlen + 1, device=hidden.device
+                    )
+                    // COMPRESS_RATIO
                 )
                 future = (
                     torch.arange(compressed_count, device=hidden.device)
@@ -729,7 +861,7 @@ class Ratio4FullPositionAttention:
                 mask_add = torch.where(future, float("-inf"), 0.0)
             fuse_active = (
                 self.index_score_mode in ("fused", "paired_gate")
-                and start_pos == 0
+                and seqlen > 1
                 and seqlen >= self.fuse_min_seqlen
             )
             topk_count = min(cfg.index_topk, compressed_count)
@@ -756,7 +888,7 @@ class Ratio4FullPositionAttention:
                 # the previous out-of-place broadcast add)
                 scores = scores.add_(mask_add.to(scores.dtype))
             compressed_indices = scores.topk(topk_count, dim=-1).indices
-            if start_pos == 0:
+            if visible is not None:
                 invalid = compressed_indices >= visible.view(1, seqlen, 1)
                 compressed_indices = torch.where(
                     invalid, -1 - offset, compressed_indices
@@ -767,24 +899,35 @@ class Ratio4FullPositionAttention:
                 (batch, seqlen, 0), dtype=torch.int32, device=hidden.device
             )
 
-        window = window_topk_indices(
-            batch_size=batch,
-            seqlen=seqlen,
-            start_pos=start_pos,
-            device=hidden.device,
-        )
+        if is_chunk:
+            window = chunk_window_topk_indices(
+                batch_size=batch,
+                seqlen=seqlen,
+                start_pos=start_pos,
+                device=hidden.device,
+                window_size=WINDOW_SIZE,
+            )
+        else:
+            window = window_topk_indices(
+                batch_size=batch,
+                seqlen=seqlen,
+                start_pos=start_pos,
+                device=hidden.device,
+            )
         topk = torch.cat((window, compressed_indices), dim=-1).contiguous()
         # 21st vertical: prefill-only sparse core selection.  ``tilelang``
-        # swaps in the reference kernel for the start_pos == 0 call; the
-        # decode step below keeps the torch core unconditionally.  Row
-        # blocking bounds the torch core's FP32 gather workspace only, which
-        # the kernel never materializes, so the tilelang arm runs one call.
+        # swaps in the reference kernel for multi-token (prefill / chunk)
+        # calls; the single-token decode step keeps the torch core
+        # unconditionally.  Row blocking bounds the torch core's FP32 gather
+        # workspace only, which the kernel never materializes, so the tilelang
+        # arm runs one call.
+        multi_token = seqlen > 1
         row_block = self.sparse_row_block
         sparse_core = torch_sparse_attention
-        if start_pos == 0 and self.prefill_sparse_backend != "torch":
+        if multi_token and self.prefill_sparse_backend != "torch":
             sparse_core = prefill_sparse_core(self.prefill_sparse_backend)
             row_block = None
-        if row_block is not None and start_pos == 0 and seqlen > row_block:
+        if row_block is not None and multi_token and seqlen > row_block:
             # Query rows are independent (per-row mask/softmax), so blocking
             # the row axis is bitwise identical to the single call; it only
             # bounds the FP32 gather workspace [b, rows, k, 512].

@@ -37,6 +37,7 @@ from .attention import (
     window_topk_indices,
 )
 from .block_weights import ResidentAttentionWeights
+from .chunked_prefill import chunk_window_topk_indices
 from .model_contract import SUPPORTED_LAYER_SPECS, validate_model_layer_config
 from .moe_forward import dequant_fp8_block
 from .static_kv import LATENT_DIM, WINDOW_SIZE
@@ -887,12 +888,14 @@ class WindowTorchAttention:
                 f"start_pos {start_pos} != static KV next position "
                 f"{self.state.next_position}"
             )
-        if start_pos > 0 and hidden.shape[1] != 1:
-            raise ValueError("decode attention requires one token")
         if start_pos + hidden.shape[1] > cfg.max_seq_len:
             raise ValueError("attention input exceeds static KV capacity")
 
         batch, seqlen, _ = hidden.shape
+        # 25th vertical: multi-token input at start_pos > 0 is an incremental
+        # prefill chunk (chunked_prefill.py).  start_pos == 0 and the
+        # single-token decode step keep their frozen paths.
+        is_chunk = start_pos > 0 and seqlen > 1
         frequencies = self.freqs_cis[start_pos : start_pos + seqlen]
 
         def record(name: str, value: torch.Tensor) -> None:
@@ -945,22 +948,48 @@ class WindowTorchAttention:
             self.state.prefill_write(raw_latent)
             # FP8 KV: attention reads what the cache write+read returns.
             attention_kv = self.state.quantize_dequantize_rows(raw_latent)
+            topk = window_topk_indices(
+                batch_size=batch,
+                seqlen=seqlen,
+                start_pos=start_pos,
+                device=hidden.device,
+            )
+        elif is_chunk:
+            # Union layout [ring(128) | chunk(seqlen)] built before the ring
+            # advances: the chunk's queries need absolute raw positions
+            # [start_pos-127, start_pos+seqlen), which the 128-slot ring cannot
+            # hold on its own once the chunk starts overwriting it.
+            attention_kv = torch.cat(
+                (
+                    self.state.dequantized_latent(),
+                    self.state.quantize_dequantize_rows(raw_latent),
+                ),
+                dim=1,
+            )
+            topk = chunk_window_topk_indices(
+                batch_size=batch,
+                seqlen=seqlen,
+                start_pos=start_pos,
+                device=hidden.device,
+            )
+            self.state.chunk_write(raw_latent)
         else:
             self.state.decode_write(raw_latent)
             attention_kv = self.state.dequantized_latent()
+            topk = window_topk_indices(
+                batch_size=batch,
+                seqlen=seqlen,
+                start_pos=start_pos,
+                device=hidden.device,
+            )
         record("attention_kv", attention_kv)
-        topk = window_topk_indices(
-            batch_size=batch,
-            seqlen=seqlen,
-            start_pos=start_pos,
-            device=hidden.device,
-        )
         record("topk", topk)
         # 21st vertical: prefill-only optional tilelang sparse core (env
-        # selected, default torch).  Decode (start_pos > 0, seqlen == 1) keeps
-        # the torch core unconditionally.
+        # selected, default torch).  Decode (seqlen == 1) keeps the torch core
+        # unconditionally; a prefill chunk is prefill-shaped, so it follows the
+        # same selection as the whole-sequence call.
         sparse_core = torch_sparse_attention
-        if start_pos == 0:
+        if seqlen > 1:
             from .attention import _prefill_sparse_backend
 
             backend = _prefill_sparse_backend()

@@ -573,6 +573,12 @@ def compressed_topk_indices(
     return matrix.to(torch.int32).contiguous()
 
 
+from .chunked_prefill import (  # noqa: E402  (helpers, no import cycle)
+    chunk_compressed_topk_indices,
+    chunk_window_topk_indices,
+)
+
+
 def _prefill_sparse_row_block() -> int | None:
     """Optional prefill sparse-core row block (C2F), from the environment.
 
@@ -1478,12 +1484,14 @@ class Ratio128TorchAttention:
             raise ValueError(
                 f"start_pos {start_pos} != static KV next position {self.state.next_position}"
             )
-        if start_pos > 0 and hidden.shape[1] != 1:
-            raise ValueError("decode attention requires one token")
         if start_pos + hidden.shape[1] > cfg.max_seq_len:
             raise ValueError("attention input exceeds static KV capacity")
 
         batch, seqlen, _ = hidden.shape
+        # 25th vertical: multi-token input at start_pos > 0 is an incremental
+        # prefill chunk (chunked_prefill.py).  start_pos == 0 and the
+        # single-token decode step keep their frozen paths.
+        is_chunk = start_pos > 0 and seqlen > 1
         frequencies = self.freqs_cis[start_pos : start_pos + seqlen]
 
         def record(name: str, value: torch.Tensor) -> None:
@@ -1575,6 +1583,43 @@ class Ratio128TorchAttention:
                 offset=seqlen,
                 device=hidden.device,
             )
+        elif is_chunk:
+            # Union layout [ring(128) | chunk(seqlen) | compressed], built
+            # before the ring advances: the chunk's queries need absolute raw
+            # positions [start_pos-127, start_pos+seqlen), which the 128-slot
+            # ring cannot hold once the chunk starts overwriting it.
+            # Compression runs first so this chunk's own rows are visible to
+            # its own queries under the causal bound (model.py:525 ordering);
+            # ``chunk_write`` also advances the ring, so the pre-write ring is
+            # snapshotted here (``dequantized_latent`` aliases the buffer for
+            # the BF16 KV option).
+            ring_snapshot = (
+                self.state.dequantized_latent()[:, :WINDOW_SIZE].clone()
+            )
+            compression = self.state.chunk_write(
+                raw_latent,
+                projected_kv=projected_kv,
+                projected_score=projected_score,
+                ape=self.weights.compressor_ape,
+                finalize_compressed=self._compress_finalizer,
+            )
+            compressed_count = (start_pos + seqlen) // COMPRESS_RATIO
+            attention_kv = torch.cat(
+                (
+                    ring_snapshot,
+                    self.state.quantize_dequantize_rows(raw_latent),
+                    self.state.dequantized_compressed(compressed_count),
+                ),
+                dim=1,
+            )
+            compressed = chunk_compressed_topk_indices(
+                batch_size=batch,
+                seqlen=seqlen,
+                start_pos=start_pos,
+                offset=WINDOW_SIZE + seqlen,
+                device=hidden.device,
+                ratio=COMPRESS_RATIO,
+            )
         else:
             compression = self.state.decode_write(
                 raw_latent,
@@ -1604,12 +1649,21 @@ class Ratio128TorchAttention:
                     self.state.dequantized_compressed_rows(compressed_rows),
                 )
         record("attention_kv", attention_kv)
-        window = window_topk_indices(
-            batch_size=batch,
-            seqlen=seqlen,
-            start_pos=start_pos,
-            device=hidden.device,
-        )
+        if is_chunk:
+            window = chunk_window_topk_indices(
+                batch_size=batch,
+                seqlen=seqlen,
+                start_pos=start_pos,
+                device=hidden.device,
+                window_size=WINDOW_SIZE,
+            )
+        else:
+            window = window_topk_indices(
+                batch_size=batch,
+                seqlen=seqlen,
+                start_pos=start_pos,
+                device=hidden.device,
+            )
         topk = torch.cat((window, compressed), dim=-1).contiguous()
         record("topk", topk)
         # C2F prefill vertical: optional query-row blocking of the prefill
@@ -1625,14 +1679,15 @@ class Ratio128TorchAttention:
         # forms are the same math).
         row_block = _prefill_sparse_row_block()
         sparse_core = torch_sparse_attention
-        if start_pos == 0:
+        multi_token = seqlen > 1
+        if multi_token:
             backend = _prefill_sparse_backend()
             if backend != "torch":
                 from .ops.tilelang_sparse import prefill_sparse_core
 
                 sparse_core = prefill_sparse_core(backend)
                 row_block = None
-        if row_block is not None and start_pos == 0 and seqlen > row_block:
+        if row_block is not None and multi_token and seqlen > row_block:
             output = torch.cat(
                 [
                     sparse_core(

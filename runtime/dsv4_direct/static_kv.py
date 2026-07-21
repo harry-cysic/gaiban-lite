@@ -16,6 +16,8 @@ from typing import Callable
 
 import torch
 
+from .chunked_prefill import plain_chunk_compress
+
 
 WINDOW_SIZE = 128
 COMPRESS_RATIO = 128
@@ -711,6 +713,107 @@ class StaticLayerKV:
 
         self._next_position.fill_(seqlen)
         self._compressed_count.fill_(completed)
+        return result
+
+    def chunk_write(
+        self,
+        raw_latent: torch.Tensor,
+        *,
+        projected_kv: torch.Tensor,
+        projected_score: torch.Tensor,
+        ape: torch.Tensor,
+        finalize_compressed: CompressionFinalizer | None,
+    ) -> CompressionWrite | None:
+        """Append a multi-token prefill chunk (25th vertical).
+
+        The ratio-128 compressor has ``overlap = False`` (``model.py:290``), so
+        a chunk boundary only has to stitch the open group that
+        ``model.py:333-335`` (prefill, ``offset = 0``) / ``model.py:356-357``
+        (decode) park in ``kv_state[:, :pos % 128]``.  Pooling itself is the
+        reference's plain grouped softmax (``model.py:337-338``, ``:342``).
+        Callers must build their attention KV from the pre-write ring.
+        """
+
+        position = self.next_position
+        if position == 0:
+            raise RuntimeError("chunk_write requires a preceding prefill_write")
+        if raw_latent.ndim != 3:
+            raise ValueError("raw_latent must have shape [batch, seqlen, 512]")
+        seqlen = raw_latent.shape[1]
+        if seqlen < 1 or position + seqlen > self.max_seq_len:
+            raise RuntimeError("static KV capacity is exhausted")
+        self._validate_prefill_inputs(
+            raw_latent, projected_kv, projected_score, ape
+        )
+
+        pooled, row_offset, starts = plain_chunk_compress(
+            projected_kv,
+            projected_score,
+            ape,
+            kv_state=self.kv_state,
+            score_state=self.score_state,
+            start_pos=position,
+            ratio=COMPRESS_RATIO,
+        )
+        finalized: torch.Tensor | None = None
+        result: CompressionWrite | None = None
+        if pooled is not None:
+            finalized, result = self._run_finalizer(
+                pooled,
+                row_offset=row_offset,
+                group_start_positions=starts,
+                finalize_compressed=finalize_compressed,
+            )
+
+        end = position + seqlen
+        kept = min(seqlen, WINDOW_SIZE)
+        absolute_positions = torch.arange(
+            end - kept, end, dtype=torch.int64, device=self.device
+        )
+        raw_slots = absolute_positions.remainder(WINDOW_SIZE)
+        index_copy_rows(
+            self.raw, raw_slots, self._quantize_rows(raw_latent[:, -kept:])
+        )
+        raw_rope = self.raw_rope
+        if raw_rope is not None:
+            raw_rope.index_copy_(
+                1,
+                raw_slots,
+                raw_latent[:, -kept:, -LATENT_ROPE_DIM:].contiguous(),
+            )
+        self._raw_positions.index_copy_(
+            1,
+            raw_slots,
+            absolute_positions.unsqueeze(0).expand(self.num_local_sequences, -1),
+        )
+
+        if finalized is not None:
+            rows = finalized.shape[1]
+            self.compressed[:, row_offset : row_offset + rows].copy_(
+                self._quantize_rows(finalized)
+            )
+            compressed_rope = self.compressed_rope
+            if compressed_rope is not None:
+                compressed_rope[:, row_offset : row_offset + rows].copy_(
+                    finalized[..., -LATENT_ROPE_DIM:]
+                )
+            start_tensor = torch.tensor(
+                starts, dtype=torch.int64, device=self.device
+            )
+            self._compressed_group_starts[:, row_offset : row_offset + rows].copy_(
+                start_tensor.unsqueeze(0).expand(self.num_local_sequences, -1)
+            )
+
+        tail = end % COMPRESS_RATIO
+        if tail:
+            state_positions = torch.arange(
+                end - tail, end, dtype=torch.int64, device=self.device
+            )
+            self._state_positions[:, :tail].copy_(
+                state_positions.unsqueeze(0).expand(self.num_local_sequences, -1)
+            )
+        self._next_position.fill_(end)
+        self._compressed_count.fill_(end // COMPRESS_RATIO)
         return result
 
     def decode_write(

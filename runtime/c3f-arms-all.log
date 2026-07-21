@@ -1,0 +1,17 @@
++ ./run_c3f_long_arm.sh chunk0 0
++ echo 'chunk0 rc=0'
+chunk0 rc=0
++ ./run_c3f_long_arm.sh chunk1024b 1024
++ echo 'chunk1024b rc=0'
+chunk1024b rc=0
++ ./run_c3f_long_arm.sh chunk1000 1000
++ echo 'chunk1000 rc=0'
+chunk1000 rc=0
++ ./run_c3f_long_arm.sh chunk512 512
++ echo 'chunk512 rc=0'
+chunk512 rc=0
++ ./run_c3f_short_regress.sh shortregress
++ echo 'short rc=0'
+short rc=0
++ echo ARMS_ALL_DONE
+ARMS_ALL_DONE

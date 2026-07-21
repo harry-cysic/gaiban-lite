@@ -1,0 +1,3 @@
+accepted=True
+state_machine all_bitwise=True
+index_equivalence all_equal=True

@@ -443,6 +443,7 @@ def run_prompt(
     head_material: EmbedHeadMaterial | None,
     device: torch.device,
     mode: str,
+    prefill_chunk: int = 0,
 ) -> dict[str, Any]:
     stage = topo["stage"]
     prompt_len = len(prompt_tokens)
@@ -452,14 +453,36 @@ def run_prompt(
 
     prefill_evidence: dict[str, Any] | None = None
     reset_path_evidence(lane)
+    # Per-prompt activation peak.  Resident weights are already allocated, so
+    # what this measures on top of them is the forward's own workspace -- the
+    # quantity chunked prefill is supposed to bound.
+    torch.cuda.reset_peak_memory_stats(device)
+    resident_gib = torch.cuda.memory_allocated(device) / (1024 ** 3)
 
-    for step in range(compare_steps):
-        if step == 0:
-            position = 0
-            step_tokens = prompt_tokens
-        else:
-            position = prompt_len + step - 1
-            step_tokens = [golden_tokens[step - 1]]
+    # 25th vertical: the prompt may be prefilled incrementally.  ``--prefill-chunk 0``
+    # (default) keeps the single whole-sequence forward the gate always ran, so
+    # every previously frozen arm is byte-identical.  With a chunk size the
+    # prompt is split into consecutive ``start_pos > 0`` multi-token forwards;
+    # only the last one produces the step-0 comparison logits, because
+    # ``head_logits`` reads the final position (head_stage.py:262).
+    plan: list[tuple[int, list[int]]] = []
+    if prefill_chunk and prefill_chunk < prompt_len:
+        position = 0
+        while position < prompt_len:
+            length = min(prefill_chunk, prompt_len - position)
+            plan.append((position, prompt_tokens[position : position + length]))
+            position += length
+    else:
+        plan.append((0, prompt_tokens))
+    prefill_forwards = len(plan)
+    prefill_chunk_lengths = [len(item[1]) for item in plan]
+    for step in range(1, compare_steps):
+        plan.append((prompt_len + step - 1, [golden_tokens[step - 1]]))
+
+    prefill_wall_ms = 0.0
+    for plan_index, (position, step_tokens) in enumerate(plan):
+        # Comparison steps start at the *last* prefill forward.
+        step = plan_index - (prefill_forwards - 1)
         seqlen = len(step_tokens)
         started = time.perf_counter()
 
@@ -483,6 +506,11 @@ def run_prompt(
             pair_transfer(
                 residual.contiguous(), send=True, group=topo["next_pair"]
             )
+        elif step < 0:
+            # Intermediate prefill chunk: nothing to compare, because
+            # ``head_logits`` reads only the final position (head_stage.py:262).
+            # Every tail lane skips the same collectives, so no rank diverges.
+            pass
         else:
             logits = head_logits(head_material, residual)
             if not bool(torch.isfinite(logits).all().item()):
@@ -514,19 +542,30 @@ def run_prompt(
             if len(set(lane_predictions)) != 1:
                 lane_agreement = False
         torch.cuda.synchronize(device)
-        if step == 0:
-            # Snapshot before any decode step can pollute the counters: this is
-            # the prefill chunk's own path record.
-            prefill_evidence = collect_path_evidence(lane)
-            prefill_evidence["seqlen"] = seqlen
-            prefill_evidence["rows_per_lane"] = LOCAL_BATCH * seqlen
-            prefill_evidence["moe_global_rows"] = (
-                LOCAL_BATCH * seqlen * EXPECTED_TP_SIZE
-            )
-            prefill_evidence["prefill_forwards"] = 1
-            prefill_evidence["wall_ms"] = (time.perf_counter() - started) * 1e3
+        elapsed_ms = (time.perf_counter() - started) * 1e3
+        if step <= 0:
+            prefill_wall_ms += elapsed_ms
+            if step == 0:
+                # Snapshot before any decode step can pollute the counters.
+                # The counters cover every prefill forward, because
+                # ``reset_path_evidence`` ran before the first one.
+                prefill_evidence = collect_path_evidence(lane)
+                prefill_evidence["seqlen"] = prompt_len
+                prefill_evidence["rows_per_lane"] = LOCAL_BATCH * prompt_len
+                prefill_evidence["moe_global_rows"] = (
+                    LOCAL_BATCH * prompt_len * EXPECTED_TP_SIZE
+                )
+                prefill_evidence["prefill_forwards"] = prefill_forwards
+                prefill_evidence["chunk_lengths"] = prefill_chunk_lengths
+                prefill_evidence["max_chunk_rows_per_lane"] = (
+                    LOCAL_BATCH * max(prefill_chunk_lengths)
+                )
+                prefill_evidence["wall_ms"] = prefill_wall_ms
+                prefill_evidence["peak_allocated_gib"] = (
+                    torch.cuda.max_memory_allocated(device) / (1024 ** 3)
+                )
         else:
-            decode_ms.append((time.perf_counter() - started) * 1e3)
+            decode_ms.append(elapsed_ms)
 
     # cross-lane residual digest at the final step (diagnostic only)
     digest = tensor_sha256(residual)
@@ -647,6 +686,13 @@ def main() -> int:
         "layers of the same route kind.  Buffers are scratch and layers run "
         "serially, so this is output-identical; without it an 11-layer stage "
         "at a 32768-row prefill shape needs ~29 GB and OOMs at load",
+    )
+    parser.add_argument(
+        "--prefill-chunk", type=int, default=0,
+        help="C3F: split the prompt prefill into consecutive chunks of this "
+        "many tokens (0 = one whole-sequence prefill, the frozen behaviour).  "
+        "Chunks after the first enter the runtime at start_pos > 0 with "
+        "seqlen > 1, i.e. the incremental path added in the 25th vertical",
     )
     parser.add_argument(
         "--max-steps", type=int, default=MAX_COMPARE_STEPS,
@@ -849,9 +895,23 @@ def main() -> int:
         prompts = envelope["prompts"]
 
         # MoE global-row registration: 4 rows per decode token plus one
-        # prefill shape per distinct prompt length.
+        # prefill shape per distinct forward length.  With --prefill-chunk the
+        # forwards are the chunks, not the whole prompt, so the registered
+        # shapes have to be the *chunk* lengths (a missed shape makes the
+        # Marlin per-shape buffer lookup miss at run time).
+        prefill_lengths: set[int] = set()
+        for entry in prompts:
+            prompt_len = len(entry["prompt_tokens"])
+            chunk = args.prefill_chunk
+            if chunk and chunk < prompt_len:
+                position = 0
+                while position < prompt_len:
+                    prefill_lengths.add(min(chunk, prompt_len - position))
+                    position += chunk
+            else:
+                prefill_lengths.add(prompt_len)
         prefill_rows = sorted(
-            {EXPECTED_TP_SIZE * len(entry["prompt_tokens"]) for entry in prompts}
+            {EXPECTED_TP_SIZE * length for length in prefill_lengths}
         )
         global_row_shapes = tuple([EXPECTED_TP_SIZE] + prefill_rows)
         result["global_row_shapes"] = list(global_row_shapes)
@@ -860,6 +920,7 @@ def main() -> int:
         ]
         result["max_seq_len"] = args.max_seq_len
         result["share_moe_buffers"] = bool(args.share_moe_buffers)
+        result["prefill_chunk"] = int(args.prefill_chunk)
 
         # The last decode step reads position prompt_len + compare_steps - 2 and
         # writes one row, so the state must admit prompt_len + compare_steps - 1.
@@ -982,6 +1043,7 @@ def main() -> int:
                     head_material=head_material,
                     device=device,
                     mode=mode,
+                    prefill_chunk=args.prefill_chunk,
                 )
                 del lane
                 # tail-stage record travels to every rank for logging and the
@@ -1060,6 +1122,11 @@ def main() -> int:
                         "compare_steps": row["compare_steps"],
                         "first_mismatch": row["first_mismatch"],
                         "prefill_evidence": row.get("prefill_evidence"),
+                        # C3F: the argmax stream itself, so two arms can be
+                        # compared position by position instead of only on
+                        # their match counts against golden (two arms can
+                        # score alike while predicting differently).
+                        "predicted_tokens": row.get("predicted_tokens"),
                     }
                     for row in rows
                 ],
@@ -1172,6 +1239,7 @@ def main() -> int:
                 "prompt_lengths": result.get("prompt_lengths"),
                 "global_row_shapes": result.get("global_row_shapes"),
                 "share_moe_buffers": result.get("share_moe_buffers"),
+                "prefill_chunk": result.get("prefill_chunk", 0),
                 "moe_overlap_blocks": result.get("moe_overlap_blocks", 0),
                 "fused_scope": args.fused_scope,
                 "kv_dtype": args.kv_dtype,

@@ -1,0 +1,38 @@
+accepted=True
+state_machine all_bitwise=True
+index_equivalence all_equal=True
+layer window: all_bitwise=False worst_branch_rms_rel=1.192e-02 worst_max_abs=2.500e-01
+    whole                  bitwise=True  branch_rms_rel=0.000e+00 max_abs=0.000e+00
+    2x512                  bitwise=False branch_rms_rel=1.160e-02 max_abs=2.500e-01
+    4x256                  bitwise=False branch_rms_rel=1.184e-02 max_abs=2.500e-01
+    8x128                  bitwise=False branch_rms_rel=1.169e-02 max_abs=2.500e-01
+    uneven_1000_24         bitwise=False branch_rms_rel=1.320e-03 max_abs=1.250e-01
+    uneven_999_25          bitwise=False branch_rms_rel=1.360e-03 max_abs=1.250e-01
+    uneven_517_507         bitwise=False branch_rms_rel=1.192e-02 max_abs=2.500e-01
+    uneven_3_1021          bitwise=False branch_rms_rel=3.609e-03 max_abs=9.180e-02
+    uneven_130_894         bitwise=False branch_rms_rel=6.710e-03 max_abs=7.812e-02
+    tiny_lead_1_1_1022     bitwise=False branch_rms_rel=2.214e-04 max_abs=1.562e-02
+layer ratio128: all_bitwise=False worst_branch_rms_rel=1.261e-02 worst_max_abs=2.500e-01
+    whole                  bitwise=True  branch_rms_rel=0.000e+00 max_abs=0.000e+00
+    2x512                  bitwise=False branch_rms_rel=1.230e-02 max_abs=2.500e-01
+    4x256                  bitwise=False branch_rms_rel=1.261e-02 max_abs=2.500e-01
+    8x128                  bitwise=False branch_rms_rel=1.211e-02 max_abs=1.250e-01
+    uneven_1000_24         bitwise=False branch_rms_rel=1.359e-03 max_abs=2.500e-01
+    uneven_999_25          bitwise=False branch_rms_rel=1.369e-03 max_abs=2.500e-01
+    uneven_517_507         bitwise=False branch_rms_rel=1.235e-02 max_abs=2.500e-01
+    uneven_3_1021          bitwise=False branch_rms_rel=3.489e-03 max_abs=7.812e-02
+    uneven_130_894         bitwise=False branch_rms_rel=7.434e-03 max_abs=7.812e-02
+    tiny_lead_1_1_1022     bitwise=False branch_rms_rel=3.650e-04 max_abs=3.125e-02
+layer ratio4: all_bitwise=False worst_branch_rms_rel=9.316e-03 worst_max_abs=2.500e-01
+    whole                  bitwise=True  branch_rms_rel=0.000e+00 max_abs=0.000e+00
+    2x512                  bitwise=False branch_rms_rel=8.685e-03 max_abs=2.500e-01
+    4x256                  bitwise=False branch_rms_rel=9.114e-03 max_abs=2.500e-01
+    8x128                  bitwise=False branch_rms_rel=8.854e-03 max_abs=1.250e-01
+    uneven_1000_24         bitwise=False branch_rms_rel=1.193e-03 max_abs=1.250e-01
+    uneven_999_25          bitwise=False branch_rms_rel=1.217e-03 max_abs=1.250e-01
+    uneven_517_507         bitwise=False branch_rms_rel=9.316e-03 max_abs=2.500e-01
+    uneven_3_1021          bitwise=False branch_rms_rel=1.920e-03 max_abs=3.125e-02
+    uneven_130_894         bitwise=False branch_rms_rel=5.930e-03 max_abs=6.250e-02
+    tiny_lead_1_1_1022     bitwise=False branch_rms_rel=3.041e-04 max_abs=3.125e-02
+gemm_shape_probe wq_a_bf16: all_bitwise=False worst_max_abs=9.766e-04
+gemm_shape_probe compressor_wkv_fp32: all_bitwise=False worst_max_abs=1.565e-07

@@ -420,6 +420,54 @@ class StaticWindowKV:
         )
         self._next_position.fill_(seqlen)
 
+    def chunk_write(self, raw_latent: torch.Tensor) -> None:
+        """Append a multi-token prefill chunk at ``next_position`` (25th vertical).
+
+        Same placement rule as both reference branches (``model.py:518-523``
+        prefill, ``model.py:530`` decode): absolute position ``p`` lives at ring
+        slot ``p % window``.  Only the last ``min(seqlen, window)`` rows of the
+        chunk can survive, so writing just those keeps the slot indices unique
+        (a full ``index_copy_`` over a longer chunk would have duplicate
+        indices, which is undefined).  Callers must have already built their
+        attention KV from the pre-write ring.
+        """
+
+        position = self.next_position
+        if position == 0:
+            raise RuntimeError("chunk_write requires a preceding prefill_write")
+        if raw_latent.ndim != 3:
+            raise ValueError("raw_latent must have shape [batch, seqlen, 512]")
+        seqlen = raw_latent.shape[1]
+        if seqlen < 1 or position + seqlen > self.max_seq_len:
+            raise RuntimeError("static window KV capacity is exhausted")
+        self._require_tensor(
+            "raw_latent",
+            raw_latent,
+            (self.num_local_sequences, seqlen, LATENT_DIM),
+            torch.bfloat16,
+        )
+        kept = min(seqlen, WINDOW_SIZE)
+        end = position + seqlen
+        absolute_positions = torch.arange(
+            end - kept, end, dtype=torch.int64, device=self.device
+        )
+        raw_slots = absolute_positions.remainder(WINDOW_SIZE)
+        index_copy_rows(
+            self.latent, raw_slots, self._quantize_rows(raw_latent[:, -kept:])
+        )
+        if self.latent_rope is not None:
+            self.latent_rope.index_copy_(
+                1,
+                raw_slots,
+                raw_latent[:, -kept:, -LATENT_ROPE_DIM:].contiguous(),
+            )
+        self._raw_positions.index_copy_(
+            1,
+            raw_slots,
+            absolute_positions.unsqueeze(0).expand(self.num_local_sequences, -1),
+        )
+        self._next_position.fill_(end)
+
     def decode_write(self, raw_latent: torch.Tensor) -> None:
         """Append one decode token at ring slot ``position % window``.
 
