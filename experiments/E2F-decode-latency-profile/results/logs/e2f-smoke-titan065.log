@@ -1,0 +1,156 @@
+W0721 09:38:45.930000 171086 torch/distributed/run.py:851] 
+W0721 09:38:45.930000 171086 torch/distributed/run.py:851] *****************************************
+W0721 09:38:45.930000 171086 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 09:38:45.930000 171086 torch/distributed/run.py:851] *****************************************
+[E2F] layer=0 rank=0 experts=64/256
+[E2F] layer=0 rank=0 experts=128/256
+[E2F] layer=0 rank=0 experts=192/256
+[E2F] layer=0 rank=0 experts=256/256
+[E2F] stage 0 layer 0 material loaded
+[E2F] layer=1 rank=0 experts=64/256
+[E2F] layer=1 rank=0 experts=128/256
+[E2F] layer=1 rank=0 experts=192/256
+[E2F] layer=1 rank=0 experts=256/256
+[E2F] stage 0 layer 1 material loaded
+[E2F] layer=2 rank=0 experts=64/256
+[E2F] layer=2 rank=0 experts=128/256
+[E2F] layer=2 rank=0 experts=192/256
+[E2F] layer=2 rank=0 experts=256/256
+[E2F] stage 0 layer 2 material loaded
+[E2F] layer=3 rank=0 experts=64/256
+[E2F] layer=3 rank=0 experts=128/256
+[E2F] layer=3 rank=0 experts=192/256
+[E2F] layer=3 rank=0 experts=256/256
+[E2F] stage 0 layer 3 material loaded
+[E2F] layer=4 rank=0 experts=64/256
+[E2F] layer=4 rank=0 experts=128/256
+[E2F] layer=4 rank=0 experts=192/256
+[E2F] layer=4 rank=0 experts=256/256
+[E2F] stage 0 layer 4 material loaded
+[E2F] layer=5 rank=0 experts=64/256
+[E2F] layer=5 rank=0 experts=128/256
+[E2F] layer=5 rank=0 experts=192/256
+[E2F] layer=5 rank=0 experts=256/256
+[E2F] stage 0 layer 5 material loaded
+[E2F] layer=6 rank=0 experts=64/256
+[E2F] layer=6 rank=0 experts=128/256
+[E2F] layer=6 rank=0 experts=192/256
+[E2F] layer=6 rank=0 experts=256/256
+[E2F] stage 0 layer 6 material loaded
+[E2F] layer=7 rank=0 experts=64/256
+[E2F] layer=7 rank=0 experts=128/256
+[E2F] layer=7 rank=0 experts=192/256
+[E2F] layer=7 rank=0 experts=256/256
+[E2F] stage 0 layer 7 material loaded
+[E2F] layer=8 rank=0 experts=64/256
+[E2F] layer=8 rank=0 experts=128/256
+[E2F] layer=8 rank=0 experts=192/256
+[E2F] layer=8 rank=0 experts=256/256
+[E2F] stage 0 layer 8 material loaded
+[E2F] layer=9 rank=0 experts=64/256
+[E2F] layer=9 rank=0 experts=128/256
+[E2F] layer=9 rank=0 experts=192/256
+[E2F] layer=9 rank=0 experts=256/256
+[E2F] stage 0 layer 9 material loaded
+[E2F] layer=10 rank=0 experts=64/256
+[E2F] layer=10 rank=0 experts=128/256
+[E2F] layer=10 rank=0 experts=192/256
+[E2F] layer=10 rank=0 experts=256/256
+[E2F] stage 0 layer 10 material loaded
+[E2F] warmup done (18s, free 9.86 GiB)
+[E2F] round A p50 {'normal': 7.611546898260713, 'ratio4_boundary': 8.24897619895637}
+[E2F] rank 0 FAILED
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e2f_decode_phase_probe.py", line 599, in main
+    graphs_b = capture_families(
+               ^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e2f_decode_phase_probe.py", line 487, in capture_families
+    step = schedule[cursor_index]
+           ~~~~~~~~^^^^^^^^^^^^^^
+IndexError: tuple index out of range
+
+[E2F] rank 1 FAILED
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e2f_decode_phase_probe.py", line 599, in main
+    graphs_b = capture_families(
+               ^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e2f_decode_phase_probe.py", line 487, in capture_families
+    step = schedule[cursor_index]
+           ~~~~~~~~^^^^^^^^^^^^^^
+IndexError: tuple index out of range
+
+[E2F] rank 2 FAILED
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e2f_decode_phase_probe.py", line 599, in main
+    graphs_b = capture_families(
+               ^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e2f_decode_phase_probe.py", line 487, in capture_families
+    step = schedule[cursor_index]
+           ~~~~~~~~^^^^^^^^^^^^^^
+IndexError: tuple index out of range
+
+[E2F] rank 3 FAILED
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e2f_decode_phase_probe.py", line 599, in main
+    graphs_b = capture_families(
+               ^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e2f_decode_phase_probe.py", line 487, in capture_families
+    step = schedule[cursor_index]
+           ~~~~~~~~^^^^^^^^^^^^^^
+IndexError: tuple index out of range
+
+W0721 09:39:25.142000 171086 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 171180 closing signal SIGTERM
+W0721 09:39:25.144000 171086 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 171182 closing signal SIGTERM
+E0721 09:39:25.308000 171086 torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: 1) local_rank: 0 (pid: 171179) of binary: /home/cysic/Workspace/venvs/sglang/bin/python3
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+e2f_decode_phase_probe.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-07-21_09:39:25
+  host      : titan065
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 171181)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-07-21_09:39:25
+  host      : titan065
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 171180)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2026-07-21_09:39:25
+  host      : titan065
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 171182)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-21_09:39:25
+  host      : titan065
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 171179)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

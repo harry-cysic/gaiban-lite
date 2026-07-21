@@ -1,0 +1,6 @@
+# nsys raw exports: the gpu_trace CSV is ~25 MB per run and the .nsys-rep /
+# .sqlite stay on the titan node.  The category budget JSON and the kernel
+# summary CSV are the artifacts that get cited, so those are tracked.
+results/**/*_cuda_gpu_trace.csv
+results/**/*.nsys-rep
+results/**/*.sqlite

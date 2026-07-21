@@ -18,8 +18,10 @@ START=${5:-2048}
 MASTER=10.234.1.64
 PORT=29651
 TR='~/Workspace/venvs/sglang/bin/torchrun'
-RESULTS=../experiments/E1F-full-decode-throughput/results
-OUT="out-e1f-bl${B}"
+# Both overridable so a reproduction run can be filed elsewhere without
+# clobbering a frozen artifact; defaults are the original ones.
+RESULTS=${E1F_RESULTS:-../experiments/E1F-full-decode-throughput/results}
+OUT=${E1F_OUT:-out-e1f-bl${B}}
 mkdir -p "$RESULTS/logs" "$RESULTS/$OUT"
 
 echo "== sync runtime to both nodes =="

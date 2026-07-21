@@ -1,0 +1,85 @@
+{
+  "by_category": {
+    "MoE: Marlin fp4": {
+      "kernel_types": 1,
+      "kernels_per_replay": 22.0,
+      "mean_us": 57.689452651515154,
+      "ms_per_replay": 1.2691679583333333,
+      "share": 0.1175967746827976
+    },
+    "collective: NCCL": {
+      "kernel_types": 2,
+      "kernels_per_replay": 25.0,
+      "mean_us": 26.228,
+      "ms_per_replay": 0.6557000000000001,
+      "share": 0.060754925818304294
+    },
+    "dense projection: cutlass GEMM": {
+      "kernel_types": 4,
+      "kernels_per_replay": 98.0,
+      "mean_us": 33.489294642857146,
+      "ms_per_replay": 3.2819508749999997,
+      "share": 0.3040943754002499
+    },
+    "dense projection: fp32 SGEMM": {
+      "kernel_types": 5,
+      "kernels_per_replay": 68.0,
+      "mean_us": 19.453569852941175,
+      "ms_per_replay": 1.32284275,
+      "share": 0.12257009782756086
+    },
+    "elementwise: copy": {
+      "kernel_types": 9,
+      "kernels_per_replay": 451.25,
+      "mean_us": 1.8404221606648201,
+      "ms_per_replay": 0.8304904999999999,
+      "share": 0.07695041744747055
+    },
+    "elementwise: other": {
+      "kernel_types": 71,
+      "kernels_per_replay": 1982.75,
+      "mean_us": 1.1173634892615476,
+      "ms_per_replay": 2.2154524583333335,
+      "share": 0.20527626926951587
+    },
+    "elementwise: reduce": {
+      "kernel_types": 10,
+      "kernels_per_replay": 289.5,
+      "mean_us": 1.7945837651122625,
+      "ms_per_replay": 0.519532,
+      "share": 0.0481380633219998
+    },
+    "fused tilelang (HC / sparse attn)": {
+      "kernel_types": 2,
+      "kernels_per_replay": 42.0,
+      "mean_us": 4.2789206349206355,
+      "ms_per_replay": 0.17971466666666666,
+      "share": 0.01665174811925365
+    },
+    "index / gather / scatter": {
+      "kernel_types": 2,
+      "kernels_per_replay": 30.0,
+      "mean_us": 1.442977777777778,
+      "ms_per_replay": 0.04328933333333334,
+      "share": 0.004011041993885182
+    },
+    "other": {
+      "kernel_types": 8,
+      "kernels_per_replay": 77.0,
+      "mean_us": 1.2966401515151516,
+      "ms_per_replay": 0.09984129166666666,
+      "share": 0.009250953589769736
+    },
+    "sort / topk": {
+      "kernel_types": 5,
+      "kernels_per_replay": 48.0,
+      "mean_us": 7.803306423611112,
+      "ms_per_replay": 0.3745587083333333,
+      "share": 0.03470533252919253
+    }
+  },
+  "kernel_ms_per_replay": 10.792540541666668,
+  "kernels_per_replay": 3133.5,
+  "mean_kernel_us": 3.444244627945322,
+  "replays": 24
+}

@@ -93,4 +93,68 @@ class PhaseRecorder:
         return [float(sum(value for _, value in spans)) for spans in self.passes]
 
 
-__all__ = ["PhaseRecorder"]
+class GraphPhaseRecorder(PhaseRecorder):
+    """Phase timing for marks baked into a captured CUDA graph (E2F, 28th).
+
+    A mark issued during ``torch.cuda.graph`` capture becomes an event-record
+    *node*, so it is re-executed by every replay -- ``mark`` runs once, at
+    capture, and ``collect()`` reads the spans back after each replay.  The
+    events must be created with ``external=True``: a node recorded from a
+    default event makes ``cudaEventElapsedTime`` return
+    ``cudaErrorInvalidValue`` (measured on titan065, CUDA 13.2), while an
+    external event-record node keeps its timing queryable.
+
+    Coverage is bounded below by the first mark and above by the last, so the
+    caller reports ``sum(spans) / replay_wall`` as the coverage witness and an
+    uninstrumented p50 from the same process as the overhead witness -- the
+    C4F caliber, kept because the marks sit inside the timed region.
+    """
+
+    def __init__(self, device: torch.device | str, *, capacity: int = 256) -> None:
+        super().__init__(device, capacity=capacity)
+        self._pool = [
+            torch.cuda.Event(enable_timing=True, external=True)
+            for _ in range(capacity)
+        ]
+        self._captured = False
+
+    def mark(self, name: str) -> None:
+        if self._captured:
+            raise RuntimeError(
+                "graph phase marks are issued once, during capture; "
+                "use collect() after each replay"
+            )
+        if self._used >= len(self._pool):
+            self._pool.append(torch.cuda.Event(enable_timing=True, external=True))
+        self._pool[self._used].record()
+        self._names.append(name)
+        self._used += 1
+
+    def end(self) -> list[tuple[str, float]]:
+        raise RuntimeError("graph phase recorder uses seal()/collect(), not end()")
+
+    def seal(self) -> int:
+        """Freeze the mark list once capture is complete."""
+
+        if self._used < 2:
+            raise RuntimeError("graph phase recorder needs at least two marks")
+        self._captured = True
+        return self._used
+
+    def collect(self) -> list[tuple[str, float]]:
+        """Read one replay's spans; the caller must have synchronized."""
+
+        if not self._captured:
+            raise RuntimeError("seal() the recorder after capture before collecting")
+        spans = [
+            (
+                self._names[index],
+                float(self._pool[index - 1].elapsed_time(self._pool[index])),
+            )
+            for index in range(1, self._used)
+        ]
+        self.passes.append(spans)
+        return spans
+
+
+__all__ = ["PhaseRecorder", "GraphPhaseRecorder"]

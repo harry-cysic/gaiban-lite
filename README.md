@@ -22,6 +22,12 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
 | 混合单池 8K/1K | T=**2,538** tok/s | 裸引擎折算 | — |
 | 单路 decode | 27.5 tok/s（+MTP ~38） | 16 卡、B=1、graph | E1F/MTP |
 
+单路那一格已有完整归因（E2F）：36.3 ms/token = 投影字节 14.0 + 固定
+elementwise 尾巴 12.1 + 其余图内 4.5 + head 2.6 + 16-rank 固定偏移 2.3
++ 交接 0.8。**当前形态的带宽天花板是 76.2 tok/s 而非此前记的 335**——
+attention 权重在每个 TP rank 上是完整副本（DP-attention），占 12.19 GB/token
+的 88% 且不除以 4。
+
 语义:满配 43 层 PP4×TP4 双机 E2E 对 golden tokens 97.1%（分歧全为近平局）;
 每个语义变更（fused HC、FP8 KV、MTP、tilelang attention、融合 QAT 核）均过冻结门。
 
@@ -31,13 +37,16 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   （契约、加载、三层型 attention、MoE、整层、superstage+stateful graph、单机 PP2、
   双机 PP4、满配 E2E）→ 吞吐与容量前沿。
 - **Phase 4 进行中**:prefill 杠杆（已放行 tilelang 稀疏核、融合 QAT 核；已否决
-  HC 融合与集合重叠）、chunked prefill（能力已具，容量杠杆而非速度杠杆）。
-- **最大空白**（按 TARGET §2 优先级）:M4 延迟模式（差 8–14×，8 卡形态从未跑过）、
-  M5 长上下文（零覆盖）、serving 折扣验证。
+  HC 融合与集合重叠）、chunked prefill（能力已具，容量杠杆而非速度杠杆）；
+  M4 延迟 profile 已完成（E2F）。
+- **最大空白**（按 TARGET §2 优先级）:8 卡形态验证（从未跑过，且 M4 的形态改动
+  应直接在它上面设计）、elementwise 尾巴折叠（decode 侧最大单一可攻项，39.5%）、
+  attention TP4 分片（M4 的另一半）、M5 长上下文（零覆盖）、serving 折扣验证。
 
 ### 实验索引
 
 `experiments/` 下每个目录一个实验，README 记动机/方法/结论/artifact:
 B1·B2 标定 | A0 契约 | D0·D0L golden oracle | A3F·A4F·A5F·A6F kernel |
 C1F 集成 block | E1F 吞吐与容量前沿 | C2F·C3F·C4F prefill |
+E2F B=1 decode 延迟 profile |
 `runtime/` 是 direct runtime 与全部门脚本（非安装包，靠 rsync 到 titan 运行）。

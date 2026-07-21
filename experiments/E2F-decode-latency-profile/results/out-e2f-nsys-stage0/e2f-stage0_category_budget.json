@@ -1,0 +1,92 @@
+{
+  "by_category": {
+    "MoE: Marlin fp4": {
+      "kernel_types": 1,
+      "kernels_per_replay": 22.0,
+      "mean_us": 17.917113636363634,
+      "ms_per_replay": 0.3941765,
+      "share": 0.05093153993031641
+    },
+    "collective: NCCL": {
+      "kernel_types": 2,
+      "kernels_per_replay": 25.0,
+      "mean_us": 10.2825,
+      "ms_per_replay": 0.2570625,
+      "share": 0.03321504195033687
+    },
+    "dense projection: cublas GEMV": {
+      "kernel_types": 6,
+      "kernels_per_replay": 83.0,
+      "mean_us": 27.641281124497993,
+      "ms_per_replay": 2.2942263333333335,
+      "share": 0.29643695173443896
+    },
+    "dense projection: cutlass GEMM": {
+      "kernel_types": 3,
+      "kernels_per_replay": 44.0,
+      "mean_us": 24.77015340909091,
+      "ms_per_replay": 1.08988675,
+      "share": 0.140824251387761
+    },
+    "dense projection: fp32 SGEMM": {
+      "kernel_types": 4,
+      "kernels_per_replay": 39.0,
+      "mean_us": 4.102067307692308,
+      "ms_per_replay": 0.15998062500000002,
+      "share": 0.020671094269355164
+    },
+    "elementwise: copy": {
+      "kernel_types": 6,
+      "kernels_per_replay": 371.0,
+      "mean_us": 1.7252486522911052,
+      "ms_per_replay": 0.64006725,
+      "share": 0.08270308022285147
+    },
+    "elementwise: other": {
+      "kernel_types": 71,
+      "kernels_per_replay": 1979.75,
+      "mean_us": 1.0305000420928567,
+      "ms_per_replay": 2.0401324583333333,
+      "share": 0.2636054857779161
+    },
+    "elementwise: reduce": {
+      "kernel_types": 9,
+      "kernels_per_replay": 233.5,
+      "mean_us": 1.623692362598144,
+      "ms_per_replay": 0.37913216666666666,
+      "share": 0.0489876618353725
+    },
+    "fused tilelang (HC / sparse attn)": {
+      "kernel_types": 2,
+      "kernels_per_replay": 42.0,
+      "mean_us": 3.5640625,
+      "ms_per_replay": 0.149690625,
+      "share": 0.0193415235164489
+    },
+    "index / gather / scatter": {
+      "kernel_types": 3,
+      "kernels_per_replay": 33.0,
+      "mean_us": 1.4765,
+      "ms_per_replay": 0.048724500000000004,
+      "share": 0.0062956919484918605
+    },
+    "other": {
+      "kernel_types": 9,
+      "kernels_per_replay": 78.0,
+      "mean_us": 1.163463141025641,
+      "ms_per_replay": 0.090750125,
+      "share": 0.011725822353992959
+    },
+    "sort / topk": {
+      "kernel_types": 6,
+      "kernels_per_replay": 48.0,
+      "mean_us": 4.073126736111111,
+      "ms_per_replay": 0.19551008333333333,
+      "share": 0.025261855072717818
+    }
+  },
+  "kernel_ms_per_replay": 7.739339916666666,
+  "kernels_per_replay": 2998.25,
+  "mean_kernel_us": 2.5812857222268546,
+  "replays": 24
+}
