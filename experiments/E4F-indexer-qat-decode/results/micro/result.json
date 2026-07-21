@@ -1,0 +1,101 @@
+{
+  "accepted": true,
+  "bitwise_equal": true,
+  "caliber": "both arms captured as CUDA graphs and replayed back-to-back in alternating order within each iteration (TARGET 9.1); the decode chain runs inside the decode graph in production, so device-side kernel time is the right quantity",
+  "device": "NVIDIA GeForce RTX 4090",
+  "eager_floor_corrected_us": 55.26400078088045,
+  "eager_p50_us": 68.60800087451935,
+  "errors": [],
+  "experiment": "E4F-indexer-qat-decode",
+  "fused_floor_corrected_us": 0.01600012183189392,
+  "fused_p50_us": 13.36000021547079,
+  "fused_resolvable_above_floor": false,
+  "graph_outputs_bitwise_equal": true,
+  "host": "titan065",
+  "judgment_scope": "alive-or-dead only; TARGET 9.4 forbids converting a micro number into a projected in-layer gain",
+  "max_abs_diff": 0.0,
+  "measurement_class": "paired_alternating_graph_replay_microbenchmark",
+  "measurement_floor_us": 13.344000093638897,
+  "null_p50_us": 13.344000093638897,
+  "round_spread_pct": {
+    "eager": 0.0,
+    "fused": 0.8383227522031599,
+    "null": 0.7194229541001887
+  },
+  "rounds": [
+    {
+      "eager_p50_us": 68.60800087451935,
+      "fused_p50_us": 13.311999849975109,
+      "null_p50_us": 13.311999849975109,
+      "round": 0
+    },
+    {
+      "eager_p50_us": 68.60800087451935,
+      "fused_p50_us": 13.311999849975109,
+      "null_p50_us": 13.311999849975109,
+      "round": 1
+    },
+    {
+      "eager_p50_us": 68.60800087451935,
+      "fused_p50_us": 13.36000021547079,
+      "null_p50_us": 13.344000093638897,
+      "round": 2
+    },
+    {
+      "eager_p50_us": 68.60800087451935,
+      "fused_p50_us": 13.423999771475792,
+      "null_p50_us": 13.344000093638897,
+      "round": 3
+    },
+    {
+      "eager_p50_us": 68.60800087451935,
+      "fused_p50_us": 13.407999649643898,
+      "null_p50_us": 13.407999649643898,
+      "round": 4
+    }
+  ],
+  "saved_us_per_call": 55.24800065904856,
+  "schema_version": 1,
+  "selfcheck": {
+    "bitwise_equal": true,
+    "records": [
+      {
+        "bitwise_equal": true,
+        "elements": 8388608,
+        "max_abs_diff": 0.0,
+        "mismatched_elements": 0,
+        "reference_abs_max": 6.0,
+        "shape": [
+          1,
+          1024,
+          64,
+          128
+        ]
+      },
+      {
+        "bitwise_equal": true,
+        "elements": 37248,
+        "max_abs_diff": 0.0,
+        "mismatched_elements": 0,
+        "reference_abs_max": 4.0,
+        "shape": [
+          1,
+          97,
+          3,
+          128
+        ]
+      }
+    ]
+  },
+  "shape": [
+    1,
+    1,
+    64,
+    128
+  ],
+  "speedup": 5.1353293239525355,
+  "speedup_floor_corrected": null,
+  "speedup_floor_corrected_lower_bound": 55.26400078088045,
+  "torch": "2.11.0+cu130",
+  "verdict": "alive"
+}

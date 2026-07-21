@@ -523,8 +523,18 @@ class Ratio4TorchAttention:
         *,
         sparse_attention_backend: Ratio4SparseAttentionBackend | None = None,
         projection_backend: AttentionProjectionBackend | None = None,
+        indexer_qat_mode: str | None = None,
     ) -> None:
         config.validate()
+        resolved_qat = (
+            indexer_qat_mode
+            if indexer_qat_mode is not None
+            else (os.environ.get("DSV4_INDEXER_QAT_DECODE", "").strip() or "fused")
+        )
+        if resolved_qat not in ("ref", "fused"):
+            raise ValueError(
+                f"indexer_qat_mode must be ref/fused, got {resolved_qat!r}"
+            )
         identities = (config.layer_id, weights.layer_id, state.layer_id)
         if (
             any(
@@ -552,6 +562,15 @@ class Ratio4TorchAttention:
         self.config = config
         self.weights = weights
         self.state = state
+        # E4F: the decode indexer QAT chain is launch-floor bound at B=1, not
+        # bandwidth bound (E2F).  C4F's fused kernel is **bitwise identical**
+        # here at every level that was checked -- kernel self-check, decode
+        # shape (max_abs_diff 0.0), 480 in-layer steps, and a D0L long gate
+        # that reproduces the frozen 494/512 with max top2_gap 0.959503173828125
+        # and the same first-mismatch logits on all eight prompts.  It buys
+        # +2.31% single-stream (27.740 -> 28.381 tok/s), so it is the default.
+        # DSV4_INDEXER_QAT_DECODE=ref restores the unfused chain.
+        self.indexer_qat_mode = resolved_qat
         if sparse_attention_backend is not None and not callable(
             sparse_attention_backend
         ):
@@ -580,6 +599,25 @@ class Ratio4TorchAttention:
             beta_slow=config.beta_slow,
             device=weights.wq_a.device,
         )
+
+    def _indexer_qat(self, index_query: torch.Tensor) -> torch.Tensor:
+        """Hadamard + FP4 QAT on the indexer query (E4F).
+
+        ``fused`` calls C4F's single-pass Triton kernel, which is bitwise
+        identical to the eager pair -- verified at the decode shape by E4F's
+        micro gate and re-verified in-layer by the E2F probe's bitwise arm.
+        Only the ``[..., 128]`` width with ``group_size=32`` is supported by
+        the kernel; anything else must stay on the eager path.
+        """
+
+        if self.indexer_qat_mode == "fused":
+            from .ops.indexer_qat import FP4_GROUP, HADAMARD_WIDTH, fused_hadamard_fp4
+
+            if index_query.shape[-1] == HADAMARD_WIDTH and not (
+                HADAMARD_WIDTH % FP4_GROUP
+            ):
+                return fused_hadamard_fp4(index_query)
+        return fp4_quant_dequant(hadamard_transform(index_query))
 
     @contextmanager
     def observe_evidence(self) -> Iterator[list[Ratio4AttentionEvidence]]:
@@ -1102,7 +1140,7 @@ class Ratio4TorchAttention:
         index_query[..., -cfg.rope_dim :] = apply_rotary_emb(
             index_query[..., -cfg.rope_dim :], frequencies
         )
-        index_query = fp4_quant_dequant(hadamard_transform(index_query))
+        index_query = self._indexer_qat(index_query)
         index_weights = F.linear(hidden, weights.index_weights_proj) * (
             cfg.index_head_dim**-0.5 * cfg.index_n_heads**-0.5
         )
@@ -1398,7 +1436,7 @@ class Ratio4TorchAttention:
         index_query[..., -cfg.rope_dim :] = apply_rotary_emb(
             index_query[..., -cfg.rope_dim :], plan.frequencies
         )
-        index_query = fp4_quant_dequant(hadamard_transform(index_query))
+        index_query = self._indexer_qat(index_query)
         index_weights = F.linear(hidden, weights.index_weights_proj) * (
             cfg.index_head_dim**-0.5 * cfg.index_n_heads**-0.5
         )

@@ -50,6 +50,7 @@ import traceback
 from collections import defaultdict
 from datetime import timedelta
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import torch
@@ -65,6 +66,7 @@ from dsv4_direct.physical_stage import (
 )
 from dsv4_direct.stateful_decode import (
     DecodeGraphFamily,
+    StatefulDecodeCursor,
     build_decode_schedule,
     schedule_family_counts,
 )
@@ -74,8 +76,12 @@ from dsv4_direct.stateful_graph import (
     teardown_stateful_graphs,
 )
 
+from dsv4_direct.superstage import TP4DecodeStage
+
 from e1f_full_decode_bench import (
     EAGER_MOE_SLOT,
+    full_state_sha256,
+    seed_state,
     GRAPH_MOE_SLOTS,
     GRAPH_MOE_SLOT_TUPLE,
     HC_MULT,
@@ -93,6 +99,12 @@ from e1f_full_decode_bench import (
 
 
 EXPECTED_VOCAB = 129280
+
+# Variant-lane graph MoE slots for --mode ab.  Slot 0 is the eager slot and
+# 1-3 belong to the base lane (GRAPH_MOE_SLOT_TUPLE); the MoE objects are
+# shared across lanes, so the variant lane needs a disjoint range.
+VARIANT_MOE_SLOT_TUPLE = (5, 6, 7)
+VARIANT_MOE_SLOTS: dict[Any, int] = {}  # filled in main(), keyed by family
 
 # Marks emitted by the super-stage chain itself (one set per layer) plus the
 # four stage-level ones.  Everything else -- attention internals in
@@ -215,6 +227,30 @@ def phase_table(
     }
 
 
+
+def apply_ab_variant(lane: Any, variant: str) -> list[int]:
+    """Mutate lane B in place; return the layer ids the treatment reached."""
+
+    applied: list[int] = []
+    if variant == "none":
+        # Control arm: lane B is left identical to lane A.  It exists because
+        # the two lanes are not perfectly symmetric -- lane B is built second,
+        # so its tensors sit later in the allocator, and it runs on a different
+        # MoE slot range.  If that asymmetry alone moved the number, every
+        # treatment measured this way would be wrong by the same amount.
+        return applied
+    for layer_id, block in zip(lane.stage.layer_ids, lane.stage.blocks, strict=True):
+        attention = getattr(block, "attention", None)
+        if variant == "qat_fused":
+            # only ratio-4 layers carry the indexer chain
+            if getattr(attention, "indexer_qat_mode", None) is not None:
+                attention.indexer_qat_mode = "fused"
+                applied.append(int(layer_id))
+        else:
+            raise ValueError(f"unknown A/B variant {variant!r}")
+    return applied
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--stage-root", type=Path, required=True)
@@ -259,8 +295,21 @@ def main() -> int:
         "--mode",
         type=str,
         default="both",
-        choices=("plain", "both"),
-        help="plain: round A only (no marks); both: A then instrumented B",
+        choices=("plain", "both", "ab"),
+        help=(
+            "plain: round A only (no marks); both: A then instrumented B; "
+            "ab: two-lane paired alternating A/B of a variant (--ab-variant)"
+        ),
+    )
+    parser.add_argument(
+        "--ab-variant",
+        type=str,
+        default="qat_fused",
+        choices=("qat_fused", "none"),
+        help=(
+            "the treatment applied to lane B in --mode ab; 'none' is the "
+            "control arm -- two identical lanes, which must read equal"
+        ),
     )
     args = parser.parse_args()
 
@@ -274,6 +323,9 @@ def main() -> int:
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.set_float32_matmul_precision("highest")
 
+    VARIANT_MOE_SLOTS.update(
+        dict(zip(DecodeGraphFamily, VARIANT_MOE_SLOT_TUPLE, strict=True))
+    )
     layer_ids = parse_layers(args.layers)
     local_batch = int(args.local_batch)
     start_position = int(args.start_position)
@@ -428,7 +480,9 @@ def main() -> int:
                 checkpoint_id=result["checkpoint_id"],
                 max_seq_len=max_seq_len,
                 global_row_shapes=(global_rows,),
-                slots_per_shape=4,
+                # mode ab runs two graph lanes over shared MoE objects, so the
+                # slot budget has to cover both families sets plus the eager slot
+                slots_per_shape=(8 if args.mode == "ab" else 4),
                 kv_dtype=args.kv_dtype,
                 indexer_kv_dtype=args.kv_dtype,
                 progress=(
@@ -447,28 +501,63 @@ def main() -> int:
             None if args.hc_backend == "default" else args.hc_backend
         )
         phase_started = time.perf_counter()
-        lane = synchronized_local_step(
-            "build lane",
-            lambda: StageLane(
-                label="graph",
-                materials=stage_material.materials,
-                payloads={
-                    material.layer_id: build_seed_payload(
-                        material,
-                        seed=args.seed,
-                        local_batch=local_batch,
-                        start_position=start_position,
-                        device=device,
-                        dp_tp_rank=None,
-                    )
-                    for material in stage_material.materials
-                },
-                backend=backend,
+        seed_payloads = {
+            material.layer_id: build_seed_payload(
+                material,
+                seed=args.seed,
                 local_batch=local_batch,
                 start_position=start_position,
-                stop_position=stop_position,
                 device=device,
-            ),
+                dp_tp_rank=None,
+            )
+            for material in stage_material.materials
+        }
+
+        def new_lane(label: str, *, graph_moe_slots: tuple[int, int, int]) -> Any:
+            """Build one lane over the shared materials.
+
+            ``StageLane`` hardwires the graph MoE slot tuple, but the MoE
+            objects are **shared across lanes** (physical_stage shares weight
+            and MoE material and gives each lane only its own state/attention).
+            Two graph lanes therefore cannot both capture into slots 1-3 --
+            the second capture fails ``_validate_family_slot_clean``.  So the
+            variant lane gets its own slot range and the stage is built with
+            enough slots for both.
+            """
+
+            blocks = []
+            for material in stage_material.materials:
+                state = material.new_state(num_local_sequences=local_batch)
+                seed_state(
+                    material,
+                    state,
+                    seed_payloads[material.layer_id],
+                    start_position=start_position,
+                )
+                blocks.append(material.new_block(state))
+            stage = TP4DecodeStage(blocks, hc_boundary_backend=backend)
+            cursor = StatefulDecodeCursor(
+                start_position=start_position, device=device
+            )
+            lane_obj = SimpleNamespace(label=label, stage=stage, cursor=cursor)
+            lane_obj.plan = stage.prepare_stateful_decode_plan(
+                cursor,
+                start_position=start_position,
+                stop_position=stop_position,
+                graph_moe_slots=graph_moe_slots,
+            )
+            lane_obj.state_digests = lambda: {
+                str(layer_id): full_state_sha256(state)
+                for layer_id, state in zip(
+                    stage.layer_ids, stage.states, strict=True
+                )
+            }
+            lane_obj.terminal = lambda expected: StageLane.terminal(lane_obj, expected)
+            return lane_obj
+
+        lane = synchronized_local_step(
+            "build lane",
+            lambda: new_lane("graph", graph_moe_slots=GRAPH_MOE_SLOT_TUPLE),
             device=device,
             world=world,
         )
@@ -557,10 +646,19 @@ def main() -> int:
             *,
             marker_family: DecodeGraphFamily | None = None,
             pools: dict[DecodeGraphFamily, Any],
+            target: Any = None,
+            start_index: int | None = None,
         ) -> dict[DecodeGraphFamily, Any]:
-            """Walk the schedule until every family is captured; replay each."""
+            """Walk the schedule until every family is captured; replay each.
+
+            ``target`` selects the lane.  Every lane walks the same schedule
+            from the same start, so all lanes finish the capture walk at the
+            same position -- which is what makes the A/B pairing legitimate.
+            """
 
             nonlocal cursor_index
+            target = lane if target is None else target
+            local_index = cursor_index if start_index is None else start_index
             graphs: dict[DecodeGraphFamily, Any] = {}
             coarse_only = args.mark_level == "coarse"
             marker = None
@@ -575,14 +673,14 @@ def main() -> int:
                     )
 
             while len(graphs) < len(DecodeGraphFamily):
-                step = schedule[cursor_index]
+                step = schedule[local_index]
                 if step.family not in graphs:
                     marked = marker is not None and step.family == marker_family
                     graphs[step.family] = synchronized_local_step(
                         f"capture {step.family.value}",
                         lambda step=step, marked=marked: capture_stateful_graph(
-                            lane.stage,
-                            plan,
+                            target.stage,
+                            target.plan,
                             graph_family=step.family,
                             capture_stream=capture_stream,
                             pool=pools[step.family],
@@ -598,10 +696,14 @@ def main() -> int:
                     )
                     if marked:
                         recorder.seal()
-                replay_stateful_graph(graphs[step.family], plan, graph_family=step.family)
+                replay_stateful_graph(
+                    graphs[step.family], target.plan, graph_family=step.family
+                )
                 torch.cuda.synchronize(device)
-                lane.cursor.advance_host(step.family)
-                cursor_index += 1
+                target.cursor.advance_host(step.family)
+                local_index += 1
+            if target is lane:
+                cursor_index = local_index
             return graphs
 
         def timed_segment(
@@ -668,24 +770,28 @@ def main() -> int:
             }
 
         # round A: uninstrumented ------------------------------------------
-        graphs = capture_families(None, pools=graph_pools)
-        memory_snapshot("after_capture_a")
-        phase_started = time.perf_counter()
-        result["round_a"] = timed_segment(
-            graphs, recorder=None, instrumented_family=None
-        )
-        result["diagnostic_seconds"]["round_a"] = time.perf_counter() - phase_started
-        if rank == 0:
-            print(f"[E2F] round A p50 {result['round_a']['family_p50_ms']}", flush=True)
-
-        teardown_a = teardown_stateful_graphs(
-            lane.stage, plan, graphs, pool_handles=dict(graph_pools)
-        )
-        result["teardown_a"] = teardown_a
-        for slot in GRAPH_MOE_SLOT_TUPLE:
-            for moe in lane.stage.moes:
-                moe.reset_free_slot_completion_event(global_rows, slot)
-        torch.cuda.synchronize(device)
+        if args.mode != "ab":
+            graphs = capture_families(None, pools=graph_pools)
+            memory_snapshot("after_capture_a")
+            phase_started = time.perf_counter()
+            result["round_a"] = timed_segment(
+                graphs, recorder=None, instrumented_family=None
+            )
+            result["diagnostic_seconds"]["round_a"] = (
+                time.perf_counter() - phase_started
+            )
+            if rank == 0:
+                print(
+                    f"[E2F] round A p50 {result['round_a']['family_p50_ms']}",
+                    flush=True,
+                )
+            result["teardown_a"] = teardown_stateful_graphs(
+                lane.stage, plan, graphs, pool_handles=dict(graph_pools)
+            )
+            for slot in GRAPH_MOE_SLOT_TUPLE:
+                for moe in lane.stage.moes:
+                    moe.reset_free_slot_completion_event(global_rows, slot)
+            torch.cuda.synchronize(device)
 
         # round B: instrumented --------------------------------------------
         if args.mode == "both":
@@ -739,16 +845,225 @@ def main() -> int:
                     f"{table['spans_per_replay']}",
                     flush=True,
                 )
-        else:
+        elif args.mode == "plain":
             result["round_a"]["instrumented_walls_ms"] = []
+
+        def paired_alternating(
+            lane_a: Any,
+            graphs_a: dict[DecodeGraphFamily, Any],
+            variant_lane: Any,
+            graphs_v: dict[DecodeGraphFamily, Any],
+        ) -> dict[str, Any]:
+            """Replay both lanes back-to-back, alternating order every step.
+
+            TARGET 9.1: a serial A/B on a 4090 can report 51/219/318 us for the
+            same configuration across three rounds, which is the same order as
+            the effects being chased here.  Two resident lanes replayed
+            back-to-back with the order swapped each step cancels clock and
+            thermal drift to first order.
+
+            The bitwise comparison is free and is the in-layer numeric gate:
+            a variant that is bitwise identical in a micro gate still has to
+            prove it in the layer, on real weights and real state.
+            """
+
+            nonlocal cursor_index
+            rounds_out: list[dict[str, Any]] = []
+            bitwise_steps = 0
+            total_steps = 0
+            first_mismatch: int | None = None
+            max_abs = 0.0
+            for round_index in range(rounds):
+                base_ms: list[float] = []
+                variant_ms: list[float] = []
+                for _ in range(steps_per_round):
+                    step = schedule[cursor_index]
+                    cursor_index += 1
+                    order = (
+                        (("base", lane_a, graphs_a), ("variant", variant_lane, graphs_v))
+                        if total_steps % 2 == 0
+                        else (
+                            ("variant", variant_lane, graphs_v),
+                            ("base", lane_a, graphs_a),
+                        )
+                    )
+                    for label, target, graphs in order:
+                        start = time.perf_counter()
+                        replay_stateful_graph(
+                            graphs[step.family], target.plan, graph_family=step.family
+                        )
+                        torch.cuda.synchronize(device)
+                        wall = (time.perf_counter() - start) * 1e3
+                        (base_ms if label == "base" else variant_ms).append(wall)
+                    if torch.equal(lane_a.plan.output_buffer, variant_lane.plan.output_buffer):
+                        bitwise_steps += 1
+                    else:
+                        if first_mismatch is None:
+                            first_mismatch = step.position
+                        max_abs = max(
+                            max_abs,
+                            float(
+                                (
+                                    lane_a.plan.output_buffer.float()
+                                    - variant_lane.plan.output_buffer.float()
+                                )
+                                .abs()
+                                .max()
+                                .item()
+                            ),
+                        )
+                    total_steps += 1
+                    lane_a.cursor.advance_host(step.family)
+                    variant_lane.cursor.advance_host(step.family)
+                rounds_out.append(
+                    {
+                        "round": round_index,
+                        "base": summarize_ms(base_ms),
+                        "variant": summarize_ms(variant_ms),
+                        "telemetry": device_telemetry(local_rank),
+                    }
+                )
+            base_p50 = statistics.median(r["base"]["p50_ms"] for r in rounds_out)
+            variant_p50 = statistics.median(r["variant"]["p50_ms"] for r in rounds_out)
+
+            def spread(key: str) -> float:
+                values = [r[key]["p50_ms"] for r in rounds_out]
+                middle = statistics.median(values)
+                return 100.0 * (max(values) - min(values)) / middle if middle else 0.0
+
+            return {
+                "caliber": (
+                    "two resident lanes, back-to-back replay, order swapped "
+                    "every step; host wall around replay + synchronize"
+                ),
+                "rounds": rounds_out,
+                "steps": total_steps,
+                "base_p50_ms": base_p50,
+                "variant_p50_ms": variant_p50,
+                "delta_ms": variant_p50 - base_p50,
+                "delta_pct": 100.0 * (variant_p50 - base_p50) / base_p50,
+                "round_spread_pct": {
+                    "base": spread("base"),
+                    "variant": spread("variant"),
+                },
+                "bitwise_steps": bitwise_steps,
+                "first_mismatch_position": first_mismatch,
+                "max_abs_diff": max_abs,
+            }
+
+        # ------------------------------------------------------------------
+        # mode ab: two-lane paired alternating A/B (TARGET 9.1)
+        if args.mode == "ab":
+            lane_b = synchronized_local_step(
+                "build lane b",
+                lambda: new_lane("variant", graph_moe_slots=VARIANT_MOE_SLOT_TUPLE),
+                device=device,
+                world=world,
+            )
+            if lane.state_digests() != lane_b.state_digests():
+                raise RuntimeError("A/B lanes were not seeded identically")
+            applied = apply_ab_variant(lane_b, args.ab_variant)
+            result["ab_variant"] = {"name": args.ab_variant, "applied_to": applied}
+            if not applied and args.ab_variant != "none":
+                raise RuntimeError(f"variant {args.ab_variant} applied to no layer")
+
+            snapshots_b = [clone_state(state) for state in lane_b.stage.states]
+
+            def warmup_lane_b() -> None:
+                for step in warm_schedule:
+                    forward_eager_prevalidated(
+                        lane_b.stage, lane_b.plan, graph_family=step.family
+                    )
+                    lane_b.cursor.advance_host(step.family)
+                torch.cuda.synchronize(device)
+                copy_stage_states(lane_b.stage.states, snapshots_b)
+                lane_b.cursor.reset(start_position)
+                lane_b.plan.expected_position.fill_(start_position)
+                lane_b.plan.stop_position_tensor.fill_(lane_b.plan.stop_position)
+                with torch.cuda.stream(capture_stream):
+                    for step in warm_schedule:
+                        forward_eager_prevalidated(
+                            lane_b.stage,
+                            lane_b.plan,
+                            graph_family=step.family,
+                            # the variant lane's own slots: MoE objects are
+                            # shared, so warming on the base slots would leave
+                            # them dirty and fail lane A's capture
+                            moe_slot=VARIANT_MOE_SLOTS[step.family],
+                        )
+                        lane_b.cursor.advance_host(step.family)
+                torch.cuda.synchronize(device)
+                copy_stage_states(lane_b.stage.states, snapshots_b)
+                lane_b.cursor.reset(start_position)
+                lane_b.plan.expected_position.fill_(start_position)
+                lane_b.plan.stop_position_tensor.fill_(lane_b.plan.stop_position)
+                # reset every slot either lane may have touched
+                for slot in GRAPH_MOE_SLOT_TUPLE + VARIANT_MOE_SLOT_TUPLE:
+                    for moe in lane_b.stage.moes:
+                        moe.reset_free_slot_completion_event(global_rows, slot)
+
+            synchronized_local_step(
+                "warmup lane b", warmup_lane_b, device=device, world=world
+            )
+            del snapshots_b
+            lane_b.plan.input_residual_buffer.copy_(plan.input_residual_buffer)
+            lane_b.plan.input_ids_buffer.copy_(plan.input_ids_buffer)
+
+            # Both lanes are still at start_position (mode ab skips round A),
+            # and both walk the same schedule from index 0, so both capture
+            # walks end at the same position -- that identity is what makes the
+            # step-by-step pairing legitimate, and it is asserted below.
+            pools_b = {
+                family: torch.cuda.graph_pool_handle()
+                for family in DecodeGraphFamily
+            }
+            graphs_a = capture_families(None, pools=graph_pools, start_index=0)
+            graphs_b = capture_families(
+                None, pools=pools_b, target=lane_b, start_index=0
+            )
+            if lane.cursor.host_position != lane_b.cursor.host_position:
+                raise RuntimeError(
+                    "A/B capture walks ended at different positions: "
+                    f"{lane.cursor.host_position} vs {lane_b.cursor.host_position}"
+                )
+            memory_snapshot("after_capture_ab")
+
+            phase_started = time.perf_counter()
+            result["ab"] = paired_alternating(lane, graphs_a, lane_b, graphs_b)
+            result["diagnostic_seconds"]["ab"] = time.perf_counter() - phase_started
+            result["teardown_ab_a"] = teardown_stateful_graphs(
+                lane.stage, plan, graphs_a, pool_handles=dict(graph_pools)
+            )
+            result["teardown_ab_b"] = teardown_stateful_graphs(
+                lane_b.stage, lane_b.plan, graphs_b, pool_handles=dict(pools_b)
+            )
+            if rank == 0:
+                ab = result["ab"]
+                print(
+                    f"[E2F] A/B {args.ab_variant}: base {ab['base_p50_ms']:.4f} "
+                    f"variant {ab['variant_p50_ms']:.4f} delta "
+                    f"{ab['delta_pct']:+.2f}%  bitwise {ab['bitwise_steps']}/"
+                    f"{ab['steps']}",
+                    flush=True,
+                )
 
         memory_snapshot("at_end")
         result["terminal"] = lane.terminal(schedule[cursor_index].position)
-        result["accepted"] = bool(
-            result["terminal"]["accepted"]
-            and result["teardown_a"].get("accepted", False)
-            and (args.mode == "plain" or result.get("teardown_b", {}).get("accepted"))
-        )
+        if args.mode == "ab":
+            result["accepted"] = bool(
+                result["ab"]["bitwise_steps"] == result["ab"]["steps"]
+                and result["teardown_ab_a"].get("accepted", False)
+                and result["teardown_ab_b"].get("accepted", False)
+            )
+        else:
+            result["accepted"] = bool(
+                result["terminal"]["accepted"]
+                and result["teardown_a"].get("accepted", False)
+                and (
+                    args.mode == "plain"
+                    or result.get("teardown_b", {}).get("accepted")
+                )
+            )
     except Exception:
         result["errors"].append(traceback.format_exc())
         result["accepted"] = False

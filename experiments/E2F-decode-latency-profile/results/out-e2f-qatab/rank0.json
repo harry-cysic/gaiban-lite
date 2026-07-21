@@ -1,0 +1,964 @@
+{
+  "ab": {
+    "base_p50_ms": 7.6489311177283525,
+    "bitwise_steps": 480,
+    "caliber": "two resident lanes, back-to-back replay, order swapped every step; host wall around replay + synchronize",
+    "delta_ms": -0.29248627834022045,
+    "delta_pct": -3.8238843289137323,
+    "first_mismatch_position": null,
+    "max_abs_diff": 0.0,
+    "round_spread_pct": {
+      "base": 0.2093089932764638,
+      "variant": 0.23315521832249905
+    },
+    "rounds": [
+      {
+        "base": {
+          "count": 160.0,
+          "max_ms": 8.697139099240303,
+          "mean_ms": 7.801462383940816,
+          "min_ms": 7.605490041896701,
+          "p50_ms": 7.6489311177283525,
+          "p95_ms": 8.289337158203125
+        },
+        "round": 0,
+        "telemetry": {
+          "clocks.max.sm": 3105.0,
+          "clocks.sm": 2760.0,
+          "power.draw": 205.29,
+          "power.limit": 450.0,
+          "temperature.gpu": 56.0
+        },
+        "variant": {
+          "count": 160.0,
+          "max_ms": 8.410955080762506,
+          "mean_ms": 7.514065783470869,
+          "min_ms": 7.31861381791532,
+          "p50_ms": 7.356444839388132,
+          "p95_ms": 8.011359022930264
+        }
+      },
+      {
+        "base": {
+          "count": 160.0,
+          "max_ms": 8.74300510622561,
+          "mean_ms": 7.799199027067516,
+          "min_ms": 7.601622957736254,
+          "p50_ms": 7.647409103810787,
+          "p95_ms": 8.285491028800607
+        },
+        "round": 1,
+        "telemetry": {
+          "clocks.max.sm": 3105.0,
+          "clocks.sm": 2760.0,
+          "power.draw": 204.93,
+          "power.limit": 450.0,
+          "temperature.gpu": 57.0
+        },
+        "variant": {
+          "count": 160.0,
+          "max_ms": 8.455188013613224,
+          "mean_ms": 7.510056137107313,
+          "min_ms": 7.312884088605642,
+          "p50_ms": 7.355273002758622,
+          "p95_ms": 8.004726143553853
+        }
+      },
+      {
+        "base": {
+          "count": 160.0,
+          "max_ms": 8.757343050092459,
+          "mean_ms": 7.817499485099688,
+          "min_ms": 7.62848393060267,
+          "p50_ms": 7.663419004529715,
+          "p95_ms": 8.289207937195897
+        },
+        "round": 2,
+        "telemetry": {
+          "clocks.max.sm": 3105.0,
+          "clocks.sm": 2760.0,
+          "power.draw": 204.42,
+          "power.limit": 450.0,
+          "temperature.gpu": 58.0
+        },
+        "variant": {
+          "count": 160.0,
+          "max_ms": 8.468823973089457,
+          "mean_ms": 7.530434447107837,
+          "min_ms": 7.3160589672625065,
+          "p50_ms": 7.372424937784672,
+          "p95_ms": 8.013904094696045
+        }
+      }
+    ],
+    "steps": 480,
+    "variant_p50_ms": 7.356444839388132
+  },
+  "ab_variant": {
+    "applied_to": [
+      2,
+      4,
+      6,
+      8,
+      10
+    ],
+    "name": "qat_fused"
+  },
+  "accepted": true,
+  "caliber": {
+    "b_semantics": "full replication (E1F replicated caliber): identical 1 sequences on all 4 TP ranks; MoE gathers 4 rows",
+    "hc_backend": "fused",
+    "input": "the stage input residual buffer is filled once with a deterministic bf16 tensor and held constant; no transport runs inside the timed window",
+    "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328; kv_dtype=bf16",
+    "timing": "round A: host wall around replay + torch.cuda.synchronize. round B: same wall, plus in-graph external CUDA event nodes read back after the synchronize (outside the timed window)",
+    "topology": "single node, TP4 only, one super-stage over layers 0-10; no PP handoff, no embed/head; the graph replay is the whole measured object"
+  },
+  "checkpoint_id": "f217676c0685b0aa6464f90c893644725546bc287905500a0be65e204e44488a",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "ab": 7.778017334872857,
+    "build": 0.16216491488739848,
+    "load": 13.4366649761796,
+    "process": 55.97151686786674,
+    "warmup": 18.046980544924736
+  },
+  "errors": [],
+  "experiment": "E2F-decode-latency-profile",
+  "host": "titan065",
+  "layer_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "local_batch": 1,
+  "mark_level": "fine",
+  "max_seq_len": 3328,
+  "measurement_class": "stage_local_graph_replay_profile",
+  "memory": {
+    "after_build": {
+      "free_bytes": 10334699520,
+      "total_bytes": 25252724736
+    },
+    "after_capture_ab": {
+      "free_bytes": 10246619136,
+      "total_bytes": 25252724736
+    },
+    "after_load": {
+      "free_bytes": 10359865344,
+      "total_bytes": 25252724736
+    },
+    "after_warmup": {
+      "free_bytes": 10563289088,
+      "total_bytes": 25252724736
+    },
+    "at_end": {
+      "free_bytes": 10387128320,
+      "total_bytes": 25252724736
+    }
+  },
+  "mode": "ab",
+  "nccl_env": {
+    "NCCL_IB_DISABLE": null,
+    "NCCL_P2P_LEVEL": "SYS",
+    "NCCL_SOCKET_IFNAME": null
+  },
+  "phases": null,
+  "rank": 0,
+  "round_a": null,
+  "round_b": null,
+  "rounds": 3,
+  "schema_version": 1,
+  "settle_steps": 132,
+  "start_position": 2048,
+  "steps_per_round": 160,
+  "stop_position": 3288,
+  "teardown_ab_a": {
+    "accepted": true,
+    "empty_cache_called": true,
+    "errors": [],
+    "families": [
+      "normal",
+      "ratio4_boundary",
+      "ratio4_ratio128_boundary"
+    ],
+    "gc_collected": true,
+    "gc_unreachable": 3381,
+    "global_rows": 4,
+    "graph_moe_slots": [
+      1,
+      2,
+      3
+    ],
+    "graph_pool_objects_distinct": true,
+    "graph_registry": {
+      "bindings": {
+        "normal": true,
+        "ratio4_boundary": true,
+        "ratio4_ratio128_boundary": true
+      },
+      "bindings_exact": true,
+      "bindings_released": {
+        "normal": true,
+        "ratio4_boundary": true,
+        "ratio4_ratio128_boundary": true
+      },
+      "families_exact": true,
+      "observed_families": [
+        "normal",
+        "ratio4_boundary",
+        "ratio4_ratio128_boundary"
+      ],
+      "registry_cleared": true,
+      "reset": {
+        "normal": true,
+        "ratio4_boundary": true,
+        "ratio4_ratio128_boundary": true
+      },
+      "reset_capable": true,
+      "values_distinct": true,
+      "values_present": true,
+      "values_valid": true
+    },
+    "graph_slot_layer_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pool_registry": {
+      "families_exact": true,
+      "observed_families": [
+        "normal",
+        "ratio4_boundary",
+        "ratio4_ratio128_boundary"
+      ],
+      "registry_cleared": true,
+      "reset_capable": true,
+      "values_distinct": true,
+      "values_present": true,
+      "values_valid": true
+    },
+    "registry_objects_distinct": true,
+    "schema": "dsv4-stateful-graph-teardown-v1",
+    "semantic_layer_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "slot_cleanup": {
+      "normal": {
+        "accepted": true,
+        "layers": {
+          "0": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "1": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "10": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "2": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "3": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "4": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "5": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "6": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "7": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "8": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "9": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          }
+        },
+        "slot": 1
+      },
+      "ratio4_boundary": {
+        "accepted": true,
+        "layers": {
+          "0": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "1": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "10": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "2": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "3": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "4": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "5": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "6": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "7": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "8": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "9": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          }
+        },
+        "slot": 2
+      },
+      "ratio4_ratio128_boundary": {
+        "accepted": true,
+        "layers": {
+          "0": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "1": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "10": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "2": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "3": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "4": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "5": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "6": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "7": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "8": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "9": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          }
+        },
+        "slot": 3
+      }
+    },
+    "slot_cleanup_accepted": true,
+    "synchronization": {
+      "after_reset": true,
+      "before_reset": true,
+      "final": true
+    }
+  },
+  "teardown_ab_b": {
+    "accepted": true,
+    "empty_cache_called": true,
+    "errors": [],
+    "families": [
+      "normal",
+      "ratio4_boundary",
+      "ratio4_ratio128_boundary"
+    ],
+    "gc_collected": true,
+    "gc_unreachable": 0,
+    "global_rows": 4,
+    "graph_moe_slots": [
+      5,
+      6,
+      7
+    ],
+    "graph_pool_objects_distinct": true,
+    "graph_registry": {
+      "bindings": {
+        "normal": true,
+        "ratio4_boundary": true,
+        "ratio4_ratio128_boundary": true
+      },
+      "bindings_exact": true,
+      "bindings_released": {
+        "normal": true,
+        "ratio4_boundary": true,
+        "ratio4_ratio128_boundary": true
+      },
+      "families_exact": true,
+      "observed_families": [
+        "normal",
+        "ratio4_boundary",
+        "ratio4_ratio128_boundary"
+      ],
+      "registry_cleared": true,
+      "reset": {
+        "normal": true,
+        "ratio4_boundary": true,
+        "ratio4_ratio128_boundary": true
+      },
+      "reset_capable": true,
+      "values_distinct": true,
+      "values_present": true,
+      "values_valid": true
+    },
+    "graph_slot_layer_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pool_registry": {
+      "families_exact": true,
+      "observed_families": [
+        "normal",
+        "ratio4_boundary",
+        "ratio4_ratio128_boundary"
+      ],
+      "registry_cleared": true,
+      "reset_capable": true,
+      "values_distinct": true,
+      "values_present": true,
+      "values_valid": true
+    },
+    "registry_objects_distinct": true,
+    "schema": "dsv4-stateful-graph-teardown-v1",
+    "semantic_layer_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "slot_cleanup": {
+      "normal": {
+        "accepted": true,
+        "layers": {
+          "0": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "1": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "10": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "2": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "3": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "4": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "5": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "6": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "7": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "8": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "9": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          }
+        },
+        "slot": 5
+      },
+      "ratio4_boundary": {
+        "accepted": true,
+        "layers": {
+          "0": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "1": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "10": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "2": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "3": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "4": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "5": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "6": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "7": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "8": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "9": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          }
+        },
+        "slot": 6
+      },
+      "ratio4_ratio128_boundary": {
+        "accepted": true,
+        "layers": {
+          "0": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "1": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "10": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "2": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "3": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "4": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "5": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "6": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "7": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "8": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          },
+          "9": {
+            "accepted": true,
+            "reset": true,
+            "status": {
+              "has_completion_event": false,
+              "state": "free"
+            }
+          }
+        },
+        "slot": 7
+      }
+    },
+    "slot_cleanup_accepted": true,
+    "synchronization": {
+      "after_reset": true,
+      "before_reset": true,
+      "final": true
+    }
+  },
+  "terminal": {
+    "accepted": true,
+    "device_position": 2656,
+    "dispatch_error": 0,
+    "expected_position": 2656,
+    "host_position": 2656,
+    "stop_position": 3288
+  },
+  "torch": "2.11.0+cu130",
+  "tp_group_binding": {
+    "backend": "nccl",
+    "global_rank": 0,
+    "global_ranks": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "local_rank": 0,
+    "validated_live": true,
+    "world_size": 4
+  },
+  "world": 4
+}

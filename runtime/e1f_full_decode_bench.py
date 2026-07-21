@@ -910,6 +910,20 @@ def main() -> int:
         graph_lane = lanes["graph"]
         eager_lane = lanes.get("eager")
         result["plan_resident_bytes"] = int(graph_lane.plan.resident_bytes)
+        # Treatment witness: an env-gated variant that fails to reach the
+        # process looks exactly like a variant that does not work.  Record what
+        # the built blocks actually resolved to, so a no-op flag is visible in
+        # the artifact instead of being read as a negative result.
+        result["attention_modes"] = {
+            str(layer_id): {
+                key: getattr(block.attention, key)
+                for key in ("indexer_qat_mode", "index_score_mode")
+                if hasattr(block.attention, key)
+            }
+            for layer_id, block in zip(
+                graph_lane.stage.layer_ids, graph_lane.stage.blocks, strict=True
+            )
+        }
         result["diagnostic_seconds"]["build"] = time.perf_counter() - phase_started
         memory_snapshot("after_build")
         if rank in (0, 4, 8, 12):
