@@ -1,0 +1,67 @@
+W0721 00:45:00.089000 156848 torch/distributed/run.py:851] 
+W0721 00:45:00.089000 156848 torch/distributed/run.py:851] *****************************************
+W0721 00:45:00.089000 156848 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 00:45:00.089000 156848 torch/distributed/run.py:851] *****************************************
+[E1MTPLB] layer=22 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 22 material loaded
+[E1MTPLB] layer=33 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 33 material loaded
+[E1MTPLB] layer=23 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 23 material loaded
+[E1MTPLB] layer=34 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 34 material loaded
+[E1MTPLB] layer=24 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 24 material loaded
+[E1MTPLB] layer=35 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 35 material loaded
+[E1MTPLB] layer=25 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 25 material loaded
+[E1MTPLB] layer=36 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 36 material loaded
+[E1MTPLB] layer=26 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 26 material loaded
+[E1MTPLB] layer=37 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 37 material loaded
+[E1MTPLB] layer=27 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 27 material loaded
+[E1MTPLB] layer=38 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 38 material loaded
+[E1MTPLB] layer=28 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 28 material loaded
+[E1MTPLB] layer=39 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 39 material loaded
+[E1MTPLB] layer=29 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 29 material loaded
+[E1MTPLB] layer=40 rank=0 experts=256/256
+[E1MTPLB] layer=30 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 40 material loaded
+[E1MTPLB] stage 2 layer 30 material loaded
+[E1MTPLB] layer=31 rank=0 experts=256/256
+[E1MTPLB] layer=41 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 31 material loaded
+[E1MTPLB] stage 3 layer 41 material loaded
+[E1MTPLB] layer=32 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 32 material loaded
+[E1MTPLB] layer=42 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 42 material loaded
+[E1MTPLB] stage 2 loaded, free 7.78 GiB
+[E1MTPLB] stage 3 loaded, free 4.68 GiB
+[E1MTPLB] stage 3 lane mb0 built
+[E1MTPLB] stage 3 lane mb1 built
+[E1MTPLB] stage 2 lanes built, free 4.50 GiB
+[E1MTPLB] stage 3 lanes built, free 1.91 GiB
+[E1MTPLB] stage 3 mb0 warm done
+[E1MTPLB] stage 3 mb1 warm done
+[E1MTPLB] stage 3 warmup done, free 1.87 GiB
+[E1MTPLB] stage 2 warmup done, free 4.45 GiB
+[E1MTPLB] stage 3 settle captured mb0 a (0.1s)
+[E1MTPLB] stage 3 settle captured mb0 mtp_a (0.0s)
+[E1MTPLB] stage 3 settle captured mb0 b (0.1s)
+[E1MTPLB] stage 3 settle captured mb0 mtp_b (0.0s)
+[E1MTPLB] stage 3 settle captured mb1 a (0.1s)
+[E1MTPLB] stage 3 settle captured mb1 mtp_a (0.0s)
+[E1MTPLB] stage 3 settle captured mb1 b (0.1s)
+[E1MTPLB] stage 3 settle captured mb1 mtp_b (0.0s)
+[E1MTPLB] stage 3 segment 0: wall 70.28s, round 234.3 ms, alpha_local 0.9838932291666667
+[E1MTPLB] stage 3 segment 1: wall 70.15s, round 233.8 ms, alpha_local 0.99515625
+[E1MTPLB] stage 3 segment 2: wall 70.38s, round 234.6 ms, alpha_local 0.99671875

@@ -1,0 +1,197 @@
+{
+  "experiment": "specdec-unit-gate",
+  "torch": "2.11.0+cu130",
+  "device": "NVIDIA GeForce RTX 4090",
+  "batch": 4,
+  "start": 2048,
+  "results": [
+    {
+      "test": "t1_uniform",
+      "layer": "window",
+      "steps": 132,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "bf16",
+      "indexer_dtype": "bf16"
+    },
+    {
+      "test": "t2_protocol_pollution_invariance",
+      "layer": "window",
+      "rounds": 136,
+      "accepts_total": 351,
+      "positions_equal": true,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "bf16",
+      "indexer_dtype": "bf16"
+    },
+    {
+      "test": "t3_graph",
+      "layer": "window",
+      "rounds": 48,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "bf16",
+      "indexer_dtype": "bf16"
+    },
+    {
+      "test": "t1_uniform",
+      "layer": "ratio128",
+      "steps": 132,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "bf16",
+      "indexer_dtype": "bf16"
+    },
+    {
+      "test": "t2_protocol_pollution_invariance",
+      "layer": "ratio128",
+      "rounds": 136,
+      "accepts_total": 351,
+      "positions_equal": true,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "bf16",
+      "indexer_dtype": "bf16"
+    },
+    {
+      "test": "t3_graph",
+      "layer": "ratio128",
+      "rounds": 48,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "bf16",
+      "indexer_dtype": "bf16"
+    },
+    {
+      "test": "t1_uniform",
+      "layer": "ratio4",
+      "steps": 132,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "bf16",
+      "indexer_dtype": "bf16"
+    },
+    {
+      "test": "t2_protocol_pollution_invariance",
+      "layer": "ratio4",
+      "rounds": 136,
+      "accepts_total": 351,
+      "positions_equal": true,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "bf16",
+      "indexer_dtype": "bf16"
+    },
+    {
+      "test": "t3_graph",
+      "layer": "ratio4",
+      "rounds": 48,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "bf16",
+      "indexer_dtype": "bf16"
+    },
+    {
+      "test": "t1_uniform",
+      "layer": "window",
+      "steps": 132,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "fp8",
+      "indexer_dtype": "fp8"
+    },
+    {
+      "test": "t2_protocol_pollution_invariance",
+      "layer": "window",
+      "rounds": 136,
+      "accepts_total": 351,
+      "positions_equal": true,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "fp8",
+      "indexer_dtype": "fp8"
+    },
+    {
+      "test": "t3_graph",
+      "layer": "window",
+      "rounds": 48,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "fp8",
+      "indexer_dtype": "fp8"
+    },
+    {
+      "test": "t1_uniform",
+      "layer": "ratio128",
+      "steps": 132,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "fp8",
+      "indexer_dtype": "fp8"
+    },
+    {
+      "test": "t2_protocol_pollution_invariance",
+      "layer": "ratio128",
+      "rounds": 136,
+      "accepts_total": 351,
+      "positions_equal": true,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "fp8",
+      "indexer_dtype": "fp8"
+    },
+    {
+      "test": "t3_graph",
+      "layer": "ratio128",
+      "rounds": 48,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "fp8",
+      "indexer_dtype": "fp8"
+    },
+    {
+      "test": "t1_uniform",
+      "layer": "ratio4",
+      "steps": 132,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "fp8",
+      "indexer_dtype": "fp8"
+    },
+    {
+      "test": "t2_protocol_pollution_invariance",
+      "layer": "ratio4",
+      "rounds": 136,
+      "accepts_total": 351,
+      "positions_equal": true,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "fp8",
+      "indexer_dtype": "fp8"
+    },
+    {
+      "test": "t3_graph",
+      "layer": "ratio4",
+      "rounds": 48,
+      "final_state_equal": true,
+      "mismatches": [],
+      "accepted": true,
+      "kv_dtype": "fp8",
+      "indexer_dtype": "fp8"
+    }
+  ],
+  "accepted": true,
+  "seconds": 24.38135589612648
+}

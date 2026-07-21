@@ -1,0 +1,224 @@
+{
+  "accepted": true,
+  "caliber": {
+    "b_semantics": "dp caliber: lane m serves B_mb_global=32 distinct sequences (bl=8/GPU/lane), B_total=64",
+    "form": "chained dual-pass MTP rounds: per lane per round two single-token row-position graphs (pass A verify at positions[B], pass B draft at positions+1); accept/reject changes only per-row advance + ratio-4 shadow restore; 2 lanes x 2 passes = 4 pipeline slots; MTP block (mtp.0) as two per-lane tail-stage graphs",
+    "graph_pool": "single global pool (17th-vertical scope)",
+    "hc_backend": "eager",
+    "indexer_kv_dtype": "fp8",
+    "kv": "seeded decode residency at 2048; max_seq_len=2304 (covers worst-case 2 pos/round)",
+    "kv_dtype": "fp8"
+  },
+  "check_mode": "gate",
+  "checkpoint_id": "33fd3df002d0b44ce4fd3c95d5dd1220e9bf4e050f677314aee519da68952e91",
+  "config_tag": "mtp-largeb-chained-fp8-idxfp8",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "build": 10.715549845946953,
+    "load": 12.73102618707344,
+    "off_phase": 42.63775474112481,
+    "on_interleaved": 3.700477394973859,
+    "on_solo": 38.4747366940137,
+    "process": 114.0063082689885,
+    "warmup": 3.7977754338644445
+  },
+  "errors": [],
+  "experiment": "E1F-full-decode-throughput/mtp-largeb",
+  "gate_record": {
+    "accepted": true,
+    "judgment": "per lane: OFF eager-family solo stream (2R steps) -> ON solo chained rounds (graphs, per-pass bitwise graph-vs-eager twin incl. MTP) -> restore -> ON interleaved; per-row: ON emitted stream must be an exact prefix of the OFF stream; interleaved streams/states must equal solo (no cross-talk)",
+    "lanes": {
+      "0": {
+        "accepted": true,
+        "interleaved_positions": [
+          2079,
+          2079,
+          2079,
+          2079,
+          2106,
+          2104,
+          2092,
+          2106
+        ],
+        "positions_equal_solo_vs_interleaved": true,
+        "prefix_ok": null,
+        "records_equal_solo_vs_interleaved": null,
+        "solo_positions": [
+          2079,
+          2079,
+          2079,
+          2079,
+          2106,
+          2104,
+          2092,
+          2106
+        ],
+        "stage_trace": {
+          "first_input_mismatch": {
+            "round": 2,
+            "row": 1
+          },
+          "first_output_mismatch": {
+            "round": 2,
+            "row": 1
+          }
+        },
+        "state_equal_solo_vs_interleaved": true,
+        "twin_bitwise_slots": 64,
+        "twin_final_state_equal": true,
+        "twin_mismatched": [],
+        "twin_ok": true
+      },
+      "1": {
+        "accepted": true,
+        "interleaved_positions": [
+          2079,
+          2079,
+          2079,
+          2079,
+          2106,
+          2106,
+          2103,
+          2104
+        ],
+        "positions_equal_solo_vs_interleaved": true,
+        "prefix_ok": null,
+        "records_equal_solo_vs_interleaved": null,
+        "solo_positions": [
+          2079,
+          2079,
+          2079,
+          2079,
+          2106,
+          2106,
+          2103,
+          2104
+        ],
+        "stage_trace": {
+          "first_input_mismatch": {
+            "round": 4,
+            "row": 0
+          },
+          "first_output_mismatch": {
+            "round": 4,
+            "row": 0
+          }
+        },
+        "state_equal_solo_vs_interleaved": true,
+        "twin_bitwise_slots": 64,
+        "twin_final_state_equal": true,
+        "twin_mismatched": [],
+        "twin_ok": true
+      }
+    },
+    "off_steps": 64,
+    "rounds": 32
+  },
+  "gate_rounds": 32,
+  "global_batch": 64,
+  "host": "titan064",
+  "indexer_kv_dtype": "fp8",
+  "kv_dtype": "fp8",
+  "local_batch": 8,
+  "local_rank": 6,
+  "max_seq_len": 2304,
+  "mb_count": 2,
+  "mb_global": 32,
+  "measurement_class": "chained_mtp_interleaved_decode",
+  "memory": {
+    "after_build": {
+      "free_bytes": 9820831744,
+      "total_bytes": 25252724736
+    },
+    "after_interleaved": {
+      "free_bytes": 9468510208,
+      "total_bytes": 25252724736
+    },
+    "after_load": {
+      "free_bytes": 9971826688,
+      "total_bytes": 25252724736
+    },
+    "after_solo": {
+      "free_bytes": 9468510208,
+      "total_bytes": 25252724736
+    },
+    "after_warmup": {
+      "free_bytes": 9697099776,
+      "total_bytes": 25252724736
+    },
+    "at_end": {
+      "free_bytes": 9502064640,
+      "total_bytes": 25252724736
+    }
+  },
+  "placement": {
+    "accepted": true,
+    "stage_hosts": {
+      "0": [
+        "titan064"
+      ],
+      "1": [
+        "titan064"
+      ],
+      "2": [
+        "titan065"
+      ],
+      "3": [
+        "titan065"
+      ]
+    }
+  },
+  "positions_final": {
+    "0": [
+      2079,
+      2079,
+      2079,
+      2079,
+      2106,
+      2104,
+      2092,
+      2106
+    ],
+    "1": [
+      2079,
+      2079,
+      2079,
+      2079,
+      2106,
+      2106,
+      2103,
+      2104
+    ]
+  },
+  "rank": 6,
+  "round_results": [],
+  "rounds_per_segment": null,
+  "row_accepts": null,
+  "schema_version": 1,
+  "seed": 20260721,
+  "segments": 0,
+  "settle_rounds": null,
+  "stage": 1,
+  "start_position": 2048,
+  "stop_position": 2120,
+  "teardown": {
+    "accepted": true,
+    "errors": []
+  },
+  "torch": "2.11.0+cu130",
+  "tp_group_binding": {
+    "backend": "nccl",
+    "global_rank": 6,
+    "global_ranks": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "local_rank": 2,
+    "validated_live": true,
+    "world_size": 4
+  },
+  "tp_rank": 2,
+  "world": 16
+}

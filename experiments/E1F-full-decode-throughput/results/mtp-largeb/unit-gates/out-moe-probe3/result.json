@@ -1,0 +1,30 @@
+{
+  "experiment": "moe-composition-probe",
+  "layer": 33,
+  "ranks": [
+    {
+      "rank": 0,
+      "deterministic": true,
+      "composition_row0_equal": true,
+      "composition_row0_max_abs": 0.0,
+      "row0_scale_max_abs": 0.0015106201171875
+    },
+    {
+      "rank": 1,
+      "deterministic": true
+    },
+    {
+      "rank": 2,
+      "deterministic": true,
+      "note": "shuffle places old row0 at rank2 local1",
+      "middle_row17_equal": true,
+      "middle_row17_max_abs": 0.0,
+      "shuffle_row0_equal": false,
+      "shuffle_row0_max_abs": 1.52587890625e-05
+    },
+    {
+      "rank": 3,
+      "deterministic": true
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+W0721 00:45:00.084000 183983 torch/distributed/run.py:851] 
+W0721 00:45:00.084000 183983 torch/distributed/run.py:851] *****************************************
+W0721 00:45:00.084000 183983 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 00:45:00.084000 183983 torch/distributed/run.py:851] *****************************************
+[E1MTPLB] layer=0 rank=0 experts=256/256
+[E1MTPLB] layer=11 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 11 material loaded
+[E1MTPLB] stage 0 layer 0 material loaded
+[E1MTPLB] layer=1 rank=0 experts=256/256
+[E1MTPLB] layer=12 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 1 material loaded
+[E1MTPLB] stage 1 layer 12 material loaded
+[E1MTPLB] layer=2 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 2 material loaded
+[E1MTPLB] layer=13 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 13 material loaded
+[E1MTPLB] layer=3 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 3 material loaded
+[E1MTPLB] layer=14 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 14 material loaded
+[E1MTPLB] layer=4 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 4 material loaded
+[E1MTPLB] layer=15 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 15 material loaded
+[E1MTPLB] layer=5 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 5 material loaded
+[E1MTPLB] layer=16 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 16 material loaded
+[E1MTPLB] layer=6 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 6 material loaded
+[E1MTPLB] layer=17 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 17 material loaded
+[E1MTPLB] layer=7 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 7 material loaded
+[E1MTPLB] layer=18 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 18 material loaded
+[E1MTPLB] layer=8 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 8 material loaded
+[E1MTPLB] layer=19 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 19 material loaded
+[E1MTPLB] layer=9 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 9 material loaded
+[E1MTPLB] layer=20 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 20 material loaded
+[E1MTPLB] layer=10 rank=0 experts=256/256
+[E1MTPLB] stage 0 layer 10 material loaded
+[E1MTPLB] layer=21 rank=0 experts=256/256
+[E1MTPLB] stage 1 layer 21 material loaded
+[E1MTPLB] stage 1 loaded, free 7.79 GiB
+[E1MTPLB] stage 0 loaded, free 6.88 GiB
+[E1MTPLB] stage 0 lane mb0 built
+[E1MTPLB] stage 0 lane mb1 built
+[E1MTPLB] stage 1 lanes built, free 4.86 GiB
+[E1MTPLB] stage 0 lanes built, free 4.18 GiB
+[E1MTPLB] stage 0 mb0 warm done
+[E1MTPLB] stage 0 mb1 warm done
+[E1MTPLB] stage 1 warmup done, free 4.78 GiB
+[E1MTPLB] stage 0 warmup done, free 4.10 GiB
+[E1MTPLB] stage 0 settle captured mb0 a (0.1s)
+[E1MTPLB] stage 0 settle captured mb0 b (0.1s)
+[E1MTPLB] stage 0 settle captured mb1 a (0.1s)
+[E1MTPLB] stage 0 settle captured mb1 b (0.1s)
+[E1MTPLB] settle round 0/16
+[E1MTPLB] settle done (4s)
+[E1MTPLB] segment0 round 0/300
+[E1MTPLB] segment0 round 32/300
+[E1MTPLB] segment0 round 64/300
+[E1MTPLB] segment0 round 96/300
+[E1MTPLB] segment0 round 128/300
+[E1MTPLB] segment0 round 160/300
+[E1MTPLB] segment0 round 192/300
+[E1MTPLB] segment0 round 224/300
+[E1MTPLB] segment0 round 256/300
+[E1MTPLB] segment0 round 288/300
+[E1MTPLB] stage 0 segment 0: wall 70.28s, round 234.3 ms, alpha_local None
+[E1MTPLB] segment1 round 0/300
+[E1MTPLB] segment1 round 32/300
+[E1MTPLB] segment1 round 64/300
+[E1MTPLB] segment1 round 96/300
+[E1MTPLB] segment1 round 128/300
+[E1MTPLB] segment1 round 160/300
+[E1MTPLB] segment1 round 192/300
+[E1MTPLB] segment1 round 224/300
+[E1MTPLB] segment1 round 256/300
+[E1MTPLB] segment1 round 288/300
+[E1MTPLB] stage 0 segment 1: wall 70.15s, round 233.8 ms, alpha_local None
+[E1MTPLB] segment2 round 0/300
+[E1MTPLB] segment2 round 32/300
+[E1MTPLB] segment2 round 64/300
+[E1MTPLB] segment2 round 96/300
+[E1MTPLB] segment2 round 128/300
+[E1MTPLB] segment2 round 160/300
+[E1MTPLB] segment2 round 192/300
+[E1MTPLB] segment2 round 224/300
+[E1MTPLB] segment2 round 256/300
+[E1MTPLB] segment2 round 288/300
+[E1MTPLB] stage 0 segment 2: wall 70.38s, round 234.6 ms, alpha_local None
+[E1MTPLB] overall: PASS

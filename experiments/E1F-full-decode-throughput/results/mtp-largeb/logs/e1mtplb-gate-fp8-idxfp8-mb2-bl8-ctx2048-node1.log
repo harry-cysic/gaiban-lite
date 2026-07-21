@@ -1,0 +1,156 @@
+W0721 01:20:54.384000 157629 torch/distributed/run.py:851] 
+W0721 01:20:54.384000 157629 torch/distributed/run.py:851] *****************************************
+W0721 01:20:54.384000 157629 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 01:20:54.384000 157629 torch/distributed/run.py:851] *****************************************
+[E1MTPLB] layer=22 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 22 material loaded
+[E1MTPLB] layer=33 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 33 material loaded
+[E1MTPLB] layer=23 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 23 material loaded
+[E1MTPLB] layer=34 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 34 material loaded
+[E1MTPLB] layer=24 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 24 material loaded
+[E1MTPLB] layer=35 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 35 material loaded
+[E1MTPLB] layer=25 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 25 material loaded
+[E1MTPLB] layer=36 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 36 material loaded
+[E1MTPLB] layer=26 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 26 material loaded
+[E1MTPLB] layer=37 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 37 material loaded
+[E1MTPLB] layer=27 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 27 material loaded
+[E1MTPLB] layer=38 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 38 material loaded
+[E1MTPLB] layer=28 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 28 material loaded
+[E1MTPLB] layer=39 rank=0 experts=256/256
+[E1MTPLB] layer=29 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 29 material loaded
+[E1MTPLB] stage 3 layer 39 material loaded
+[E1MTPLB] layer=30 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 30 material loaded
+[E1MTPLB] layer=40 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 40 material loaded
+[E1MTPLB] layer=31 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 31 material loaded
+[E1MTPLB] layer=41 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 41 material loaded
+[E1MTPLB] layer=32 rank=0 experts=256/256
+[E1MTPLB] stage 2 layer 32 material loaded
+[E1MTPLB] layer=42 rank=0 experts=256/256
+[E1MTPLB] stage 3 layer 42 material loaded
+[E1MTPLB] stage 2 loaded, free 9.28 GiB
+[E1MTPLB] stage 3 loaded, free 6.35 GiB
+[E1MTPLB] stage 3 lane mb0 built
+[E1MTPLB] stage 3 lane mb1 built
+[E1MTPLB] stage 2 lanes built, free 9.30 GiB
+[E1MTPLB] stage 3 lanes built, free 6.32 GiB
+[E1MTPLB] stage 3 mb0 warm done
+[E1MTPLB] stage 3 mb1 warm done
+[E1MTPLB] stage 3 warmup done, free 6.12 GiB
+[E1MTPLB] stage 2 warmup done, free 9.06 GiB
+[E1MTPLB] off-mb0 done
+[E1MTPLB] off-mb1 done
+[E1MTPLB] stage 3 on-solo-mb0 captured mb0 a (0.1s)
+[E1MTPLB] stage 3 on-solo-mb0 captured mb0 mtp_a (0.0s)
+[E1MTPLB] stage 3 on-solo-mb0 captured mb0 b (0.1s)
+[E1MTPLB] stage 3 on-solo-mb0 captured mb0 mtp_b (0.0s)
+[E1MTPLB] on-solo-mb0 done: twin bitwise 264, mismatches 0
+[E1MTPLB] stage 3 on-solo-mb1 captured mb1 a (0.1s)
+[E1MTPLB] stage 3 on-solo-mb1 captured mb1 mtp_a (0.0s)
+[E1MTPLB] stage 3 on-solo-mb1 captured mb1 b (0.1s)
+[E1MTPLB] stage 3 on-solo-mb1 captured mb1 mtp_b (0.0s)
+[E1MTPLB] on-solo-mb1 done: twin bitwise 264, mismatches 0
+W0721 01:25:20.123000 157629 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 157719 closing signal SIGTERM
+W0721 01:25:20.125000 157629 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 157720 closing signal SIGTERM
+W0721 01:25:20.125000 157629 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 157721 closing signal SIGTERM
+W0721 01:25:20.126000 157629 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 157722 closing signal SIGTERM
+W0721 01:25:20.127000 157629 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 157723 closing signal SIGTERM
+W0721 01:25:20.127000 157629 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 157725 closing signal SIGTERM
+W0721 01:25:20.127000 157629 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 157726 closing signal SIGTERM
+E0721 01:25:20.920000 157629 torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: 1) local_rank: 5 (pid: 157724) of binary: /home/cysic/Workspace/venvs/sglang/bin/python3
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+e1mtp_largeb_bench.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-07-21_01:25:20
+  host      : titan065
+  rank      : 8 (local_rank: 0)
+  exitcode  : 1 (pid: 157719)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-07-21_01:25:20
+  host      : titan065
+  rank      : 9 (local_rank: 1)
+  exitcode  : -15 (pid: 157720)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 157720
+[3]:
+  time      : 2026-07-21_01:25:20
+  host      : titan065
+  rank      : 10 (local_rank: 2)
+  exitcode  : -15 (pid: 157721)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 157721
+[4]:
+  time      : 2026-07-21_01:25:20
+  host      : titan065
+  rank      : 11 (local_rank: 3)
+  exitcode  : -15 (pid: 157722)
+  error_file: <N/A>
+  traceback : Signal 15 (SIGTERM) received by PID 157722
+[5]:
+  time      : 2026-07-21_01:25:20
+  host      : titan065
+  rank      : 12 (local_rank: 4)
+  exitcode  : 1 (pid: 157723)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[6]:
+  time      : 2026-07-21_01:25:20
+  host      : titan065
+  rank      : 14 (local_rank: 6)
+  exitcode  : 1 (pid: 157725)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[7]:
+  time      : 2026-07-21_01:25:20
+  host      : titan065
+  rank      : 15 (local_rank: 7)
+  exitcode  : 1 (pid: 157726)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-21_01:25:20
+  host      : titan065
+  rank      : 13 (local_rank: 5)
+  exitcode  : 1 (pid: 157724)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
