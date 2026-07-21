@@ -1,0 +1,50 @@
+{
+  "tag": "qatfused",
+  "argv": {
+    "stage_root": "/home/cysic/Workspace/DeepSeek-V4-Flash",
+    "out_dir": "out-c4f-qatfused",
+    "layer": 12,
+    "chunk": 8192,
+    "max_seq_len": 16384,
+    "iters": 10,
+    "warmup": 3,
+    "seed": 20260727,
+    "variant": "qat_fused",
+    "mode": "ab",
+    "tag": "qatfused"
+  },
+  "env": {
+    "torch": "2.11.0+cu130",
+    "python": "3.12.3",
+    "device": "NVIDIA GeForce RTX 4090",
+    "hostname": "titan064",
+    "NCCL_P2P_LEVEL": "SYS",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+    "triton": "3.6.0",
+    "tilelang": "0.1.8"
+  },
+  "result": {
+    "mode": "ab",
+    "provenance": {
+      "checkpoint_id": "90b6ad27949819e9c108288f46c1b93c821e2043607c8493dcd4edbddb5405ca",
+      "layer_id": 12,
+      "block_resident_bytes": 142131800,
+      "prepared_attention_bytes": 273183488
+    },
+    "variants": [
+      "qat_fused"
+    ],
+    "chunk": 8192,
+    "bitwise_equal": true,
+    "rel_fro": 0.0,
+    "max_abs_diff": 0.0,
+    "reference_abs_max": 11.875,
+    "finite": true,
+    "state_bitwise": {
+      "compressed": true,
+      "indexer_kv": true,
+      "raw": true
+    }
+  },
+  "ok": true
+}

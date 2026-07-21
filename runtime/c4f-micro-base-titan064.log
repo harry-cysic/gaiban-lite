@@ -1,0 +1,53 @@
+{
+  "tag": "base",
+  "argv": {
+    "stage_root": "/home/cysic/Workspace/DeepSeek-V4-Flash",
+    "out_dir": "out-c4f-base",
+    "layer": 12,
+    "chunk": 8192,
+    "max_seq_len": 16384,
+    "iters": 10,
+    "warmup": 3,
+    "seed": 20260727,
+    "variant": "",
+    "mode": "micro",
+    "tag": "base"
+  },
+  "env": {
+    "torch": "2.11.0+cu130",
+    "python": "3.12.3",
+    "device": "NVIDIA GeForce RTX 4090",
+    "hostname": "titan064",
+    "NCCL_P2P_LEVEL": "SYS",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+    "triton": "3.6.0",
+    "tilelang": "0.1.8"
+  },
+  "result": {
+    "mode": "micro",
+    "chunk": 8192,
+    "results": {
+      "comp_main_fp32_ms": 1.7414280446246266,
+      "comp_main_fp32_precast_ms": 1.5243719099089503,
+      "comp_main_tf32_ms": 0.9331585606560111,
+      "comp_main_bf16_ms": 0.46021759044378996,
+      "comp_index_fp32_ms": 0.6333775818347931,
+      "comp_index_fp32_precast_ms": 0.46619900967925787,
+      "comp_index_tf32_ms": 0.24396192748099566,
+      "comp_index_bf16_ms": 0.13222801499068737,
+      "hidden_float_cast_ms": 0.23256591521203518,
+      "hadamard_ms": 13.27704347204417,
+      "fp4_quant_dequant_ms": 16.506414976902306,
+      "hadamard_matmul_ms": 1.478641526773572,
+      "wo_a_einsum_ms": 3.2426670659333467,
+      "wo_a_bmm_ms": 3.23339004535228,
+      "wo_a_blockdiag_ms": 26.399431051686406,
+      "topk512_ms": 0.6897130515426397,
+      "topk512_sorted_false_ms": 0.5375823238864541,
+      "topk512_bf16_ms": 0.397620489820838,
+      "rope_tail_ms": 0.7695225067436695,
+      "rope_tail_contiguous_ms": 0.7505865069106221
+    }
+  },
+  "ok": true
+}

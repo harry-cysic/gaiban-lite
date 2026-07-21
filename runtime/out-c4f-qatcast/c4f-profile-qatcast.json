@@ -1,0 +1,267 @@
+{
+  "tag": "qatcast",
+  "argv": {
+    "stage_root": "/home/cysic/Workspace/DeepSeek-V4-Flash",
+    "out_dir": "out-c4f-qatcast",
+    "layer": 12,
+    "chunk": 8192,
+    "max_seq_len": 16384,
+    "iters": 10,
+    "warmup": 3,
+    "seed": 20260727,
+    "variant": "qat_fused,comp_cast_hoist",
+    "mode": "profile",
+    "tag": "qatcast"
+  },
+  "env": {
+    "torch": "2.11.0+cu130",
+    "python": "3.12.3",
+    "device": "NVIDIA GeForce RTX 4090",
+    "hostname": "titan064",
+    "NCCL_P2P_LEVEL": "SYS",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+    "triton": "3.6.0",
+    "tilelang": "0.1.8"
+  },
+  "result": {
+    "mode": "profile",
+    "provenance": {
+      "checkpoint_id": "90b6ad27949819e9c108288f46c1b93c821e2043607c8493dcd4edbddb5405ca",
+      "layer_id": 12,
+      "block_resident_bytes": 142131800,
+      "prepared_attention_bytes": 273183488
+    },
+    "variants": [
+      "comp_cast_hoist",
+      "qat_fused"
+    ],
+    "chunk": 8192,
+    "layer_wall_p50_ms": 42.46099141892046,
+    "layer_wall_p50_instrumented_ms": 42.59029112290591,
+    "instrumentation_overhead": 0.003045140955607595,
+    "phase_event_sum_p50_ms": 42.51224003266543,
+    "phase_coverage": 1.0012069575399065,
+    "phases": [
+      {
+        "phase": "sparse_core",
+        "p50_ms": 15.777791976928711,
+        "share_of_layer": 0.37158322143882366,
+        "min_ms": 15.769599914550781,
+        "max_ms": 15.790271759033203
+      },
+      {
+        "phase": "wo_b",
+        "p50_ms": 3.483296036720276,
+        "share_of_layer": 0.08203520267235523,
+        "min_ms": 3.480288028717041,
+        "max_ms": 3.487744092941284
+      },
+      {
+        "phase": "q_wq_b",
+        "p50_ms": 3.341823935508728,
+        "share_of_layer": 0.0787033892482224,
+        "min_ms": 3.3372159004211426,
+        "max_ms": 3.3454079627990723
+      },
+      {
+        "phase": "wo_a_einsum",
+        "p50_ms": 3.2184319496154785,
+        "share_of_layer": 0.07579738112712454,
+        "min_ms": 3.2174079418182373,
+        "max_ms": 3.2197439670562744
+      },
+      {
+        "phase": "q_head_norm",
+        "p50_ms": 2.950208067893982,
+        "share_of_layer": 0.0694804329646288,
+        "min_ms": 2.950144052505493,
+        "max_ms": 2.9521920680999756
+      },
+      {
+        "phase": "idx_score",
+        "p50_ms": 2.4985759258270264,
+        "share_of_layer": 0.05884403171786682,
+        "min_ms": 2.4893438816070557,
+        "max_ms": 2.505728006362915
+      },
+      {
+        "phase": "comp_main_wgate_fp32",
+        "p50_ms": 1.8647040128707886,
+        "share_of_layer": 0.04391569651479884,
+        "min_ms": 1.8585599660873413,
+        "max_ms": 1.8677760362625122
+      },
+      {
+        "phase": "comp_main_wkv_fp32",
+        "p50_ms": 1.5518720149993896,
+        "share_of_layer": 0.03654818135753376,
+        "min_ms": 1.5482879877090454,
+        "max_ms": 1.5595519542694092
+      },
+      {
+        "phase": "out_rope",
+        "p50_ms": 0.9041919708251953,
+        "share_of_layer": 0.02129465046881338,
+        "min_ms": 0.9012479782104492,
+        "max_ms": 0.9082880020141602
+      },
+      {
+        "phase": "q_rope",
+        "p50_ms": 0.8929280042648315,
+        "share_of_layer": 0.02102937247637949,
+        "min_ms": 0.8908799886703491,
+        "max_ms": 0.894976019859314
+      },
+      {
+        "phase": "idx_rope",
+        "p50_ms": 0.882207989692688,
+        "share_of_layer": 0.020776905112478827,
+        "min_ms": 0.881663978099823,
+        "max_ms": 0.8826879858970642
+      },
+      {
+        "phase": "idx_wq_b",
+        "p50_ms": 0.8227840065956116,
+        "share_of_layer": 0.019377409219629813,
+        "min_ms": 0.8202239871025085,
+        "max_ms": 0.8243200182914734
+      },
+      {
+        "phase": "idx_topk",
+        "p50_ms": 0.6072319746017456,
+        "share_of_layer": 0.014300937267592045,
+        "min_ms": 0.605184018611908,
+        "max_ms": 0.6082559823989868
+      },
+      {
+        "phase": "q_wq_a_norm",
+        "p50_ms": 0.5729280114173889,
+        "share_of_layer": 0.013493043668360847,
+        "min_ms": 0.5703039765357971,
+        "max_ms": 0.5762240290641785
+      },
+      {
+        "phase": "compress_main",
+        "p50_ms": 0.49510399997234344,
+        "share_of_layer": 0.011660208191741066,
+        "min_ms": 0.4925439953804016,
+        "max_ms": 0.4976640045642853
+      },
+      {
+        "phase": "comp_index_wgate_fp32",
+        "p50_ms": 0.492031991481781,
+        "share_of_layer": 0.011587859233605493,
+        "min_ms": 0.43007999658584595,
+        "max_ms": 0.49459201097488403
+      },
+      {
+        "phase": "comp_index_wkv_fp32",
+        "p50_ms": 0.49060800671577454,
+        "share_of_layer": 0.011554322928436415,
+        "min_ms": 0.4546560049057007,
+        "max_ms": 0.49561598896980286
+      },
+      {
+        "phase": "idx_hadamard_fp4",
+        "p50_ms": 0.2836480140686035,
+        "share_of_layer": 0.006680202336071951,
+        "min_ms": 0.2826240062713623,
+        "max_ms": 0.28467199206352234
+      },
+      {
+        "phase": "kv_wkv_norm",
+        "p50_ms": 0.2682879865169525,
+        "share_of_layer": 0.006318457896331747,
+        "min_ms": 0.2672640085220337,
+        "max_ms": 0.27033600211143494
+      },
+      {
+        "phase": "compress_index",
+        "p50_ms": 0.24063999950885773,
+        "share_of_layer": 0.005667319378737574,
+        "min_ms": 0.2396160066127777,
+        "max_ms": 0.24166400730609894
+      },
+      {
+        "phase": "comp_cast_hoist",
+        "p50_ms": 0.2099200040102005,
+        "share_of_layer": 0.004943831903007826,
+        "min_ms": 0.2088959962129593,
+        "max_ms": 0.21196800470352173
+      },
+      {
+        "phase": "idx_mask_add",
+        "p50_ms": 0.17715199291706085,
+        "share_of_layer": 0.004172111554562586,
+        "min_ms": 0.17612800002098083,
+        "max_ms": 0.17817600071430206
+      },
+      {
+        "phase": "idx_weights_proj",
+        "p50_ms": 0.11161600053310394,
+        "share_of_layer": 0.002628671559547436,
+        "min_ms": 0.10956799983978271,
+        "max_ms": 0.11264000087976456
+      },
+      {
+        "phase": "kv_fp8_qdq",
+        "p50_ms": 0.09985599666833878,
+        "share_of_layer": 0.002351711378643018,
+        "min_ms": 0.09830400347709656,
+        "max_ms": 0.10035199671983719
+      },
+      {
+        "phase": "idx_mask_build",
+        "p50_ms": 0.0870399996638298,
+        "share_of_layer": 0.0020498814736823385,
+        "min_ms": 0.0870399996638298,
+        "max_ms": 0.09011200070381165
+      },
+      {
+        "phase": "idx_index_fixup",
+        "p50_ms": 0.08089599758386612,
+        "share_of_layer": 0.0019051839083488562,
+        "min_ms": 0.0798719972372055,
+        "max_ms": 0.08191999793052673
+      },
+      {
+        "phase": "window_index",
+        "p50_ms": 0.03686400130391121,
+        "share_of_layer": 0.0008681851287976462,
+        "min_ms": 0.035840000957250595,
+        "max_ms": 0.03788800165057182
+      },
+      {
+        "phase": "topk_cat",
+        "p50_ms": 0.02457600086927414,
+        "share_of_layer": 0.0005787900858650975,
+        "min_ms": 0.023552000522613525,
+        "max_ms": 0.025599999353289604
+      },
+      {
+        "phase": "kv_cat",
+        "p50_ms": 0.020479999482631683,
+        "share_of_layer": 0.0004823250423094425,
+        "min_ms": 0.01945599913597107,
+        "max_ms": 0.020479999482631683
+      },
+      {
+        "phase": "kv_rope",
+        "p50_ms": 0.01740800030529499,
+        "share_of_layer": 0.00040997630350990936,
+        "min_ms": 0.01740800030529499,
+        "max_ms": 0.018432000651955605
+      },
+      {
+        "phase": "ring_write",
+        "p50_ms": 0.008704000152647495,
+        "share_of_layer": 0.00020498815175495468,
+        "min_ms": 0.008191999979317188,
+        "max_ms": 0.009216000325977802
+      }
+    ],
+    "five_layer_projection_s": 0.2123049570946023,
+    "peak_memory_bytes": 2219751424
+  },
+  "ok": true
+}

@@ -57,6 +57,8 @@ C2F prefill additions (all default-off, decode paths untouched):
 
 from __future__ import annotations
 
+import os
+
 import torch
 import torch.nn.functional as F
 
@@ -116,11 +118,31 @@ class Ratio4FullPositionAttention:
         fuse_min_seqlen: int = 1024,
         sparse_row_block: int | None = None,
         prefill_sparse_backend: str | None = None,
+        indexer_qat_mode: str | None = None,
+        compressor_cast_mode: str | None = None,
     ) -> None:
         config.validate()
         if index_score_mode not in ("ref", "fused", "paired_gate"):
             raise Ratio4FullPositionError(
                 f"index_score_mode must be ref/fused/paired_gate, got {index_score_mode!r}"
+            )
+        resolved_qat = (
+            indexer_qat_mode
+            if indexer_qat_mode is not None
+            else (os.environ.get("DSV4_INDEXER_QAT", "").strip() or "ref")
+        )
+        if resolved_qat not in ("ref", "fused"):
+            raise Ratio4FullPositionError(
+                f"indexer_qat_mode must be ref/fused, got {resolved_qat!r}"
+            )
+        resolved_cast = (
+            compressor_cast_mode
+            if compressor_cast_mode is not None
+            else (os.environ.get("DSV4_COMPRESSOR_CAST", "").strip() or "ref")
+        )
+        if resolved_cast not in ("ref", "hoist"):
+            raise Ratio4FullPositionError(
+                f"compressor_cast_mode must be ref/hoist, got {resolved_cast!r}"
             )
         try:
             resolved_backend = resolve_prefill_sparse_backend(prefill_sparse_backend)
@@ -158,6 +180,8 @@ class Ratio4FullPositionAttention:
         self.fuse_min_seqlen = fuse_min_seqlen
         self.sparse_row_block = sparse_row_block
         self.prefill_sparse_backend = resolved_backend
+        self.indexer_qat_mode = resolved_qat
+        self.compressor_cast_mode = resolved_cast
         self.index_gate_records: list[dict] = []
         self.device = torch.device(device)
         self.freqs_cis = precompute_freqs_cis(
@@ -589,8 +613,22 @@ class Ratio4FullPositionAttention:
         return scores_ref
 
     # ------------------------------------------------------------------
+    # C4F phase instrumentation (27th vertical).  ``phase_recorder`` is a
+    # class attribute so attaching one is a per-instance opt-in and the
+    # default path pays a single attribute load + branch per mark site.  No
+    # tensor op, dtype, or ordering changes: marks only record CUDA events.
+
+    phase_recorder = None
+
+    def _mark(self, name: str) -> None:
+        recorder = self.phase_recorder
+        if recorder is not None:
+            recorder.mark(name)
+
+    # ------------------------------------------------------------------
 
     def __call__(self, hidden: torch.Tensor, *, start_pos: int) -> torch.Tensor:
+        self._mark("enter")
         cfg = self.config
         weights = self.weights
         if hidden.ndim != 3 or hidden.shape[0] != self.batch_size:
@@ -618,32 +656,62 @@ class Ratio4FullPositionAttention:
         query_lora = rms_norm(
             F.linear(hidden, weights.wq_a), weights.q_norm, eps=cfg.norm_eps
         )
+        self._mark("q_wq_a_norm")
         query = F.linear(query_lora, weights.wq_b).reshape(
             batch, seqlen, cfg.num_heads, cfg.head_dim
         )
+        self._mark("q_wq_b")
         query *= torch.rsqrt(
             query.square().mean(dim=-1, keepdim=True) + cfg.norm_eps
         )
+        self._mark("q_head_norm")
         query[..., -cfg.rope_dim:] = apply_rotary_emb(
             query[..., -cfg.rope_dim:], frequencies
         )
+        self._mark("q_rope")
 
         # raw kv path (model.py:502-506)
         raw_latent = rms_norm(
             F.linear(hidden, weights.wkv), weights.kv_norm, eps=cfg.norm_eps
         )
+        self._mark("kv_wkv_norm")
         raw_latent[..., -cfg.rope_dim:] = apply_rotary_emb(
             raw_latent[..., -cfg.rope_dim:], frequencies
         )
+        self._mark("kv_rope")
         raw_latent[..., : -cfg.rope_dim] = fp8_quant_dequant(
             raw_latent[..., : -cfg.rope_dim], group_size=64
         )
+        self._mark("kv_fp8_qdq")
 
-        # compressor projections (fp32, model.py:322-324)
-        main_projected = F.linear(hidden.float(), weights.compressor_wkv)
-        main_score = F.linear(hidden.float(), weights.compressor_wgate)
-        index_projected = F.linear(hidden.float(), weights.index_compressor_wkv)
-        index_score = F.linear(hidden.float(), weights.index_compressor_wgate)
+        # compressor projections (fp32, model.py:322-324).  27th vertical:
+        # ``hoist`` computes the BF16 -> FP32 cast once instead of four times.
+        # ``Tensor.float()`` is a pure deterministic elementwise cast, so the
+        # four GEMMs receive byte-identical inputs either way -- this is common
+        # subexpression elimination, not a numeric change.
+        hidden_fp32 = hidden.float() if self.compressor_cast_mode == "hoist" else None
+        self._mark("comp_cast_hoist")
+        main_projected = F.linear(
+            hidden.float() if hidden_fp32 is None else hidden_fp32,
+            weights.compressor_wkv,
+        )
+        self._mark("comp_main_wkv_fp32")
+        main_score = F.linear(
+            hidden.float() if hidden_fp32 is None else hidden_fp32,
+            weights.compressor_wgate,
+        )
+        self._mark("comp_main_wgate_fp32")
+        index_projected = F.linear(
+            hidden.float() if hidden_fp32 is None else hidden_fp32,
+            weights.index_compressor_wkv,
+        )
+        self._mark("comp_index_wkv_fp32")
+        index_score = F.linear(
+            hidden.float() if hidden_fp32 is None else hidden_fp32,
+            weights.index_compressor_wgate,
+        )
+        self._mark("comp_index_wgate_fp32")
+        del hidden_fp32
 
         if start_pos == 0:
             # ring keeps the last <= window rows at slots position % window
@@ -664,6 +732,7 @@ class Ratio4FullPositionAttention:
                     ring_slots,
                     ring_rows[..., -LATENT_ROPE_DIM:].contiguous(),
                 )
+            self._mark("ring_write")
             main_rows = self._prefill_compress(
                 main_projected,
                 main_score,
@@ -675,6 +744,7 @@ class Ratio4FullPositionAttention:
                 output_cache=self.compressed,
                 output_cache_rope=self.compressed_rope,
             )
+            self._mark("compress_main")
             index_rows = self._prefill_compress(
                 index_projected,
                 index_score,
@@ -685,6 +755,7 @@ class Ratio4FullPositionAttention:
                 finalizer=self._finalize_index,
                 output_cache=self.indexer_kv,
             )
+            self._mark("compress_index")
             if main_rows != index_rows:
                 raise AssertionError("main/index compressors disagree on row count")
             compressed_count = main_rows
@@ -702,6 +773,7 @@ class Ratio4FullPositionAttention:
                 ),
                 dim=1,
             )
+            self._mark("kv_cat")
         elif is_chunk:
             # ---- incremental prefill chunk [start_pos, start_pos + seqlen) ----
             # Compression first (model.py:525 runs the compressor before
@@ -832,13 +904,27 @@ class Ratio4FullPositionAttention:
         index_query = F.linear(query_lora, weights.index_wq_b).reshape(
             batch, seqlen, cfg.index_n_heads, cfg.index_head_dim
         )
+        self._mark("idx_wq_b")
         index_query[..., -cfg.rope_dim:] = apply_rotary_emb(
             index_query[..., -cfg.rope_dim:], frequencies
         )
-        index_query = fp4_quant_dequant(hadamard_transform(index_query))
+        self._mark("idx_rope")
+        # 27th vertical: this pair is 41.3% of the ratio-4 prefill layer and is
+        # bandwidth-bound (22 elementwise passes over a 268 MB FP32 working
+        # set).  ``fused`` runs the identical arithmetic in one Triton pass;
+        # it is gated as bitwise-identical, not as an approximation.  The
+        # single-token decode step keeps the eager pair unconditionally.
+        if self.indexer_qat_mode == "fused" and seqlen > 1:
+            from .ops.indexer_qat import fused_hadamard_fp4
+
+            index_query = fused_hadamard_fp4(index_query)
+        else:
+            index_query = fp4_quant_dequant(hadamard_transform(index_query))
+        self._mark("idx_hadamard_fp4")
         index_weights = F.linear(hidden, weights.index_weights_proj) * (
             cfg.index_head_dim**-0.5 * cfg.index_n_heads**-0.5
         )
+        self._mark("idx_weights_proj")
         if compressed_count > 0:
             index_kv = self.indexer_kv[:, :compressed_count]
             mask_add = None
@@ -859,6 +945,7 @@ class Ratio4FullPositionAttention:
                     >= visible.unsqueeze(1)
                 )
                 mask_add = torch.where(future, float("-inf"), 0.0)
+            self._mark("idx_mask_build")
             fuse_active = (
                 self.index_score_mode in ("fused", "paired_gate")
                 and seqlen > 1
@@ -883,17 +970,21 @@ class Ratio4FullPositionAttention:
                 scores = self._ref_index_scores(
                     index_query, index_kv, index_weights
                 )
+            self._mark("idx_score")
             if mask_add is not None:
                 # in-place add of the frozen causal mask (identical values to
                 # the previous out-of-place broadcast add)
                 scores = scores.add_(mask_add.to(scores.dtype))
+            self._mark("idx_mask_add")
             compressed_indices = scores.topk(topk_count, dim=-1).indices
+            self._mark("idx_topk")
             if visible is not None:
                 invalid = compressed_indices >= visible.view(1, seqlen, 1)
                 compressed_indices = torch.where(
                     invalid, -1 - offset, compressed_indices
                 )
             compressed_indices = (compressed_indices + offset).to(torch.int32)
+            self._mark("idx_index_fixup")
         else:
             compressed_indices = torch.empty(
                 (batch, seqlen, 0), dtype=torch.int32, device=hidden.device
@@ -914,7 +1005,9 @@ class Ratio4FullPositionAttention:
                 start_pos=start_pos,
                 device=hidden.device,
             )
+        self._mark("window_index")
         topk = torch.cat((window, compressed_indices), dim=-1).contiguous()
+        self._mark("topk_cat")
         # 21st vertical: prefill-only sparse core selection.  ``tilelang``
         # swaps in the reference kernel for multi-token (prefill / chunk)
         # calls; the single-token decode step keeps the torch core
@@ -952,9 +1045,11 @@ class Ratio4FullPositionAttention:
                 topk,
                 cfg.head_dim**-0.5,
             )
+        self._mark("sparse_core")
         output[..., -cfg.rope_dim:] = apply_rotary_emb(
             output[..., -cfg.rope_dim:], frequencies, inverse=True
         )
+        self._mark("out_rope")
         grouped = output.reshape(
             batch,
             seqlen,
@@ -967,7 +1062,9 @@ class Ratio4FullPositionAttention:
             cfg.num_heads * cfg.head_dim // cfg.o_groups,
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
+        self._mark("wo_a_einsum")
         branch = F.linear(projected.flatten(2), weights.wo_b)
+        self._mark("wo_b")
 
         self.next_position = start_pos + seqlen
         self.compressed_count = compressed_count

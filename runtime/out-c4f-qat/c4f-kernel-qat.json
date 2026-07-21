@@ -1,0 +1,108 @@
+{
+  "tag": "qat",
+  "argv": {
+    "stage_root": "/home/cysic/Workspace/DeepSeek-V4-Flash",
+    "out_dir": "out-c4f-qat",
+    "layer": 12,
+    "chunk": 8192,
+    "max_seq_len": 16384,
+    "iters": 20,
+    "warmup": 5,
+    "seed": 20260727,
+    "variant": "",
+    "mode": "kernel",
+    "tag": "qat"
+  },
+  "env": {
+    "torch": "2.11.0+cu130",
+    "python": "3.12.3",
+    "device": "NVIDIA GeForce RTX 4090",
+    "hostname": "titan064",
+    "NCCL_P2P_LEVEL": "SYS",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+    "triton": "3.6.0",
+    "tilelang": "0.1.8"
+  },
+  "result": {
+    "mode": "kernel",
+    "chunk": 8192,
+    "selfcheck": {
+      "records": [
+        {
+          "shape": [
+            1,
+            8192,
+            64,
+            128
+          ],
+          "bitwise_equal": true,
+          "mismatched_elements": 0,
+          "elements": 67108864,
+          "max_abs_diff": 0.0,
+          "reference_abs_max": 6.0
+        },
+        {
+          "shape": [
+            1,
+            1024,
+            64,
+            128
+          ],
+          "bitwise_equal": true,
+          "mismatched_elements": 0,
+          "elements": 8388608,
+          "max_abs_diff": 0.0,
+          "reference_abs_max": 6.0
+        },
+        {
+          "shape": [
+            1,
+            4096,
+            64,
+            128
+          ],
+          "bitwise_equal": true,
+          "mismatched_elements": 0,
+          "elements": 33554432,
+          "max_abs_diff": 0.0,
+          "reference_abs_max": 6.0
+        },
+        {
+          "shape": [
+            1,
+            97,
+            3,
+            128
+          ],
+          "bitwise_equal": true,
+          "mismatched_elements": 0,
+          "elements": 37248,
+          "max_abs_diff": 0.0,
+          "reference_abs_max": 4.0
+        },
+        {
+          "shape": [
+            1,
+            1,
+            64,
+            128
+          ],
+          "bitwise_equal": true,
+          "mismatched_elements": 0,
+          "elements": 8192,
+          "max_abs_diff": 0.0,
+          "reference_abs_max": 4.0
+        }
+      ],
+      "bitwise_equal": true
+    },
+    "eager_ms": 29.766823048703372,
+    "fused_ms": 0.3289574524387717,
+    "speedup": 90.48836810968379,
+    "eager_peak_bytes": 3976200192,
+    "fused_peak_bytes": 268435456,
+    "moved_bytes": 268435456,
+    "fused_effective_gbps": 816.0187708468571
+  },
+  "ok": true
+}

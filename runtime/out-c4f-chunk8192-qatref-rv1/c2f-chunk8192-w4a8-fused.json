@@ -1,0 +1,152 @@
+{
+  "allocator_backend": "native",
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "chunk": 8192,
+  "component_walls_s": {
+    "attention_ratio128": 0.15818415023386478,
+    "attention_ratio4": 0.3605199600569904,
+    "hc": 0.313154756790027,
+    "moe": 0.430846534203738,
+    "norm": 0.032166559249162674,
+    "total_instrumented": 1.295871929032728
+  },
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "driver_free_bytes_end": 2445213696,
+  "driver_total_bytes": 25252724736,
+  "errors": [],
+  "experiment": "C2F-prefill-stage-bench",
+  "fuse_min_seqlen": 1024,
+  "global_row_shapes": [
+    32768
+  ],
+  "global_rows": 32768,
+  "hc_backend": "default",
+  "host": "titan064",
+  "indexer": "fused",
+  "input_scale": 0.02,
+  "input_tok_s_per_lane": 6339.986887208522,
+  "input_tok_s_per_stage_dp4": 25359.947548834087,
+  "iters": 5,
+  "koujing": "prefill of a --chunk-long sequence, B=1/lane, 4 DP lanes with distinct sequences; --prefill-chunk 0 does it in one start_pos=0 forward (the frozen arm), >0 splits it into consecutive start_pos>0 forwards; input tok/s/stage = 4*chunk / wall of the *whole* prefill either way; host walls around torch.cuda.synchronize; eager, no CUDA graph, no PP handoff",
+  "layers": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "load_seconds": 13.363858459051698,
+  "max_memory_allocated_bytes": 21914060800,
+  "max_memory_reserved_bytes": 22013804544,
+  "measurement_class": "open_loop_single_stage_prefill",
+  "memory_allocated_bytes_after_load": 16501010432,
+  "memory_allocated_bytes_end": 16501010432,
+  "memory_reserved_bytes_end": 22013804544,
+  "moe_collective_selfcheck": {
+    "all_gather_bus_gbps": 23.873028103542342,
+    "all_gather_p50_ms": 8.433223934844136,
+    "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
+    "payload_bytes": 268435456,
+    "reduce_scatter_bus_gbps": 23.118939446476467,
+    "reduce_scatter_p50_ms": 8.708297042176127,
+    "rows_global": 32768
+  },
+  "moe_mode": "w4a8",
+  "moe_overlap": "off",
+  "moe_overlap_blocks": 4,
+  "moe_registered_global_rows": [
+    32768
+  ],
+  "moe_resident_bytes_layer0": 861931008,
+  "moe_shape_buffer_bytes": 2685220852,
+  "nccl_p2p_level": "SYS",
+  "nccl_version": "2.28.9",
+  "ok": true,
+  "per_rank_driver_free_bytes_end": [
+    2445213696,
+    2445213696,
+    2445213696,
+    2445213696
+  ],
+  "per_rank_errors": [
+    [],
+    [],
+    [],
+    []
+  ],
+  "per_rank_max_memory_allocated_bytes": [
+    21914060800,
+    21914060800,
+    21914060800,
+    21914060800
+  ],
+  "per_rank_ok": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "per_rank_prefill_peak_allocated_bytes": [
+    21914060800,
+    21914060800,
+    21914060800,
+    21914060800
+  ],
+  "pipeline16_projection_tok_s": 25359.947548834087,
+  "prefill_activation_peak_bytes": 5413050368,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "prefill_peak_allocated_bytes": 21914060800,
+  "prefill_peak_reserved_bytes": 22013804544,
+  "pytorch_cuda_alloc_conf": "expandable_segments:True",
+  "rank": 0,
+  "ref_score_row_block_unit_check": {
+    "bitwise_equal": true
+  },
+  "ring_wrap_unit_check": {
+    "1031": true,
+    "128": true,
+    "130": true,
+    "2048": true,
+    "96": true,
+    "pass": true
+  },
+  "row_block": 1024,
+  "schema_version": 1,
+  "seed": 20260721,
+  "segment_lengths": [
+    8192
+  ],
+  "segment_start_positions": [
+    0
+  ],
+  "segment_walls_s": [
+    1.2958449081052095
+  ],
+  "sliced_sparse_unit_check": {
+    "bitwise_equal": true
+  },
+  "sparse_backend": "tilelang",
+  "sparse_head_chunk": 16,
+  "stage_pass_wall_mean_s": 1.2918582854326814,
+  "stage_pass_wall_p50_s": 1.2921162371058017,
+  "stage_pass_walls_s": [
+    1.291015800088644,
+    1.2922597269061953,
+    1.2921162371058017,
+    1.2917044979985803,
+    1.2921951650641859
+  ],
+  "torch": "2.11.0+cu130",
+  "triton": "3.6.0",
+  "vllm": "0.22.1",
+  "warmup": 2,
+  "world": 4
+}
