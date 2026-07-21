@@ -99,8 +99,13 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   归因:**attention 58%**(ratio-4 41% + ratio-128 17%)、MoE 24%、HC 16% ——
   **prefill 由 attention 主导**,而 runtime 至今用 torch masked-einsum 正确性
   实现,reference 的 tilelang sparse kernel 从未接入。单池 T 投影 **1.68k**
-  (原 1.2k);够到 3.2–4.2k 带需 P≈40k,路径 = attention 换真 kernel(3× 则
-  ~27k)+ prefill HC 融合 + MoE 临时量预分配。
+  (原 1.2k)。**attention kernel 杠杆已判活**:reference tilelang `sparse_attn`
+  与 runtime torch 路径签名一致,prefill 形状实测 **6.49×**(106.1→16.4 ms,
+  显存 −55%,数值 rel_fro 1.9e-3)——折算 pass 省 ~611 ms → **~24k input tok/s
+  (+45%)**,叠 prefill HC 融合近 27k,§5.3 的 30–40k 带可及。单池 T:P=24k→2.2k、
+  P=40k→3.18k ≈ 带下沿,即 **3.2–4.2k 需 prefill 与 decode 双侧同时接近上限**。
+  下一步:接入 tilelang sparse attention(过冻结质量门)→ prefill HC 融合 →
+  chunked prefill 交错 / serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
 - **Prefill 基线与杠杆已实测**
