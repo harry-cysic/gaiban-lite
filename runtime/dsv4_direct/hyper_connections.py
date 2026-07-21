@@ -210,6 +210,9 @@ def hc_pre(
     return hidden.to(residual.dtype), post, comb
 
 
+HC_POST_CHUNK = 1024
+
+
 def hc_post(
     branch_output: torch.Tensor,
     residual: torch.Tensor,
@@ -257,6 +260,33 @@ def hc_post(
     if len(devices) != 1:
         raise ValueError("branch_output, residual, post, and comb must share a device")
 
-    residual_mix = torch.matmul(comb.float().transpose(-1, -2), residual.float())
-    branch_mix = post.float().unsqueeze(-1) * branch_output.float().unsqueeze(-2)
-    return (branch_mix + residual_mix).to(branch_output.dtype)
+    # Chunked along s.  Every operation here is batched over (b, s) and the
+    # only reduction is over the hc axis, so s is never summed across and
+    # chunking is exact, not an approximation.  Unchunked, an 8192-token
+    # prefill materialises three [b, s, hc, hidden] fp32 buffers at once
+    # (residual_mix, branch_mix, and their sum) and OOMs stage 0; the same
+    # change was already made to the reference for the golden extension.
+    if sequence <= HC_POST_CHUNK:
+        residual_mix = torch.matmul(
+            comb.float().transpose(-1, -2), residual.float()
+        )
+        branch_mix = post.float().unsqueeze(-1) * branch_output.float().unsqueeze(-2)
+        return (branch_mix + residual_mix).to(branch_output.dtype)
+
+    out = torch.empty(
+        (batch, sequence, hc_mult, hidden_size),
+        dtype=branch_output.dtype,
+        device=branch_output.device,
+    )
+    for start in range(0, sequence, HC_POST_CHUNK):
+        stop = min(start + HC_POST_CHUNK, sequence)
+        residual_mix = torch.matmul(
+            comb[:, start:stop].float().transpose(-1, -2),
+            residual[:, start:stop].float(),
+        )
+        branch_mix = (
+            post[:, start:stop].float().unsqueeze(-1)
+            * branch_output[:, start:stop].float().unsqueeze(-2)
+        )
+        out[:, start:stop] = (branch_mix + residual_mix).to(branch_output.dtype)
+    return out
