@@ -37,8 +37,13 @@ ssh "$HOST" "rm -rf $REMOTE && mkdir -p $REMOTE"
 rsync -a ../reference/inference/model.py ../reference/inference/generate.py \
   ../reference/inference/kernel.py ../reference/inference/config.json \
   "$HOST:$REMOTE/"
-rsync -a ../experiments/D0L-long-prompt-oracle/oracle_long_generate.py \
-  ../experiments/D0L-long-prompt-oracle/long_prompts.json "$HOST:$REMOTE/"
+# Overridable so an independently drawn set can be generated without editing
+# the script; defaults to the frozen v1 set.  The remote name is always
+# long_prompts.json so the generator invocation below does not have to change.
+PROMPTS=${D0L_PROMPTS:-../experiments/D0L-long-prompt-oracle/long_prompts.json}
+rsync -a ../experiments/D0L-long-prompt-oracle/oracle_long_generate.py "$HOST:$REMOTE/"
+rsync -a "$PROMPTS" "$HOST:$REMOTE/long_prompts.json"
+echo "== prompt set: $PROMPTS =="
 
 # encoding_dsv4 (the tokenizer) ships in the checkpoint tree, not with the
 # inference code, so it has to be on PYTHONPATH explicitly.

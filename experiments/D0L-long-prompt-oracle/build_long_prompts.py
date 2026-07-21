@@ -156,6 +156,56 @@ def file_md5(path: Path) -> str:
     return hashlib.md5(path.read_bytes()).hexdigest()
 
 
+# Independent draw (D0L-indep).  Same corpus, but windows disjoint from the v1
+# draw: v1 consumed the first 71,464 characters sequentially, so this set
+# starts past that mark and reads the ~79.6k characters v1 never touched.
+#
+# What this does and does not establish: it is a fresh draw of *content*, so it
+# answers "is the 3-position difference an artifact of those particular eight
+# prompts".  It is the same corpus and therefore the same domain and register,
+# so it does NOT establish cross-domain generalisation.  Do not report it as
+# the latter.
+#
+# No 8192 tier: those prompts require max_seq_len 8320, which stage 0 cannot
+# load in TP4xPP4 (D0L README, "v2 extension not gateable").  Every length here
+# fits the 4224 configuration the gate actually runs.
+#
+# 15 prompts x 64 compared positions = 960, against the frozen set's 512.
+INDEP_SPECS: tuple[tuple[int, str, str], ...] = (
+    (1024, "以下是一份工程记录的节选(可能在中途截断)。\n\n---\n\n",
+     "\n\n---\n\n请用两句话说明上文在讨论什么。"),
+    (1024, "Below is a fragment of engineering notes. It may be cut off "
+     "mid-sentence.\n\n---\n\n",
+     "\n\n---\n\nName the main subject of the text above."),
+    (1024, "阅读下面这段材料。\n\n---\n\n",
+     "\n\n---\n\n上文提到的主要困难是什么?"),
+    (1024, "The following text is an excerpt.\n\n---\n\n",
+     "\n\n---\n\nState one concrete number reported above."),
+    (1024, "以下材料可能在中途截断。\n\n---\n\n",
+     "\n\n---\n\n请指出上文的一个结论。"),
+    (1024, "Read the excerpt below.\n\n---\n\n",
+     "\n\n---\n\nWhat problem is being described?"),
+    (2048, "以下是一份实验记录的节选。\n\n---\n\n",
+     "\n\n---\n\n请概括上文的测量结果。"),
+    (2048, "Below is a longer excerpt from engineering notes.\n\n---\n\n",
+     "\n\n---\n\nSummarize what was measured above."),
+    (2048, "下面是一段较长的技术材料。\n\n---\n\n",
+     "\n\n---\n\n请说明上文中的一个取舍。"),
+    (2048, "The text below is a technical excerpt.\n\n---\n\n",
+     "\n\n---\n\nDescribe one trade-off discussed above."),
+    (2048, "阅读以下工程文档。\n\n---\n\n",
+     "\n\n---\n\n上文的主要发现是什么?"),
+    (2048, "Here is an excerpt from a report.\n\n---\n\n",
+     "\n\n---\n\nWhat conclusion does the text reach?"),
+    (4096, "以下是一份很长的工程文档节选(可能在中途截断)。\n\n---\n\n",
+     "\n\n---\n\n请用一段话概括上文。"),
+    (4096, "The following is a long excerpt from technical notes.\n\n---\n\n",
+     "\n\n---\n\nSummarize the excerpt above in one paragraph."),
+    (4096, "下面是一份长文档的节选。\n\n---\n\n",
+     "\n\n---\n\n请指出上文最重要的一项结论。"),
+)
+
+
 def build_corpus(repo_root: Path) -> tuple[str, list[dict]]:
     """Concatenate the source documents in the fixed order."""
 
@@ -189,6 +239,18 @@ def main() -> int:
     parser.add_argument("--tokenizer", type=Path, required=True)
     parser.add_argument("--encoding-dir", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument(
+        "--spec-set", choices=("v1", "indep"), default="v1",
+        help="v1 = the frozen 10-prompt set; indep = the disjoint-window draw",
+    )
+    parser.add_argument(
+        "--cursor-start", type=int, default=0,
+        help=(
+            "character offset into the corpus at which to begin taking "
+            "windows.  Use 71464 with --spec-set indep so the windows are "
+            "disjoint from the v1 draw."
+        ),
+    )
     args = parser.parse_args()
 
     sys.path.insert(0, str(args.encoding_dir.expanduser().resolve()))
@@ -207,9 +269,14 @@ def main() -> int:
             )
         )
 
+    specs = SPECS if args.spec_set == "v1" else INDEP_SPECS
     records: list[dict] = []
-    cursor = 0
-    for index, (target, header, footer) in enumerate(SPECS):
+    cursor = args.cursor_start
+    if cursor >= len(corpus):
+        raise ValueError(
+            f"--cursor-start {cursor} is past the corpus ({len(corpus)} chars)"
+        )
+    for index, (target, header, footer) in enumerate(specs):
         # Binary search the largest body character count whose templated prompt
         # is still <= target tokens.
         low, high = 0, min(len(corpus) - cursor, target * 8)
@@ -295,7 +362,7 @@ def main() -> int:
         "chat_template": "encode_messages(thinking_mode='chat')",
         "length_histogram": {
             str(target): sum(1 for r in records if r["target_tokens"] == target)
-            for target in sorted({spec[0] for spec in SPECS})
+            for target in sorted({spec[0] for spec in specs})
         },
         "prompts": records,
     }
