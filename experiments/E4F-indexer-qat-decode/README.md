@@ -90,6 +90,20 @@ eager 的 68.61 µs 与 E2F 用完全独立的两条路子得到的估算吻合
 也必须用它自己的 slot**，否则会把基线 lane 的 slot 弄脏、让基线的 capture 以
 `slot is not clean` 失败。
 
+**对照臂（`--ab-variant none`）**：两条 lane 完全相同、不施加任何处理，其余口径
+不变。这是必需的控制——两条 lane 并不完全对称（lane B 后建，张量在分配器里更
+靠后；MoE slot 区间也不同），若这份不对称本身就能移动读数，那么用这套口径测的
+**每一个**处理效应都会带同样的偏差。
+
+| 臂 | base lane | variant lane | 差 |
+|---|---:|---:|---:|
+| `none`（对照） | 7.3605 ms | 7.3595 ms | **−0.01%** |
+| `qat_fused`（处理） | 7.6489 | 7.3564 | **−3.82%** |
+
+**相差 380 倍。**lane 不对称不是解释，−3.82% 全部来自处理本身。
+（对照臂两条 lane 都读 7.36，与处理臂的 variant lane 7.3564 一致——此时默认
+已是 fused，两条都在跑融合核，这本身又是一次默认生效的旁证。）
+
 titan065，stage 0（11 层，其中 5 个 ratio-4），B=1，max_seq 3328，3 轮 ×160 步：
 
 | 项 | 值 |
@@ -208,6 +222,7 @@ D0L 长门逐位一致）且单路 +2.31%，故**默认改为 `fused`**；
 | `../../runtime/dsv4_direct/ratio4_attention.py` | `indexer_qat_mode` + `_indexer_qat()` |
 | `../../runtime/e2f_decode_phase_probe.py` | `--mode ab` 双 lane 交替重放 |
 | `results/micro/result.json` | 微基准结果 |
+| `../E2F-decode-latency-profile/results/out-e2f-abcontrol/` | 对照臂（`--ab-variant none`，−0.01%） |
 | `../E2F-decode-latency-profile/results/out-e2f-qatab/` | 层内 A/B（480 步逐位 + 交替重放计时） |
 | `results/e1f-bl1-qatfused/` | 16 卡闭环（E1F 冻结脚本 + fused env） |
 | `results/e1f-bl1-defaultfused/` | 翻默认后无 env 的验证运行（含处理组见证） |

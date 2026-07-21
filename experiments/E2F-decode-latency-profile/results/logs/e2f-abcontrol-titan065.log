@@ -58,3 +58,4 @@ W0721 10:41:50.781000 177704 torch/distributed/run.py:851] *********************
 [E2F] layer=10 rank=0 experts=256/256
 [E2F] stage 0 layer 10 material loaded
 [E2F] warmup done (17s, free 9.84 GiB)
+[E2F] A/B none: base 7.3605 variant 7.3595 delta -0.01%  bitwise 480/480
