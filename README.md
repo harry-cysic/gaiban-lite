@@ -104,8 +104,17 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   显存 −55%,数值 rel_fro 1.9e-3)——折算 pass 省 ~611 ms → **~24k input tok/s
   (+45%)**,叠 prefill HC 融合近 27k,§5.3 的 30–40k 带可及。单池 T:P=24k→2.2k、
   P=40k→3.18k ≈ 带下沿,即 **3.2–4.2k 需 prefill 与 decode 双侧同时接近上限**。
-  下一步:接入 tilelang sparse attention(过冻结质量门)→ prefill HC 融合 →
-  chunked prefill 交错 / serving。
+  **tilelang sparse attention 已接入 prefill**(仅 prefill,decode 与默认值
+  不变;三处 padding 语义差异经实测坐实并在包装层归一;head_chunk 16 为 sm89
+  上限——32 亦超限):attention 桶 **1.147→0.520 s(2.205×,省 626.6 ms,
+  与预测 611 差 2.6%)**,全部数值门通过未放宽容差,E2E **472/482**(基线
+  468/482)不劣化。
+- **新头号瓶颈 = prefill MoE 的分配器双模**:MoE 桶在快分支 0.483 s 与慢分支
+  1.36–1.38 s 间双模(2.8×,用未改动 launcher 可复现,线索 max_memory_reserved
+  20.50 vs 23.98 GiB)。代入快分支 MoE:torch 折算 16,575(与冻结 16,602 差
+  0.2%,自洽)、**tilelang 折算 24,268 ≈ 预测 24k**。attention 已降到 prefill
+  的 23.2%。下一步:修分配器双模(值 +32%,把 24k 折算变实测)→ prefill HC
+  融合 → chunked prefill 交错 / serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
 - **Prefill 基线与杠杆已实测**
