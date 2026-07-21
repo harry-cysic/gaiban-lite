@@ -6,10 +6,15 @@ the two prefill-specific levers (W4A8 Marlin MoE, D0b fused Triton indexer).
 
 Measurement口径 (stated once, used everywhere):
 
-- One "chunk" is a single-shot prefill call at start_pos=0 with sequence
-  length L (B=1 per rank).  This equals the cost of the last chunk of an
-  L-long chunked prefill (O(s^2) indexer/attention terms are at their
-  end-of-sequence size), matching gaiban D0b's "chunk" definition.
+- ``--chunk`` is the *total* prefill length L (B=1 per rank).  With the
+  default ``--prefill-chunk 0`` it is served by a single start_pos=0 forward,
+  which equals the cost of the last chunk of an L-long chunked prefill (O(s^2)
+  indexer/attention terms are at their end-of-sequence size), matching gaiban
+  D0b's "chunk" definition -- this is the frozen C2F arm.
+- 26th vertical: ``--prefill-chunk S`` instead splits L into consecutive
+  S-long forwards using the 25th vertical's incremental (start_pos > 0)
+  capability, and times the *whole* prefill.  Throughput stays 4*L / wall, so
+  the two modes are directly comparable at equal delivered tokens.
 - DP form: each TP lane feeds its own distinct B=1 sequence (per-rank seed),
   so one stage pass processes 4*L input tokens; attention runs per lane with
   full heads, MoE all-gathers 4*L rows (the runtime's native DP-attention +
@@ -527,6 +532,16 @@ def main() -> int:
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--layers", default="11-21", help="first-last inclusive")
     parser.add_argument("--chunk", type=int, required=True)
+    parser.add_argument(
+        "--prefill-chunk", type=int, default=0,
+        help="26th vertical: segment length for a *real* chunked prefill.  0 "
+        "(default) keeps the historical single whole-sequence forward at "
+        "start_pos=0, so every frozen arm is reproduced verbatim.  With a "
+        "positive value the --chunk-long prefill is split into consecutive "
+        "start_pos>0 multi-token forwards (the 25th vertical's incremental "
+        "capability); the MoE per-shape buffers are then registered on the "
+        "*segment* row counts, not the total",
+    )
     parser.add_argument("--moe-mode", choices=["w4a16", "w4a8"], default="w4a16")
     parser.add_argument("--indexer", choices=["ref", "fused"], default="ref")
     parser.add_argument("--fuse-min-seqlen", type=int, default=1024)
@@ -627,15 +642,41 @@ def main() -> int:
     global_rows = LOCAL_BATCH * chunk * EXPECTED_TP_SIZE
     marlin_input_dtype = FP8 if args.moe_mode == "w4a8" else None
 
+    # ---- 26th vertical: segmented (真分段) prefill plan -------------------
+    # ``--chunk`` is the *total* prefill length L (unchanged).  ``--prefill-
+    # chunk S`` splits it into consecutive forwards; S == 0 or S >= L keeps the
+    # single whole-sequence forward, i.e. the frozen C2F arm bit-for-bit.
+    prefill_chunk = int(args.prefill_chunk)
+    if prefill_chunk < 0 or (prefill_chunk and prefill_chunk % 128):
+        raise ValueError("--prefill-chunk must be 0 or a positive multiple of 128")
+    prefill_plan: list[tuple[int, int]] = []
+    if prefill_chunk and prefill_chunk < chunk:
+        position = 0
+        while position < chunk:
+            length = min(prefill_chunk, chunk - position)
+            prefill_plan.append((position, length))
+            position += length
+    else:
+        prefill_plan.append((0, chunk))
+    segment_lengths = [length for _position, length in prefill_plan]
+    # MoE per-shape buffer registration follows the *forward* row count.  With
+    # a single whole-sequence forward this is exactly ``(4*L,)`` -- the frozen
+    # registration -- so the control arm is unchanged.
+    global_row_shapes = tuple(
+        sorted({LOCAL_BATCH * length * EXPECTED_TP_SIZE for length in segment_lengths})
+    )
+
     result: dict[str, Any] = {
         "schema_version": 1,
         "experiment": "C2F-prefill-stage-bench",
         "measurement_class": "open_loop_single_stage_prefill",
         "koujing": (
-            "single-shot prefill at start_pos=0, B=1/lane, 4 DP lanes with "
-            "distinct sequences; input tok/s/stage = 4*chunk / stage wall; "
-            "host walls around torch.cuda.synchronize; eager, no CUDA graph, "
-            "no PP handoff"
+            "prefill of a --chunk-long sequence, B=1/lane, 4 DP lanes with "
+            "distinct sequences; --prefill-chunk 0 does it in one start_pos=0 "
+            "forward (the frozen arm), >0 splits it into consecutive "
+            "start_pos>0 forwards; input tok/s/stage = 4*chunk / wall of the "
+            "*whole* prefill either way; host walls around "
+            "torch.cuda.synchronize; eager, no CUDA graph, no PP handoff"
         ),
         "rank": rank,
         "world": world,
@@ -648,6 +689,13 @@ def main() -> int:
         "layers": list(layer_ids),
         "chunk": chunk,
         "global_rows": global_rows,
+        # 26th vertical: segmentation evidence.  ``prefill_forwards == 1`` and
+        # ``segment_lengths == [chunk]`` is the whole-sequence control arm.
+        "prefill_chunk": prefill_chunk,
+        "prefill_forwards": len(prefill_plan),
+        "segment_lengths": list(segment_lengths),
+        "segment_start_positions": [position for position, _ in prefill_plan],
+        "global_row_shapes": list(global_row_shapes),
         "moe_mode": args.moe_mode,
         "indexer": args.indexer,
         "fuse_min_seqlen": args.fuse_min_seqlen,
@@ -682,50 +730,75 @@ def main() -> int:
         # The prefill MoE bucket is ~40% NCCL even on the fast path, and the
         # SHM fallback is silent.  Measure the two MoE collectives at the real
         # shapes so every result carries its own transport evidence.
-        probe_local = torch.zeros(
-            LOCAL_BATCH * chunk, HIDDEN, dtype=torch.bfloat16, device=device
-        )
-        probe_gathered = torch.zeros(
-            global_rows, HIDDEN, dtype=torch.bfloat16, device=device
-        )
-        probe_reduced = torch.zeros_like(probe_local)
-        collective_walls = {"all_gather": [], "reduce_scatter": []}
-        for probe_iteration in range(5):
-            torch.cuda.synchronize(device)
-            dist.barrier()
-            started = time.perf_counter()
-            dist.all_gather_into_tensor(probe_gathered, probe_local, group=tp_group)
-            torch.cuda.synchronize(device)
-            if probe_iteration >= 2:
-                collective_walls["all_gather"].append(time.perf_counter() - started)
-            dist.barrier()
-            started = time.perf_counter()
-            dist.reduce_scatter_tensor(
-                probe_reduced, probe_gathered, op=dist.ReduceOp.SUM, group=tp_group
+        def collective_selfcheck(rows_global: int) -> dict[str, Any]:
+            probe_local = torch.zeros(
+                rows_global // EXPECTED_TP_SIZE,
+                HIDDEN,
+                dtype=torch.bfloat16,
+                device=device,
             )
-            torch.cuda.synchronize(device)
-            if probe_iteration >= 2:
-                collective_walls["reduce_scatter"].append(
-                    time.perf_counter() - started
+            probe_gathered = torch.zeros(
+                rows_global, HIDDEN, dtype=torch.bfloat16, device=device
+            )
+            probe_reduced = torch.zeros_like(probe_local)
+            collective_walls: dict[str, list[float]] = {
+                "all_gather": [], "reduce_scatter": []
+            }
+            for probe_iteration in range(5):
+                torch.cuda.synchronize(device)
+                dist.barrier()
+                started = time.perf_counter()
+                dist.all_gather_into_tensor(
+                    probe_gathered, probe_local, group=tp_group
                 )
-        payload = probe_gathered.numel() * probe_gathered.element_size()
-        bus_bytes = (EXPECTED_TP_SIZE - 1) / EXPECTED_TP_SIZE * payload
-        result["moe_collective_selfcheck"] = {
-            "payload_bytes": int(payload),
-            "all_gather_p50_ms": statistics.median(collective_walls["all_gather"]) * 1e3,
-            "all_gather_bus_gbps": bus_bytes
-            / statistics.median(collective_walls["all_gather"])
-            / 1e9,
-            "reduce_scatter_p50_ms": statistics.median(
-                collective_walls["reduce_scatter"]
+                torch.cuda.synchronize(device)
+                if probe_iteration >= 2:
+                    collective_walls["all_gather"].append(
+                        time.perf_counter() - started
+                    )
+                dist.barrier()
+                started = time.perf_counter()
+                dist.reduce_scatter_tensor(
+                    probe_reduced, probe_gathered, op=dist.ReduceOp.SUM,
+                    group=tp_group,
+                )
+                torch.cuda.synchronize(device)
+                if probe_iteration >= 2:
+                    collective_walls["reduce_scatter"].append(
+                        time.perf_counter() - started
+                    )
+            payload = probe_gathered.numel() * probe_gathered.element_size()
+            bus_bytes = (EXPECTED_TP_SIZE - 1) / EXPECTED_TP_SIZE * payload
+            del probe_local, probe_gathered, probe_reduced
+            return {
+                "rows_global": int(rows_global),
+                "payload_bytes": int(payload),
+                "all_gather_p50_ms": statistics.median(
+                    collective_walls["all_gather"]
+                ) * 1e3,
+                "all_gather_bus_gbps": bus_bytes
+                / statistics.median(collective_walls["all_gather"])
+                / 1e9,
+                "reduce_scatter_p50_ms": statistics.median(
+                    collective_walls["reduce_scatter"]
+                )
+                * 1e3,
+                "reduce_scatter_bus_gbps": bus_bytes
+                / statistics.median(collective_walls["reduce_scatter"])
+                / 1e9,
+                "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
+            }
+
+        # Headline self-check keeps the *total* payload so its bus numbers stay
+        # directly comparable across every arm and with the frozen runs.
+        result["moe_collective_selfcheck"] = collective_selfcheck(global_rows)
+        # 26th vertical: the segmented arm's MoE actually moves one segment per
+        # forward, so the per-segment transport efficiency is what its MoE
+        # bucket sees.  Recorded separately; never replaces the headline.
+        if len(global_row_shapes) == 1 and global_row_shapes[0] != global_rows:
+            result["moe_collective_selfcheck_segment"] = collective_selfcheck(
+                global_row_shapes[0]
             )
-            * 1e3,
-            "reduce_scatter_bus_gbps": bus_bytes
-            / statistics.median(collective_walls["reduce_scatter"])
-            / 1e9,
-            "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
-        }
-        del probe_local, probe_gathered, probe_reduced
 
         envelope_holder: list[Any] = [None]
         if rank == 0:
@@ -778,7 +851,7 @@ def main() -> int:
             device=device,
             checkpoint_id=envelope["checkpoint_id"],
             max_seq_len=max_seq_len,
-            global_row_shapes=(global_rows,),
+            global_row_shapes=global_row_shapes,
             slots_per_shape=1,
             progress_every=args.progress_every,
             progress=(lambda m: print(m, flush=True)) if rank == 0 else None,
@@ -790,6 +863,39 @@ def main() -> int:
         result["load_seconds"] = time.perf_counter() - load_started
         result["moe_resident_bytes_layer0"] = int(
             stage.materials[0].moe.resident.resident_bytes
+        )
+        # 26th vertical: measure the MoE per-shape (Marlin) buffer bytes that
+        # the registration actually costs, so the segmented arm's memory win
+        # can be split into (b) buffer registration and (a) the forward's own
+        # activations rather than being asserted.  ``share_moe_buffers=True``
+        # means one set backs all 11 layers.
+        moe_buffer_bytes = 0
+        seen_storage: set[int] = set()
+
+        def account(value: Any) -> None:
+            nonlocal moe_buffer_bytes
+            if isinstance(value, torch.Tensor):
+                storage = value.untyped_storage()
+                key = storage.data_ptr()
+                if key in seen_storage:
+                    return
+                seen_storage.add(key)
+                moe_buffer_bytes += storage.nbytes()
+            elif isinstance(value, (list, tuple)):
+                for member in value:
+                    account(member)
+            elif hasattr(value, "__dataclass_fields__"):
+                for field_name in value.__dataclass_fields__:
+                    account(getattr(value, field_name))
+
+        for buffers in stage.materials[0].moe._buffers.values():
+            account(buffers)
+        result["moe_shape_buffer_bytes"] = int(moe_buffer_bytes)
+        result["moe_registered_global_rows"] = list(
+            stage.materials[0].moe.registered_global_rows
+        )
+        result["memory_allocated_bytes_after_load"] = int(
+            torch.cuda.memory_allocated(device)
         )
         for material in stage.materials:
             if material.route_kind != "learned":
@@ -855,7 +961,48 @@ def main() -> int:
                 * args.input_scale
             ).contiguous()
 
+        def run_prefill(
+            lane: PrefillLane,
+            residual: torch.Tensor,
+            *,
+            segment_walls: list[float] | None = None,
+            **forward_kwargs: Any,
+        ) -> torch.Tensor:
+            """Drive the whole prefill, one forward per planned segment.
+
+            With the default single-element plan this is exactly the frozen
+            ``lane.forward(residual, start_pos=0)`` call.  Slicing dim 1 of the
+            contiguous ``[1, L, 4, H]`` residual yields a contiguous view (dim 0
+            is size 1), so the segmented arm pays no extra copy.  Only the last
+            segment's output is retained -- the earlier ones would have been
+            handed to the next PP stage and freed.
+            """
+
+            output: torch.Tensor | None = None
+            for position, length in prefill_plan:
+                if segment_walls is not None:
+                    torch.cuda.synchronize(device)
+                    segment_started = time.perf_counter()
+                output = lane.forward(
+                    residual[:, position : position + length],
+                    start_pos=position,
+                    **forward_kwargs,
+                )
+                if segment_walls is not None:
+                    torch.cuda.synchronize(device)
+                    segment_walls.append(time.perf_counter() - segment_started)
+            assert output is not None
+            return output
+
         # ---------------- timed prefill passes ----------------
+        # 26th vertical: isolate the *forward's own* peak from the load peak.
+        # The headline ``max_memory_allocated_bytes`` still covers the whole
+        # process (max() is restored below), so the frozen number's meaning is
+        # unchanged; this window additionally answers "what does one prefill
+        # cost on top of the resident weights", which is what segmenting bounds.
+        peak_allocated_before_timed = int(torch.cuda.max_memory_allocated(device))
+        peak_reserved_before_timed = int(torch.cuda.max_memory_reserved(device))
+        torch.cuda.reset_peak_memory_stats(device)
         walls: list[float] = []
         for iteration in range(args.warmup + args.iters):
             lane = make_lane(args.indexer)
@@ -863,7 +1010,7 @@ def main() -> int:
             torch.cuda.synchronize(device)
             dist.barrier()
             started = time.perf_counter()
-            output = lane.forward(residual, start_pos=0)
+            output = run_prefill(lane, residual)
             torch.cuda.synchronize(device)
             dist.barrier()
             wall = time.perf_counter() - started
@@ -879,6 +1026,17 @@ def main() -> int:
                 )
             del lane, residual, output
 
+        result["prefill_peak_allocated_bytes"] = int(
+            torch.cuda.max_memory_allocated(device)
+        )
+        result["prefill_peak_reserved_bytes"] = int(
+            torch.cuda.max_memory_reserved(device)
+        )
+        result["prefill_activation_peak_bytes"] = (
+            result["prefill_peak_allocated_bytes"]
+            - result["memory_allocated_bytes_after_load"]
+        )
+
         p50 = statistics.median(walls)
         result["stage_pass_walls_s"] = walls
         result["stage_pass_wall_p50_s"] = p50
@@ -891,18 +1049,21 @@ def main() -> int:
         lane = make_lane(args.indexer)
         residual = make_residual(10_000)
         component_walls: dict[str, float] = {}
+        segment_walls: list[float] = []
         torch.cuda.synchronize(device)
         dist.barrier()
         started = time.perf_counter()
-        lane.forward(
+        run_prefill(
+            lane,
             residual,
-            start_pos=0,
+            segment_walls=segment_walls,
             component_walls=component_walls,
             device=device,
         )
         torch.cuda.synchronize(device)
         component_walls["total_instrumented"] = time.perf_counter() - started
         result["component_walls_s"] = component_walls
+        result["segment_walls_s"] = segment_walls
         del lane, residual
 
         # ---------------- allocator probe pass (optional) ----------------
@@ -916,9 +1077,9 @@ def main() -> int:
                 torch.cuda.synchronize(device)
                 dist.barrier()
                 started = time.perf_counter()
-                lane.forward(
+                run_prefill(
+                    lane,
                     residual,
-                    start_pos=0,
                     component_walls=probe_walls,
                     device=device,
                     alloc_records=alloc_records,
@@ -1336,12 +1497,22 @@ def main() -> int:
             }
             del other_moe, other_resident, gate_hidden, out_this, out_other
 
-        result["max_memory_allocated_bytes"] = int(
-            torch.cuda.max_memory_allocated(device)
+        # Whole-process peaks: the timed loop reset the counters, so restore the
+        # pre-reset maxima to keep this field's frozen meaning.
+        result["max_memory_allocated_bytes"] = max(
+            peak_allocated_before_timed, int(torch.cuda.max_memory_allocated(device))
         )
-        result["max_memory_reserved_bytes"] = int(
-            torch.cuda.max_memory_reserved(device)
+        result["max_memory_reserved_bytes"] = max(
+            peak_reserved_before_timed, int(torch.cuda.max_memory_reserved(device))
         )
+        # 26th vertical: end-of-run occupancy (the C3F "收尾 free" counterpart).
+        end_free, end_total = torch.cuda.mem_get_info(device)
+        result["memory_allocated_bytes_end"] = int(
+            torch.cuda.memory_allocated(device)
+        )
+        result["memory_reserved_bytes_end"] = int(torch.cuda.memory_reserved(device))
+        result["driver_free_bytes_end"] = int(end_free)
+        result["driver_total_bytes"] = int(end_total)
         result["ok"] = True
     except Exception:
         result["ok"] = False
@@ -1356,11 +1527,22 @@ def main() -> int:
         ]
         summary["per_rank_ok"] = [entry.get("ok") for entry in gathered]
         summary["per_rank_errors"] = [entry.get("errors") for entry in gathered]
+        summary["per_rank_prefill_peak_allocated_bytes"] = [
+            entry.get("prefill_peak_allocated_bytes") for entry in gathered
+        ]
+        summary["per_rank_driver_free_bytes_end"] = [
+            entry.get("driver_free_bytes_end") for entry in gathered
+        ]
         tag = f"chunk{chunk}-{args.moe_mode}-{args.indexer}"
+        if prefill_chunk:
+            tag = f"{tag}-seg{prefill_chunk}"
         write_json(out_dir / f"c2f-{tag}.json", summary)
         print(json.dumps(
             {
                 "chunk": chunk,
+                "prefill_chunk": prefill_chunk,
+                "prefill_forwards": len(prefill_plan),
+                "segment_lengths": list(segment_lengths),
                 "moe_mode": args.moe_mode,
                 "indexer": args.indexer,
                 "wall_p50_s": summary.get("stage_pass_wall_p50_s"),

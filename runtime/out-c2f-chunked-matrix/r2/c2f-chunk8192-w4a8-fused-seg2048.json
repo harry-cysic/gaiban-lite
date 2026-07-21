@@ -1,0 +1,170 @@
+{
+  "allocator_backend": "native",
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "chunk": 8192,
+  "component_walls_s": {
+    "attention_ratio128": 0.19089089101180434,
+    "attention_ratio4": 0.3549250012729317,
+    "hc": 0.34980418626219034,
+    "moe": 0.4545901622623205,
+    "norm": 0.013959095813333988,
+    "total_instrumented": 1.3676963050384074
+  },
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "driver_free_bytes_end": 8287879168,
+  "driver_total_bytes": 25252724736,
+  "errors": [],
+  "experiment": "C2F-prefill-stage-bench",
+  "fuse_min_seqlen": 1024,
+  "global_row_shapes": [
+    8192
+  ],
+  "global_rows": 32768,
+  "hc_backend": "default",
+  "host": "titan064",
+  "indexer": "fused",
+  "input_scale": 0.02,
+  "input_tok_s_per_lane": 6133.124109605312,
+  "input_tok_s_per_stage_dp4": 24532.496438421247,
+  "iters": 5,
+  "koujing": "prefill of a --chunk-long sequence, B=1/lane, 4 DP lanes with distinct sequences; --prefill-chunk 0 does it in one start_pos=0 forward (the frozen arm), >0 splits it into consecutive start_pos>0 forwards; input tok/s/stage = 4*chunk / wall of the *whole* prefill either way; host walls around torch.cuda.synchronize; eager, no CUDA graph, no PP handoff",
+  "layers": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "load_seconds": 13.36137911095284,
+  "max_memory_allocated_bytes": 16141739008,
+  "max_memory_reserved_bytes": 16171139072,
+  "measurement_class": "open_loop_single_stage_prefill",
+  "memory_allocated_bytes_after_load": 14487145472,
+  "memory_allocated_bytes_end": 14487145472,
+  "memory_reserved_bytes_end": 16171139072,
+  "moe_collective_selfcheck": {
+    "all_gather_bus_gbps": 23.682778875871147,
+    "all_gather_p50_ms": 8.500969968736172,
+    "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
+    "payload_bytes": 268435456,
+    "reduce_scatter_bus_gbps": 23.072861397845912,
+    "reduce_scatter_p50_ms": 8.72568809427321,
+    "rows_global": 32768
+  },
+  "moe_collective_selfcheck_segment": {
+    "all_gather_bus_gbps": 22.88125716201375,
+    "all_gather_p50_ms": 2.1996889263391495,
+    "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
+    "payload_bytes": 67108864,
+    "reduce_scatter_bus_gbps": 22.6309738441972,
+    "reduce_scatter_p50_ms": 2.2240160033106804,
+    "rows_global": 8192
+  },
+  "moe_mode": "w4a8",
+  "moe_overlap": "off",
+  "moe_overlap_blocks": 4,
+  "moe_registered_global_rows": [
+    8192
+  ],
+  "moe_resident_bytes_layer0": 861931008,
+  "moe_shape_buffer_bytes": 671355892,
+  "nccl_p2p_level": "SYS",
+  "nccl_version": "2.28.9",
+  "ok": true,
+  "per_rank_driver_free_bytes_end": [
+    8287879168,
+    8287879168,
+    8287879168,
+    8287879168
+  ],
+  "per_rank_errors": [
+    [],
+    [],
+    [],
+    []
+  ],
+  "per_rank_max_memory_allocated_bytes": [
+    16141739008,
+    16141739008,
+    16141739008,
+    16141739008
+  ],
+  "per_rank_ok": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "per_rank_prefill_peak_allocated_bytes": [
+    16141739008,
+    16141739008,
+    16141739008,
+    16141739008
+  ],
+  "pipeline16_projection_tok_s": 24532.496438421247,
+  "prefill_activation_peak_bytes": 1654593536,
+  "prefill_chunk": 2048,
+  "prefill_forwards": 4,
+  "prefill_peak_allocated_bytes": 16141739008,
+  "prefill_peak_reserved_bytes": 16171139072,
+  "pytorch_cuda_alloc_conf": "expandable_segments:True",
+  "rank": 0,
+  "ref_score_row_block_unit_check": {
+    "bitwise_equal": true
+  },
+  "ring_wrap_unit_check": {
+    "1031": true,
+    "128": true,
+    "130": true,
+    "2048": true,
+    "96": true,
+    "pass": true
+  },
+  "row_block": 1024,
+  "schema_version": 1,
+  "seed": 20260721,
+  "segment_lengths": [
+    2048,
+    2048,
+    2048,
+    2048
+  ],
+  "segment_start_positions": [
+    0,
+    2048,
+    4096,
+    6144
+  ],
+  "segment_walls_s": [
+    0.34026787080802023,
+    0.3415606308262795,
+    0.34248240594752133,
+    0.34334492799825966
+  ],
+  "sliced_sparse_unit_check": {
+    "bitwise_equal": true
+  },
+  "sparse_backend": "tilelang",
+  "sparse_head_chunk": 16,
+  "stage_pass_wall_mean_s": 1.3359404230024665,
+  "stage_pass_wall_p50_s": 1.3356977379880846,
+  "stage_pass_walls_s": [
+    1.335572425974533,
+    1.3355711351614445,
+    1.3360311018768698,
+    1.3356977379880846,
+    1.336829714011401
+  ],
+  "torch": "2.11.0+cu130",
+  "triton": "3.6.0",
+  "vllm": "0.22.1",
+  "warmup": 2,
+  "world": 4
+}

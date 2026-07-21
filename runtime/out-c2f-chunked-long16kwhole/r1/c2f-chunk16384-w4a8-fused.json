@@ -1,0 +1,130 @@
+{
+  "allocator_backend": "native",
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "chunk": 16384,
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [
+    "Traceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 1013, in main\n    output = run_prefill(lane, residual)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 986, in run_prefill\n    output = lane.forward(\n             ^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 319, in forward\n    residual = timed(\n               ^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 216, in timed\n    return fn()\n           ^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 320, in <lambda>\n    \"hc\", lambda: hc_post(moe_output, residual, post, comb)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/hyper_connections.py\", line 262, in hc_post\n    return (branch_mix + residual_mix).to(branch_output.dtype)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 401.94 MiB is free. Including non-PyTorch memory, this process has 23.12 GiB memory in use. Of the allocated memory 22.32 GiB is allocated by PyTorch, and 70.86 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n"
+  ],
+  "experiment": "C2F-prefill-stage-bench",
+  "fuse_min_seqlen": 1024,
+  "global_row_shapes": [
+    65536
+  ],
+  "global_rows": 65536,
+  "hc_backend": "default",
+  "host": "titan064",
+  "indexer": "fused",
+  "input_scale": 0.02,
+  "iters": 5,
+  "koujing": "prefill of a --chunk-long sequence, B=1/lane, 4 DP lanes with distinct sequences; --prefill-chunk 0 does it in one start_pos=0 forward (the frozen arm), >0 splits it into consecutive start_pos>0 forwards; input tok/s/stage = 4*chunk / wall of the *whole* prefill either way; host walls around torch.cuda.synchronize; eager, no CUDA graph, no PP handoff",
+  "layers": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "load_seconds": 13.236699720146134,
+  "measurement_class": "open_loop_single_stage_prefill",
+  "memory_allocated_bytes_after_load": 19186163712,
+  "moe_collective_selfcheck": {
+    "all_gather_bus_gbps": 23.29740022392987,
+    "all_gather_p50_ms": 17.28318096138537,
+    "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
+    "payload_bytes": 536870912,
+    "reduce_scatter_bus_gbps": 23.091585914856925,
+    "reduce_scatter_p50_ms": 17.437225207686424,
+    "rows_global": 65536
+  },
+  "moe_mode": "w4a8",
+  "moe_overlap": "off",
+  "moe_overlap_blocks": 4,
+  "moe_registered_global_rows": [
+    65536
+  ],
+  "moe_resident_bytes_layer0": 861931008,
+  "moe_shape_buffer_bytes": 5370374132,
+  "nccl_p2p_level": "SYS",
+  "nccl_version": "2.28.9",
+  "ok": false,
+  "per_rank_driver_free_bytes_end": [
+    null,
+    null,
+    null,
+    null
+  ],
+  "per_rank_errors": [
+    [
+      "Traceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 1013, in main\n    output = run_prefill(lane, residual)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 986, in run_prefill\n    output = lane.forward(\n             ^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 319, in forward\n    residual = timed(\n               ^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 216, in timed\n    return fn()\n           ^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 320, in <lambda>\n    \"hc\", lambda: hc_post(moe_output, residual, post, comb)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/hyper_connections.py\", line 262, in hc_post\n    return (branch_mix + residual_mix).to(branch_output.dtype)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 401.94 MiB is free. Including non-PyTorch memory, this process has 23.12 GiB memory in use. Of the allocated memory 22.32 GiB is allocated by PyTorch, and 70.86 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n"
+    ],
+    [
+      "Traceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 1013, in main\n    output = run_prefill(lane, residual)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 986, in run_prefill\n    output = lane.forward(\n             ^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 319, in forward\n    residual = timed(\n               ^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 216, in timed\n    return fn()\n           ^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 320, in <lambda>\n    \"hc\", lambda: hc_post(moe_output, residual, post, comb)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/hyper_connections.py\", line 262, in hc_post\n    return (branch_mix + residual_mix).to(branch_output.dtype)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 1 has a total capacity of 23.52 GiB of which 401.94 MiB is free. Including non-PyTorch memory, this process has 23.12 GiB memory in use. Of the allocated memory 22.32 GiB is allocated by PyTorch, and 70.86 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n"
+    ],
+    [
+      "Traceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 1013, in main\n    output = run_prefill(lane, residual)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 986, in run_prefill\n    output = lane.forward(\n             ^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 319, in forward\n    residual = timed(\n               ^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 216, in timed\n    return fn()\n           ^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 320, in <lambda>\n    \"hc\", lambda: hc_post(moe_output, residual, post, comb)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/hyper_connections.py\", line 262, in hc_post\n    return (branch_mix + residual_mix).to(branch_output.dtype)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 2 has a total capacity of 23.52 GiB of which 401.94 MiB is free. Including non-PyTorch memory, this process has 23.12 GiB memory in use. Of the allocated memory 22.32 GiB is allocated by PyTorch, and 70.86 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n"
+    ],
+    [
+      "Traceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 1013, in main\n    output = run_prefill(lane, residual)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 986, in run_prefill\n    output = lane.forward(\n             ^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 319, in forward\n    residual = timed(\n               ^^^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 216, in timed\n    return fn()\n           ^^^^\n  File \"/home/cysic/e0f-runtime/c2f_prefill_stage_bench.py\", line 320, in <lambda>\n    \"hc\", lambda: hc_post(moe_output, residual, post, comb)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/hyper_connections.py\", line 262, in hc_post\n    return (branch_mix + residual_mix).to(branch_output.dtype)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 3 has a total capacity of 23.52 GiB of which 401.94 MiB is free. Including non-PyTorch memory, this process has 23.12 GiB memory in use. Of the allocated memory 22.32 GiB is allocated by PyTorch, and 70.86 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n"
+    ]
+  ],
+  "per_rank_max_memory_allocated_bytes": [
+    null,
+    null,
+    null,
+    null
+  ],
+  "per_rank_ok": [
+    false,
+    false,
+    false,
+    false
+  ],
+  "per_rank_prefill_peak_allocated_bytes": [
+    null,
+    null,
+    null,
+    null
+  ],
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "pytorch_cuda_alloc_conf": "expandable_segments:True",
+  "rank": 0,
+  "ref_score_row_block_unit_check": {
+    "bitwise_equal": true
+  },
+  "ring_wrap_unit_check": {
+    "1031": true,
+    "128": true,
+    "130": true,
+    "2048": true,
+    "96": true,
+    "pass": true
+  },
+  "row_block": 1024,
+  "schema_version": 1,
+  "seed": 20260721,
+  "segment_lengths": [
+    16384
+  ],
+  "segment_start_positions": [
+    0
+  ],
+  "sliced_sparse_unit_check": {
+    "bitwise_equal": true
+  },
+  "sparse_backend": "tilelang",
+  "sparse_head_chunk": 16,
+  "torch": "2.11.0+cu130",
+  "triton": "3.6.0",
+  "vllm": "0.22.1",
+  "warmup": 2,
+  "world": 4
+}

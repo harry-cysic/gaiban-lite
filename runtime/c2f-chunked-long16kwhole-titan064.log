@@ -1,0 +1,113 @@
+PYTORCH_CUDA_ALLOC_CONF=[expandable_segments:True] NCCL_P2P_LEVEL=[SYS]
+===== round 1 total=16384 seg=0 =====
+W0721 07:30:48.272000 229481 torch/distributed/run.py:851] 
+W0721 07:30:48.272000 229481 torch/distributed/run.py:851] *****************************************
+W0721 07:30:48.272000 229481 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:30:48.272000 229481 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+{
+  "chunk": 16384,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    16384
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": null,
+  "input_tok_s_per_stage_dp4": null,
+  "ok": [
+    false,
+    false,
+    false,
+    false
+  ]
+}
+W0721 07:31:11.307000 229481 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 229573 closing signal SIGTERM
+W0721 07:31:11.309000 229481 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 229574 closing signal SIGTERM
+W0721 07:31:11.309000 229481 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 229575 closing signal SIGTERM
+E0721 07:31:11.837000 229481 torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: 1) local_rank: 3 (pid: 229576) of binary: /home/cysic/Workspace/venvs/sglang/bin/python3
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+c2f_prefill_stage_bench.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-07-21_07:31:11
+  host      : titan064
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 229573)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-07-21_07:31:11
+  host      : titan064
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 229574)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2026-07-21_07:31:11
+  host      : titan064
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 229575)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-21_07:31:11
+  host      : titan064
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 229576)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

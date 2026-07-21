@@ -1,0 +1,1750 @@
+PYTORCH_CUDA_ALLOC_CONF=[expandable_segments:True] NCCL_P2P_LEVEL=[SYS]
+===== round 1 total=8192 seg=0 =====
+W0721 07:06:59.434000 222388 torch/distributed/run.py:851] 
+W0721 07:06:59.434000 222388 torch/distributed/run.py:851] *****************************************
+W0721 07:06:59.434000 222388 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:06:59.434000 222388 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5204.9 ms
+iter 1 (warmup): 1291.2 ms
+iter 2 (timed): 1293.1 ms
+iter 3 (timed): 1295.0 ms
+iter 4 (timed): 1293.1 ms
+iter 5 (timed): 1295.6 ms
+iter 6 (timed): 1292.3 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    8192
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.2931217630393803,
+  "input_tok_s_per_stage_dp4": 25340.227762450933,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 1 total=8192 seg=1024 =====
+W0721 07:07:35.349000 222581 torch/distributed/run.py:851] 
+W0721 07:07:35.349000 222581 torch/distributed/run.py:851] *****************************************
+W0721 07:07:35.349000 222581 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:07:35.349000 222581 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5289.9 ms
+iter 1 (warmup): 1347.9 ms
+iter 2 (timed): 1351.2 ms
+iter 3 (timed): 1352.7 ms
+iter 4 (timed): 1348.6 ms
+iter 5 (timed): 1347.0 ms
+iter 6 (timed): 1347.1 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 1024,
+  "prefill_forwards": 8,
+  "segment_lengths": [
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.348572479793802,
+  "input_tok_s_per_stage_dp4": 24298.28614403451,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 1 total=8192 seg=2048 =====
+W0721 07:08:12.313000 222774 torch/distributed/run.py:851] 
+W0721 07:08:12.313000 222774 torch/distributed/run.py:851] *****************************************
+W0721 07:08:12.313000 222774 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:08:12.313000 222774 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5157.1 ms
+iter 1 (warmup): 1333.2 ms
+iter 2 (timed): 1332.3 ms
+iter 3 (timed): 1333.1 ms
+iter 4 (timed): 1333.5 ms
+iter 5 (timed): 1334.2 ms
+iter 6 (timed): 1334.5 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 2048,
+  "prefill_forwards": 4,
+  "segment_lengths": [
+    2048,
+    2048,
+    2048,
+    2048
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.3334767241030931,
+  "input_tok_s_per_stage_dp4": 24573.357305535283,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 1 total=8192 seg=4096 =====
+W0721 07:08:48.321000 222973 torch/distributed/run.py:851] 
+W0721 07:08:48.321000 222973 torch/distributed/run.py:851] *****************************************
+W0721 07:08:48.321000 222973 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:08:48.321000 222973 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5227.5 ms
+iter 1 (warmup): 1305.3 ms
+iter 2 (timed): 1305.9 ms
+iter 3 (timed): 1306.6 ms
+iter 4 (timed): 1307.2 ms
+iter 5 (timed): 1307.5 ms
+iter 6 (timed): 1307.6 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 4096,
+  "prefill_forwards": 2,
+  "segment_lengths": [
+    4096,
+    4096
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.3071640469133854,
+  "input_tok_s_per_stage_dp4": 25068.008929235228,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 1 total=4096 seg=0 =====
+W0721 07:09:24.627000 223167 torch/distributed/run.py:851] 
+W0721 07:09:24.627000 223167 torch/distributed/run.py:851] *****************************************
+W0721 07:09:24.627000 223167 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:09:24.627000 223167 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4529.1 ms
+iter 1 (warmup): 652.1 ms
+iter 2 (timed): 651.0 ms
+iter 3 (timed): 651.6 ms
+iter 4 (timed): 651.3 ms
+iter 5 (timed): 651.6 ms
+iter 6 (timed): 651.0 ms
+{
+  "chunk": 4096,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    4096
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.6512939119711518,
+  "input_tok_s_per_stage_dp4": 25156.077308343865,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 1 total=4096 seg=1024 =====
+W0721 07:09:55.389000 223363 torch/distributed/run.py:851] 
+W0721 07:09:55.389000 223363 torch/distributed/run.py:851] *****************************************
+W0721 07:09:55.389000 223363 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:09:55.389000 223363 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4553.4 ms
+iter 1 (warmup): 670.6 ms
+iter 2 (timed): 671.7 ms
+iter 3 (timed): 672.3 ms
+iter 4 (timed): 675.1 ms
+iter 5 (timed): 672.7 ms
+iter 6 (timed): 673.3 ms
+{
+  "chunk": 4096,
+  "prefill_chunk": 1024,
+  "prefill_forwards": 4,
+  "segment_lengths": [
+    1024,
+    1024,
+    1024,
+    1024
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.672722714021802,
+  "input_tok_s_per_stage_dp4": 24354.759633504837,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 1 total=4096 seg=2048 =====
+W0721 07:10:26.639000 223556 torch/distributed/run.py:851] 
+W0721 07:10:26.639000 223556 torch/distributed/run.py:851] *****************************************
+W0721 07:10:26.639000 223556 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:10:26.639000 223556 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4587.4 ms
+iter 1 (warmup): 671.8 ms
+iter 2 (timed): 664.5 ms
+iter 3 (timed): 666.4 ms
+iter 4 (timed): 665.3 ms
+iter 5 (timed): 666.3 ms
+iter 6 (timed): 665.4 ms
+{
+  "chunk": 4096,
+  "prefill_chunk": 2048,
+  "prefill_forwards": 2,
+  "segment_lengths": [
+    2048,
+    2048
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.6653544811997563,
+  "input_tok_s_per_stage_dp4": 24624.46780317259,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 1 total=2048 seg=0 =====
+W0721 07:10:57.521000 223749 torch/distributed/run.py:851] 
+W0721 07:10:57.521000 223749 torch/distributed/run.py:851] *****************************************
+W0721 07:10:57.521000 223749 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:10:57.521000 223749 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4203.2 ms
+iter 1 (warmup): 331.3 ms
+iter 2 (timed): 331.4 ms
+iter 3 (timed): 334.9 ms
+iter 4 (timed): 331.5 ms
+iter 5 (timed): 332.0 ms
+iter 6 (timed): 332.1 ms
+{
+  "chunk": 2048,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    2048
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.332023044815287,
+  "input_tok_s_per_stage_dp4": 24672.986191538064,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 1 total=2048 seg=1024 =====
+W0721 07:11:25.915000 223948 torch/distributed/run.py:851] 
+W0721 07:11:25.915000 223948 torch/distributed/run.py:851] *****************************************
+W0721 07:11:25.915000 223948 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:11:25.915000 223948 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4164.3 ms
+iter 1 (warmup): 333.3 ms
+iter 2 (timed): 334.0 ms
+iter 3 (timed): 333.5 ms
+iter 4 (timed): 333.7 ms
+iter 5 (timed): 333.9 ms
+iter 6 (timed): 334.2 ms
+{
+  "chunk": 2048,
+  "prefill_chunk": 1024,
+  "prefill_forwards": 2,
+  "segment_lengths": [
+    1024,
+    1024
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.3339117029681802,
+  "input_tok_s_per_stage_dp4": 24533.43182398327,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 2 total=8192 seg=0 =====
+W0721 07:11:54.089000 224145 torch/distributed/run.py:851] 
+W0721 07:11:54.089000 224145 torch/distributed/run.py:851] *****************************************
+W0721 07:11:54.089000 224145 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:11:54.089000 224145 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5182.2 ms
+iter 1 (warmup): 1294.1 ms
+iter 2 (timed): 1294.2 ms
+iter 3 (timed): 1294.9 ms
+iter 4 (timed): 1295.1 ms
+iter 5 (timed): 1295.8 ms
+iter 6 (timed): 1297.0 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    8192
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.295115047134459,
+  "input_tok_s_per_stage_dp4": 25301.227155457505,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 2 total=8192 seg=1024 =====
+W0721 07:12:30.720000 224344 torch/distributed/run.py:851] 
+W0721 07:12:30.720000 224344 torch/distributed/run.py:851] *****************************************
+W0721 07:12:30.720000 224344 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:12:30.720000 224344 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5214.9 ms
+iter 1 (warmup): 1348.4 ms
+iter 2 (timed): 1353.4 ms
+iter 3 (timed): 1351.3 ms
+iter 4 (timed): 1352.5 ms
+iter 5 (timed): 1354.1 ms
+iter 6 (timed): 1351.7 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 1024,
+  "prefill_forwards": 8,
+  "segment_lengths": [
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.3525295399595052,
+  "input_tok_s_per_stage_dp4": 24227.197286190938,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 2 total=8192 seg=2048 =====
+W0721 07:13:08.008000 224540 torch/distributed/run.py:851] 
+W0721 07:13:08.008000 224540 torch/distributed/run.py:851] *****************************************
+W0721 07:13:08.008000 224540 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:13:08.008000 224540 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5102.6 ms
+iter 1 (warmup): 1338.1 ms
+iter 2 (timed): 1335.6 ms
+iter 3 (timed): 1335.6 ms
+iter 4 (timed): 1336.0 ms
+iter 5 (timed): 1335.7 ms
+iter 6 (timed): 1336.8 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 2048,
+  "prefill_forwards": 4,
+  "segment_lengths": [
+    2048,
+    2048,
+    2048,
+    2048
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.3356977379880846,
+  "input_tok_s_per_stage_dp4": 24532.496438421247,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 2 total=8192 seg=4096 =====
+W0721 07:13:44.363000 224739 torch/distributed/run.py:851] 
+W0721 07:13:44.363000 224739 torch/distributed/run.py:851] *****************************************
+W0721 07:13:44.363000 224739 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:13:44.363000 224739 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5235.3 ms
+iter 1 (warmup): 1307.2 ms
+iter 2 (timed): 1307.7 ms
+iter 3 (timed): 1308.5 ms
+iter 4 (timed): 1308.0 ms
+iter 5 (timed): 1308.8 ms
+iter 6 (timed): 1309.1 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 4096,
+  "prefill_forwards": 2,
+  "segment_lengths": [
+    4096,
+    4096
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.3084723378997296,
+  "input_tok_s_per_stage_dp4": 25042.9443946801,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 2 total=4096 seg=0 =====
+W0721 07:14:20.201000 224935 torch/distributed/run.py:851] 
+W0721 07:14:20.201000 224935 torch/distributed/run.py:851] *****************************************
+W0721 07:14:20.201000 224935 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:14:20.201000 224935 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4606.6 ms
+iter 1 (warmup): 651.9 ms
+iter 2 (timed): 651.5 ms
+iter 3 (timed): 654.3 ms
+iter 4 (timed): 651.8 ms
+iter 5 (timed): 651.9 ms
+iter 6 (timed): 652.3 ms
+{
+  "chunk": 4096,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    4096
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.6519191518891603,
+  "input_tok_s_per_stage_dp4": 25131.950721990168,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 2 total=4096 seg=1024 =====
+W0721 07:14:50.894000 225131 torch/distributed/run.py:851] 
+W0721 07:14:50.894000 225131 torch/distributed/run.py:851] *****************************************
+W0721 07:14:50.894000 225131 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:14:50.894000 225131 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4493.0 ms
+iter 1 (warmup): 670.6 ms
+iter 2 (timed): 671.2 ms
+iter 3 (timed): 671.4 ms
+iter 4 (timed): 671.8 ms
+iter 5 (timed): 671.0 ms
+iter 6 (timed): 672.4 ms
+{
+  "chunk": 4096,
+  "prefill_chunk": 1024,
+  "prefill_forwards": 4,
+  "segment_lengths": [
+    1024,
+    1024,
+    1024,
+    1024
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.6714075920172036,
+  "input_tok_s_per_stage_dp4": 24402.464605404984,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 2 total=4096 seg=2048 =====
+W0721 07:15:22.025000 225327 torch/distributed/run.py:851] 
+W0721 07:15:22.025000 225327 torch/distributed/run.py:851] *****************************************
+W0721 07:15:22.025000 225327 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:15:22.025000 225327 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4431.7 ms
+iter 1 (warmup): 665.6 ms
+iter 2 (timed): 665.2 ms
+iter 3 (timed): 665.3 ms
+iter 4 (timed): 665.6 ms
+iter 5 (timed): 665.3 ms
+iter 6 (timed): 665.8 ms
+{
+  "chunk": 4096,
+  "prefill_chunk": 2048,
+  "prefill_forwards": 2,
+  "segment_lengths": [
+    2048,
+    2048
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.665329233976081,
+  "input_tok_s_per_stage_dp4": 24625.402226935686,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 2 total=2048 seg=0 =====
+W0721 07:15:52.271000 225523 torch/distributed/run.py:851] 
+W0721 07:15:52.271000 225523 torch/distributed/run.py:851] *****************************************
+W0721 07:15:52.271000 225523 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:15:52.271000 225523 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4181.6 ms
+iter 1 (warmup): 331.4 ms
+iter 2 (timed): 331.7 ms
+iter 3 (timed): 331.4 ms
+iter 4 (timed): 331.4 ms
+iter 5 (timed): 331.5 ms
+iter 6 (timed): 331.7 ms
+{
+  "chunk": 2048,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    2048
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.3315321300178766,
+  "input_tok_s_per_stage_dp4": 24709.520611345502,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 2 total=2048 seg=1024 =====
+W0721 07:16:19.965000 225719 torch/distributed/run.py:851] 
+W0721 07:16:19.965000 225719 torch/distributed/run.py:851] *****************************************
+W0721 07:16:19.965000 225719 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:16:19.965000 225719 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4239.7 ms
+iter 1 (warmup): 333.5 ms
+iter 2 (timed): 333.6 ms
+iter 3 (timed): 333.5 ms
+iter 4 (timed): 333.7 ms
+iter 5 (timed): 335.2 ms
+iter 6 (timed): 336.2 ms
+{
+  "chunk": 2048,
+  "prefill_chunk": 1024,
+  "prefill_forwards": 2,
+  "segment_lengths": [
+    1024,
+    1024
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.33372804592363536,
+  "input_tok_s_per_stage_dp4": 24546.933049416282,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 3 total=8192 seg=0 =====
+W0721 07:16:48.903000 225915 torch/distributed/run.py:851] 
+W0721 07:16:48.903000 225915 torch/distributed/run.py:851] *****************************************
+W0721 07:16:48.903000 225915 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:16:48.903000 225915 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5174.9 ms
+iter 1 (warmup): 1294.3 ms
+iter 2 (timed): 1298.1 ms
+iter 3 (timed): 1294.9 ms
+iter 4 (timed): 1295.6 ms
+iter 5 (timed): 1297.4 ms
+iter 6 (timed): 1296.2 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    8192
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.296160391997546,
+  "input_tok_s_per_stage_dp4": 25280.821881542295,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 3 total=8192 seg=1024 =====
+W0721 07:17:24.884000 226111 torch/distributed/run.py:851] 
+W0721 07:17:24.884000 226111 torch/distributed/run.py:851] *****************************************
+W0721 07:17:24.884000 226111 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:17:24.884000 226111 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5093.0 ms
+iter 1 (warmup): 1352.3 ms
+iter 2 (timed): 1352.5 ms
+iter 3 (timed): 1351.2 ms
+iter 4 (timed): 1352.0 ms
+iter 5 (timed): 1353.5 ms
+iter 6 (timed): 1356.0 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 1024,
+  "prefill_forwards": 8,
+  "segment_lengths": [
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.352519806008786,
+  "input_tok_s_per_stage_dp4": 24227.371646923697,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 3 total=8192 seg=2048 =====
+W0721 07:18:01.081000 226307 torch/distributed/run.py:851] 
+W0721 07:18:01.081000 226307 torch/distributed/run.py:851] *****************************************
+W0721 07:18:01.081000 226307 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:18:01.081000 226307 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5213.4 ms
+iter 1 (warmup): 1338.1 ms
+iter 2 (timed): 1333.8 ms
+iter 3 (timed): 1335.9 ms
+iter 4 (timed): 1334.8 ms
+iter 5 (timed): 1334.8 ms
+iter 6 (timed): 1336.6 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 2048,
+  "prefill_forwards": 4,
+  "segment_lengths": [
+    2048,
+    2048,
+    2048,
+    2048
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.334822239819914,
+  "input_tok_s_per_stage_dp4": 24548.58708708723,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 3 total=8192 seg=4096 =====
+W0721 07:18:37.500000 226503 torch/distributed/run.py:851] 
+W0721 07:18:37.500000 226503 torch/distributed/run.py:851] *****************************************
+W0721 07:18:37.500000 226503 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:18:37.500000 226503 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 5081.6 ms
+iter 1 (warmup): 1308.5 ms
+iter 2 (timed): 1308.0 ms
+iter 3 (timed): 1308.9 ms
+iter 4 (timed): 1308.4 ms
+iter 5 (timed): 1309.1 ms
+iter 6 (timed): 1311.7 ms
+{
+  "chunk": 8192,
+  "prefill_chunk": 4096,
+  "prefill_forwards": 2,
+  "segment_lengths": [
+    4096,
+    4096
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 1.308910716092214,
+  "input_tok_s_per_stage_dp4": 25034.557053539673,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 3 total=4096 seg=0 =====
+W0721 07:19:13.465000 226699 torch/distributed/run.py:851] 
+W0721 07:19:13.465000 226699 torch/distributed/run.py:851] *****************************************
+W0721 07:19:13.465000 226699 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:19:13.465000 226699 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4453.1 ms
+iter 1 (warmup): 652.3 ms
+iter 2 (timed): 652.3 ms
+iter 3 (timed): 652.0 ms
+iter 4 (timed): 651.8 ms
+iter 5 (timed): 652.6 ms
+iter 6 (timed): 652.5 ms
+{
+  "chunk": 4096,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    4096
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.6523267060983926,
+  "input_tok_s_per_stage_dp4": 25116.249031093244,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 3 total=4096 seg=1024 =====
+W0721 07:19:43.897000 226895 torch/distributed/run.py:851] 
+W0721 07:19:43.897000 226895 torch/distributed/run.py:851] *****************************************
+W0721 07:19:43.897000 226895 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:19:43.897000 226895 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4542.7 ms
+iter 1 (warmup): 671.9 ms
+iter 2 (timed): 673.2 ms
+iter 3 (timed): 672.4 ms
+iter 4 (timed): 672.2 ms
+iter 5 (timed): 672.2 ms
+iter 6 (timed): 672.7 ms
+{
+  "chunk": 4096,
+  "prefill_chunk": 1024,
+  "prefill_forwards": 4,
+  "segment_lengths": [
+    1024,
+    1024,
+    1024,
+    1024
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.672409551916644,
+  "input_tok_s_per_stage_dp4": 24366.10240484963,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 3 total=4096 seg=2048 =====
+W0721 07:20:14.660000 227091 torch/distributed/run.py:851] 
+W0721 07:20:14.660000 227091 torch/distributed/run.py:851] *****************************************
+W0721 07:20:14.660000 227091 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:20:14.660000 227091 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4614.7 ms
+iter 1 (warmup): 665.6 ms
+iter 2 (timed): 665.9 ms
+iter 3 (timed): 665.9 ms
+iter 4 (timed): 666.2 ms
+iter 5 (timed): 666.8 ms
+iter 6 (timed): 665.7 ms
+{
+  "chunk": 4096,
+  "prefill_chunk": 2048,
+  "prefill_forwards": 2,
+  "segment_lengths": [
+    2048,
+    2048
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.6658741980791092,
+  "input_tok_s_per_stage_dp4": 24605.24832958537,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 3 total=2048 seg=0 =====
+W0721 07:20:46.649000 227287 torch/distributed/run.py:851] 
+W0721 07:20:46.649000 227287 torch/distributed/run.py:851] *****************************************
+W0721 07:20:46.649000 227287 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:20:46.649000 227287 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4102.3 ms
+iter 1 (warmup): 335.5 ms
+iter 2 (timed): 331.0 ms
+iter 3 (timed): 331.4 ms
+iter 4 (timed): 331.5 ms
+iter 5 (timed): 331.6 ms
+iter 6 (timed): 331.4 ms
+{
+  "chunk": 2048,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "segment_lengths": [
+    2048
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.33143396698869765,
+  "input_tok_s_per_stage_dp4": 24716.838996406663,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
+===== round 3 total=2048 seg=1024 =====
+W0721 07:21:14.829000 222387 torch/distributed/run.py:851] 
+W0721 07:21:14.829000 222387 torch/distributed/run.py:851] *****************************************
+W0721 07:21:14.829000 222387 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 07:21:14.829000 222387 torch/distributed/run.py:851] *****************************************
+layer=11 rank=0 experts=128/256
+layer=11 rank=0 experts=256/256
+stage 1 layer 11 material loaded
+layer=12 rank=0 experts=128/256
+layer=12 rank=0 experts=256/256
+stage 1 layer 12 material loaded
+layer=13 rank=0 experts=128/256
+layer=13 rank=0 experts=256/256
+stage 1 layer 13 material loaded
+layer=14 rank=0 experts=128/256
+layer=14 rank=0 experts=256/256
+stage 1 layer 14 material loaded
+layer=15 rank=0 experts=128/256
+layer=15 rank=0 experts=256/256
+stage 1 layer 15 material loaded
+layer=16 rank=0 experts=128/256
+layer=16 rank=0 experts=256/256
+stage 1 layer 16 material loaded
+layer=17 rank=0 experts=128/256
+layer=17 rank=0 experts=256/256
+stage 1 layer 17 material loaded
+layer=18 rank=0 experts=128/256
+layer=18 rank=0 experts=256/256
+stage 1 layer 18 material loaded
+layer=19 rank=0 experts=128/256
+layer=19 rank=0 experts=256/256
+stage 1 layer 19 material loaded
+layer=20 rank=0 experts=128/256
+layer=20 rank=0 experts=256/256
+stage 1 layer 20 material loaded
+layer=21 rank=0 experts=128/256
+layer=21 rank=0 experts=256/256
+stage 1 layer 21 material loaded
+iter 0 (warmup): 4087.6 ms
+iter 1 (warmup): 336.3 ms
+iter 2 (timed): 333.8 ms
+iter 3 (timed): 333.7 ms
+iter 4 (timed): 334.6 ms
+iter 5 (timed): 333.7 ms
+iter 6 (timed): 333.7 ms
+{
+  "chunk": 2048,
+  "prefill_chunk": 1024,
+  "prefill_forwards": 2,
+  "segment_lengths": [
+    1024,
+    1024
+  ],
+  "moe_mode": "w4a8",
+  "indexer": "fused",
+  "wall_p50_s": 0.33374300110153854,
+  "input_tok_s_per_stage_dp4": 24545.833090017826,
+  "ok": [
+    true,
+    true,
+    true,
+    true
+  ]
+}
