@@ -84,8 +84,12 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   graph 投影 ~1.4×;chained 形天然填 PP 空泡）。工作区瘦身完成
   （pool 共享 +2.5 GiB、sparse core 逐位精确瘦身 +4.6% 副收益、半精度累加
   数值门 FAIL 弃用）：**8K 前沿 7523 → 8733 tok/s(+16.1%,bl72)**,bl80 墙
-  已是权重+KV 结构容量。下一步：大 B MTP graph 化(设计已出;8K 投影
-  8733 × ~1.4 ≈ **~12.2k**)→ 剩余差距(带下沿 15k)候选:KV 行宽再压、
-  head 入 graph、handoff overlap、短 ctx 运营 → chunked prefill/serving。
+  已是权重+KV 结构容量。大 B MTP graph 化完成但 **×1.4 投影被证伪**
+  (满流水中无空泡可填,每轮付 2 slot;8K 持平 1.00×(省 11% KV)、
+  **2K +13% → 9656 tok/s 新高**;无损性 force-reject 全逐位证据链完整,
+  失步臂分歧归因到 Marlin 批组成 ULP 敏感,任何投机形态共有)。
+  **当前实测最优:8K 8733、2K 9656 output tok/s**。带下沿 15k 的剩余差距
+  ~1.7×@8K,候选:seqlen-2 融合 verify(需先解无损)、MTP head GEMM 优化
+  (10ms/轮)、KV 行宽、handoff overlap、短 ctx 运营 → chunked prefill/serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
