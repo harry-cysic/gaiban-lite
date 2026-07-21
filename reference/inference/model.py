@@ -680,10 +680,40 @@ class Block(nn.Module):
         y = torch.sum(pre.unsqueeze(-1) * x.view(shape), dim=2)
         return y.to(dtype), post, comb
 
+    # Evaluation-harness only (gaiban-lite D0L): the sequence-chunk width for
+    # hc_post.  0 disables chunking and restores the original single-shot form.
+    HC_POST_CHUNK = 1024
+
     def hc_post(self, x: torch.Tensor, residual: torch.Tensor, post: torch.Tensor, comb: torch.Tensor):
         # x: [b,s,d], residual: [b,s,hc,d], post: [b,s,hc], comb: [b,s,hc,hc], y: [b,s,hc,d]
-        y = post.unsqueeze(-1) * x.unsqueeze(-2) + torch.sum(comb.unsqueeze(-1) * residual.unsqueeze(-2), dim=2)
-        return y.type_as(x)
+        #
+        # ``comb.unsqueeze(-1) * residual.unsqueeze(-2)`` broadcasts to
+        # [b,s,hc,hc,d] fp32 = 256 KiB/token, so a single 8192-token prefill
+        # needs exactly 2.00 GiB in one allocation and OOMs at MP=8 -- which is
+        # why the D0L golden set stops at 4096 tokens.
+        #
+        # Chunking along s is **exact, not an approximation**: the only
+        # reduction is over dim=2 (hc), every output row depends solely on its
+        # own token, and nothing is summed across s.  Splitting an axis that is
+        # never reduced cannot change any value, so goldens produced with and
+        # without chunking are bitwise identical -- asserted by
+        # ``hc_post_chunking_selfcheck`` below rather than assumed.
+        chunk = self.HC_POST_CHUNK
+        if not chunk or x.shape[1] <= chunk:
+            y = post.unsqueeze(-1) * x.unsqueeze(-2) + torch.sum(comb.unsqueeze(-1) * residual.unsqueeze(-2), dim=2)
+            return y.type_as(x)
+        pieces = []
+        for start in range(0, x.shape[1], chunk):
+            stop = start + chunk
+            pieces.append(
+                post[:, start:stop].unsqueeze(-1) * x[:, start:stop].unsqueeze(-2)
+                + torch.sum(
+                    comb[:, start:stop].unsqueeze(-1)
+                    * residual[:, start:stop].unsqueeze(-2),
+                    dim=2,
+                )
+            )
+        return torch.cat(pieces, dim=1).type_as(x)
 
     def forward(self, x: torch.Tensor, start_pos: int, input_ids: Optional[torch.Tensor]) -> torch.Tensor:
         residual = x

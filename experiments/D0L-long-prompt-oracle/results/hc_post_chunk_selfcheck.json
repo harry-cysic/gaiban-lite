@@ -1,0 +1,101 @@
+{
+ "accepted": true,
+ "cases": 15,
+ "records": [
+  {
+   "s": 128,
+   "chunk": 256,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 128,
+   "chunk": 1024,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 128,
+   "chunk": 4096,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 1000,
+   "chunk": 256,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 1000,
+   "chunk": 1024,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 1000,
+   "chunk": 4096,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 1024,
+   "chunk": 256,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 1024,
+   "chunk": 1024,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 1024,
+   "chunk": 4096,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 2048,
+   "chunk": 256,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 2048,
+   "chunk": 1024,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 2048,
+   "chunk": 4096,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 4096,
+   "chunk": 256,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 4096,
+   "chunk": 1024,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  },
+  {
+   "s": 4096,
+   "chunk": 4096,
+   "bitwise_equal": true,
+   "max_abs_diff": 0.0
+  }
+ ],
+ "s8192": {
+  "chunked_1024_peak_gib": 1.6881103515625,
+  "unchunked_peak_gib": 3.6881103515625,
+  "unchunked_ok": true
+ }
+}
