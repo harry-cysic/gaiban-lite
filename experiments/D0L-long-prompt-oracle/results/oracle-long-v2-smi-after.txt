@@ -1,0 +1,9 @@
+== nvidia-smi AFTER ==
+0, 1 MiB
+1, 1 MiB
+2, 1 MiB
+3, 1 MiB
+4, 1 MiB
+5, 1 MiB
+6, 1 MiB
+7, 1 MiB

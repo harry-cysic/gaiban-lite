@@ -1,0 +1,43 @@
+W0721 13:47:02.236000 187200 torch/distributed/run.py:851] 
+W0721 13:47:02.236000 187200 torch/distributed/run.py:851] *****************************************
+W0721 13:47:02.236000 187200 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 13:47:02.236000 187200 torch/distributed/run.py:851] *****************************************
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+[D0L] 10/10 prompts, longest 8192 tokens, max_seq_len 8320, max_new_tokens 64
+[D0L] loaded: free 2.16 GiB / 23.52 GiB
+[D0L] prompt 0: 1024 prompt tokens -> 65 completion tokens in 48.9s (peak alloc 21.34 GiB, reserved 21.42 GiB, free 1.47 GiB)
+      DeepSeek-V4系列包含两款混合专家模型（Pro版1.6T参数、Flash版284B参数），均支持百万token上下文长度。该系列通过混合注意力架构、流形约束超连接和Muon优化器三大技术升级，显著提升长文本处理效率。其中Pro-M<｜end▁of▁sentence｜>
+[D0L] prompt 1: 1024 prompt tokens -> 65 completion tokens in 17.3s (peak alloc 21.34 GiB, reserved 21.42 GiB, free 1.47 GiB)
+      Based on the provided excerpt, the three most important facts are:  1.  **DeepSeek-V4-Flash-Max** achieves comparable reasoning performance to the Pro version w
+[D0L] prompt 2: 1024 prompt tokens -> 65 completion tokens in 17.3s (peak alloc 21.34 GiB, reserved 21.42 GiB, free 1.47 GiB)
+      上文讨论的核心技术问题是：**不同AI模型（特别是DeepSeek-V4系列及其竞品）在多项基准测试中的性能对比，以及DeepSeek-V4-Pro和DeepSeek-V4-Flash所支持的三种推理模式（Non-think、Think High、Think Max）的特点与应用场景<｜end▁of▁sentence｜
+[D0L] prompt 3: 2048 prompt tokens -> 65 completion tokens in 17.8s (peak alloc 21.48 GiB, reserved 21.64 GiB, free 1.25 GiB)
+      根据提供的工程实验报告节选，主要实验结论如下：  1. **模型版本与模式对比**：报告比较了 V4-Flash 和 V4-Pro 两种模型在“Non-Think”、“High”、“Max”三种模式下的性能表现。总体来看，**V4-Pro Max 模式<｜end▁of▁sentence｜>
+[D0L] prompt 4: 2048 prompt tokens -> 65 completion tokens in 17.8s (peak alloc 21.48 GiB, reserved 21.64 GiB, free 1.25 GiB)
+      Based on the engineering report excerpt, the main measurement results are as follows:  **Core Finding:** The V4-Flash model (284B total parameters, 13B activate
+[D0L] prompt 5: 2048 prompt tokens -> 65 completion tokens in 17.8s (peak alloc 21.48 GiB, reserved 21.64 GiB, free 1.25 GiB)
+      根据文档内容，一个明确的性能瓶颈是 **TP16（官方多机方式）** 的通信开销。  **原因：** - 文档指出，在 TP16 配置下，44 层每层都需要多次执行 `[B,4096]` 的 all-reduce（AR）<｜end▁of▁sentence｜>
+[D0L] prompt 6: 4096 prompt tokens -> 65 completion tokens in 18.7s (peak alloc 21.81 GiB, reserved 22.09 GiB, free 0.80 GiB)
+      这份技术文档节选主要围绕一个基于RTX 4090集群的大模型推理系统的性能评估与优化展开，详细分析了在MoE架构下prefill和decode阶段的吞吐量、延迟及瓶颈，并通过实测数据对先前的roofline预估进行了修订。文档指出，在双机PP<｜end▁of▁sentence｜>
+[D0L] prompt 7: 4096 prompt tokens -> 65 completion tokens in 18.6s (peak alloc 21.81 GiB, reserved 22.09 GiB, free 0.80 GiB)
+      Based on the extensive engineering notes, the single most important conclusion is:  **The system achieves a measured maximum throughput of 8,733 output tokens/s
+[D0L] prompt 8: 8192 prompt tokens -> 65 completion tokens in 20.7s (peak alloc 22.72 GiB, reserved 22.87 GiB, free 0.02 GiB)
+      这份技术文档主要包含三部分内容：一是对DSV4-Direct解码前向模块结构的详细分析，列出了从Flash几何移植时需要修改和可直接复用的所有文件与代码位置；二是C2F实验的实测结果，显示单stage预填充基线约为10.7–11.7<｜end▁of▁sentence｜>
+[D0L] prompt 9: 8192 prompt tokens -> 65 completion tokens in 20.7s (peak alloc 22.72 GiB, reserved 22.87 GiB, free 0.02 GiB)
+      The prefill throughput was improved by two main levers: fusing HC boundary operations (gaining ~20% throughput to reach ~30k input tok/s/stage) and overlapping 
+WROTE oracle-long-v2.json
