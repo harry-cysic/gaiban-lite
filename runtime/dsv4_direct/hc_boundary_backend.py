@@ -42,6 +42,7 @@ callers that want an environment toggle without changing call sites.
 from __future__ import annotations
 
 import os
+from typing import Any
 
 import torch
 
@@ -131,6 +132,24 @@ class FusedTilelangHCBoundaryBackend:
             raise ValueError("max_rows must be positive or None")
         self._kernel = mhc_fused_post_pre_tilelang
         self.max_rows = max_rows
+        # Pure observability (no behaviour change): lets a gate prove that a
+        # long-prompt prefill really did take the row-split branch rather than
+        # inferring it from the row count.  ``row_histogram`` maps the boundary
+        # call's row count to how many times it was seen.
+        self.call_stats: dict[str, Any] = {
+            "calls": 0,
+            "split_calls": 0,
+            "kernel_launches": 0,
+            "row_histogram": {},
+        }
+
+    def reset_stats(self) -> None:
+        self.call_stats = {
+            "calls": 0,
+            "split_calls": 0,
+            "kernel_launches": 0,
+            "row_histogram": {},
+        }
 
     def _call_kernel(self, branch_output, residual, post, comb, packed):
         *kernel_args, kernel_kwargs = packed
@@ -232,6 +251,14 @@ class FusedTilelangHCBoundaryBackend:
         rows = 1
         for dim in branch_output.shape[:-1]:
             rows *= int(dim)
+        stats = self.call_stats
+        stats["calls"] += 1
+        stats["row_histogram"][rows] = stats["row_histogram"].get(rows, 0) + 1
+        if self.max_rows is None or rows <= self.max_rows:
+            stats["kernel_launches"] += 1
+        else:
+            stats["split_calls"] += 1
+            stats["kernel_launches"] += -(-rows // self.max_rows)
         if self.max_rows is None or rows <= self.max_rows:
             residual_new, post_new, comb_new, hidden = self._kernel(
                 branch_output.contiguous(),

@@ -96,7 +96,7 @@ STAGE_LAYERS: dict[int, tuple[int, ...]] = {
     2: tuple(range(22, 33)),
     3: tuple(range(33, 43)),
 }
-MAX_SEQ_LEN = 256  # prompts <= 22 + 128 decode steps < 256; multiple of 128
+MAX_SEQ_LEN = 256  # D0 default: prompts <= 22 + 128 decode steps; multiple of 128
 MAX_COMPARE_STEPS = 128
 LOCAL_BATCH = 1
 HIDDEN = 4096
@@ -382,6 +382,52 @@ class StageLane:
 
 
 # --------------------------------------------------------------------------
+# prefill-path evidence
+#
+# D0L (24th vertical): with 10-22 token prompts the prefill row count never
+# reaches any of the thresholds that prefill-only code paths switch on, so the
+# gate could not tell "the lever ran and was harmless" from "the lever never
+# ran".  These helpers read the pure-observability counters on the HC boundary
+# backend and on each layer's TP4MoE so a run can *prove* which path executed.
+
+
+def reset_path_evidence(lane: StageLane) -> None:
+    backend = lane.backend
+    if backend is not None and hasattr(backend, "reset_stats"):
+        backend.reset_stats()
+    for material, _ in lane.layers:
+        for key in material.moe.overlap_stats:
+            material.moe.overlap_stats[key] = 0
+
+
+def collect_path_evidence(lane: StageLane) -> dict[str, Any]:
+    backend = lane.backend
+    hc: dict[str, Any] | None = None
+    if backend is not None and hasattr(backend, "call_stats"):
+        stats = backend.call_stats
+        hc = {
+            "calls": int(stats["calls"]),
+            "split_calls": int(stats["split_calls"]),
+            "kernel_launches": int(stats["kernel_launches"]),
+            "max_rows": backend.max_rows,
+            "row_histogram": {
+                str(rows): int(count)
+                for rows, count in sorted(stats["row_histogram"].items())
+            },
+        }
+    moe = {
+        "overlapped_calls": 0,
+        "overlapped_rows": 0,
+        "sequential_calls": 0,
+        "sequential_rows": 0,
+    }
+    for material, _ in lane.layers:
+        for key in moe:
+            moe[key] += int(material.moe.overlap_stats[key])
+    return {"hc_boundary": hc, "moe": moe}
+
+
+# --------------------------------------------------------------------------
 # per-prompt pipeline run
 
 
@@ -403,6 +449,9 @@ def run_prompt(
     steps: list[dict[str, Any]] = []
     decode_ms: list[float] = []
     lane_agreement = True
+
+    prefill_evidence: dict[str, Any] | None = None
+    reset_path_evidence(lane)
 
     for step in range(compare_steps):
         if step == 0:
@@ -465,7 +514,18 @@ def run_prompt(
             if len(set(lane_predictions)) != 1:
                 lane_agreement = False
         torch.cuda.synchronize(device)
-        if step > 0:
+        if step == 0:
+            # Snapshot before any decode step can pollute the counters: this is
+            # the prefill chunk's own path record.
+            prefill_evidence = collect_path_evidence(lane)
+            prefill_evidence["seqlen"] = seqlen
+            prefill_evidence["rows_per_lane"] = LOCAL_BATCH * seqlen
+            prefill_evidence["moe_global_rows"] = (
+                LOCAL_BATCH * seqlen * EXPECTED_TP_SIZE
+            )
+            prefill_evidence["prefill_forwards"] = 1
+            prefill_evidence["wall_ms"] = (time.perf_counter() - started) * 1e3
+        else:
             decode_ms.append((time.perf_counter() - started) * 1e3)
 
     # cross-lane residual digest at the final step (diagnostic only)
@@ -483,6 +543,8 @@ def run_prompt(
         "decode_ms_mean": (
             statistics.fmean(decode_ms) if decode_ms else None
         ),
+        "prefill_evidence": prefill_evidence,
+        "run_evidence": collect_path_evidence(lane),
     }
     if stage == STAGE_COUNT - 1:
         mismatches = [record for record in steps if not record["match"]]
@@ -560,6 +622,31 @@ def main() -> int:
     )
     parser.add_argument(
         "--max-prompts", type=int, default=0, help="0 = all golden prompts"
+    )
+    parser.add_argument(
+        "--max-seq-len", type=int, default=MAX_SEQ_LEN,
+        help="attention state capacity (multiple of 128).  The D0 default 256 "
+        "covers 22-token prompts + 128 decode steps; the D0L long-prompt oracle "
+        "needs prompt_len + decode steps",
+    )
+    parser.add_argument(
+        "--prompt-min-tokens", type=int, default=0,
+        help="D0L: keep only golden prompts with at least this many prompt "
+        "tokens",
+    )
+    parser.add_argument(
+        "--prompt-max-tokens", type=int, default=0,
+        help="D0L: keep only golden prompts with at most this many prompt "
+        "tokens (0 = no cap).  Prompt lengths are bucketed across runs because "
+        "every distinct length registers its own Marlin per-shape buffer set "
+        "(~80 KiB per global row: a 8192-token prompt alone is 2.5 GiB)",
+    )
+    parser.add_argument(
+        "--share-moe-buffers", action="store_true",
+        help="D0L: share one Marlin per-shape buffer set across the stage's "
+        "layers of the same route kind.  Buffers are scratch and layers run "
+        "serially, so this is output-identical; without it an 11-layer stage "
+        "at a 32768-row prefill shape needs ~29 GB and OOMs at load",
     )
     parser.add_argument(
         "--max-steps", type=int, default=MAX_COMPARE_STEPS,
@@ -710,6 +797,22 @@ def main() -> int:
                     args.oracle_json.expanduser().read_text(encoding="utf-8")
                 )
                 golden_prompts = oracle["prompts"]
+                if args.prompt_min_tokens > 0:
+                    golden_prompts = [
+                        entry
+                        for entry in golden_prompts
+                        if len(entry["prompt_tokens"]) >= args.prompt_min_tokens
+                    ]
+                if args.prompt_max_tokens > 0:
+                    golden_prompts = [
+                        entry
+                        for entry in golden_prompts
+                        if len(entry["prompt_tokens"]) <= args.prompt_max_tokens
+                    ]
+                if not golden_prompts:
+                    raise ValueError(
+                        "prompt length filter selected no golden prompts"
+                    )
                 if args.max_prompts > 0:
                     golden_prompts = golden_prompts[: args.max_prompts]
                 tokenizer_check = tokenizer_preflight(stage_root, golden_prompts)
@@ -752,6 +855,27 @@ def main() -> int:
         )
         global_row_shapes = tuple([EXPECTED_TP_SIZE] + prefill_rows)
         result["global_row_shapes"] = list(global_row_shapes)
+        result["prompt_lengths"] = [
+            len(entry["prompt_tokens"]) for entry in prompts
+        ]
+        result["max_seq_len"] = args.max_seq_len
+        result["share_moe_buffers"] = bool(args.share_moe_buffers)
+
+        # The last decode step reads position prompt_len + compare_steps - 2 and
+        # writes one row, so the state must admit prompt_len + compare_steps - 1.
+        needed = max(
+            len(entry["prompt_tokens"])
+            + min(
+                len(entry["completion_tokens"]), MAX_COMPARE_STEPS, args.max_steps
+            )
+            - 1
+            for entry in prompts
+        )
+        if needed > args.max_seq_len:
+            raise ValueError(
+                f"--max-seq-len {args.max_seq_len} too small: longest prompt + "
+                f"compared decode steps needs {needed}"
+            )
 
         # ------------------------------------------------------------------
         # load stage materials + embed/head material
@@ -766,9 +890,10 @@ def main() -> int:
             tp_global_ranks=topo["tp_global_ranks"],
             device=device,
             checkpoint_id=result["checkpoint_id"],
-            max_seq_len=MAX_SEQ_LEN,
+            max_seq_len=args.max_seq_len,
             global_row_shapes=global_row_shapes,
             slots_per_shape=1,
+            share_moe_buffers=args.share_moe_buffers,
             kv_dtype=args.kv_dtype,
             indexer_kv_dtype=args.indexer_kv_dtype,
             moe_marlin_input_dtype=(
@@ -930,12 +1055,45 @@ def main() -> int:
                 "per_prompt": [
                     {
                         "prompt_index": row["prompt_index"],
+                        "prompt_len": row["prompt_len"],
                         "matched": row["matched"],
                         "compare_steps": row["compare_steps"],
                         "first_mismatch": row["first_mismatch"],
+                        "prefill_evidence": row.get("prefill_evidence"),
                     }
                     for row in rows
                 ],
+                # D0L: aggregate proof that the prefill chunk regime was
+                # actually entered on this arm.
+                "prefill_coverage": {
+                    "prompt_lengths": [row["prompt_len"] for row in rows],
+                    "hc_split_calls": sum(
+                        (row.get("prefill_evidence") or {}).get("hc_boundary", {})
+                        .get("split_calls", 0)
+                        if (row.get("prefill_evidence") or {}).get("hc_boundary")
+                        else 0
+                        for row in rows
+                    ),
+                    "hc_calls": sum(
+                        (row.get("prefill_evidence") or {}).get("hc_boundary", {})
+                        .get("calls", 0)
+                        if (row.get("prefill_evidence") or {}).get("hc_boundary")
+                        else 0
+                        for row in rows
+                    ),
+                    "moe_overlapped_calls": sum(
+                        (row.get("prefill_evidence") or {})
+                        .get("moe", {})
+                        .get("overlapped_calls", 0)
+                        for row in rows
+                    ),
+                    "moe_sequential_calls": sum(
+                        (row.get("prefill_evidence") or {})
+                        .get("moe", {})
+                        .get("sequential_calls", 0)
+                        for row in rows
+                    ),
+                },
             }
         if len(modes) == 2 and "eager" in modes and "fused" in modes:
             eager_tokens = {
@@ -971,6 +1129,8 @@ def main() -> int:
         result["memory_at_end"] = {
             "free_bytes": int(free_bytes),
             "total_bytes": int(total_bytes),
+            "peak_allocated_bytes": int(torch.cuda.max_memory_allocated(device)),
+            "peak_reserved_bytes": int(torch.cuda.max_memory_reserved(device)),
         }
 
         # Hard gates: topology, tokenizer parity, contract, finite logits
@@ -1008,6 +1168,14 @@ def main() -> int:
                 "accepted": accepted_all,
                 "checkpoint_id": result["checkpoint_id"],
                 "mode_summaries": result.get("mode_summaries"),
+                "max_seq_len": result.get("max_seq_len"),
+                "prompt_lengths": result.get("prompt_lengths"),
+                "global_row_shapes": result.get("global_row_shapes"),
+                "share_moe_buffers": result.get("share_moe_buffers"),
+                "moe_overlap_blocks": result.get("moe_overlap_blocks", 0),
+                "fused_scope": args.fused_scope,
+                "kv_dtype": args.kv_dtype,
+                "memory_at_end": result.get("memory_at_end"),
                 "placement": result["placement"],
                 "tokenizer_preflight": result["tokenizer_preflight"],
                 "errors": result["errors"],

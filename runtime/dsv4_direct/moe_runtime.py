@@ -551,6 +551,13 @@ class TP4MoE:
         # 0 or 1 == the sequential path (unchanged).  Set through
         # `enable_collective_overlap`.
         self._overlap_blocks = 0
+        # Pure observability: which path each forward actually took.
+        self.overlap_stats: dict[str, int] = {
+            "overlapped_calls": 0,
+            "overlapped_rows": 0,
+            "sequential_calls": 0,
+            "sequential_rows": 0,
+        }
         self._overlap_alignment: dict[tuple[int, int, int], Any] = {}
         self._route_tensor_observer: list[MoERouteTensors] | None = None
         self._route_observer_captures_local_input = False
@@ -1667,6 +1674,11 @@ class TP4MoE:
                 collect_stage_digests=collect_stage_digests,
                 route_override=route_override,
             ):
+                # Observability only: a gate needs to prove the pipelined path
+                # actually engaged rather than silently falling back (the
+                # fallback in _overlap_supported is deliberately quiet).
+                self.overlap_stats["overlapped_calls"] += 1
+                self.overlap_stats["overlapped_rows"] += int(local_flat.shape[0])
                 local_output = self._call_overlapped(
                     local_flat,
                     buffers,
@@ -1680,6 +1692,8 @@ class TP4MoE:
                 if stage_marker is not None:
                     stage_marker("moe_finalize_done")
                 return local_output, None
+            self.overlap_stats["sequential_calls"] += 1
+            self.overlap_stats["sequential_rows"] += int(local_flat.shape[0])
             if stage_marker is not None:
                 stage_marker("moe_inputs_ready")
             dist.all_gather_into_tensor(buffers.gathered, local_flat, group=self.group)

@@ -478,8 +478,18 @@ def build_physical_stage(
             f"stage layer ids must be non-empty and consecutive, got {selected}"
         )
     materials = []
-    moe_buffer_donor: TP4MoE | None = None
+    # One donor *per route kind*.  A hash-routed MoE registers an extra
+    # ``gathered_input_ids`` buffer that learned routing does not have, so the
+    # two kinds cannot share a buffer set and ``build_physical_layer_material``
+    # rejects a mismatched donor.  Electing a single donor from the stage's
+    # first layer therefore silently disabled sharing for every learned layer
+    # of stage 0 (layers 0-2 are hash, 3-10 learned; model_contract.py:101) --
+    # 8 unshared layers, which at a 32768-row prefill shape is 8 x 2.5 GiB and
+    # OOMs at load.  Stages 1-3 are all-learned and were unaffected, which is
+    # why the C2F single-stage bench (layers 11-21) never saw this.
+    moe_buffer_donors: dict[str, TP4MoE] = {}
     for layer_id in selected:
+        route_kind = str(SUPPORTED_LAYER_SPECS[layer_id]["route_kind"])
         materials.append(
             build_physical_layer_material(
                 layer_id=layer_id,
@@ -498,11 +508,11 @@ def build_physical_stage(
                 kv_dtype=kv_dtype,
                 indexer_kv_dtype=indexer_kv_dtype,
                 moe_marlin_input_dtype=moe_marlin_input_dtype,
-                moe_buffer_donor=moe_buffer_donor,
+                moe_buffer_donor=moe_buffer_donors.get(route_kind),
             )
         )
-        if share_moe_buffers and moe_buffer_donor is None:
-            moe_buffer_donor = materials[0].moe
+        if share_moe_buffers:
+            moe_buffer_donors.setdefault(route_kind, materials[-1].moe)
         if progress is not None:
             progress(f"stage {stage_id} layer {layer_id} material loaded")
     evidence = {

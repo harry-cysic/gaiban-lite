@@ -1,0 +1,576 @@
+{
+  "accepted": true,
+  "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "load": 11.808181669097394,
+    "mode_eager": 68.7409978758078,
+    "process": 85.45984954899177
+  },
+  "errors": [],
+  "experiment": "E0e2e-tp4-pp4-golden-token-gate",
+  "fuse_min_seqlen": 1024,
+  "global_row_shapes": [
+    4,
+    4096,
+    8192,
+    16384
+  ],
+  "host": "titan065",
+  "indexer_kv_dtype": "bf16",
+  "kv_dtype": "bf16",
+  "local_rank": 7,
+  "max_seq_len": 4224,
+  "measurement_class": "semantic_e2e_golden_token_gate",
+  "memory_after_load": {
+    "free_bytes": 6029180928,
+    "total_bytes": 25252724736
+  },
+  "memory_at_end": {
+    "free_bytes": 3514695680,
+    "peak_allocated_bytes": 19715524608,
+    "peak_reserved_bytes": 20883439616,
+    "total_bytes": 25252724736
+  },
+  "mode_summaries": {
+    "eager": {
+      "lane_argmax_agreement": false,
+      "match_rate": 0.958984375,
+      "matched_tokens": 491,
+      "mismatch_count": 21,
+      "mismatch_golden_deficit": {
+        "max": 0.8686599731445312,
+        "median": 0.3521080017089844,
+        "min": 0.02065277099609375
+      },
+      "mismatch_top2_gap": {
+        "max": 0.8686599731445312,
+        "median": 0.3521080017089844,
+        "min": 0.02065277099609375
+      },
+      "per_prompt": [
+        {
+          "compare_steps": 64,
+          "first_mismatch": {
+            "golden": 6161,
+            "golden_deficit": 0.5593948364257812,
+            "golden_logit": 48.05618667602539,
+            "match": false,
+            "position": 1078,
+            "predicted": 52908,
+            "step": 55,
+            "top1_logit": 48.61558151245117,
+            "top2_gap": 0.5593948364257812,
+            "top2_logit": 48.05618667602539
+          },
+          "matched": 62,
+          "prefill_evidence": {
+            "hc_boundary": null,
+            "moe": {
+              "overlapped_calls": 10,
+              "overlapped_rows": 10240,
+              "sequential_calls": 0,
+              "sequential_rows": 0
+            },
+            "moe_global_rows": 4096,
+            "prefill_forwards": 1,
+            "rows_per_lane": 1024,
+            "seqlen": 1024,
+            "wall_ms": 16659.47865205817
+          },
+          "prompt_index": 0,
+          "prompt_len": 1024
+        },
+        {
+          "compare_steps": 64,
+          "first_mismatch": {
+            "golden": 4496,
+            "golden_deficit": 0.60919189453125,
+            "golden_logit": 42.67961502075195,
+            "match": false,
+            "position": 1026,
+            "predicted": 37437,
+            "step": 3,
+            "top1_logit": 43.2888069152832,
+            "top2_gap": 0.60919189453125,
+            "top2_logit": 42.67961502075195
+          },
+          "matched": 61,
+          "prefill_evidence": {
+            "hc_boundary": null,
+            "moe": {
+              "overlapped_calls": 10,
+              "overlapped_rows": 10240,
+              "sequential_calls": 0,
+              "sequential_rows": 0
+            },
+            "moe_global_rows": 4096,
+            "prefill_forwards": 1,
+            "rows_per_lane": 1024,
+            "seqlen": 1024,
+            "wall_ms": 756.9908790756017
+          },
+          "prompt_index": 1,
+          "prompt_len": 1024
+        },
+        {
+          "compare_steps": 64,
+          "first_mismatch": {
+            "golden": 6232,
+            "golden_deficit": 0.02065277099609375,
+            "golden_logit": 33.22283172607422,
+            "match": false,
+            "position": 1042,
+            "predicted": 1542,
+            "step": 19,
+            "top1_logit": 33.24348449707031,
+            "top2_gap": 0.02065277099609375,
+            "top2_logit": 33.22283172607422
+          },
+          "matched": 63,
+          "prefill_evidence": {
+            "hc_boundary": null,
+            "moe": {
+              "overlapped_calls": 10,
+              "overlapped_rows": 10240,
+              "sequential_calls": 0,
+              "sequential_rows": 0
+            },
+            "moe_global_rows": 4096,
+            "prefill_forwards": 1,
+            "rows_per_lane": 1024,
+            "seqlen": 1024,
+            "wall_ms": 751.762687927112
+          },
+          "prompt_index": 2,
+          "prompt_len": 1024
+        },
+        {
+          "compare_steps": 64,
+          "first_mismatch": null,
+          "matched": 64,
+          "prefill_evidence": {
+            "hc_boundary": null,
+            "moe": {
+              "overlapped_calls": 10,
+              "overlapped_rows": 20480,
+              "sequential_calls": 0,
+              "sequential_rows": 0
+            },
+            "moe_global_rows": 8192,
+            "prefill_forwards": 1,
+            "rows_per_lane": 2048,
+            "seqlen": 2048,
+            "wall_ms": 1493.9969549886882
+          },
+          "prompt_index": 3,
+          "prompt_len": 2048
+        },
+        {
+          "compare_steps": 64,
+          "first_mismatch": {
+            "golden": 38096,
+            "golden_deficit": 0.6679039001464844,
+            "golden_logit": 33.797813415527344,
+            "match": false,
+            "position": 2064,
+            "predicted": 17105,
+            "step": 17,
+            "top1_logit": 34.46571731567383,
+            "top2_gap": 0.6679039001464844,
+            "top2_logit": 33.797813415527344
+          },
+          "matched": 61,
+          "prefill_evidence": {
+            "hc_boundary": null,
+            "moe": {
+              "overlapped_calls": 10,
+              "overlapped_rows": 20480,
+              "sequential_calls": 0,
+              "sequential_rows": 0
+            },
+            "moe_global_rows": 8192,
+            "prefill_forwards": 1,
+            "rows_per_lane": 2048,
+            "seqlen": 2048,
+            "wall_ms": 1496.2230799719691
+          },
+          "prompt_index": 4,
+          "prompt_len": 2048
+        },
+        {
+          "compare_steps": 64,
+          "first_mismatch": {
+            "golden": 25728,
+            "golden_deficit": 0.0683135986328125,
+            "golden_logit": 37.73358154296875,
+            "match": false,
+            "position": 2048,
+            "predicted": 103248,
+            "step": 1,
+            "top1_logit": 37.80189514160156,
+            "top2_gap": 0.0683135986328125,
+            "top2_logit": 37.73358154296875
+          },
+          "matched": 58,
+          "prefill_evidence": {
+            "hc_boundary": null,
+            "moe": {
+              "overlapped_calls": 10,
+              "overlapped_rows": 20480,
+              "sequential_calls": 0,
+              "sequential_rows": 0
+            },
+            "moe_global_rows": 8192,
+            "prefill_forwards": 1,
+            "rows_per_lane": 2048,
+            "seqlen": 2048,
+            "wall_ms": 1493.9680329989642
+          },
+          "prompt_index": 5,
+          "prompt_len": 2048
+        },
+        {
+          "compare_steps": 64,
+          "first_mismatch": {
+            "golden": 13808,
+            "golden_deficit": 0.6116905212402344,
+            "golden_logit": 40.494834899902344,
+            "match": false,
+            "position": 4113,
+            "predicted": 2971,
+            "step": 18,
+            "top1_logit": 41.10652542114258,
+            "top2_gap": 0.6116905212402344,
+            "top2_logit": 40.494834899902344
+          },
+          "matched": 59,
+          "prefill_evidence": {
+            "hc_boundary": null,
+            "moe": {
+              "overlapped_calls": 10,
+              "overlapped_rows": 40960,
+              "sequential_calls": 0,
+              "sequential_rows": 0
+            },
+            "moe_global_rows": 16384,
+            "prefill_forwards": 1,
+            "rows_per_lane": 4096,
+            "seqlen": 4096,
+            "wall_ms": 2942.404474131763
+          },
+          "prompt_index": 6,
+          "prompt_len": 4096
+        },
+        {
+          "compare_steps": 64,
+          "first_mismatch": {
+            "golden": 14325,
+            "golden_deficit": 0.6159782409667969,
+            "golden_logit": 33.09120559692383,
+            "match": false,
+            "position": 4098,
+            "predicted": 11868,
+            "step": 3,
+            "top1_logit": 33.707183837890625,
+            "top2_gap": 0.6159782409667969,
+            "top2_logit": 33.09120559692383
+          },
+          "matched": 63,
+          "prefill_evidence": {
+            "hc_boundary": null,
+            "moe": {
+              "overlapped_calls": 10,
+              "overlapped_rows": 40960,
+              "sequential_calls": 0,
+              "sequential_rows": 0
+            },
+            "moe_global_rows": 16384,
+            "prefill_forwards": 1,
+            "rows_per_lane": 4096,
+            "seqlen": 4096,
+            "wall_ms": 2941.3855948951095
+          },
+          "prompt_index": 7,
+          "prompt_len": 4096
+        }
+      ],
+      "prefill_coverage": {
+        "hc_calls": 0,
+        "hc_split_calls": 0,
+        "moe_overlapped_calls": 80,
+        "moe_sequential_calls": 0,
+        "prompt_lengths": [
+          1024,
+          1024,
+          1024,
+          2048,
+          2048,
+          2048,
+          4096,
+          4096
+        ]
+      },
+      "prompts": 8,
+      "total_tokens": 512
+    }
+  },
+  "modes": [
+    "eager"
+  ],
+  "moe_input_dtype": "bf16",
+  "moe_overlap_blocks": 2,
+  "nccl_env": {
+    "NCCL_IB_DISABLE": "0",
+    "NCCL_NET_GDR_LEVEL": null,
+    "NCCL_P2P_LEVEL": "SYS",
+    "NCCL_SOCKET_IFNAME": "enp33s0f0"
+  },
+  "placement": {
+    "accepted": true,
+    "ranks": [
+      {
+        "host": "titan064",
+        "local_rank": 0,
+        "rank": 0,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 1,
+        "rank": 1,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 2,
+        "rank": 2,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 3,
+        "rank": 3,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 4,
+        "rank": 4,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 5,
+        "rank": 5,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 6,
+        "rank": 6,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 7,
+        "rank": 7,
+        "stage": 1
+      },
+      {
+        "host": "titan065",
+        "local_rank": 0,
+        "rank": 8,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 1,
+        "rank": 9,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 2,
+        "rank": 10,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 3,
+        "rank": 11,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 4,
+        "rank": 12,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 5,
+        "rank": 13,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 6,
+        "rank": 14,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 7,
+        "rank": 15,
+        "stage": 3
+      }
+    ],
+    "stage_hosts": {
+      "0": [
+        "titan064"
+      ],
+      "1": [
+        "titan064"
+      ],
+      "2": [
+        "titan065"
+      ],
+      "3": [
+        "titan065"
+      ]
+    }
+  },
+  "prompt_lengths": [
+    1024,
+    1024,
+    1024,
+    2048,
+    2048,
+    2048,
+    4096,
+    4096
+  ],
+  "prompt_results": {
+    "eager": [
+      {
+        "compare_steps": 64,
+        "matched": 62,
+        "prompt_index": 0
+      },
+      {
+        "compare_steps": 64,
+        "matched": 61,
+        "prompt_index": 1
+      },
+      {
+        "compare_steps": 64,
+        "matched": 63,
+        "prompt_index": 2
+      },
+      {
+        "compare_steps": 64,
+        "matched": 64,
+        "prompt_index": 3
+      },
+      {
+        "compare_steps": 64,
+        "matched": 61,
+        "prompt_index": 4
+      },
+      {
+        "compare_steps": 64,
+        "matched": 58,
+        "prompt_index": 5
+      },
+      {
+        "compare_steps": 64,
+        "matched": 59,
+        "prompt_index": 6
+      },
+      {
+        "compare_steps": 64,
+        "matched": 63,
+        "prompt_index": 7
+      }
+    ]
+  },
+  "rank": 15,
+  "ratio4_index_mode": "ref",
+  "schema_version": 1,
+  "share_moe_buffers": true,
+  "stage": 3,
+  "stage_layer_ids": {
+    "0": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "1": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "2": [
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "3": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42
+    ]
+  },
+  "tokenizer_preflight": {
+    "accepted": true,
+    "eos_token_id": 1
+  },
+  "torch": "2.11.0+cu130",
+  "tp_group_binding": {
+    "backend": "nccl",
+    "global_rank": 15,
+    "global_ranks": [
+      12,
+      13,
+      14,
+      15
+    ],
+    "local_rank": 3,
+    "validated_live": true,
+    "world_size": 4
+  },
+  "tp_rank": 3,
+  "world": 16
+}
