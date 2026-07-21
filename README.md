@@ -137,8 +137,23 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   方法论修复——两个杠杆的"通过"此前都不具判定力。**
 - 能力缺口记录:runtime **没有增量 chunked prefill**
   (`Ratio4FullPositionAttention` 对多 token 输入强制 `start_pos == 0`),
-  §7 Phase 4 的 chunked 交错需先补该能力。下一步:ratio-4 attention 深挖
-  (现最大非 MoE 项)、增量 chunked prefill 能力、serving。
+  §7 Phase 4 的 chunked 交错需先补该能力。
+- **增量 chunked prefill 已实现**([`C3F`](experiments/C3F-chunked-prefill/README.md)
+  + [`C2F/chunked`](experiments/C2F-prefill/results/chunked/README.md);reference 里
+  不存在"多 token 且 start_pos>0"的分支可抄,语义由"prefill 终态 == decode 运行态"
+  推导):compressor 状态机**逐位 27/27**、topk 索引集**精确 18/18**。
+  **吞吐上分段不划算**(整段 25,307 vs 分段 0.958–0.990×,单调);C3F 观察到的
+  1.5–2.3× 已被同口径证伪并归因——那是整段路径在 0.6 GiB 余量下的分配器压力,
+  真实规律是**规模经济**(每 token 成本随单次 forward 行数下降),O(s²) 上下文税
+  仅 +1.08%~+3.33%。**分段的价值是容量**:峰值 20.409→14.095 GiB,且
+  **整段 16384 四卡全 OOM 而 16×1024 只用 14.4 GiB**(整段上限 ≈11.4K token)——
+  chunking 把 prefill 峰值从 O(总长) 变成 O(段长)。
+- **§6 的"2 节点无 P/D 分离空间"修正为有条件成立**:decode 8K 前沿每卡余
+  0.531 GiB,整段 prefill 需 7.54 GiB(14×,判断成立),但 1024 段长只需
+  1.229 GiB,可用约 10 个 bl 的 decode 退让(≈ −8% decode)买到同池。
+  即"结构上不可能" → "**约 8% decode 代价 + 必须分段 prefill**"。
+- 下一步:ratio-4 attention 深挖(现最大非 MoE 项)、chunked prefill 的自有
+  golden(使其可默认开启)、P/D 同池实现与 serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
 - **Prefill 基线与杠杆已实测**
