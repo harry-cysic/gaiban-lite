@@ -92,6 +92,7 @@ from dsv4_direct.dp_caliber import (
     oracle_state_to_device,
 )
 from dsv4_direct.hc_boundary_backend import resolve_hc_boundary_backend
+from dsv4_direct.mode_witness import collect_attention_modes
 from dsv4_direct.head_stage import (
     EmbedHeadMaterial,
     embed_hc_residual,
@@ -914,21 +915,10 @@ def main() -> int:
         # process looks exactly like a variant that does not work.  Record what
         # the built blocks actually resolved to, so a no-op flag is visible in
         # the artifact instead of being read as a negative result.
-        result["attention_modes"] = {
-            str(layer_id): {
-                key: getattr(block.attention, key)
-                for key in (
-                    "indexer_qat_mode",
-                    "kv_qat_mode",
-                    "index_score_mode",
-                    "nope_quant_mode",
-                )
-                if hasattr(block.attention, key)
-            }
-            for layer_id, block in zip(
-                graph_lane.stage.layer_ids, graph_lane.stage.blocks, strict=True
-            )
-        }
+        result["attention_modes"] = collect_attention_modes(
+            layer_ids=graph_lane.stage.layer_ids,
+            attentions=[block.attention for block in graph_lane.stage.blocks],
+        )
         result["diagnostic_seconds"]["build"] = time.perf_counter() - phase_started
         memory_snapshot("after_build")
         if rank in (0, 4, 8, 12):

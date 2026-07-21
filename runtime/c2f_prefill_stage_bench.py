@@ -73,6 +73,7 @@ from dsv4_direct.physical_stage import (
     PhysicalLayerMaterial,
     build_physical_stage,
 )
+from dsv4_direct.mode_witness import collect_attention_modes
 from dsv4_direct.ratio4_fullpos import Ratio4FullPositionAttention
 
 
@@ -953,14 +954,9 @@ def main() -> int:
                 ),
             )
             if result.get("resolved_attention_modes") is None:
-                result["resolved_attention_modes"] = {
-                    str(material.layer_id): {
-                        key: getattr(attention, key)
-                        for key in ("kv_qat_mode", "indexer_qat_mode")
-                        if hasattr(attention, key)
-                    }
-                    for material, attention in lane.layers
-                }
+                result["resolved_attention_modes"] = collect_attention_modes(
+                    lane.layers
+                )
             return lane
 
         def make_residual(iteration: int) -> torch.Tensor:
