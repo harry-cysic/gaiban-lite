@@ -76,6 +76,7 @@ import json
 import os
 import platform
 import statistics
+import sys
 import time
 import traceback
 from datetime import timedelta
@@ -613,6 +614,16 @@ def main() -> int:
     parser.add_argument(
         "--hc-backend", type=str, default="fused", choices=("fused", "eager", "default")
     )
+    parser.add_argument(
+        "--attention-tp-shard",
+        action="store_true",
+        help=(
+            "E6F variant A: shard the attention o-path across TP4. NOT bitwise "
+            "(changed summation order, TARGET 9.6) -- release goes through the "
+            "D0L soft gate, so --check-mode bitwise still applies only to the "
+            "graph-vs-eager comparison within one arm."
+        ),
+    )
     parser.add_argument("--progress-every", type=int, default=256)
     parser.add_argument("--config-tag", type=str, default="nogdr")
     args = parser.parse_args()
@@ -822,6 +833,7 @@ def main() -> int:
                 max_seq_len=max_seq_len,
                 global_row_shapes=(global_rows,),
                 slots_per_shape=4,
+                attention_tp_shard=args.attention_tp_shard,
                 progress_every=args.progress_every,
                 progress=(
                     (lambda message: print(f"[E1F] {message}", flush=True))
@@ -915,6 +927,26 @@ def main() -> int:
         # process looks exactly like a variant that does not work.  Record what
         # the built blocks actually resolved to, so a no-op flag is visible in
         # the artifact instead of being read as a negative result.
+        # Witness, take three.  Discovering *_mode/*_backend attributes was
+        # not enough: the o-path sharding state lives in tp_size/tp_rank, which
+        # match no naming convention, so an E6F run whose flag had been dropped
+        # by the launcher looked identical to one where sharding did nothing.
+        # Record what was *asked for* (argv) beside what was *resolved*, so the
+        # two can disagree visibly.
+        result["argv"] = list(sys.argv)
+        result["attention_tp"] = {
+            str(layer_id): {
+                "tp_size": getattr(block.attention.config, "tp_size", None),
+                "tp_rank": getattr(block.attention.config, "tp_rank", None),
+                "local_num_heads": getattr(
+                    block.attention.config, "local_num_heads", None
+                ),
+                "wo_b_shape": list(block.attention.weights.wo_b.shape),
+            }
+            for layer_id, block in zip(
+                graph_lane.stage.layer_ids, graph_lane.stage.blocks, strict=True
+            )
+        }
         result["attention_modes"] = collect_attention_modes(
             layer_ids=graph_lane.stage.layer_ids,
             attentions=[block.attention for block in graph_lane.stage.blocks],

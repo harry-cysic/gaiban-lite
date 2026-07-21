@@ -14,6 +14,9 @@ CHECK=${2:?check_mode off|bitwise}
 ROUNDS=${3:-3}
 STEPS=${4:-300}
 START=${5:-2048}
+shift 5 2>/dev/null || shift $#
+EXTRA="$*"   # anything further goes to the bench; without this a flag is
+             # silently dropped and reads as "the lever does nothing" (E6F)
 
 MASTER=10.234.1.64
 PORT=29651
@@ -33,7 +36,7 @@ done
 ENV_BASE='export CUDA_HOME=/usr/local/cuda-13.2; export PATH=$CUDA_HOME/bin:$PATH; export LD_LIBRARY_PATH=$CUDA_HOME/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}; export NCCL_SOCKET_IFNAME=enp33s0f0 NCCL_IB_DISABLE=0 NCCL_P2P_LEVEL=SYS TORCH_NCCL_ASYNC_ERROR_HANDLING=1'"; ${E1F_EXTRA_ENV:-:}"
 
 launch() {  # node_rank
-  echo "cd ~/e0f-runtime && rm -rf $OUT && $ENV_BASE; $TR --nnodes 2 --node-rank $1 --nproc-per-node 8 --master-addr $MASTER --master-port $PORT e1f_full_decode_bench.py --stage-root ~/Workspace/DeepSeek-V4-Flash --out-dir $OUT --local-batch $B --check-mode $CHECK --rounds $ROUNDS --steps $STEPS --start-position $START --config-tag nogdr"
+  echo "cd ~/e0f-runtime && rm -rf $OUT && $ENV_BASE; $TR --nnodes 2 --node-rank $1 --nproc-per-node 8 --master-addr $MASTER --master-port $PORT e1f_full_decode_bench.py --stage-root ~/Workspace/DeepSeek-V4-Flash --out-dir $OUT --local-batch $B --check-mode $CHECK --rounds $ROUNDS --steps $STEPS --start-position $START --config-tag nogdr $EXTRA"
 }
 
 echo "== E1F bl=$B check=$CHECK rounds=$ROUNDS steps=$STEPS start=$START =="

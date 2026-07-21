@@ -698,6 +698,11 @@ def main() -> int:
         "--max-steps", type=int, default=MAX_COMPARE_STEPS,
         help="cap on compared completion steps per prompt",
     )
+    parser.add_argument(
+        "--attention-tp-shard",
+        action="store_true",
+        help="E6F variant A: shard the attention o-path across TP4 (not bitwise)",
+    )
     parser.add_argument("--progress-every", type=int, default=64)
     parser.add_argument(
         "--kv-dtype",
@@ -954,6 +959,7 @@ def main() -> int:
             max_seq_len=args.max_seq_len,
             global_row_shapes=global_row_shapes,
             slots_per_shape=1,
+            attention_tp_shard=args.attention_tp_shard,
             share_moe_buffers=args.share_moe_buffers,
             kv_dtype=args.kv_dtype,
             indexer_kv_dtype=args.indexer_kv_dtype,
