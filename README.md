@@ -6,13 +6,16 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
 实验方法与 kernel 资产来源：`../gaiban`（DeepSeek-V4-Pro on 64×4090）。
 长期目标与无人值守约束见 [`CLAUDE_GOAL.md`](CLAUDE_GOAL.md)。
 
-## 当前状态（2026-07-21）
+## 当前状态（2026-07-22）
 
 **权威目标定义见 [`docs/TARGET-v4-flash.md`](docs/TARGET-v4-flash.md)**（两级验收 +
 模式矩阵 + 已证伪假设清单）。本段只给一句话现状与索引；数字的权威副本在该文档的
 "实测"列，推导与证据在各实验 README 与 git history。
 
-### 已放行的实测（裸引擎，均过 D0L 长门 494/512，容差从未放宽）
+### 已放行的实测（裸引擎，均过 D0L 长门，容差从未放宽）
+
+⚠️ **门基准已于 2026-07-22 从 8 条/512 位迁到 v2 十条/640 位**，分数基线
+494/512 → **614/640**，`top2_gap` 包络常数**逐位未变**（迁移记录见 TARGET §1.3）。
 
 **全部为专业版口径 = 一套 16 卡系统的整系统数字**（TARGET §9.13）。
 **标准版（一套 8 卡系统）目前一格实测都没有**，且不得由下表折算得到——
@@ -24,7 +27,11 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
 | 聚合 decode @2K | **9,656** tok/s | 同上，bl128×mb2 | E1IF/MTP |
 | prefill | **28,622** input tok/s | 16 卡、whole-8192、tilelang 稀疏核 + 融合 QAT 核 | C2F/C4F |
 | 混合单池 8K/1K | T=**2,538** tok/s | 裸引擎折算 | — |
-| 单路 decode | **29.1** tok/s（+MTP ~40） | 16 卡、B=1、graph、两个融合 QAT 核 | E1F/MTP/E4F/E5F |
+| 单路 decode | **39.2** tok/s（+MTP ~40） | 16 卡、B=1、graph、两个融合 QAT 核、**attention TP4 分片**（已放行默认） | E1F/E6F |
+
+⚠️ **分片已于 2026-07-22 设为默认**（E6F，门基准迁到 D0L v2 640 位后两条判据 PASS）。
+**此前所有"不带 flag"的数字都是未分片口径**（单路 29.2 即是），与上表**不可直接比较**。
+**聚合与 prefill 尚未在新默认下重测**，上表两行仍是未分片口径。
 
 单路那一格已有完整归因（E2F）：36.3 ms/token = 投影字节 14.0 + 固定
 elementwise 尾巴 12.1 + 其余图内 4.5 + head 2.6 + 16-rank 固定偏移 2.3
@@ -47,9 +54,13 @@ attention 权重在每个 TP rank 上是完整副本（DP-attention），占 12.
   权重 23.05 GiB > 卡容量。**证伪范围仅限吞吐档位**（M7 的 10–16K 聚合）——
   attention TP4 分片 + FP8 常驻后模型装得下（余 1.13 GiB），
   故客户口径的标准版五行须**逐行**重算容量，见 TARGET §7.7。
+- **Phase 1 进行中（TARGET §10 交付路线）**:专业版单路 serving 做实。
+  E7F 已证 prefill 出来的状态是合法 decode 状态（分片默认下逐位），
+  正在把真实 prompt 接到图路径上。
 - **最大空白**（按 TARGET §2 优先级）:elementwise 尾巴折叠（decode 侧最大单一
-  可攻项，39.5%，每步固定成本；E4F+E5F 已取下两块共 +4.74%，其余按链未拆解）、attention TP4 分片（M4 延迟目标与 8 卡可行性的共同前提）、
-  M5 长上下文（零覆盖）、serving 折扣验证。
+  可攻项，39.5%，每步固定成本；E4F+E5F 已取下两块共 +4.74%，其余按链未拆解）、
+  M5 长上下文（零覆盖）、serving 折扣验证（Phase 1 的产出）。
+  ~~attention TP4 分片~~ **已放行并设默认**（E6F）。
 
 ### 实验索引
 
@@ -58,4 +69,5 @@ B1·B2 标定 | A0 契约 | D0·D0L golden oracle | A3F·A4F·A5F·A6F kernel |
 C1F 集成 block | E1F 吞吐与容量前沿 | C2F·C3F·C4F prefill |
 E2F B=1 decode 延迟 profile | E3F 8 卡容量判决 |
 E4F·E5F decode 融合 QAT 核（indexer / KV latent） |
+E6F attention TP4 分片（已放行、已默认） | E7F 单路 serving 骨架（进行中） |
 `runtime/` 是 direct runtime 与全部门脚本（非安装包，靠 rsync 到 titan 运行）。
