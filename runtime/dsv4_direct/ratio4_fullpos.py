@@ -43,6 +43,11 @@ C2F prefill additions (all default-off, decode paths untouched):
   attention core.  Rows are independent (per-row softmax), so slicing is
   bitwise identical; it only bounds the FP32 gather workspace
   (``[b, rows, k, 512]``) that would otherwise reach ~10.7 GB at 8192.
+- ``prefill_sparse_backend`` (21st vertical): ``"torch"`` (default, the
+  frozen masked-einsum core) or ``"tilelang"`` (reference ``sparse_attn``
+  kernel with an sm89 head loop, ``ops/tilelang_sparse.py``).  Prefill only
+  -- the decode step below always uses the torch core.  Defaults from
+  ``DSV4_PREFILL_SPARSE_BACKEND`` when the argument is omitted.
 - State is held in plain reference-shaped tensors (raw ring, compressed
   rows, indexer rows, 2x4-slot overlap kv/score states initialized to
   ``(0, -inf)`` exactly like the reference ``register_buffer`` init,
@@ -81,6 +86,10 @@ from .static_ratio4_kv import (
     LATENT_DIM,
     WINDOW_SIZE,
 )
+from .ops.tilelang_sparse import (
+    prefill_sparse_core,
+    resolve_prefill_sparse_backend,
+)
 
 
 class Ratio4FullPositionError(ValueError):
@@ -102,12 +111,17 @@ class Ratio4FullPositionAttention:
         index_score_mode: str = "ref",
         fuse_min_seqlen: int = 1024,
         sparse_row_block: int | None = None,
+        prefill_sparse_backend: str | None = None,
     ) -> None:
         config.validate()
         if index_score_mode not in ("ref", "fused", "paired_gate"):
             raise Ratio4FullPositionError(
                 f"index_score_mode must be ref/fused/paired_gate, got {index_score_mode!r}"
             )
+        try:
+            resolved_backend = resolve_prefill_sparse_backend(prefill_sparse_backend)
+        except ValueError as error:
+            raise Ratio4FullPositionError(str(error)) from error
         if (
             not isinstance(fuse_min_seqlen, int)
             or isinstance(fuse_min_seqlen, bool)
@@ -139,6 +153,7 @@ class Ratio4FullPositionAttention:
         self.index_score_mode = index_score_mode
         self.fuse_min_seqlen = fuse_min_seqlen
         self.sparse_row_block = sparse_row_block
+        self.prefill_sparse_backend = resolved_backend
         self.index_gate_records: list[dict] = []
         self.device = torch.device(device)
         self.freqs_cis = precompute_freqs_cis(
@@ -759,14 +774,23 @@ class Ratio4FullPositionAttention:
             device=hidden.device,
         )
         topk = torch.cat((window, compressed_indices), dim=-1).contiguous()
+        # 21st vertical: prefill-only sparse core selection.  ``tilelang``
+        # swaps in the reference kernel for the start_pos == 0 call; the
+        # decode step below keeps the torch core unconditionally.  Row
+        # blocking bounds the torch core's FP32 gather workspace only, which
+        # the kernel never materializes, so the tilelang arm runs one call.
         row_block = self.sparse_row_block
+        sparse_core = torch_sparse_attention
+        if start_pos == 0 and self.prefill_sparse_backend != "torch":
+            sparse_core = prefill_sparse_core(self.prefill_sparse_backend)
+            row_block = None
         if row_block is not None and start_pos == 0 and seqlen > row_block:
             # Query rows are independent (per-row mask/softmax), so blocking
             # the row axis is bitwise identical to the single call; it only
             # bounds the FP32 gather workspace [b, rows, k, 512].
             output = torch.cat(
                 [
-                    torch_sparse_attention(
+                    sparse_core(
                         query[:, begin : begin + row_block],
                         attention_kv,
                         weights.attn_sink,
@@ -778,7 +802,7 @@ class Ratio4FullPositionAttention:
                 dim=1,
             )
         else:
-            output = torch_sparse_attention(
+            output = sparse_core(
                 query,
                 attention_kv,
                 weights.attn_sink,

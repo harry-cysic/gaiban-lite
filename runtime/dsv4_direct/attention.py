@@ -591,6 +591,20 @@ def _prefill_sparse_row_block() -> int | None:
     return value if value > 0 else None
 
 
+def _prefill_sparse_backend() -> str:
+    """Prefill-only sparse core selector (21st vertical), from the environment.
+
+    ``DSV4_PREFILL_SPARSE_BACKEND`` unset = ``"torch"`` (the shipped masked
+    einsum core).  ``"tilelang"`` swaps in the reference kernel for the
+    ``start_pos == 0`` call only -- decode keeps the torch core and every
+    plan-driven/stateful path is untouched.
+    """
+
+    from .ops.tilelang_sparse import resolve_prefill_sparse_backend
+
+    return resolve_prefill_sparse_backend()
+
+
 def torch_sparse_attention(
     query: torch.Tensor,
     latent_kv: torch.Tensor,
@@ -1603,11 +1617,25 @@ class Ratio128TorchAttention:
         # blocked form is bitwise identical to the single call; it only
         # bounds the FP32 gather workspace at long prefill chunks.  Default
         # off (env unset) -- decode and all oracle paths are unchanged.
+        # 21st vertical: the prefill sparse core may be the reference tilelang
+        # kernel instead (env-selected, default torch; decode is never
+        # switched).  Row blocking exists only to bound the torch core's FP32
+        # gather workspace, which the kernel never materializes, so the
+        # tilelang arm runs the single call (rows are independent -- both
+        # forms are the same math).
         row_block = _prefill_sparse_row_block()
+        sparse_core = torch_sparse_attention
+        if start_pos == 0:
+            backend = _prefill_sparse_backend()
+            if backend != "torch":
+                from .ops.tilelang_sparse import prefill_sparse_core
+
+                sparse_core = prefill_sparse_core(backend)
+                row_block = None
         if row_block is not None and start_pos == 0 and seqlen > row_block:
             output = torch.cat(
                 [
-                    torch_sparse_attention(
+                    sparse_core(
                         query[:, begin : begin + row_block],
                         attention_kv,
                         self.weights.attn_sink,
@@ -1619,7 +1647,7 @@ class Ratio128TorchAttention:
                 dim=1,
             )
         else:
-            output = torch_sparse_attention(
+            output = sparse_core(
                 query,
                 attention_kv,
                 self.weights.attn_sink,

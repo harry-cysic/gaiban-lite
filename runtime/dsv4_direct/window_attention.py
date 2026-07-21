@@ -956,7 +956,19 @@ class WindowTorchAttention:
             device=hidden.device,
         )
         record("topk", topk)
-        output = torch_sparse_attention(
+        # 21st vertical: prefill-only optional tilelang sparse core (env
+        # selected, default torch).  Decode (start_pos > 0, seqlen == 1) keeps
+        # the torch core unconditionally.
+        sparse_core = torch_sparse_attention
+        if start_pos == 0:
+            from .attention import _prefill_sparse_backend
+
+            backend = _prefill_sparse_backend()
+            if backend != "torch":
+                from .ops.tilelang_sparse import prefill_sparse_core
+
+                sparse_core = prefill_sparse_core(backend)
+        output = sparse_core(
             query,
             attention_kv,
             self.weights.attn_sink,

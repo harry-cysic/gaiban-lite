@@ -97,6 +97,7 @@ class PrefillLane:
         index_score_mode: str,
         fuse_min_seqlen: int,
         sparse_row_block: int | None,
+        prefill_sparse_backend: str = "torch",
     ) -> None:
         self.device = device
         self.layers: list[tuple[PhysicalLayerMaterial, Any]] = []
@@ -112,6 +113,7 @@ class PrefillLane:
                     index_score_mode=index_score_mode,
                     fuse_min_seqlen=fuse_min_seqlen,
                     sparse_row_block=sparse_row_block,
+                    prefill_sparse_backend=prefill_sparse_backend,
                 )
             else:
                 state = material.new_state(num_local_sequences=LOCAL_BATCH)
@@ -328,6 +330,23 @@ def main() -> int:
     parser.add_argument("--warmup", type=int, default=2)
     parser.add_argument("--seed", type=int, default=20260721)
     parser.add_argument("--input-scale", type=float, default=0.02)
+    parser.add_argument(
+        "--sparse-backend", choices=["torch", "tilelang"], default="torch",
+        help="prefill sparse attention core (21st vertical); tilelang uses "
+        "the reference kernel with an sm89 head loop for every prefill call "
+        "(ratio-4, ratio-128, window) and ignores --row-block, which exists "
+        "only to bound the torch core's FP32 gather workspace",
+    )
+    parser.add_argument(
+        "--sparse-head-chunk", type=int, default=16,
+        help="tilelang head-loop width (16 is the sm89 maximum)",
+    )
+    parser.add_argument(
+        "--gate-sparse", action="store_true",
+        help="layer-level A/B of the prefill sparse core on real weights "
+        "(torch vs tilelang, identical residual) -- the ratio-4 prefill gate, "
+        "which has no single-layer oracle",
+    )
     parser.add_argument("--gate-indexer", action="store_true")
     parser.add_argument("--gate-w4a8", action="store_true")
     parser.add_argument("--progress-every", type=int, default=128)
@@ -337,6 +356,10 @@ def main() -> int:
     # the FP32 gather workspace) -- must be set before any prefill call.
     if args.row_block > 0:
         os.environ["DSV4_PREFILL_SPARSE_ROW_BLOCK"] = str(args.row_block)
+    # ratio-128 / window prefill sparse core (the ratio-4 layer takes it as a
+    # constructor argument); must also be set before any prefill call.
+    os.environ["DSV4_PREFILL_SPARSE_BACKEND"] = args.sparse_backend
+    os.environ["DSV4_PREFILL_SPARSE_HEAD_CHUNK"] = str(args.sparse_head_chunk)
 
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
     torch.cuda.set_device(local_rank)
@@ -385,6 +408,8 @@ def main() -> int:
         "indexer": args.indexer,
         "fuse_min_seqlen": args.fuse_min_seqlen,
         "row_block": args.row_block,
+        "sparse_backend": args.sparse_backend,
+        "sparse_head_chunk": args.sparse_head_chunk,
         "iters": args.iters,
         "warmup": args.warmup,
         "seed": args.seed,
@@ -470,13 +495,16 @@ def main() -> int:
         materials = list(stage.materials)
         row_block = args.row_block if args.row_block > 0 else None
 
-        def make_lane(index_score_mode: str) -> PrefillLane:
+        def make_lane(
+            index_score_mode: str, sparse_backend: str | None = None
+        ) -> PrefillLane:
             return PrefillLane(
                 materials,
                 device=device,
                 index_score_mode=index_score_mode,
                 fuse_min_seqlen=args.fuse_min_seqlen,
                 sparse_row_block=row_block,
+                prefill_sparse_backend=sparse_backend or args.sparse_backend,
             )
 
         def make_residual(iteration: int) -> torch.Tensor:
@@ -544,6 +572,102 @@ def main() -> int:
         component_walls["total_instrumented"] = time.perf_counter() - started
         result["component_walls_s"] = component_walls
         del lane, residual
+
+        # ---------------- prefill sparse-core A/B gate (optional) --------
+        # The ratio-4 prefill path has no single-layer oracle (e0ff is frozen
+        # to saturated decode positions), so this is its layer-level gate:
+        # identical residual through two freshly built lanes, per-layer
+        # attention branch plus the compounded 11-layer stage output.
+        if args.gate_sparse:
+
+            def delta(reference: torch.Tensor, candidate: torch.Tensor) -> dict:
+                reference = reference.float()
+                candidate = candidate.float()
+                difference = candidate - reference
+                return {
+                    "rel_fro": float(
+                        torch.linalg.norm(difference)
+                        / torch.linalg.norm(reference)
+                    ),
+                    "max_abs": float(difference.abs().max()),
+                    "reference_max_abs": float(reference.abs().max()),
+                    "nonfinite": int((~torch.isfinite(candidate)).sum()),
+                }
+
+            # Two lanes driven in lockstep: each layer's attention is called
+            # once per backend on the *same* hidden, so every delta is the
+            # local kernel error rather than the compounded chain divergence.
+            # The chain then advances on the torch branch for both, keeping
+            # their states on one trajectory.  ratio-128 layers read the
+            # backend from the environment, so it is flipped per call.
+            control = make_lane(args.indexer, sparse_backend="torch")
+            candidate_lane = make_lane(args.indexer, sparse_backend="tilelang")
+            residual = make_residual(30_000)
+            per_layer = []
+            for index, (material, control_attention) in enumerate(control.layers):
+                _, candidate_attention = candidate_lane.layers[index]
+                hc = material.raw_block.hyper_connection
+                hidden, post, comb = hc_pre(
+                    residual,
+                    hc.attn_fn,
+                    hc.attn_scale,
+                    hc.attn_base,
+                    norm_eps=material.norm_eps,
+                    sinkhorn_iters=material.sinkhorn_iters,
+                    hc_eps=material.hc_eps,
+                )
+                hidden = rms_norm(
+                    hidden, material.raw_block.attn_norm, eps=material.norm_eps
+                )
+                os.environ["DSV4_PREFILL_SPARSE_BACKEND"] = "torch"
+                control_branch = PrefillLane._attention_branch(
+                    material, control_attention, hidden, 0
+                )
+                os.environ["DSV4_PREFILL_SPARSE_BACKEND"] = "tilelang"
+                candidate_branch = PrefillLane._attention_branch(
+                    material, candidate_attention, hidden, 0
+                )
+                torch.cuda.synchronize(device)
+                entry = {"layer_index": index, "kind": material.kind}
+                entry.update(delta(control_branch, candidate_branch))
+                per_layer.append(entry)
+                del candidate_branch
+
+                residual = hc_post(control_branch, residual, post, comb)
+                hidden, post, comb = hc_pre(
+                    residual,
+                    hc.ffn_fn,
+                    hc.ffn_scale,
+                    hc.ffn_base,
+                    norm_eps=material.norm_eps,
+                    sinkhorn_iters=material.sinkhorn_iters,
+                    hc_eps=material.hc_eps,
+                )
+                hidden = rms_norm(
+                    hidden, material.raw_block.ffn_norm, eps=material.norm_eps
+                )
+                residual = hc_post(
+                    material.moe.forward_tensor(hidden, slot=0),
+                    residual,
+                    post,
+                    comb,
+                )
+                del control_branch, hidden
+            os.environ["DSV4_PREFILL_SPARSE_BACKEND"] = args.sparse_backend
+            result["sparse_gate"] = {
+                "form": "layer-locked: both backends see the same hidden; the "
+                "chain advances on the torch branch",
+                "per_layer_branch": per_layer,
+                "worst_branch_rel_fro": max(e["rel_fro"] for e in per_layer),
+                "worst_by_kind": {
+                    kind: max(
+                        e["rel_fro"] for e in per_layer if e["kind"] == kind
+                    )
+                    for kind in sorted({e["kind"] for e in per_layer})
+                },
+            }
+            del control, candidate_lane, residual
+            torch.cuda.empty_cache()
 
         # ---------------- paired indexer gate (optional) -----------------
         if args.gate_indexer:

@@ -1,0 +1,69 @@
+[03:42:20] /project/src/transform/thread_storage_sync.cc:841: Warning: [ThreadSync] Hoisting sync from inside if to before if. Condition depends on runtime value: thread_binding % 32 // 4 * 2 + thread_binding % 64 // 32 == 0
+[03:42:21] /project/src/transform/thread_storage_sync.cc:841: Warning: [ThreadSync] Hoisting sync from inside if to before if. Condition depends on runtime value: thread_binding % 32 // 4 * 2 + thread_binding % 64 // 32 == 0
+[03:42:21] /project/src/transform/thread_storage_sync.cc:841: Warning: [ThreadSync] Hoisting sync from inside if to before if. Condition depends on runtime value: thread_binding % 32 // 4 * 2 + thread_binding % 64 // 32 == 0
+[03:42:32] /project/src/transform/thread_storage_sync.cc:841: Warning: [ThreadSync] Hoisting sync from inside if to before if. Condition depends on runtime value: thread_binding % 32 // 4 * 4 + thread_binding % 128 // 32 == 0
+[03:42:32] /project/src/transform/thread_storage_sync.cc:841: Warning: [ThreadSync] Hoisting sync from inside if to before if. Condition depends on runtime value: thread_binding % 32 // 4 * 4 + thread_binding % 128 // 32 == 0
+[03:42:32] /project/src/transform/thread_storage_sync.cc:841: Warning: [ThreadSync] Hoisting sync from inside if to before if. Condition depends on runtime value: thread_binding % 32 // 4 * 4 + thread_binding % 128 // 32 == 0
+{"name": "window-96", "kind": "window", "seqlen": 96, "kv_rows": 96, "candidates": 96, "padding_fraction": 0.494792, "first_row_valid": 1, "sink_margin": {"max_sink_minus_rowmax": 2.8944780826568604, "min_sink_minus_rowmax": -2.0700619220733643, "fp32_exp_overflow_threshold": 88.0}}
+  head_chunk_16: {"rel_fro": 0.0019473396241664886, "max_abs": 0.00048828125, "reference_max_abs": 0.1748046875, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.0019473396241664886, "max_abs": 0.00048828125, "reference_max_abs": 0.1748046875, "candidate_nonfinite": 0, "pass": true}
+{"name": "window-128", "kind": "window", "seqlen": 128, "kv_rows": 128, "candidates": 128, "padding_fraction": 0.496094, "first_row_valid": 1, "sink_margin": {"max_sink_minus_rowmax": 2.387206792831421, "min_sink_minus_rowmax": -2.1053354740142822, "fp32_exp_overflow_threshold": 88.0}}
+  head_chunk_16: {"rel_fro": 0.0019350488437339664, "max_abs": 0.00048828125, "reference_max_abs": 0.1513671875, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.0019350488437339664, "max_abs": 0.00048828125, "reference_max_abs": 0.1513671875, "candidate_nonfinite": 0, "pass": true}
+{"name": "window-200", "kind": "window", "seqlen": 200, "kv_rows": 200, "candidates": 128, "padding_fraction": 0.3175, "first_row_valid": 1, "sink_margin": {"max_sink_minus_rowmax": 2.144365072250366, "min_sink_minus_rowmax": -2.4294333457946777, "fp32_exp_overflow_threshold": 88.0}}
+  head_chunk_16: {"rel_fro": 0.001956111518666148, "max_abs": 0.00048828125, "reference_max_abs": 0.150390625, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.001956111518666148, "max_abs": 0.00048828125, "reference_max_abs": 0.150390625, "candidate_nonfinite": 0, "pass": true}
+{"name": "window-2048", "kind": "window", "seqlen": 2048, "kv_rows": 2048, "candidates": 128, "padding_fraction": 0.031006, "first_row_valid": 1, "sink_margin": {"max_sink_minus_rowmax": 2.1911706924438477, "min_sink_minus_rowmax": -2.080150604248047, "fp32_exp_overflow_threshold": 88.0}}
+  head_chunk_16: {"rel_fro": 0.002046267269179225, "max_abs": 0.00048828125, "reference_max_abs": 0.1474609375, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.002046267269179225, "max_abs": 0.00048828125, "reference_max_abs": 0.1474609375, "candidate_nonfinite": 0, "pass": true}
+{"name": "ratio128-128", "kind": "ratio128", "seqlen": 128, "kv_rows": 129, "candidates": 129, "padding_fraction": 0.499939, "first_row_valid": 1, "sink_margin": {"max_sink_minus_rowmax": 2.8906664848327637, "min_sink_minus_rowmax": -1.9976747035980225, "fp32_exp_overflow_threshold": 88.0}}
+  head_chunk_16: {"rel_fro": 0.0019659551326185465, "max_abs": 0.00048828125, "reference_max_abs": 0.1396484375, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.0019659551326185465, "max_abs": 0.00048828125, "reference_max_abs": 0.1396484375, "candidate_nonfinite": 0, "pass": true}
+{"name": "ratio128-512", "kind": "ratio128", "seqlen": 512, "kv_rows": 516, "candidates": 132, "padding_fraction": 0.139145, "first_row_valid": 1, "sink_margin": {"max_sink_minus_rowmax": 2.1544477939605713, "min_sink_minus_rowmax": -2.7883827686309814, "fp32_exp_overflow_threshold": 88.0}}
+  head_chunk_16: {"rel_fro": 0.0019805000629276037, "max_abs": 0.00048828125, "reference_max_abs": 0.1884765625, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.0019805000629276037, "max_abs": 0.00048828125, "reference_max_abs": 0.1884765625, "candidate_nonfinite": 0, "pass": true}
+{"name": "ratio128-2048", "kind": "ratio128", "seqlen": 2048, "kv_rows": 2064, "candidates": 144, "padding_fraction": 0.086534, "first_row_valid": 1, "sink_margin": {"max_sink_minus_rowmax": 3.0420799255371094, "min_sink_minus_rowmax": -3.3424572944641113, "fp32_exp_overflow_threshold": 88.0}}
+  head_chunk_16: {"rel_fro": 0.0020455936901271343, "max_abs": 0.00048828125, "reference_max_abs": 0.16015625, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.0020455936901271343, "max_abs": 0.00048828125, "reference_max_abs": 0.16015625, "candidate_nonfinite": 0, "pass": true}
+{"name": "ratio128-8192", "kind": "ratio128", "seqlen": 8192, "kv_rows": 8256, "candidates": 192, "padding_fraction": 0.174398, "first_row_valid": 1}
+  head_chunk_16: {"rel_fro": 0.0020559774711728096, "max_abs": 0.00048828125, "reference_max_abs": 0.130859375, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.0020559774711728096, "max_abs": 0.00048828125, "reference_max_abs": 0.130859375, "candidate_nonfinite": 0, "pass": true}
+{"name": "ratio4-512", "kind": "ratio4", "seqlen": 512, "kv_rows": 640, "candidates": 256, "padding_fraction": 0.312988, "first_row_valid": 1, "sink_margin": {"max_sink_minus_rowmax": 1.9303040504455566, "min_sink_minus_rowmax": -1.8323734998703003, "fp32_exp_overflow_threshold": 88.0}}
+  head_chunk_16: {"rel_fro": 0.0019893082790076733, "max_abs": 0.00048828125, "reference_max_abs": 0.12255859375, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.0019893082790076733, "max_abs": 0.00048828125, "reference_max_abs": 0.12255859375, "candidate_nonfinite": 0, "pass": true}
+{"name": "ratio4-2048", "kind": "ratio4", "seqlen": 2048, "kv_rows": 2560, "candidates": 640, "padding_fraction": 0.406592, "first_row_valid": 1, "sink_margin": {"max_sink_minus_rowmax": 1.7195589542388916, "min_sink_minus_rowmax": -1.745665192604065, "fp32_exp_overflow_threshold": 88.0}}
+  head_chunk_16: {"rel_fro": 0.0020175129175186157, "max_abs": 0.00048828125, "reference_max_abs": 0.140625, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.0020175129175186157, "max_abs": 0.00048828125, "reference_max_abs": 0.140625, "candidate_nonfinite": 0, "pass": true}
+{"name": "ratio4-8192", "kind": "ratio4", "seqlen": 8192, "kv_rows": 10240, "candidates": 640, "padding_fraction": 0.101648, "first_row_valid": 1}
+  head_chunk_16: {"rel_fro": 0.0020343498326838017, "max_abs": 0.00048828125, "reference_max_abs": 0.1357421875, "candidate_nonfinite": 0, "pass": true}
+  head_chunk_8: {"rel_fro": 0.0020343498326838017, "max_abs": 0.00048828125, "reference_max_abs": 0.1357421875, "candidate_nonfinite": 0, "pass": true}
+EDGE {
+ "all_padding_row": {
+  "torch_row0_all_zero": true,
+  "raw_kernel_row0_nonfinite": 32768,
+  "wrapper_row0_all_zero": true,
+  "wrapper_vs_torch": {
+   "rel_fro": 0.0020486009307205677,
+   "max_abs": 0.000244140625,
+   "reference_max_abs": 0.061767578125,
+   "candidate_nonfinite": 0
+  }
+ },
+ "stray_negative_padding": {
+  "raw_kernel_vs_torch": {
+   "rel_fro": 0.2987534701824188,
+   "max_abs": 0.02783203125,
+   "reference_max_abs": 0.08349609375,
+   "candidate_nonfinite": 0
+  },
+  "wrapper_vs_torch": {
+   "rel_fro": 0.0020093407947570086,
+   "max_abs": 0.00048828125,
+   "reference_max_abs": 0.08349609375,
+   "candidate_nonfinite": 0
+  }
+ }
+}
+WALL {"32": {"ok": false, "error": "InternalError: Failed to set the allowed dynamic shared memory size to 104448"}, "64": {"ok": false, "error": "InternalError: Failed to set the allowed dynamic shared memory size to 141312"}}
+PASS
+WROTE c2f-tilelang-op-gate.json
