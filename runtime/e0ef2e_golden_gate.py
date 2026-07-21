@@ -705,7 +705,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--attention-tp-shard",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
+        default=True,
         help="E6F variant A: shard the attention o-path across TP4 (not bitwise)",
     )
     parser.add_argument(
@@ -942,6 +943,12 @@ def main() -> int:
         ]
         result["max_seq_len"] = args.max_seq_len
         result["share_moe_buffers"] = bool(args.share_moe_buffers)
+        # 9.11: record the RESOLVED value, not just what was asked for.  This
+        # one has no *_mode naming convention, so mode_witness cannot find it,
+        # and it is exactly the field whose absence let a dropped
+        # --attention-tp-shard read as "the lever does nothing" (E6F step 8).
+        result["attention_tp_shard"] = bool(args.attention_tp_shard)
+        result["argv"] = list(sys.argv[1:])
         result["prefill_chunk"] = int(args.prefill_chunk)
 
         # The last decode step reads position prompt_len + compare_steps - 2 and

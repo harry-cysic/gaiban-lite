@@ -566,7 +566,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--attention-tp-shard",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
+        default=True,
         help="E6F variant A: shard the attention o-path across TP4",
     )
     parser.add_argument(

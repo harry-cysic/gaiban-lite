@@ -293,7 +293,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--attention-tp-shard",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
+        default=True,
         help=(
             "E6F variant A: shard the attention o-path across the TP4 group. "
             "Adds one all-reduce per layer inside the captured graph."
