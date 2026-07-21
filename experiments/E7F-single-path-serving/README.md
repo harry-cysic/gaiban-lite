@@ -197,16 +197,45 @@ arm G 和 arm S 逐位相同，说明捕图对一个 **prefill 来的**状态与
 
 ### 一个此前没人比过的对子
 
-据我检索，**stateful 与非 stateful decode 从未被直接对拍过**：
-`e0sf` / `e0kf` 比的是 stateful graph vs stateful eager（同实现），
-`e0e2e_ratio4_selfcheck` 比的是 fullpos vs **非** stateful `forward_decode_tensor`。
-本门是第一次把这两条接在一起比，于是看见了这 ≤1 ULP 的差。
+据我检索，**stateful 与非 stateful decode 从未被直接对拍过**。逐个核对过的近邻：
+
+| 门 | 它比的是什么 | 是否覆盖本对子 |
+|---|---|---|
+| `e0sf` 部分 (a) | `forward_decode_tensors`（superstage）vs 手工 `forward_decode_tensor` 链 | ❌ **两边都是非 stateful** |
+| `e0sf` 部分 (b) | stateful graph vs stateful eager | ❌ 两边都是 stateful |
+| `e0e2e_ratio4_selfcheck` | fullpos vs **非** stateful `forward_decode_tensor` | ❌ 两边都是非 stateful |
+| `e0kf` 系列 | fp8-KV 配对门 | ❌ |
+
+⚠️ `e0sf` (a) 的措辞（"superstage adds no arithmetic, so its gate is also bitwise"）
+容易被读成已经覆盖——**它没有**：那是 superstage 组合 vs 手工链，
+两边都走非 stateful 实现。本门是第一次把 stateful 与非 stateful 接在一起比。
 
 **这不推翻任何冻结数字**——E1F 的 bitwise 132/132 比的正是 graph vs stateful eager，
 本门在该对子上也拿到 0.0。但它有一个对 Phase 1 要紧的推论：
 **D0L 的质量证据跑在非 stateful 路径上（`e0ef2e`），而 serving 要跑 stateful 图路径，
 两者不是同一份代码，且已实测不逐位。**
 所以步 3"真实 prompt 经图路径对 golden token"**不是走过场，是必需的**。
+
+### 试到 11 层（真实 stage 0 形状）：本门自己装不下
+
+想把步 2 推到生产 stage 形状（层 0-10 = 16 卡配置里的 stage 0，prefill 2048），
+**OOM**：`23.18 GiB in use`，还差 384 MiB。
+
+⚠️ **第一次跑这个配置的读数是污染的**：开跑前 4 张卡各已占 15,375 MiB
+（上一轮的残留进程还在），那次 OOM 不算数。清干净后**重跑**，
+precheck 读到 4 MiB 总量，仍然 OOM——所以这是真的，不是残留。
+（HANDOFF §3.8 的老教训：**每次开跑前确认 1 MiB**。我打了快照却没让脚本
+据此中止，所以第一次白跑了一轮；现在的命令里加了 precheck 会 `exit 9`。）
+
+**这是本门的开销，不是 runtime 的容量结论**：门为了做对照，同时持有
+prefill lane 的状态、decode 侧的状态、以及两份快照。
+⚠️ **各项占比未归因**——11 层权重约 11.51 GiB（E3F）、8192 行的 MoE prefill
+缓冲约 3.06 GiB（§3.8），合计约 14.6，与实测 23.18 差约 8.6 GiB。
+这 8.6 里 prefill 工作区与门自己的多份状态各占多少，**没测，别猜**。
+
+**对结论没有影响**：交接契约是**逐层**的，层数不改变它；步 2 的 4 层配置已覆盖
+全部三种层型。真正需要 11 层的是步 3，而步 3 只需**一份**状态（真实 serving 形态），
+不背这个门的对照开销。
 
 ## 对 Phase 1 的影响（TARGET §10）
 
