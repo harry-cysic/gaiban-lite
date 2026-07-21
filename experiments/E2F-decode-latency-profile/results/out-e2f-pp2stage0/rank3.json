@@ -1,0 +1,81 @@
+{
+  "accepted": false,
+  "caliber": {
+    "b_semantics": "full replication (E1F replicated caliber): identical 1 sequences on all 4 TP ranks; MoE gathers 4 rows",
+    "hc_backend": "fused",
+    "input": "the stage input residual buffer is filled once with a deterministic bf16 tensor and held constant; no transport runs inside the timed window",
+    "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328; kv_dtype=bf16",
+    "timing": "round A: host wall around replay + torch.cuda.synchronize. round B: same wall, plus in-graph external CUDA event nodes read back after the synchronize (outside the timed window)",
+    "topology": "single node, TP4 only, one super-stage over layers 0-21; no PP handoff, no embed/head; the graph replay is the whole measured object"
+  },
+  "checkpoint_id": "f8c461474a8cb29c54de16e9904b5820185a93e01829f1ffd8a9f819fdcbdd08",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "process": 19.882570629939437
+  },
+  "errors": [
+    "Traceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e2f_decode_phase_probe.py\", line 417, in main\n    stage_material = synchronized_local_step(\n                     ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 225, in synchronized_local_step\n    raise RuntimeError(f\"{name} failed before the next collective:\\n{details}\")\nRuntimeError: load materials failed before the next collective:\nrank 0:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e2f_decode_phase_probe.py\", line 419, in <lambda>\n    lambda: build_physical_stage(\n            ^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/physical_stage.py\", line 494, in build_physical_stage\n    build_physical_layer_material(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/physical_stage.py\", line 312, in build_physical_layer_material\n    moe_resident = load_resident_moe_layer(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/ops/marlin_moe.py\", line 348, in load_resident_moe_layer\n    w13_q=torch.empty((n_experts,) + q13.shape, dtype=q13.dtype, device=device),\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 403.94 MiB is free. Including non-PyTorch memory, this process has 23.12 GiB memory in use. Of the allocated memory 22.36 GiB is allocated by PyTorch, and 40.22 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 1:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e2f_decode_phase_probe.py\", line 419, in <lambda>\n    lambda: build_physical_stage(\n            ^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/physical_stage.py\", line 494, in build_physical_stage\n    build_physical_layer_material(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/physical_stage.py\", line 312, in build_physical_layer_material\n    moe_resident = load_resident_moe_layer(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/ops/marlin_moe.py\", line 348, in load_resident_moe_layer\n    w13_q=torch.empty((n_experts,) + q13.shape, dtype=q13.dtype, device=device),\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 1 has a total capacity of 23.52 GiB of which 403.94 MiB is free. Including non-PyTorch memory, this process has 23.12 GiB memory in use. Of the allocated memory 22.36 GiB is allocated by PyTorch, and 40.22 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 2:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e2f_decode_phase_probe.py\", line 419, in <lambda>\n    lambda: build_physical_stage(\n            ^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/physical_stage.py\", line 494, in build_physical_stage\n    build_physical_layer_material(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/physical_stage.py\", line 312, in build_physical_layer_material\n    moe_resident = load_resident_moe_layer(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/ops/marlin_moe.py\", line 348, in load_resident_moe_layer\n    w13_q=torch.empty((n_experts,) + q13.shape, dtype=q13.dtype, device=device),\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 2 has a total capacity of 23.52 GiB of which 403.94 MiB is free. Including non-PyTorch memory, this process has 23.12 GiB memory in use. Of the allocated memory 22.36 GiB is allocated by PyTorch, and 40.22 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\nrank 3:\nTraceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e1f_full_decode_bench.py\", line 210, in synchronized_local_step\n    value = fn()\n            ^^^^\n  File \"/home/cysic/e0f-runtime/e2f_decode_phase_probe.py\", line 419, in <lambda>\n    lambda: build_physical_stage(\n            ^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/physical_stage.py\", line 494, in build_physical_stage\n    build_physical_layer_material(\n  File \"/home/cysic/e0f-runtime/dsv4_direct/physical_stage.py\", line 312, in build_physical_layer_material\n    moe_resident = load_resident_moe_layer(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/cysic/e0f-runtime/dsv4_direct/ops/marlin_moe.py\", line 348, in load_resident_moe_layer\n    w13_q=torch.empty((n_experts,) + q13.shape, dtype=q13.dtype, device=device),\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 512.00 MiB. GPU 3 has a total capacity of 23.52 GiB of which 403.94 MiB is free. Including non-PyTorch memory, this process has 23.12 GiB memory in use. Of the allocated memory 22.36 GiB is allocated by PyTorch, and 40.22 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\n"
+  ],
+  "experiment": "E2F-decode-latency-profile",
+  "host": "titan064",
+  "layer_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "local_batch": 1,
+  "mark_level": "fine",
+  "max_seq_len": 3328,
+  "measurement_class": "stage_local_graph_replay_profile",
+  "memory": {},
+  "mode": "plain",
+  "nccl_env": {
+    "NCCL_IB_DISABLE": null,
+    "NCCL_P2P_LEVEL": "SYS",
+    "NCCL_SOCKET_IFNAME": null
+  },
+  "phases": null,
+  "rank": 3,
+  "round_a": null,
+  "round_b": null,
+  "rounds": 3,
+  "schema_version": 1,
+  "settle_steps": 132,
+  "start_position": 2048,
+  "steps_per_round": 160,
+  "stop_position": 2668,
+  "torch": "2.11.0+cu130",
+  "tp_group_binding": {
+    "backend": "nccl",
+    "global_rank": 3,
+    "global_ranks": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "local_rank": 3,
+    "validated_live": true,
+    "world_size": 4
+  },
+  "world": 4
+}

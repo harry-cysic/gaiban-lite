@@ -39,14 +39,16 @@ attention 权重在每个 TP rank 上是完整副本（DP-attention），占 12.
 - **Phase 4 进行中**:prefill 杠杆（已放行 tilelang 稀疏核、融合 QAT 核；已否决
   HC 融合与集合重叠）、chunked prefill（能力已具，容量杠杆而非速度杠杆）；
   M4 延迟 profile 已完成（E2F）。
-- **最大空白**（按 TARGET §2 优先级）:8 卡形态验证（从未跑过，且 M4 的形态改动
-  应直接在它上面设计）、elementwise 尾巴折叠（decode 侧最大单一可攻项，39.5%）、
-  attention TP4 分片（M4 的另一半）、M5 长上下文（零覆盖）、serving 折扣验证。
+- **8 卡形态已判死**（E3F）:22 层 stage 加载到第 19 层 OOM，权重 23.05 GiB >
+  卡容量。M7（方案 A）证伪、M4 回到 16 卡、单机口径失去形态基础。
+- **最大空白**（按 TARGET §2 优先级）:elementwise 尾巴折叠（decode 侧最大单一
+  可攻项，39.5%，每步固定成本）、attention TP4 分片（M4 延迟目标与 8 卡可行性
+  的共同前提）、M5 长上下文（零覆盖）、serving 折扣验证。
 
 ### 实验索引
 
 `experiments/` 下每个目录一个实验，README 记动机/方法/结论/artifact:
 B1·B2 标定 | A0 契约 | D0·D0L golden oracle | A3F·A4F·A5F·A6F kernel |
 C1F 集成 block | E1F 吞吐与容量前沿 | C2F·C3F·C4F prefill |
-E2F B=1 decode 延迟 profile |
+E2F B=1 decode 延迟 profile | E3F 8 卡容量判决 |
 `runtime/` 是 direct runtime 与全部门脚本（非安装包，靠 rsync 到 titan 运行）。
