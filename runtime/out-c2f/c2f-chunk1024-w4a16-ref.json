@@ -1,0 +1,169 @@
+{
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "chunk": 1024,
+  "component_walls_s": {
+    "attention_ratio128": 0.04152236972004175,
+    "attention_ratio4": 0.07525443332269788,
+    "hc": 0.05713058705441654,
+    "moe": 0.20329941669479012,
+    "norm": 0.0027971724048256874,
+    "total_instrumented": 0.380872820969671
+  },
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "C2F-prefill-stage-bench",
+  "fuse_min_seqlen": 1024,
+  "global_rows": 4096,
+  "host": "titan064",
+  "index_gate_records": [
+    {
+      "fused_ms": 14.845952033996582,
+      "layer_id": 12,
+      "ref_ms": 0.39321601390838623,
+      "score_abs_max_ref": 2.753737688064575,
+      "score_max_abs_diff": 2.384185791015625e-07,
+      "seqlen": 1024,
+      "t_rows": 256,
+      "topk_count": 256,
+      "topk_mismatch_mean_overlap": null,
+      "topk_rows_exact": 1024,
+      "topk_rows_total": 1024
+    },
+    {
+      "fused_ms": 0.11980800330638885,
+      "layer_id": 14,
+      "ref_ms": 0.3850240111351013,
+      "score_abs_max_ref": 5.293506622314453,
+      "score_max_abs_diff": 4.76837158203125e-07,
+      "seqlen": 1024,
+      "t_rows": 256,
+      "topk_count": 256,
+      "topk_mismatch_mean_overlap": null,
+      "topk_rows_exact": 1024,
+      "topk_rows_total": 1024
+    },
+    {
+      "fused_ms": 0.11878400295972824,
+      "layer_id": 16,
+      "ref_ms": 0.3840000033378601,
+      "score_abs_max_ref": 3.995389461517334,
+      "score_max_abs_diff": 2.384185791015625e-07,
+      "seqlen": 1024,
+      "t_rows": 256,
+      "topk_count": 256,
+      "topk_mismatch_mean_overlap": null,
+      "topk_rows_exact": 1024,
+      "topk_rows_total": 1024
+    },
+    {
+      "fused_ms": 0.11878400295972824,
+      "layer_id": 18,
+      "ref_ms": 0.3829759955406189,
+      "score_abs_max_ref": 3.1714119911193848,
+      "score_max_abs_diff": 3.5762786865234375e-07,
+      "seqlen": 1024,
+      "t_rows": 256,
+      "topk_count": 256,
+      "topk_mismatch_mean_overlap": null,
+      "topk_rows_exact": 1024,
+      "topk_rows_total": 1024
+    },
+    {
+      "fused_ms": 0.11878400295972824,
+      "layer_id": 20,
+      "ref_ms": 0.38707199692726135,
+      "score_abs_max_ref": 4.349949359893799,
+      "score_max_abs_diff": 2.384185791015625e-07,
+      "seqlen": 1024,
+      "t_rows": 256,
+      "topk_count": 256,
+      "topk_mismatch_mean_overlap": null,
+      "topk_rows_exact": 1024,
+      "topk_rows_total": 1024
+    }
+  ],
+  "indexer": "ref",
+  "input_scale": 0.02,
+  "input_tok_s_per_lane": 2929.335395866475,
+  "input_tok_s_per_stage_dp4": 11717.3415834659,
+  "iters": 5,
+  "koujing": "single-shot prefill at start_pos=0, B=1/lane, 4 DP lanes with distinct sequences; input tok/s/stage = 4*chunk / stage wall; host walls around torch.cuda.synchronize; eager, no CUDA graph, no PP handoff",
+  "layers": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "load_seconds": 13.158089970936999,
+  "max_memory_allocated_bytes": 19373629440,
+  "max_memory_reserved_bytes": 19671285760,
+  "measurement_class": "open_loop_single_stage_prefill",
+  "moe_mode": "w4a16",
+  "moe_resident_bytes_layer0": 861931008,
+  "ok": true,
+  "per_rank_errors": [
+    [],
+    [],
+    [],
+    []
+  ],
+  "per_rank_max_memory_allocated_bytes": [
+    19373629440,
+    19373629440,
+    19373629440,
+    19373629440
+  ],
+  "per_rank_ok": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "pipeline16_projection_tok_s": 11717.3415834659,
+  "rank": 0,
+  "ring_wrap_unit_check": {
+    "1031": true,
+    "128": true,
+    "130": true,
+    "2048": true,
+    "96": true,
+    "pass": true
+  },
+  "row_block": 1024,
+  "schema_version": 1,
+  "seed": 20260721,
+  "sliced_sparse_unit_check": {
+    "bitwise_equal": true
+  },
+  "stage_pass_wall_mean_s": 0.349732657847926,
+  "stage_pass_wall_p50_s": 0.3495673460420221,
+  "stage_pass_walls_s": [
+    0.3495673460420221,
+    0.3524437011219561,
+    0.3470720909535885,
+    0.35290175303816795,
+    0.34667839808389544
+  ],
+  "torch": "2.11.0+cu130",
+  "triton": "3.6.0",
+  "vllm": "0.22.1",
+  "w4a8_gate": {
+    "a3f_reference": "A3F numeric gate: marlin W4A8 rel_fro vs fp32 oracle 4.6e-2/8.5e-2 (== reference tilelang magnitude); W4A16 4.2e-3/3.5e-3",
+    "finite": true,
+    "layer_id": 11,
+    "max_abs_diff": 0.021484375,
+    "rel_fro_w4a8_vs_w4a16": 0.03787533938884735,
+    "rows_local": 1024,
+    "w4a16_rms": 0.10319260507822037
+  },
+  "warmup": 2,
+  "world": 4
+}

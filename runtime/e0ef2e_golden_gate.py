@@ -204,6 +204,8 @@ class StageLane:
         *,
         backend: Any | None,
         device: torch.device,
+        ratio4_index_mode: str = "ref",
+        fuse_min_seqlen: int = 1024,
     ) -> None:
         self.device = device
         self.backend = backend
@@ -217,6 +219,8 @@ class StageLane:
                     device=device,
                     kv_dtype=material.kv_dtype,
                     indexer_dtype=material.indexer_kv_dtype,
+                    index_score_mode=ratio4_index_mode,
+                    fuse_min_seqlen=fuse_min_seqlen,
                 )
             else:
                 state = material.new_state(num_local_sequences=LOCAL_BATCH)
@@ -548,6 +552,28 @@ def main() -> int:
         choices=("bf16", "fp8"),
         help="ratio-4 indexer_kv storage dtype",
     )
+    parser.add_argument(
+        "--ratio4-index-mode",
+        type=str,
+        default="ref",
+        choices=("ref", "fused"),
+        help="C2F arm: ratio-4 prefill index score backend (fused = D0b Triton)",
+    )
+    parser.add_argument(
+        "--fuse-min-seqlen",
+        type=int,
+        default=1024,
+        help="C2F arm: minimum prefill seqlen for the fused index score "
+        "(lower it below prompt lengths to exercise fused prefill in E2E)",
+    )
+    parser.add_argument(
+        "--moe-input-dtype",
+        type=str,
+        default="bf16",
+        choices=("bf16", "fp8"),
+        help="C2F arm: Marlin MoE activation dtype (fp8 = W4A8 repack; "
+        "applies to every MoE call in this gate)",
+    )
     args = parser.parse_args()
 
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
@@ -575,6 +601,9 @@ def main() -> int:
         "host": platform.node(),
         "kv_dtype": args.kv_dtype,
         "indexer_kv_dtype": args.indexer_kv_dtype,
+        "ratio4_index_mode": args.ratio4_index_mode,
+        "fuse_min_seqlen": args.fuse_min_seqlen,
+        "moe_input_dtype": args.moe_input_dtype,
         "device": torch.cuda.get_device_name(device),
         "torch": torch.__version__,
         "modes": modes,
@@ -714,6 +743,9 @@ def main() -> int:
             slots_per_shape=1,
             kv_dtype=args.kv_dtype,
             indexer_kv_dtype=args.indexer_kv_dtype,
+            moe_marlin_input_dtype=(
+                torch.float8_e4m3fn if args.moe_input_dtype == "fp8" else None
+            ),
             progress_every=args.progress_every,
             progress=(
                 (lambda message: print(f"[E0e2e] {message}", flush=True))
@@ -769,7 +801,11 @@ def main() -> int:
                     len(golden_tokens), MAX_COMPARE_STEPS, args.max_steps
                 )
                 lane = StageLane(
-                    stage_material.materials, backend=backend, device=device
+                    stage_material.materials,
+                    backend=backend,
+                    device=device,
+                    ratio4_index_mode=args.ratio4_index_mode,
+                    fuse_min_seqlen=args.fuse_min_seqlen,
                 )
                 record = run_prompt(
                     prompt_index=prompt_index,

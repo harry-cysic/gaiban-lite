@@ -283,6 +283,8 @@ def build_physical_layer_material(
     progress: Callable[[str], None] | None = None,
     kv_dtype: str = "bf16",
     indexer_kv_dtype: str = "bf16",
+    moe_marlin_input_dtype: torch.dtype | None = None,
+    moe_buffer_donor: TP4MoE | None = None,
 ) -> PhysicalLayerMaterial:
     """Load and construct one real-weight physical layer on a TP subgroup."""
 
@@ -319,8 +321,12 @@ def build_physical_layer_material(
         progress_every=progress_every,
         progress=progress,
         checkpoint_id=checkpoint_id,
+        marlin_input_dtype=moe_marlin_input_dtype,
     )
-    if moe_resident.resident_bytes != EXPECTED_MOE_RESIDENT_BYTES:
+    if (
+        moe_marlin_input_dtype is None
+        and moe_resident.resident_bytes != EXPECTED_MOE_RESIDENT_BYTES
+    ):
         raise PhysicalStageBuildError(
             f"layer-{layer_id} MoE resident bytes {moe_resident.resident_bytes} "
             f"!= {EXPECTED_MOE_RESIDENT_BYTES}"
@@ -342,6 +348,13 @@ def build_physical_layer_material(
         global_row_shapes=global_row_shapes,
         group=tp_group,
         slots_per_shape=slots_per_shape,
+        marlin_input_dtype=moe_marlin_input_dtype,
+        buffer_donor=(
+            moe_buffer_donor
+            if moe_buffer_donor is not None
+            and moe_buffer_donor.route_kind == route_kind
+            else None
+        ),
     )
     if moe.route_kind != route_kind:
         raise PhysicalStageBuildError(
@@ -386,6 +399,9 @@ def build_physical_layer_material(
         "tp_collective": dict(collective_evidence),
         "kv_dtype": kv_dtype,
         "indexer_kv_dtype": indexer_kv_dtype,
+        "moe_marlin_input_dtype": (
+            None if moe_marlin_input_dtype is None else str(moe_marlin_input_dtype)
+        ),
     }
     return PhysicalLayerMaterial(
         layer_id=layer_id,
@@ -445,6 +461,8 @@ def build_physical_stage(
     progress: Callable[[str], None] | None = None,
     kv_dtype: str = "bf16",
     indexer_kv_dtype: str = "bf16",
+    moe_marlin_input_dtype: torch.dtype | None = None,
+    share_moe_buffers: bool = False,
 ) -> PhysicalStageMaterial:
     """Load every layer material of one PP stage through one code path.
 
@@ -460,6 +478,7 @@ def build_physical_stage(
             f"stage layer ids must be non-empty and consecutive, got {selected}"
         )
     materials = []
+    moe_buffer_donor: TP4MoE | None = None
     for layer_id in selected:
         materials.append(
             build_physical_layer_material(
@@ -478,8 +497,12 @@ def build_physical_stage(
                 progress=progress,
                 kv_dtype=kv_dtype,
                 indexer_kv_dtype=indexer_kv_dtype,
+                moe_marlin_input_dtype=moe_marlin_input_dtype,
+                moe_buffer_donor=moe_buffer_donor,
             )
         )
+        if share_moe_buffers and moe_buffer_donor is None:
+            moe_buffer_donor = materials[0].moe
         if progress is not None:
             progress(f"stage {stage_id} layer {layer_id} material loaded")
     evidence = {

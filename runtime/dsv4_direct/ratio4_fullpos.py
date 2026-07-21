@@ -25,9 +25,24 @@ Implementation contract:
   prefill) using the same verified operator helpers as the decode mirror
   (``rms_norm``, ``apply_rotary_emb``, ``fp8_quant_dequant``,
   ``hadamard_transform``, ``fp4_quant_dequant``, ``window_topk_indices``,
-  ``torch_sparse_attention``).  Prefill is restricted to
-  ``seqlen <= window`` (128) -- the E2E prompts are <= 22 tokens; the ring
-  wrap-on-prefill branch (model.py:522-523) is out of scope and rejected.
+  ``torch_sparse_attention``).  Prefill beyond one window (C2F vertical)
+  implements the reference ring wrap-on-prefill branch (model.py:518-523):
+  only the last ``window`` raw rows survive in the ring, at slots
+  ``position % window``; prefill attention itself runs over the full raw
+  sequence + compressed rows exactly as before, so wrap only affects
+  subsequent decode reads.
+
+C2F prefill additions (all default-off, decode paths untouched):
+
+- ``index_score_mode``: ``"ref"`` (frozen materialized FP32 chain),
+  ``"fused"`` (D0b fused Triton indexer score for prefill chunks with
+  ``seqlen >= fuse_min_seqlen``; semantic change, gated), or
+  ``"paired_gate"`` (compute both, keep ref semantics, record an A/B
+  numeric + timing record per prefill call in ``index_gate_records``).
+- ``sparse_row_block``: optional query-row blocking of the prefill sparse
+  attention core.  Rows are independent (per-row softmax), so slicing is
+  bitwise identical; it only bounds the FP32 gather workspace
+  (``[b, rows, k, 512]``) that would otherwise reach ~10.7 GB at 8192.
 - State is held in plain reference-shaped tensors (raw ring, compressed
   rows, indexer rows, 2x4-slot overlap kv/score states initialized to
   ``(0, -inf)`` exactly like the reference ``register_buffer`` init,
@@ -84,8 +99,27 @@ class Ratio4FullPositionAttention:
         device: torch.device,
         kv_dtype: str = "bf16",
         indexer_dtype: str = "bf16",
+        index_score_mode: str = "ref",
+        fuse_min_seqlen: int = 1024,
+        sparse_row_block: int | None = None,
     ) -> None:
         config.validate()
+        if index_score_mode not in ("ref", "fused", "paired_gate"):
+            raise Ratio4FullPositionError(
+                f"index_score_mode must be ref/fused/paired_gate, got {index_score_mode!r}"
+            )
+        if (
+            not isinstance(fuse_min_seqlen, int)
+            or isinstance(fuse_min_seqlen, bool)
+            or fuse_min_seqlen < 1
+        ):
+            raise Ratio4FullPositionError("fuse_min_seqlen must be a positive integer")
+        if sparse_row_block is not None and (
+            not isinstance(sparse_row_block, int)
+            or isinstance(sparse_row_block, bool)
+            or sparse_row_block < 1
+        ):
+            raise Ratio4FullPositionError("sparse_row_block must be None or positive")
         if weights.layer_id != config.layer_id:
             raise Ratio4FullPositionError(
                 f"config layer {config.layer_id} != weights layer {weights.layer_id}"
@@ -102,6 +136,10 @@ class Ratio4FullPositionAttention:
         self.batch_size = batch_size
         self.kv_dtype = kv_dtype
         self.indexer_dtype = indexer_dtype
+        self.index_score_mode = index_score_mode
+        self.fuse_min_seqlen = fuse_min_seqlen
+        self.sparse_row_block = sparse_row_block
+        self.index_gate_records: list[dict] = []
         self.device = torch.device(device)
         self.freqs_cis = precompute_freqs_cis(
             dim=config.rope_dim,
@@ -328,6 +366,157 @@ class Ratio4FullPositionAttention:
         score_state[:, :COMPRESS_RATIO].copy_(score_state[:, COMPRESS_RATIO:])
 
     # ------------------------------------------------------------------
+    # indexer score backends (C2F prefill vertical)
+
+    # Test hook: force a row block in _ref_index_scores so the blocked and
+    # single-shot forms can be compared on shapes where auto-blocking would
+    # not trigger.  None = auto (~1 GiB temporary bound).
+    _REF_SCORE_ROW_BLOCK_OVERRIDE: int | None = None
+
+    @staticmethod
+    def _ref_index_scores(
+        index_query: torch.Tensor,
+        index_kv: torch.Tensor,
+        index_weights: torch.Tensor,
+    ) -> torch.Tensor:
+        """Frozen materialized FP32 chain (model.py:411-423).
+
+        Two memory-only transforms vs the previous form, both value-identical:
+        relu_/mul_ run in place on the fresh einsum output, and the query-row
+        axis is blocked so the [b, rows, h, t] FP32 temporary stays <= ~1 GiB
+        (every output element depends only on its own s row, so row blocking
+        is bitwise identical; required to fit the 8192-chunk baseline arm in
+        24 GB).
+        """
+
+        batch, seqlen, heads, _ = index_query.shape
+        t_rows = index_kv.shape[1]
+        block_bytes = 1 << 30
+        row_block = max(1, block_bytes // max(1, heads * t_rows * 4))
+        override = Ratio4FullPositionAttention._REF_SCORE_ROW_BLOCK_OVERRIDE
+        if override is not None:
+            row_block = override
+        if seqlen <= row_block:
+            scores = torch.einsum(
+                "bshd,btd->bsht", index_query.float(), index_kv.float()
+            )
+            return (
+                scores.relu_().mul_(index_weights.float().unsqueeze(-1)).sum(dim=2)
+            )
+        kv_fp32 = index_kv.float()
+        out = torch.empty(
+            (batch, seqlen, t_rows),
+            dtype=torch.float32,
+            device=index_query.device,
+        )
+        for begin in range(0, seqlen, row_block):
+            end = min(begin + row_block, seqlen)
+            scores = torch.einsum(
+                "bshd,btd->bsht", index_query[:, begin:end].float(), kv_fp32
+            )
+            torch.sum(
+                scores.relu_().mul_(
+                    index_weights[:, begin:end].float().unsqueeze(-1)
+                ),
+                dim=2,
+                out=out[:, begin:end],
+            )
+        return out
+
+    @staticmethod
+    def _fused_index_scores(
+        index_query: torch.Tensor,
+        index_kv: torch.Tensor,
+        index_weights: torch.Tensor,
+    ) -> torch.Tensor:
+        """D0b fused Triton score (semantic change vs ref: fp32 sum order)."""
+
+        from .ops.indexer_fused import fused_index_score
+
+        kv = (
+            index_kv
+            if index_kv.dtype == torch.bfloat16
+            else index_kv.to(torch.bfloat16)
+        )
+        return fused_index_score(index_query, kv, index_weights)
+
+    def _paired_index_score_gate(
+        self,
+        index_query: torch.Tensor,
+        index_kv: torch.Tensor,
+        index_weights: torch.Tensor,
+        *,
+        mask_add: torch.Tensor | None,
+        topk_count: int,
+        seqlen: int,
+        compressed_count: int,
+    ) -> torch.Tensor:
+        """Run ref and fused scoring on identical inputs; keep ref semantics.
+
+        Appends one A/B record (CUDA-event timings, score deltas, masked
+        top-k agreement) to ``index_gate_records``.  Diagnostic mode: it
+        synchronizes the device to read the events.
+        """
+
+        start_ref = torch.cuda.Event(enable_timing=True)
+        stop_ref = torch.cuda.Event(enable_timing=True)
+        start_fused = torch.cuda.Event(enable_timing=True)
+        stop_fused = torch.cuda.Event(enable_timing=True)
+        start_ref.record()
+        scores_ref = self._ref_index_scores(index_query, index_kv, index_weights)
+        stop_ref.record()
+        start_fused.record()
+        scores_fused = self._fused_index_scores(
+            index_query, index_kv, index_weights
+        )
+        stop_fused.record()
+        torch.cuda.synchronize(self.device)
+
+        delta = (scores_fused - scores_ref).abs()
+        masked_ref = scores_ref
+        masked_fused = scores_fused
+        if mask_add is not None:
+            mask = mask_add.to(scores_ref.dtype)
+            masked_ref = scores_ref + mask
+            masked_fused = scores_fused + mask
+        topk_ref = masked_ref.topk(topk_count, dim=-1).indices
+        topk_fused = masked_fused.topk(topk_count, dim=-1).indices
+        sorted_ref = topk_ref.sort(dim=-1).values
+        sorted_fused = topk_fused.sort(dim=-1).values
+        row_exact = sorted_ref.eq(sorted_fused).all(dim=-1)
+        exact_rows = int(row_exact.sum().item())
+        total_rows = int(row_exact.numel())
+        mismatch_overlap = None
+        if exact_rows != total_rows:
+            rows = (~row_exact).reshape(-1).nonzero().flatten()
+            flat_ref = sorted_ref.reshape(-1, topk_count)[rows]
+            flat_fused = sorted_fused.reshape(-1, topk_count)[rows]
+            overlaps = []
+            for row_index in range(flat_ref.shape[0]):
+                merged = torch.cat(
+                    (flat_ref[row_index], flat_fused[row_index])
+                )
+                union = int(merged.unique().numel())
+                overlaps.append((2 * topk_count - union) / topk_count)
+            mismatch_overlap = float(sum(overlaps) / len(overlaps))
+        self.index_gate_records.append(
+            {
+                "layer_id": int(self.config.layer_id),
+                "seqlen": int(seqlen),
+                "t_rows": int(compressed_count),
+                "topk_count": int(topk_count),
+                "ref_ms": float(start_ref.elapsed_time(stop_ref)),
+                "fused_ms": float(start_fused.elapsed_time(stop_fused)),
+                "score_max_abs_diff": float(delta.max().item()),
+                "score_abs_max_ref": float(scores_ref.abs().max().item()),
+                "topk_rows_total": total_rows,
+                "topk_rows_exact": exact_rows,
+                "topk_mismatch_mean_overlap": mismatch_overlap,
+            }
+        )
+        return scores_ref
+
+    # ------------------------------------------------------------------
 
     def __call__(self, hidden: torch.Tensor, *, start_pos: int) -> torch.Tensor:
         cfg = self.config
@@ -344,10 +533,7 @@ class Ratio4FullPositionAttention:
             )
         batch, seqlen, _ = hidden.shape
         if start_pos == 0:
-            if seqlen > WINDOW_SIZE:
-                raise Ratio4FullPositionError(
-                    "full-position ratio-4 prefill is frozen to <= 128 tokens"
-                )
+            pass  # prefill accepts any seqlen within capacity (ring wrap below)
         elif seqlen != 1:
             raise Ratio4FullPositionError("decode requires exactly one token")
         if start_pos + seqlen > cfg.max_seq_len:
@@ -387,11 +573,23 @@ class Ratio4FullPositionAttention:
         index_score = F.linear(hidden.float(), weights.index_compressor_wgate)
 
         if start_pos == 0:
-            # ring keeps the whole (<= window) prefill (model.py:520-521)
-            self.raw[:, :seqlen].copy_(self._quantize_rows(raw_latent))
+            # ring keeps the last <= window rows at slots position % window
+            # (model.py:518-523: direct write when seqlen <= window, the
+            # wrap-on-prefill split otherwise; index_copy_ over absolute
+            # positions % window is the same placement in one form).
+            kept = min(seqlen, WINDOW_SIZE)
+            ring_slots = torch.arange(
+                seqlen - kept, seqlen, device=self.device
+            ).remainder(WINDOW_SIZE)
+            ring_rows = raw_latent[:, seqlen - kept :]
+            self.raw.index_copy_(
+                1, ring_slots, self._quantize_rows(ring_rows).contiguous()
+            )
             if self.raw_rope is not None:
-                self.raw_rope[:, :seqlen].copy_(
-                    raw_latent[..., -LATENT_ROPE_DIM:]
+                self.raw_rope.index_copy_(
+                    1,
+                    ring_slots,
+                    ring_rows[..., -LATENT_ROPE_DIM:].contiguous(),
                 )
             main_rows = self._prefill_compress(
                 main_projected,
@@ -502,10 +700,8 @@ class Ratio4FullPositionAttention:
         )
         if compressed_count > 0:
             index_kv = self.indexer_kv[:, :compressed_count]
-            scores = torch.einsum(
-                "bshd,btd->bsht", index_query.float(), index_kv.float()
-            )
-            scores = (scores.relu() * index_weights.float().unsqueeze(-1)).sum(dim=2)
+            mask_add = None
+            visible = None
             if start_pos == 0:
                 # causal row visibility over compressed rows (model.py:424-426)
                 visible = (
@@ -515,10 +711,35 @@ class Ratio4FullPositionAttention:
                     torch.arange(compressed_count, device=hidden.device)
                     >= visible.unsqueeze(1)
                 )
-                scores = scores + torch.where(
-                    future, float("-inf"), 0.0
-                ).to(scores.dtype)
+                mask_add = torch.where(future, float("-inf"), 0.0)
+            fuse_active = (
+                self.index_score_mode in ("fused", "paired_gate")
+                and start_pos == 0
+                and seqlen >= self.fuse_min_seqlen
+            )
             topk_count = min(cfg.index_topk, compressed_count)
+            if fuse_active and self.index_score_mode == "paired_gate":
+                scores = self._paired_index_score_gate(
+                    index_query,
+                    index_kv,
+                    index_weights,
+                    mask_add=mask_add,
+                    topk_count=topk_count,
+                    seqlen=seqlen,
+                    compressed_count=compressed_count,
+                )
+            elif fuse_active:
+                scores = self._fused_index_scores(
+                    index_query, index_kv, index_weights
+                )
+            else:
+                scores = self._ref_index_scores(
+                    index_query, index_kv, index_weights
+                )
+            if mask_add is not None:
+                # in-place add of the frozen causal mask (identical values to
+                # the previous out-of-place broadcast add)
+                scores = scores.add_(mask_add.to(scores.dtype))
             compressed_indices = scores.topk(topk_count, dim=-1).indices
             if start_pos == 0:
                 invalid = compressed_indices >= visible.view(1, seqlen, 1)
@@ -538,13 +759,32 @@ class Ratio4FullPositionAttention:
             device=hidden.device,
         )
         topk = torch.cat((window, compressed_indices), dim=-1).contiguous()
-        output = torch_sparse_attention(
-            query,
-            attention_kv,
-            weights.attn_sink,
-            topk,
-            cfg.head_dim**-0.5,
-        )
+        row_block = self.sparse_row_block
+        if row_block is not None and start_pos == 0 and seqlen > row_block:
+            # Query rows are independent (per-row mask/softmax), so blocking
+            # the row axis is bitwise identical to the single call; it only
+            # bounds the FP32 gather workspace [b, rows, k, 512].
+            output = torch.cat(
+                [
+                    torch_sparse_attention(
+                        query[:, begin : begin + row_block],
+                        attention_kv,
+                        weights.attn_sink,
+                        topk[:, begin : begin + row_block],
+                        cfg.head_dim**-0.5,
+                    )
+                    for begin in range(0, seqlen, row_block)
+                ],
+                dim=1,
+            )
+        else:
+            output = torch_sparse_attention(
+                query,
+                attention_kv,
+                weights.attn_sink,
+                topk,
+                cfg.head_dim**-0.5,
+            )
         output[..., -cfg.rope_dim:] = apply_rotary_emb(
             output[..., -cfg.rope_dim:], frequencies, inverse=True
         )

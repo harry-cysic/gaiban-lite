@@ -116,6 +116,10 @@ class ResidentMoEWeights:
     intermediate_start: int | None = None
     intermediate_end: int | None = None
     checkpoint_id: str | None = None
+    # Marlin activation input dtype the repack was prepared for: None = W4A16
+    # (BF16 activations), torch.float8_e4m3fn = W4A8-FP8 (prefill lever).  The
+    # repacked layouts are incompatible, so the consumer (TP4MoE) must match.
+    marlin_input_dtype: torch.dtype | None = None
 
     @property
     def resident_bytes(self) -> int:
@@ -167,8 +171,21 @@ def _as_e8m0(tensor: torch.Tensor, device: torch.device) -> torch.Tensor:
 
 
 def _prepare_one_mxfp4(
-    packed: torch.Tensor, scale: torch.Tensor, size_n: int, size_k: int
+    packed: torch.Tensor,
+    scale: torch.Tensor,
+    size_n: int,
+    size_k: int,
+    *,
+    marlin_input_dtype: torch.dtype | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
+    """Repack one ckpt-format MXFP4 weight for Marlin.
+
+    ``marlin_input_dtype=None`` keeps the frozen W4A16 layout (BF16
+    activations).  ``torch.float8_e4m3fn`` prepares the W4A8-FP8 layout
+    (``is_a_8bit`` repack + FP8-aware scale processing), mirroring the A3F
+    ``common.py::_prep_one`` chain that passed the A3F numeric gate.
+    """
+
     from vllm import _custom_ops as ops
     from vllm.model_executor.layers.quantization.utils.marlin_utils import (
         marlin_permute_scales,
@@ -177,6 +194,11 @@ def _prepare_one_mxfp4(
         mxfp4_marlin_process_scales,
     )
 
+    if marlin_input_dtype not in (None, torch.float8_e4m3fn):
+        raise ValueError(
+            f"unsupported Marlin input dtype {marlin_input_dtype!r}"
+        )
+    is_a_8bit = marlin_input_dtype is not None
     if size_k % 8:
         raise ValueError(f"Marlin packed K must be divisible by 8, got {size_k}")
     permutation = torch.empty(0, dtype=torch.int, device=packed.device)
@@ -187,7 +209,7 @@ def _prepare_one_mxfp4(
         size_k=size_k,
         size_n=size_n,
         num_bits=4,
-        is_a_8bit=False,
+        is_a_8bit=is_a_8bit,
     )
     marlin_s = scale.to(torch.bfloat16).T.contiguous()
     marlin_s = marlin_permute_scales(
@@ -195,9 +217,9 @@ def _prepare_one_mxfp4(
         size_k=size_k,
         size_n=size_n,
         group_size=32,
-        is_a_8bit=False,
+        is_a_8bit=is_a_8bit,
     )
-    marlin_s = mxfp4_marlin_process_scales(marlin_s, input_dtype=None)
+    marlin_s = mxfp4_marlin_process_scales(marlin_s, input_dtype=marlin_input_dtype)
     return marlin_q, marlin_s
 
 
@@ -259,6 +281,7 @@ def load_resident_moe_layer(
     progress: Callable[[str], None] | None = None,
     checkpoint_id: str | None = None,
     key_prefix: str | None = None,
+    marlin_input_dtype: torch.dtype | None = None,
 ) -> ResidentMoEWeights:
     """Load all experts with each rank holding one intermediate-dimension slice.
 
@@ -306,8 +329,20 @@ def load_resident_moe_layer(
             )
             w13 = torch.cat((w1, w3), dim=0)
             s13 = torch.cat((s1, s3), dim=0)
-            q13, ms13 = _prepare_one_mxfp4(w13, s13, 2 * local_intermediate, hidden_size)
-            q2, ms2 = _prepare_one_mxfp4(w2, s2, hidden_size, local_intermediate)
+            q13, ms13 = _prepare_one_mxfp4(
+                w13,
+                s13,
+                2 * local_intermediate,
+                hidden_size,
+                marlin_input_dtype=marlin_input_dtype,
+            )
+            q2, ms2 = _prepare_one_mxfp4(
+                w2,
+                s2,
+                hidden_size,
+                local_intermediate,
+                marlin_input_dtype=marlin_input_dtype,
+            )
             if routed is None:
                 routed = MarlinRoutedWeights(
                     w13_q=torch.empty((n_experts,) + q13.shape, dtype=q13.dtype, device=device),
@@ -362,4 +397,5 @@ def load_resident_moe_layer(
         intermediate_start=start,
         intermediate_end=end,
         checkpoint_id=checkpoint_id,
+        marlin_input_dtype=marlin_input_dtype,
     )

@@ -204,6 +204,37 @@ def _tensor_storage_manifest(tensor: torch.Tensor) -> _TensorStorageManifest:
     )
 
 
+_W4A8_QUANT_PRESET_DONE = False
+
+
+def _preset_w4a8_activation_quant() -> None:
+    """Install the per-token FP8 activation quant used by Marlin W4A8.
+
+    ``marlin_quant_input`` resolves through ``QuantFP8`` which needs a vllm
+    config context (A1.5 lesson, carried by A3F ``common.preset_w4a8_quant``);
+    preset the module singleton with the same single-kernel per-token quant.
+    Idempotent; only affects the FP8-input Marlin path (W4A16 never consults
+    ``_quant_fp8_method``).
+    """
+
+    global _W4A8_QUANT_PRESET_DONE
+    if _W4A8_QUANT_PRESET_DONE:
+        return
+    from vllm import _custom_ops as ops
+    import vllm.model_executor.layers.quantization.utils.marlin_utils as mu
+
+    def _per_token_fp8(x: torch.Tensor):
+        try:
+            return ops.scaled_fp8_quant(x, None, use_per_token_if_dynamic=True)
+        except TypeError:  # signature drift fallback (eager, slower)
+            xf = x.float()
+            s = xf.abs().amax(-1, keepdim=True).clamp_min(1e-12) / 448.0
+            return (xf / s).clamp(-448, 448).to(torch.float8_e4m3fn), s
+
+    mu._quant_fp8_method = _per_token_fp8
+    _W4A8_QUANT_PRESET_DONE = True
+
+
 def prepare_shared_bf16(shared: SharedExpertSlice) -> PreparedSharedBF16:
     return PreparedSharedBF16(
         w1=dequant_fp8_block(shared.w1, shared.s1).to(torch.bfloat16),
@@ -242,15 +273,31 @@ def _tensor_digest(*tensors: torch.Tensor) -> str:
     return digest.hexdigest()
 
 
-def _marlin_block_size_m(*, rows: int, topk: int, experts: int) -> int:
-    """Match vLLM's WNA16 MoE block-size selection for this fixed ABI."""
+def _marlin_block_size_m(
+    *,
+    rows: int,
+    topk: int,
+    experts: int,
+    input_dtype: torch.dtype | None = None,
+) -> int:
+    """Match vLLM's WNA16 MoE block-size selection for this fixed ABI.
+
+    Mirrors marlin_moe.py: the 1-byte activation paths (W4A8 INT8/FP8) have
+    no kernel thread config below block 16, so vLLM raises the floor to 16
+    (otherwise the kernel rejects small-M shapes with "Invalid thread
+    config", e.g. decode MKN=[4,4096,1024]).
+    """
 
     if rows <= 0 or topk <= 0 or experts <= 0:
         raise ValueError("Marlin rows, topk, and experts must be positive")
+    selected = 64
     for candidate in (8, 16, 32, 48, 64):
         if rows * topk / experts / candidate < 0.9:
-            return candidate
-    return 64
+            selected = candidate
+            break
+    if input_dtype is not None and input_dtype.itemsize == 1:
+        selected = max(selected, 16)
+    return selected
 
 
 def _validate_moe_identity(
@@ -448,8 +495,21 @@ class TP4MoE:
         group: dist.ProcessGroup | None = None,
         slots_per_shape: int = 1,
         alignment_provider: Callable[..., object] | None = None,
+        marlin_input_dtype: torch.dtype | None = None,
+        buffer_donor: "TP4MoE | None" = None,
     ) -> None:
         config.validate()
+        if marlin_input_dtype not in (None, torch.float8_e4m3fn):
+            raise ValueError(
+                f"unsupported Marlin input dtype {marlin_input_dtype!r}"
+            )
+        if getattr(resident, "marlin_input_dtype", None) != marlin_input_dtype:
+            raise ValueError(
+                "resident Marlin repack input dtype "
+                f"{getattr(resident, 'marlin_input_dtype', None)!r} does not "
+                f"match requested {marlin_input_dtype!r}; W4A16/W4A8 layouts "
+                "are incompatible"
+            )
         if not dist.is_initialized():
             raise RuntimeError("TP4MoE requires an initialized process group")
         if dist.get_world_size(group) != config.world_size or dist.get_rank(group) != rank:
@@ -484,6 +544,9 @@ class TP4MoE:
         self._activation = MoEActivation.SILU
         self._quant_type = scalar_types.float4_e2m1f
         self._make_workspace = marlin_make_workspace_new
+        self._marlin_input_dtype = marlin_input_dtype
+        if marlin_input_dtype is not None:
+            _preset_w4a8_activation_quant()
         self._route_tensor_observer: list[MoERouteTensors] | None = None
         self._route_observer_captures_local_input = False
         self._route_capture_buffers: dict[
@@ -513,10 +576,44 @@ class TP4MoE:
         )
         if slots_per_shape < 1:
             raise ValueError("slots_per_shape must be positive")
-        self._buffers: dict[tuple[int, int], _MarlinBuffers] = {}
-        for rows in global_row_shapes:
-            for slot in range(slots_per_shape):
-                self._register_shape(int(rows), slot)
+        if buffer_donor is not None:
+            # C2F prefill vertical: per-layer TP4MoE instances of one stage
+            # never run concurrently, so the multi-GB per-shape Marlin
+            # buffers can be shared across layers (at prefill rows they
+            # would otherwise multiply by the layer count and OOM the card).
+            # The buffer state machine ("free"/"in_flight"/"poisoned") and
+            # completion events already serialize reuse.
+            if not isinstance(buffer_donor, TP4MoE):
+                raise TypeError("buffer_donor must be a TP4MoE")
+            if buffer_donor is self:
+                raise ValueError("buffer_donor must be a different instance")
+            if buffer_donor.config != self.config:
+                raise ValueError("buffer_donor config differs")
+            if (
+                buffer_donor.device != self.device
+                or buffer_donor.group is not self.group
+            ):
+                raise ValueError("buffer_donor device/group differs")
+            if buffer_donor.route_kind != self.route_kind:
+                raise ValueError(
+                    "buffer_donor route kind differs (input-ID storage shape)"
+                )
+            needed = {
+                (int(rows), slot)
+                for rows in global_row_shapes
+                for slot in range(slots_per_shape)
+            }
+            missing = needed - set(buffer_donor._buffers)
+            if missing:
+                raise ValueError(
+                    f"buffer_donor lacks registered shapes {sorted(missing)}"
+                )
+            self._buffers = buffer_donor._buffers
+        else:
+            self._buffers = {}
+            for rows in global_row_shapes:
+                for slot in range(slots_per_shape):
+                    self._register_shape(int(rows), slot)
         self._validate_alignment_provider_storage()
 
     def _snapshot_alignment_provider_tensors(
@@ -645,7 +742,10 @@ class TP4MoE:
             return
         local_rows = global_rows // cfg.world_size
         block_size_m = _marlin_block_size_m(
-            rows=global_rows, topk=cfg.topk, experts=cfg.experts
+            rows=global_rows,
+            topk=cfg.topk,
+            experts=cfg.experts,
+            input_dtype=self._marlin_input_dtype,
         )
         alignment_template = torch.empty(
             global_rows,
@@ -1481,7 +1581,7 @@ class TP4MoE:
                     intermediate_cache13=buffers.cache13,
                     intermediate_cache2=buffers.cache2,
                     output=None,
-                    input_dtype=None,
+                    input_dtype=self._marlin_input_dtype,
                     is_k_full=True,
                     clamp_limit=cfg.clamp_limit,
                 ).view(buffers.gathered.shape[0], cfg.topk, cfg.hidden_size)

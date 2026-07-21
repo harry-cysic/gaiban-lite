@@ -573,6 +573,24 @@ def compressed_topk_indices(
     return matrix.to(torch.int32).contiguous()
 
 
+def _prefill_sparse_row_block() -> int | None:
+    """Optional prefill sparse-core row block (C2F), from the environment.
+
+    ``DSV4_PREFILL_SPARSE_ROW_BLOCK`` unset/empty/non-positive = disabled.
+    """
+
+    import os
+
+    raw = os.environ.get("DSV4_PREFILL_SPARSE_ROW_BLOCK", "").strip()
+    if not raw:
+        return None
+    try:
+        value = int(raw)
+    except ValueError:
+        return None
+    return value if value > 0 else None
+
+
 def torch_sparse_attention(
     query: torch.Tensor,
     latent_kv: torch.Tensor,
@@ -1580,13 +1598,34 @@ class Ratio128TorchAttention:
         )
         topk = torch.cat((window, compressed), dim=-1).contiguous()
         record("topk", topk)
-        output = torch_sparse_attention(
-            query,
-            attention_kv,
-            self.weights.attn_sink,
-            topk,
-            cfg.head_dim**-0.5,
-        )
+        # C2F prefill vertical: optional query-row blocking of the prefill
+        # sparse core.  Rows are independent (per-row mask/softmax), so the
+        # blocked form is bitwise identical to the single call; it only
+        # bounds the FP32 gather workspace at long prefill chunks.  Default
+        # off (env unset) -- decode and all oracle paths are unchanged.
+        row_block = _prefill_sparse_row_block()
+        if row_block is not None and start_pos == 0 and seqlen > row_block:
+            output = torch.cat(
+                [
+                    torch_sparse_attention(
+                        query[:, begin : begin + row_block],
+                        attention_kv,
+                        self.weights.attn_sink,
+                        topk[:, begin : begin + row_block],
+                        cfg.head_dim**-0.5,
+                    )
+                    for begin in range(0, seqlen, row_block)
+                ],
+                dim=1,
+            )
+        else:
+            output = torch_sparse_attention(
+                query,
+                attention_kv,
+                self.weights.attn_sink,
+                topk,
+                cfg.head_dim**-0.5,
+            )
         record("sparse_output", output)
         output[..., -cfg.rope_dim :] = apply_rotary_emb(
             output[..., -cfg.rope_dim :], frequencies, inverse=True

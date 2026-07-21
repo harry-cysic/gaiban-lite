@@ -93,3 +93,14 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   (10ms/轮)、KV 行宽、handoff overlap、短 ctx 运营 → chunked prefill/serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
+- **Prefill 基线与杠杆已实测**
+  ([`C2F`](experiments/C2F-prefill/README.md)):单 stage(TP4、11 层、DP4
+  口径)chunked prefill 基线 **10.7–11.7k input tok/s**(chunk 1024–8192 近
+  平坦);两个 §4 杠杆接入并过数值门——W4A8 Marlin 端到端仅 1.02–1.03×
+  (§4.2 "~1.07× 不指望"成立)、D0b fused indexer 30→2.5 ms/层@8192 但端
+  到端 1.043×;全开 **11.4k(1.068×)**,E2E 回归两臂均 468/482(fused indexer 逐
+  prompt 与基线全同;W4A8 分歧仍全为近平局)。对照 §5.3 模型(30–40k)差 ~3×,归因:Marlin 大 M
+  MFU ~11.5%(48% 时间)+ eager torch attention(40%)——**prefill kernel
+  竖条(MoE 换 BF16 dense/cutlass 执行形态、稀疏 attention kernel、HC 融合)
+  是 P 侧主路径**,roofline P≈65–80k 说明 30–40k 仍可达。单池投影
+  (D=8733):当前 P → **T≈1.2k**,带下沿 3.2k 需 P≈40k。
