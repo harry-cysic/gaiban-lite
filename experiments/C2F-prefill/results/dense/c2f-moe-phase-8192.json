@@ -1,0 +1,19 @@
+{
+ "rank": 0,
+ "layer_id": 11,
+ "chunk": 8192,
+ "global_rows": 32768,
+ "iters": 6,
+ "phase_ms": {
+  "moe_inputs_ready": 0.044,
+  "moe_hidden_all_gather_done": 8.482,
+  "moe_route_done": 3.03,
+  "moe_routed_done": 21.002,
+  "moe_shared_done": 3.428,
+  "moe_combine_done": 4.973,
+  "moe_reduce_scatter_done": 8.728,
+  "moe_finalize_done": 0.124
+ },
+ "call_ms": 49.809,
+ "peak_gib": 5.25
+}

@@ -1,0 +1,50 @@
+{
+ "experiment": "C2F-dense-moe",
+ "layer_id": 3,
+ "rank": 0,
+ "checkpoint_id": "e33d9526298d9d5c5bc5ffa563fd0b6b84f724c79fa29877b103541750ae95b4",
+ "expert_chunk": 8,
+ "resident_bytes": {
+  "dense": 861931008,
+  "marlin": 861931008
+ },
+ "gpu": "NVIDIA GeForce RTX 4090",
+ "torch": "2.11.0+cu130",
+ "gate": {
+  "rows": 256,
+  "dense_vs_oracle": 0.004284044727683067,
+  "marlin_vs_oracle": 0.004331498872488737,
+  "dense_vs_marlin": 0.005472623277455568,
+  "dequant_bf16_exact": true
+ },
+ "timings": [
+  {
+   "rows": 4096,
+   "marlin_ms": 3.39,
+   "dense_ms": 57.865,
+   "speedup": 0.059,
+   "peak_gib": 2.94
+  },
+  {
+   "rows": 8192,
+   "marlin_ms": 5.584,
+   "dense_ms": 62.571,
+   "speedup": 0.089,
+   "peak_gib": 4.25
+  },
+  {
+   "rows": 16384,
+   "marlin_ms": 10.55,
+   "dense_ms": 69.017,
+   "speedup": 0.153,
+   "peak_gib": 6.86
+  },
+  {
+   "rows": 32768,
+   "marlin_ms": 20.449,
+   "dense_ms": 84.408,
+   "speedup": 0.242,
+   "peak_gib": 12.09
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+{
+ "probe": [
+  {
+   "rows": 8192,
+   "block_size_m": 64,
+   "align_ms": 0.545,
+   "private_marlin_ms": 5.419,
+   "topk_reduce_ms": 0.495,
+   "runtime_total_ms": 6.459,
+   "public_marlin_ms": 5.708
+  },
+  {
+   "rows": 32768,
+   "block_size_m": 64,
+   "align_ms": 0.515,
+   "private_marlin_ms": 18.293,
+   "topk_reduce_ms": 2.003,
+   "runtime_total_ms": 20.811,
+   "public_marlin_ms": 20.426
+  }
+ ]
+}
