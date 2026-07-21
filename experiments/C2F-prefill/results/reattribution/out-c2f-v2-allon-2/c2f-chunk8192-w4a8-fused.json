@@ -1,0 +1,96 @@
+{
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "chunk": 8192,
+  "component_walls_s": {
+    "attention_ratio128": 0.3294972679577768,
+    "attention_ratio4": 0.8214080650359392,
+    "hc": 0.3132112994790077,
+    "moe": 0.4824510719627142,
+    "norm": 0.03217166708782315,
+    "total_instrumented": 1.9796957599464804
+  },
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "C2F-prefill-stage-bench",
+  "fuse_min_seqlen": 1024,
+  "global_rows": 32768,
+  "host": "titan064",
+  "indexer": "fused",
+  "input_scale": 0.02,
+  "input_tok_s_per_lane": 4151.90551786485,
+  "input_tok_s_per_stage_dp4": 16607.6220714594,
+  "iters": 5,
+  "koujing": "single-shot prefill at start_pos=0, B=1/lane, 4 DP lanes with distinct sequences; input tok/s/stage = 4*chunk / stage wall; host walls around torch.cuda.synchronize; eager, no CUDA graph, no PP handoff",
+  "layers": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "load_seconds": 12.779944567009807,
+  "max_memory_allocated_bytes": 21925464064,
+  "max_memory_reserved_bytes": 23980933120,
+  "measurement_class": "open_loop_single_stage_prefill",
+  "moe_mode": "w4a8",
+  "moe_resident_bytes_layer0": 861931008,
+  "ok": true,
+  "per_rank_errors": [
+    [],
+    [],
+    [],
+    []
+  ],
+  "per_rank_max_memory_allocated_bytes": [
+    21925464064,
+    21925464064,
+    21925464064,
+    21925464064
+  ],
+  "per_rank_ok": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "pipeline16_projection_tok_s": 16607.6220714594,
+  "rank": 0,
+  "ref_score_row_block_unit_check": {
+    "bitwise_equal": true
+  },
+  "ring_wrap_unit_check": {
+    "1031": true,
+    "128": true,
+    "130": true,
+    "2048": true,
+    "96": true,
+    "pass": true
+  },
+  "row_block": 1024,
+  "schema_version": 1,
+  "seed": 20260721,
+  "sliced_sparse_unit_check": {
+    "bitwise_equal": true
+  },
+  "stage_pass_wall_mean_s": 1.9731813352089376,
+  "stage_pass_wall_p50_s": 1.9730699469801039,
+  "stage_pass_walls_s": [
+    1.9722225200384855,
+    1.9717893810011446,
+    1.9730699469801039,
+    1.9741345578804612,
+    1.9746902701444924
+  ],
+  "torch": "2.11.0+cu130",
+  "triton": "3.6.0",
+  "vllm": "0.22.1",
+  "warmup": 2,
+  "world": 4
+}
