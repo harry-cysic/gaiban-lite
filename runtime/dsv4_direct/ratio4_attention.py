@@ -16,6 +16,7 @@ from dataclasses import dataclass, replace
 from typing import Any, Callable, Iterator, Mapping, Protocol
 
 import torch
+import torch.distributed as dist
 import torch.nn.functional as F
 
 from .attention import (
@@ -610,6 +611,7 @@ class Ratio4TorchAttention:
         projection_backend: AttentionProjectionBackend | None = None,
         indexer_qat_mode: str | None = None,
         kv_qat_mode: str | None = None,
+        tp_group: Any = None,
     ) -> None:
         config.validate()
         resolved_qat = (
@@ -659,6 +661,17 @@ class Ratio4TorchAttention:
         self.indexer_qat_mode = resolved_qat
         # E5F: the KV-latent FP8 QAT chain, default "ref" until gated.
         self.kv_qat_mode = resolve_kv_qat_mode(kv_qat_mode)
+        # E6F variant A: with the o-path sharded this rank produces a partial
+        # sum over its own heads, and the four partials must be added.  Refuse
+        # to run sharded without a group rather than silently returning a
+        # quarter of the answer -- a missing collective would present as a
+        # quality regression, not as a configuration error.
+        if config.tp_size > 1 and tp_group is None:
+            raise ValueError(
+                f"tp_size={config.tp_size} requires a tp_group for the o-path "
+                "all-reduce"
+            )
+        self.tp_group = tp_group
         if sparse_attention_backend is not None and not callable(
             sparse_attention_backend
         ):
@@ -687,6 +700,23 @@ class Ratio4TorchAttention:
             beta_slow=config.beta_slow,
             device=weights.wq_a.device,
         )
+
+    def _tp_reduce_output(self, output: torch.Tensor) -> torch.Tensor:
+        """Sum the per-rank o-path partials (E6F variant A).
+
+        Upcast to FP32 before the all-reduce: ``F.linear`` on BF16 returns
+        BF16, so reducing in BF16 rounds each partial a second time at full
+        output magnitude.  E6F step 1 measured that on real weights --
+        1.68-2.08x the unsharded path's own error in BF16 against 1.25-1.49x
+        when upcast -- for 8 KB more traffic per layer, invisible against
+        ~10 us of latency-bound NCCL.
+        """
+
+        if self.config.tp_size == 1:
+            return output
+        buffer = output.float()
+        dist.all_reduce(buffer, op=dist.ReduceOp.SUM, group=self.tp_group)
+        return buffer.to(output.dtype)
 
     def _indexer_qat(self, index_query: torch.Tensor) -> torch.Tensor:
         """Hadamard + FP4 QAT on the indexer query (E4F).
@@ -1375,6 +1405,7 @@ class Ratio4TorchAttention:
                 output_lora,
                 wo_b=weights.wo_b,
             )
+        final_output = self._tp_reduce_output(final_output)
         if stage_marker is not None:
             stage_marker("output_done")
         return final_output
@@ -1642,6 +1673,7 @@ class Ratio4TorchAttention:
                 output_lora,
                 wo_b=weights.wo_b,
             )
+        branch = self._tp_reduce_output(branch)
 
         if evidence_observer is not None:
             if selected is None:

@@ -1,0 +1,97 @@
+{
+  "accepted": true,
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "E6F-attention-tp-shard",
+  "host": "titan065",
+  "layer": 4,
+  "local_shapes": {
+    "attn_sink": [
+      16
+    ],
+    "local_num_heads": 16,
+    "local_o_groups": 2,
+    "wo_a": [
+      2048,
+      4096
+    ],
+    "wo_b": [
+      4096,
+      2048
+    ],
+    "wq_b": [
+      8192,
+      1024
+    ]
+  },
+  "rank": 0,
+  "step": "dist_single_layer_wiring",
+  "steps": [
+    {
+      "bitwise_equal": false,
+      "max_abs_diff": 0.00048828125,
+      "output_absmax": 0.07080078125,
+      "position": 2048,
+      "rel_diff": 0.006896551724137931,
+      "step": 0
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff": 0.000244140625,
+      "output_absmax": 0.07275390625,
+      "position": 2049,
+      "rel_diff": 0.003355704697986577,
+      "step": 1
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff": 0.000244140625,
+      "output_absmax": 0.059326171875,
+      "position": 2050,
+      "rel_diff": 0.00411522633744856,
+      "step": 2
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff": 0.00048828125,
+      "output_absmax": 0.07958984375,
+      "position": 2051,
+      "rel_diff": 0.006134969325153374,
+      "step": 3
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff": 0.000244140625,
+      "output_absmax": 0.05322265625,
+      "position": 2052,
+      "rel_diff": 0.0045871559633027525,
+      "step": 4
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff": 0.000244140625,
+      "output_absmax": 0.047119140625,
+      "position": 2053,
+      "rel_diff": 0.0051813471502590676,
+      "step": 5
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff": 0.000244140625,
+      "output_absmax": 0.059814453125,
+      "position": 2054,
+      "rel_diff": 0.004081632653061225,
+      "step": 6
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff": 0.00048828125,
+      "output_absmax": 0.091796875,
+      "position": 2055,
+      "rel_diff": 0.005319148936170213,
+      "step": 7
+    }
+  ],
+  "within_predicted_band": true,
+  "worst_rel_diff": 0.006896551724137931
+}

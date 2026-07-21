@@ -1,0 +1,30 @@
+{
+  "accepted": true,
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "E6F-attention-tp-shard",
+  "host": "titan065",
+  "layer": 4,
+  "local_shapes": {
+    "attn_sink": [
+      16
+    ],
+    "local_num_heads": 16,
+    "local_o_groups": 2,
+    "wo_a": [
+      2048,
+      4096
+    ],
+    "wo_b": [
+      4096,
+      2048
+    ],
+    "wq_b": [
+      8192,
+      1024
+    ]
+  },
+  "rank": 2,
+  "step": "dist_single_layer_wiring",
+  "steps": []
+}

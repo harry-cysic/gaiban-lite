@@ -2,8 +2,10 @@
 
 第三十二竖条，**进行中**。设计分析见
 [`docs/design-attention-tp4-sharding.md`](../../docs/design-attention-tp4-sharding.md)。
-本目录记实验步骤；已完成 **step 1（o-path 代数等价）** 与
-**step 2（切片精确性）**，runtime 侧的配置/切片/前向改动已落地且默认恒等。
+本目录记实验步骤；已完成 **step 1（o-path 代数等价）**、**step 2（切片精确性）** 与
+**step 3（4 rank 真实 all-reduce 接线）**；ratio-4 的 runtime 改动已落地且
+`tp_size=1` 时恒等。**尚未做**：ratio-128 与滑窗层的同样改造、stage 级集成
+（含 CUDA graph 捕图）、D0L 软门。
 
 ---
 
@@ -117,6 +119,31 @@ upcast reduce 口径），没有额外来源。**
 > 分解掉——分解之后的结论反而**更强**：它不仅说"整体差多少"，还说清了
 > **差异只可能来自哪一处**。
 
+## step 3：4 个真实 rank + 真实 all-reduce
+
+step 1/2 在单卡上把数值定死了；step 3 验的是**接线**：四个进程各持自己的
+分片、前向里走 `dist.all_reduce`，能否复现单实例不分片的结果。
+
+刻意做窄：**一层、无 super-stage、无 CUDA graph**。目的是把"分片接对了没有"
+与"它能不能扛住捕图和流水"分开——这两件事一起失败时很难区分。
+
+titan065，4 rank，layer 4，B=1，8 步：
+
+| 项 | 值 |
+|---|---|
+| 每 rank 局部几何 | 16 head / 2 组，`wo_b [4096, 2048]` |
+| 最坏相对差（vs 不分片） | **6.897e-03** |
+| 逐位 | ❌（**预期如此**，TARGET §9.6） |
+
+> ⚠️ **口径提醒**：这里的 6.9e-3 是 **shard vs full**，而 step 1 的
+> 1.25–1.49× 是 **各自 vs FP64**。两者不是同一个量：若二者都离真值约 3–4.6e-3
+> 而方向不同，它们之间相差 ~6-7e-3 完全一致。**不要把这两个数并列比较。**
+
+走过的第二个弯路：`prepare_decode_plan` 默认 `advance_overlap_state=False`，
+于是 step 0 过、step 1 起因为 pending 槽仍是 −1 而失败。
+（第一次遇到这个报错时误以为是 seeding 不对——实测 seeding 在 2048 处
+给出的 `[2044,2045,2046,2047]` 与期望完全一致，问题在推进而非播种。）
+
 ## 已落地的 runtime 改动（默认不改变行为）
 
 | 改动 | 说明 |
@@ -130,9 +157,10 @@ upcast reduce 口径），没有额外来源。**
 
 ## 下一步
 
-1. ~~权重切片 + 前向改造~~ **已落地**（见上）。剩下的是**分布式接线**：
-   把 all-reduce 接进前向（TP 组注入）、并把 ratio-128 与滑窗层做同样的改动
-   （o-path 三个张量在三种层型上形状相同，改法一致）；
+1. ~~权重切片 + 前向改造 + 分布式接线~~ **ratio-4 已落地并验证**（step 3）。
+   剩下：**ratio-128 与滑窗层的同样改造**（o-path 三个张量在三种层型上形状
+   完全相同，改法一致）——一个 stage 三种层型都有，不做完无法做 stage 级集成；
+   以及 **CUDA graph 捕图下的 all-reduce**（MoE 已有先例，但需实测）；
 2. 单 stage 数值见证 + 速度 A/B（**注意：E2F 探针的逐步逐位对拍不适用**，
    见设计note §4——本次不是逐位改动）；
 3. D0L 软门——本项目第一次用软门放行形态改动；
@@ -146,4 +174,6 @@ upcast reduce 口径），没有额外来源。**
 | `results/layer{2,4,6,10}/o_path_equivalence.json` | step 1 四层结果 |
 | `../../runtime/e6f_slice_exactness.py` | step 2 脚本 |
 | `results/slice-exactness/slice_exactness.json` | step 2 五项检查 |
-| `../../runtime/dsv4_direct/ratio4_attention.py` | 配置字段、`shard_ratio4_attention_weights()`、前向 local 化 |
+| `../../runtime/e6f_dist_layer_gate.py` | step 3 脚本（4 rank + 真 all-reduce） |
+| `results/dist-single-layer/rank*.json` | step 3 结果 |
+| `../../runtime/dsv4_direct/ratio4_attention.py` | 配置字段、`shard_ratio4_attention_weights()`、`_tp_reduce_output()`、前向 local 化 |
