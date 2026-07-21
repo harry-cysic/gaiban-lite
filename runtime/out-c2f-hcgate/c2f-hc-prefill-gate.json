@@ -1,0 +1,559 @@
+{
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "C2F-prefill-hc-boundary-gate",
+  "fused_backend_import": "ok",
+  "hc_mult": 4,
+  "hc_scale_attn": [
+    0.1309632807970047,
+    0.03144034370779991,
+    0.1275200992822647
+  ],
+  "hc_scale_ffn": [
+    0.1572873741388321,
+    0.05860704556107521,
+    0.19894756376743317
+  ],
+  "hidden": 4096,
+  "host": "titan065",
+  "iters": 20,
+  "koujing": "one HC boundary (hc_post -> hc_pre -> rms_norm) at prefill shapes [1, chunk, 4, 4096]; eager vs mhc_fused_post_pre_tilelang on identical inputs; host walls around torch.cuda.synchronize; single GPU, no CUDA graph (the prefill chain has none)",
+  "layer": 11,
+  "lever": "A",
+  "ok": true,
+  "per_chunk": [
+    {
+      "chunk": 1024,
+      "eager": {
+        "max_ms": 2.7588550001382828,
+        "mean_ms": 2.035796141717583,
+        "min_ms": 1.9887960515916348,
+        "p50_ms": 1.9975824980065227,
+        "peak_delta_bytes": 234881024
+      },
+      "fused": {
+        "max_ms": 0.38909190334379673,
+        "mean_ms": 0.37940993206575513,
+        "min_ms": 0.37282099947333336,
+        "p50_ms": 0.3785324515774846,
+        "peak_delta_bytes": 92377088
+      },
+      "layout": "prefill",
+      "numerics": {
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.12112300097942352,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999115467071533,
+          "rel_fro": 0.018177563324570656
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.556640625,
+          "nonfinite": 0,
+          "reference_max_abs": 1.6015625,
+          "rel_fro": 0.07176456600427628
+        },
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 0.44411563873291016,
+          "nonfinite": 0,
+          "reference_max_abs": 1.4351985454559326,
+          "rel_fro": 0.10660744458436966
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.000244140625,
+          "nonfinite": 0,
+          "reference_max_abs": 0.10595703125,
+          "rel_fro": 1.0167265827476513e-05
+        }
+      },
+      "rows": 1024,
+      "shapes": {
+        "comb": [
+          1,
+          1024,
+          4,
+          4
+        ],
+        "hidden": [
+          1,
+          1024,
+          4096
+        ],
+        "post": [
+          1,
+          1024,
+          4
+        ],
+        "residual": [
+          1,
+          1024,
+          4,
+          4096
+        ]
+      },
+      "speedup": 5.277176341636914,
+      "weights": "real"
+    },
+    {
+      "chunk": 4096,
+      "eager": {
+        "max_ms": 8.03988496772945,
+        "mean_ms": 7.960647402796894,
+        "min_ms": 7.809042930603027,
+        "p50_ms": 8.033127523958683,
+        "peak_delta_bytes": 939524096
+      },
+      "fused": {
+        "max_ms": 1.8117439467459917,
+        "mean_ms": 1.7980851465836167,
+        "min_ms": 1.785605913028121,
+        "p50_ms": 1.7964409198611975,
+        "peak_delta_bytes": 369459200
+      },
+      "layout": "prefill",
+      "numerics": {
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.20130956172943115,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999055862426758,
+          "rel_fro": 0.018280908465385437
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.5123291015625,
+          "nonfinite": 0,
+          "reference_max_abs": 1.640625,
+          "rel_fro": 0.07017223536968231
+        },
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 0.5709143280982971,
+          "nonfinite": 0,
+          "reference_max_abs": 1.431933045387268,
+          "rel_fro": 0.10709991306066513
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.000244140625,
+          "nonfinite": 0,
+          "reference_max_abs": 0.109375,
+          "rel_fro": 1.2119788152631372e-05
+        }
+      },
+      "rows": 4096,
+      "shapes": {
+        "comb": [
+          1,
+          4096,
+          4,
+          4
+        ],
+        "hidden": [
+          1,
+          4096,
+          4096
+        ],
+        "post": [
+          1,
+          4096,
+          4
+        ],
+        "residual": [
+          1,
+          4096,
+          4,
+          4096
+        ]
+      },
+      "speedup": 4.47169034903712,
+      "weights": "real"
+    },
+    {
+      "chunk": 8192,
+      "eager": {
+        "max_ms": 15.568545088171959,
+        "mean_ms": 15.52588491467759,
+        "min_ms": 15.515719074755907,
+        "p50_ms": 15.523527981713414,
+        "peak_delta_bytes": 1879048192
+      },
+      "fused": {
+        "max_ms": 3.730013035237789,
+        "mean_ms": 3.7063230061903596,
+        "min_ms": 3.6788489669561386,
+        "p50_ms": 3.7041299510747194,
+        "peak_delta_bytes": 738902016
+      },
+      "layout": "prefill",
+      "numerics": {
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.2072659730911255,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999070167541504,
+          "rel_fro": 0.01824447698891163
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.51416015625,
+          "nonfinite": 0,
+          "reference_max_abs": 1.640625,
+          "rel_fro": 0.0713905617594719
+        },
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 0.5921534299850464,
+          "nonfinite": 0,
+          "reference_max_abs": 1.5087302923202515,
+          "rel_fro": 0.10685177892446518
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.00048828125,
+          "nonfinite": 0,
+          "reference_max_abs": 0.111328125,
+          "rel_fro": 1.1283440471743234e-05
+        }
+      },
+      "rows": 8192,
+      "shapes": {
+        "comb": [
+          1,
+          8192,
+          4,
+          4
+        ],
+        "hidden": [
+          1,
+          8192,
+          4096
+        ],
+        "post": [
+          1,
+          8192,
+          4
+        ],
+        "residual": [
+          1,
+          8192,
+          4,
+          4096
+        ]
+      },
+      "speedup": 4.190870241258518,
+      "weights": "real"
+    },
+    {
+      "chunk": 512,
+      "eager": {
+        "max_ms": 1.5729870647192001,
+        "mean_ms": 1.5569142065942287,
+        "min_ms": 1.5410890337079763,
+        "p50_ms": 1.5571729745715857,
+        "peak_delta_bytes": 117440512
+      },
+      "fused": {
+        "max_ms": 0.31669880263507366,
+        "mean_ms": 0.308294384740293,
+        "min_ms": 0.304357148706913,
+        "p50_ms": 0.30803855042904615,
+        "peak_delta_bytes": 46196736
+      },
+      "layout": "decode_control",
+      "numerics": {
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 2.7835369110107422e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9997102618217468,
+          "rel_fro": 4.598236500896746e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 1.53125,
+          "rel_fro": 0.00022421948960982263
+        },
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 5.6862831115722656e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.4036885499954224,
+          "rel_fro": 1.3171952559787314e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.000244140625,
+          "nonfinite": 0,
+          "reference_max_abs": 0.099609375,
+          "rel_fro": 1.1749061741284095e-05
+        }
+      },
+      "rows": 512,
+      "shapes": {
+        "comb": [
+          512,
+          1,
+          4,
+          4
+        ],
+        "hidden": [
+          512,
+          1,
+          4096
+        ],
+        "post": [
+          512,
+          1,
+          4
+        ],
+        "residual": [
+          512,
+          1,
+          4,
+          4096
+        ]
+      },
+      "speedup": 5.05512369280632,
+      "weights": "real"
+    },
+    {
+      "chunk": 1024,
+      "eager": {
+        "max_ms": 1.906577032059431,
+        "mean_ms": 1.901052799075842,
+        "min_ms": 1.895788125693798,
+        "p50_ms": 1.9015130819752812,
+        "peak_delta_bytes": 234881024
+      },
+      "fused": {
+        "max_ms": 0.37074810825288296,
+        "mean_ms": 0.36044466542080045,
+        "min_ms": 0.35415799356997013,
+        "p50_ms": 0.359618104994297,
+        "peak_delta_bytes": 92377088
+      },
+      "layout": "prefill_synthetic_scale1",
+      "numerics": {
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.9124752879142761,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9922292232513428,
+          "rel_fro": 0.4557049870491028
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 3.328125,
+          "nonfinite": 0,
+          "reference_max_abs": 5.5625,
+          "rel_fro": 0.1615939736366272
+        },
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 1.911393642425537,
+          "nonfinite": 0,
+          "reference_max_abs": 1.9997761249542236,
+          "rel_fro": 0.33123016357421875
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0009765625,
+          "nonfinite": 0,
+          "reference_max_abs": 0.208984375,
+          "rel_fro": 1.6446630979771726e-05
+        }
+      },
+      "rows": 1024,
+      "shapes": {
+        "comb": [
+          1,
+          1024,
+          4,
+          4
+        ],
+        "hidden": [
+          1,
+          1024,
+          4096
+        ],
+        "post": [
+          1,
+          1024,
+          4
+        ],
+        "residual": [
+          1,
+          1024,
+          4,
+          4096
+        ]
+      },
+      "speedup": 5.287589961593942,
+      "weights": "synthetic"
+    },
+    {
+      "chunk": 4096,
+      "eager": {
+        "max_ms": 7.829931797459722,
+        "mean_ms": 7.823363423813134,
+        "min_ms": 7.816737052053213,
+        "p50_ms": 7.823053980246186,
+        "peak_delta_bytes": 939524096
+      },
+      "fused": {
+        "max_ms": 1.7992909997701645,
+        "mean_ms": 1.7912984709255397,
+        "min_ms": 1.7791539430618286,
+        "p50_ms": 1.7915864009410143,
+        "peak_delta_bytes": 369459200
+      },
+      "layout": "prefill_synthetic_scale1",
+      "numerics": {
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.9350258111953735,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9983815550804138,
+          "rel_fro": 0.4570934772491455
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 4.6875,
+          "nonfinite": 0,
+          "reference_max_abs": 5.1875,
+          "rel_fro": 0.1638767123222351
+        },
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 1.8848063945770264,
+          "nonfinite": 0,
+          "reference_max_abs": 1.9999322891235352,
+          "rel_fro": 0.3279910087585449
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.00048828125,
+          "nonfinite": 0,
+          "reference_max_abs": 0.224609375,
+          "rel_fro": 1.3751422557106707e-05
+        }
+      },
+      "rows": 4096,
+      "shapes": {
+        "comb": [
+          1,
+          4096,
+          4,
+          4
+        ],
+        "hidden": [
+          1,
+          4096,
+          4096
+        ],
+        "post": [
+          1,
+          4096,
+          4
+        ],
+        "residual": [
+          1,
+          4096,
+          4,
+          4096
+        ]
+      },
+      "speedup": 4.3665513291110045,
+      "weights": "synthetic"
+    },
+    {
+      "chunk": 8192,
+      "eager": {
+        "max_ms": 15.550154028460383,
+        "mean_ms": 15.533818956464529,
+        "min_ms": 15.52345510572195,
+        "p50_ms": 15.53266099654138,
+        "peak_delta_bytes": 1879048192
+      },
+      "fused": {
+        "max_ms": 3.7781510036438704,
+        "mean_ms": 3.7425817572511733,
+        "min_ms": 3.726978087797761,
+        "p50_ms": 3.7416989216580987,
+        "peak_delta_bytes": 738902016
+      },
+      "layout": "prefill_synthetic_scale1",
+      "numerics": {
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.9484850168228149,
+          "nonfinite": 0,
+          "reference_max_abs": 0.997360348701477,
+          "rel_fro": 0.4524267017841339
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 4.203125,
+          "nonfinite": 0,
+          "reference_max_abs": 5.46875,
+          "rel_fro": 0.16284024715423584
+        },
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 1.928715467453003,
+          "nonfinite": 0,
+          "reference_max_abs": 1.999889612197876,
+          "rel_fro": 0.3404976427555084
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.00048828125,
+          "nonfinite": 0,
+          "reference_max_abs": 0.22265625,
+          "rel_fro": 1.5069788787513971e-05
+        }
+      },
+      "rows": 8192,
+      "shapes": {
+        "comb": [
+          1,
+          8192,
+          4,
+          4
+        ],
+        "hidden": [
+          1,
+          8192,
+          4096
+        ],
+        "post": [
+          1,
+          8192,
+          4
+        ],
+        "residual": [
+          1,
+          8192,
+          4,
+          4096
+        ]
+      },
+      "speedup": 4.151232186703635,
+      "weights": "synthetic"
+    }
+  ],
+  "schema_version": 1,
+  "seed": 20260723,
+  "sinkhorn_iters": 20,
+  "torch": "2.11.0+cu130",
+  "vllm": "0.22.1",
+  "warmup": 5,
+  "weights": "real"
+}

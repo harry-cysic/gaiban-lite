@@ -1,0 +1,7 @@
+usage: c2f_hc_prefill_gate.py [-h] --out-dir OUT_DIR [--chunks CHUNKS]
+                              [--stage-root STAGE_ROOT] [--layer LAYER]
+                              [--decode-control DECODE_CONTROL]
+                              [--synthetic-control] [--iters ITERS]
+                              [--warmup WARMUP] [--seed SEED]
+                              [--input-scale INPUT_SCALE]
+c2f_hc_prefill_gate.py: error: argument --decode-control: expected one argument

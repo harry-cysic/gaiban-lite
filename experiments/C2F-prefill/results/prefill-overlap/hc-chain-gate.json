@@ -1,0 +1,802 @@
+{
+  "allocator_backend": "native",
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "chunk": 8192,
+  "component_walls_s": {
+    "attention_ratio128": 0.15803191578015685,
+    "attention_ratio4": 0.3605569682549685,
+    "hc": 0.12902974616736174,
+    "moe": 0.4305995781905949,
+    "norm": 0.0014614500105381012,
+    "total_instrumented": 1.0802904670126736
+  },
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "C2F-prefill-stage-bench",
+  "fuse_min_seqlen": 1024,
+  "global_rows": 32768,
+  "hc_backend": "fused",
+  "hc_backend_max_rows": 896,
+  "hc_gate": {
+    "boundaries": 21,
+    "form": "locked per-boundary A/B (both backends on identical inputs, chain advanced on eager) + compounded 11-layer stage output from two independent chains",
+    "per_boundary": [
+      {
+        "boundary": "L0-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.0001537799835205078,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999640583992004,
+          "rel_fro": 2.8945773010491394e-05
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 1.75,
+          "rel_fro": 0.0004641685518436134
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 0.0002333521842956543,
+          "nonfinite": 0,
+          "reference_max_abs": 1.7908000946044922,
+          "rel_fro": 1.8197464669356123e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.00390625,
+          "nonfinite": 0,
+          "reference_max_abs": 2.65625,
+          "rel_fro": 1.5992342014214955e-05
+        }
+      },
+      {
+        "boundary": "L0-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.0001474618911743164,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999879002571106,
+          "rel_fro": 3.19803184538614e-05
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.03125,
+          "nonfinite": 0,
+          "reference_max_abs": 13.5,
+          "rel_fro": 0.0004653541836887598
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 3.7550926208496094e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.7484342455863953,
+          "rel_fro": 1.3764035429630894e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.00390625,
+          "nonfinite": 0,
+          "reference_max_abs": 5.40625,
+          "rel_fro": 1.3095154827169608e-05
+        }
+      },
+      {
+        "boundary": "L1-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.00010973215103149414,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999755620956421,
+          "rel_fro": 6.843127266620286e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 2.421875,
+          "rel_fro": 0.0009312158217653632
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 8.040666580200195e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.7303166389465332,
+          "rel_fro": 1.5417512258864008e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 4.5625,
+          "rel_fro": 1.4562975593435112e-05
+        }
+      },
+      {
+        "boundary": "L1-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.00014984607696533203,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999924302101135,
+          "rel_fro": 9.555921678838786e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.001953125,
+          "nonfinite": 0,
+          "reference_max_abs": 0.6484375,
+          "rel_fro": 0.0010152371833100915
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 1.2248754501342773e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.4228804409503937,
+          "rel_fro": 1.5194067600532435e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 4.03125,
+          "rel_fro": 1.3151121493137907e-05
+        }
+      },
+      {
+        "boundary": "L2-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.00011074542999267578,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999891519546509,
+          "rel_fro": 2.357911034778226e-05
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 1.859375,
+          "rel_fro": 0.0008517024689354002
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 7.233023643493652e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.6878458261489868,
+          "rel_fro": 2.7583446353673935e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 4.4375,
+          "rel_fro": 1.2193399015814066e-05
+        }
+      },
+      {
+        "boundary": "L2-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.00014644861221313477,
+          "nonfinite": 0,
+          "reference_max_abs": 0.999972939491272,
+          "rel_fro": 1.903854172269348e-05
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.0625,
+          "nonfinite": 0,
+          "reference_max_abs": 22.5,
+          "rel_fro": 0.0005897398805245757
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 8.195638656616211e-06,
+          "nonfinite": 0,
+          "reference_max_abs": 0.2585013806819916,
+          "rel_fro": 1.638678259041626e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 13.6875,
+          "rel_fro": 1.1460492714832071e-05
+        }
+      },
+      {
+        "boundary": "L3-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.00013005733489990234,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999854564666748,
+          "rel_fro": 9.95658956526313e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 2.734375,
+          "rel_fro": 0.0007607567822560668
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 7.641315460205078e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.9083006381988525,
+          "rel_fro": 2.0598006813088432e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 10.4375,
+          "rel_fro": 1.2436544238880742e-05
+        }
+      },
+      {
+        "boundary": "L3-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 7.677078247070312e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999843835830688,
+          "rel_fro": 1.1209708645765204e-05
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.00390625,
+          "nonfinite": 0,
+          "reference_max_abs": 1.2265625,
+          "rel_fro": 0.0009147492819465697
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 2.2739171981811523e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.43531540036201477,
+          "rel_fro": 1.7446345736971125e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 7.25,
+          "rel_fro": 1.3903574654250406e-05
+        }
+      },
+      {
+        "boundary": "L4-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.0001226663589477539,
+          "nonfinite": 0,
+          "reference_max_abs": 0.999884307384491,
+          "rel_fro": 3.8295060221571475e-05
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 2.53125,
+          "rel_fro": 0.0007360469899140298
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 7.957220077514648e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.9460192918777466,
+          "rel_fro": 1.5628103938070126e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 6.4375,
+          "rel_fro": 1.248897024197504e-05
+        }
+      },
+      {
+        "boundary": "L4-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 0.00017338991165161133,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999706745147705,
+          "rel_fro": 3.66115928045474e-05
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.125,
+          "nonfinite": 0,
+          "reference_max_abs": 26.25,
+          "rel_fro": 0.000948427536059171
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 1.919269561767578e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.38195788860321045,
+          "rel_fro": 9.37798267841572e-06
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 12.75,
+          "rel_fro": 1.388601685903268e-05
+        }
+      },
+      {
+        "boundary": "L5-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 6.884336471557617e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999903440475464,
+          "rel_fro": 2.185175435442943e-05
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 3.59375,
+          "rel_fro": 0.0010036922758445144
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 5.054473876953125e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.9839575290679932,
+          "rel_fro": 1.0538100468693301e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 8.6875,
+          "rel_fro": 1.4399994142877404e-05
+        }
+      },
+      {
+        "boundary": "L5-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 9.036064147949219e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999923706054688,
+          "rel_fro": 7.4012696131831035e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 1.421875,
+          "rel_fro": 0.000835586863104254
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 2.8312206268310547e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.6764234900474548,
+          "rel_fro": 1.3282067811815068e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 5.0,
+          "rel_fro": 1.3729495549341664e-05
+        }
+      },
+      {
+        "boundary": "L6-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 6.115436553955078e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9998301267623901,
+          "rel_fro": 9.032130947161932e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 3.671875,
+          "rel_fro": 0.0008767445688135922
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 3.814697265625e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.9912949800491333,
+          "rel_fro": 8.331013304996304e-06
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 6.9375,
+          "rel_fro": 1.4459356862062123e-05
+        }
+      },
+      {
+        "boundary": "L6-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 5.99399209022522e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999350905418396,
+          "rel_fro": 4.299130068829982e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.0625,
+          "nonfinite": 0,
+          "reference_max_abs": 10.0625,
+          "rel_fro": 0.0012441901490092278
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 3.8743019104003906e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9465087652206421,
+          "rel_fro": 8.560155947634485e-06
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.0078125,
+          "nonfinite": 0,
+          "reference_max_abs": 15.0625,
+          "rel_fro": 1.2780870747519657e-05
+        }
+      },
+      {
+        "boundary": "L7-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 7.808208465576172e-06,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999715089797974,
+          "rel_fro": 1.1504390613481519e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 3.984375,
+          "rel_fro": 0.00048368130228482187
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 4.170835018157959e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.9923012256622314,
+          "rel_fro": 8.221064490498975e-06
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 8.1875,
+          "rel_fro": 1.2529500963864848e-05
+        }
+      },
+      {
+        "boundary": "L7-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 3.808736801147461e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999454617500305,
+          "rel_fro": 2.583654804766411e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.0009765625,
+          "nonfinite": 0,
+          "reference_max_abs": 0.318359375,
+          "rel_fro": 0.0009140467154793441
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 3.0994415283203125e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.099514126777649,
+          "rel_fro": 8.042230547289364e-06
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 10.125,
+          "rel_fro": 1.2281664567126427e-05
+        }
+      },
+      {
+        "boundary": "L8-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 1.1205673217773438e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999865889549255,
+          "rel_fro": 2.7601913643593434e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 4.0,
+          "rel_fro": 0.0005186971393413842
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 8.96453857421875e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.7659660577774048,
+          "rel_fro": 1.6485679225297645e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.03125,
+          "nonfinite": 0,
+          "reference_max_abs": 27.625,
+          "rel_fro": 1.37755805553752e-05
+        }
+      },
+      {
+        "boundary": "L8-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 4.83393669128418e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999719262123108,
+          "rel_fro": 9.099397175305057e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.03125,
+          "nonfinite": 0,
+          "reference_max_abs": 11.125,
+          "rel_fro": 0.0008463204139843583
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 1.8849968910217285e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.2445461004972458,
+          "rel_fro": 7.069492130540311e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 25.75,
+          "rel_fro": 1.0853556887013838e-05
+        }
+      },
+      {
+        "boundary": "L9-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 2.4080276489257812e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999799728393555,
+          "rel_fro": 3.6213541534380056e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 3.578125,
+          "rel_fro": 0.0002958807453978807
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 8.377432823181152e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.9987002611160278,
+          "rel_fro": 1.531421730760485e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 22.75,
+          "rel_fro": 1.1562896361283492e-05
+        }
+      },
+      {
+        "boundary": "L9-inter-ffn2attn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 3.457069396972656e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999901652336121,
+          "rel_fro": 4.946314220433123e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.001953125,
+          "nonfinite": 0,
+          "reference_max_abs": 0.3515625,
+          "rel_fro": 0.0008002354297786951
+        },
+        "kind": "ratio4",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 3.248453140258789e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.7646698355674744,
+          "rel_fro": 2.09583140531322e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.03125,
+          "nonfinite": 0,
+          "reference_max_abs": 17.25,
+          "rel_fro": 1.3237083294370677e-05
+        }
+      },
+      {
+        "boundary": "L10-intra-attn2ffn",
+        "comb": {
+          "bitwise_equal": false,
+          "max_abs": 2.777576446533203e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 0.9999898076057434,
+          "rel_fro": 3.6788480883842567e-06
+        },
+        "hidden": {
+          "bitwise_equal": false,
+          "max_abs": 0.015625,
+          "nonfinite": 0,
+          "reference_max_abs": 3.1875,
+          "rel_fro": 0.0005185883492231369
+        },
+        "kind": "ratio128",
+        "post": {
+          "bitwise_equal": false,
+          "max_abs": 7.092952728271484e-05,
+          "nonfinite": 0,
+          "reference_max_abs": 1.9942480325698853,
+          "rel_fro": 2.044216489593964e-05
+        },
+        "residual": {
+          "bitwise_equal": false,
+          "max_abs": 0.03125,
+          "nonfinite": 0,
+          "reference_max_abs": 17.75,
+          "rel_fro": 1.2201902791275643e-05
+        }
+      }
+    ],
+    "stage_output": {
+      "bitwise_equal": false,
+      "max_abs": 10.5390625,
+      "nonfinite": 0,
+      "reference_max_abs": 22.25,
+      "rel_fro": 0.22525233030319214
+    },
+    "worst_by_tensor": {
+      "comb": 3.8295060221571475e-05,
+      "hidden": 0.0012441901490092278,
+      "post": 7.069492130540311e-05,
+      "residual": 1.5992342014214955e-05
+    }
+  },
+  "host": "titan064",
+  "indexer": "fused",
+  "input_scale": 0.02,
+  "input_tok_s_per_lane": 7613.989276761689,
+  "input_tok_s_per_stage_dp4": 30455.957107046757,
+  "iters": 2,
+  "koujing": "single-shot prefill at start_pos=0, B=1/lane, 4 DP lanes with distinct sequences; input tok/s/stage = 4*chunk / stage wall; host walls around torch.cuda.synchronize; eager, no CUDA graph, no PP handoff",
+  "layers": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "load_seconds": 14.19941375986673,
+  "max_memory_allocated_bytes": 22789953024,
+  "max_memory_reserved_bytes": 22875734016,
+  "measurement_class": "open_loop_single_stage_prefill",
+  "moe_collective_selfcheck": {
+    "all_gather_bus_gbps": 23.598364446409093,
+    "all_gather_p50_ms": 8.531379047781229,
+    "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
+    "payload_bytes": 268435456,
+    "reduce_scatter_bus_gbps": 22.918608246943986,
+    "reduce_scatter_p50_ms": 8.784416131675243
+  },
+  "moe_mode": "w4a8",
+  "moe_overlap": "off",
+  "moe_overlap_blocks": 4,
+  "moe_resident_bytes_layer0": 861931008,
+  "nccl_p2p_level": "SYS",
+  "nccl_version": "2.28.9",
+  "ok": true,
+  "per_rank_errors": [
+    [],
+    [],
+    [],
+    []
+  ],
+  "per_rank_max_memory_allocated_bytes": [
+    22789953024,
+    22789953024,
+    22789953024,
+    22789953024
+  ],
+  "per_rank_ok": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "pipeline16_projection_tok_s": 30455.957107046757,
+  "pytorch_cuda_alloc_conf": "expandable_segments:True",
+  "rank": 0,
+  "ref_score_row_block_unit_check": {
+    "bitwise_equal": true
+  },
+  "ring_wrap_unit_check": {
+    "1031": true,
+    "128": true,
+    "130": true,
+    "2048": true,
+    "96": true,
+    "pass": true
+  },
+  "row_block": 1024,
+  "schema_version": 1,
+  "seed": 20260721,
+  "sliced_sparse_unit_check": {
+    "bitwise_equal": true
+  },
+  "sparse_backend": "tilelang",
+  "sparse_head_chunk": 16,
+  "stage_pass_wall_mean_s": 1.0759143074974418,
+  "stage_pass_wall_p50_s": 1.0759143074974418,
+  "stage_pass_walls_s": [
+    1.0759409859310836,
+    1.0758876290638
+  ],
+  "torch": "2.11.0+cu130",
+  "triton": "3.6.0",
+  "vllm": "0.22.1",
+  "warmup": 1,
+  "world": 4
+}

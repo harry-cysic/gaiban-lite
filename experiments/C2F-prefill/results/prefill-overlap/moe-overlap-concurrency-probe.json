@@ -1,0 +1,38 @@
+{
+  "all_gather_bus_gbps": 23.549805577437592,
+  "analysis": {
+    "hidden_ms": 3.227356355637312,
+    "hideable_ms": 6.233794963918626,
+    "measured_ms": 11.55540905892849,
+    "overlap_fraction": 0.517719362654264,
+    "perfect_overlap_ms": 8.548970450647175,
+    "serial_sum_ms": 14.782765414565802
+  },
+  "collective_only": {
+    "mean_ms": 8.58314661309123,
+    "min_ms": 8.51041404530406,
+    "p50_ms": 8.548970450647175
+  },
+  "compute_only": {
+    "mean_ms": 6.254619639366865,
+    "min_ms": 6.2180799432098866,
+    "p50_ms": 6.233794963918626
+  },
+  "concurrent": {
+    "mean_ms": 11.553125141654164,
+    "min_ms": 11.48558920249343,
+    "p50_ms": 11.55540905892849
+  },
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "C2F-moe-overlap-probe",
+  "host": "titan065",
+  "koujing": "all_gather_into_tensor at the real MoE payload vs a BF16 GEMM load vs both issued together; host walls around torch.cuda.synchronize with dist.barrier fencing",
+  "lever": "B",
+  "local_rows": 8192,
+  "nccl_p2p_level": "SYS",
+  "nccl_version": "2.28.9",
+  "ok": true,
+  "rank": 0,
+  "schema_version": 1
+}

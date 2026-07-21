@@ -547,6 +547,11 @@ class TP4MoE:
         self._marlin_input_dtype = marlin_input_dtype
         if marlin_input_dtype is not None:
             _preset_w4a8_activation_quant()
+        # C2F 23rd vertical lever B: row-blocked collective/compute pipeline.
+        # 0 or 1 == the sequential path (unchanged).  Set through
+        # `enable_collective_overlap`.
+        self._overlap_blocks = 0
+        self._overlap_alignment: dict[tuple[int, int, int], Any] = {}
         self._route_tensor_observer: list[MoERouteTensors] | None = None
         self._route_observer_captures_local_input = False
         self._route_capture_buffers: dict[
@@ -1322,6 +1327,234 @@ class TP4MoE:
             self._route_tensor_observer = None
             self._route_observer_captures_local_input = False
 
+    # ------------------------------------------------------------------
+    # C2F 23rd vertical lever B: overlap the two TP4 collectives with the
+    # routed-expert compute.
+    #
+    # The sequential path runs all_gather -> gate -> marlin -> shared ->
+    # combine -> reduce_scatter, so both collectives (17.7 ms/layer at
+    # chunk 8192, 44% of the MoE bucket) are fully exposed.  Everything
+    # between the two collectives is *per row*, so the call can be split into
+    # row blocks and pipelined: block k's all_gather overlaps block k-1's
+    # compute, and block k's reduce_scatter overlaps block k+1's compute.
+    #
+    # Layout.  `all_gather_into_tensor` writes rank-major, so a per-block
+    # gather produces a **block-major** buffer:
+    #
+    #     gathered[k*B*W + r*B + j] == rank r's local row k*B + j
+    #
+    # rather than the sequential path's `gathered[r*L + i]`.  That is a row
+    # permutation, and it is self-consistent across both collectives: the
+    # matching per-block `reduce_scatter_tensor(reduced[k*B:(k+1)*B],
+    # combined[k*B*W:(k+1)*B*W])` returns this rank's own block-k rows, so the
+    # assembled local output is in the ordinary row order.  Both slices are
+    # contiguous views, so no repacking copies are needed.
+    #
+    # Semantics.  Gate, Marlin, the shared expert and the combine are all
+    # row-local, so the permutation cannot change a row's value; what it does
+    # change is which Marlin M-block a row lands in (the alignment groups rows
+    # by expert into `block_size_m` blocks).  Marlin's K reduction is over the
+    # hidden dimension and does not depend on a row's M position, so per-row
+    # bitwise identity is *expected* -- but it is expected, not proven, so
+    # `--gate-moe-overlap` measures it rather than assuming it.
+    # ------------------------------------------------------------------
+
+    def enable_collective_overlap(self, blocks: int) -> None:
+        """Turn on (blocks > 1) or off (blocks <= 1) the pipelined path."""
+
+        if not isinstance(blocks, int) or isinstance(blocks, bool) or blocks < 0:
+            raise ValueError("overlap blocks must be a non-negative integer")
+        self._overlap_blocks = blocks
+
+    @property
+    def collective_overlap_blocks(self) -> int:
+        return self._overlap_blocks
+
+    def _overlap_supported(
+        self,
+        *,
+        local_rows: int,
+        blocks: int,
+        slot: int,
+        global_rows: int,
+        collect_trace: bool,
+        collect_stage_digests: bool,
+        route_override: Any,
+    ) -> bool:
+        """Only the plain prefill configuration takes the pipelined path."""
+
+        return (
+            blocks > 1
+            and self.route_kind == "learned"
+            and route_override is None
+            and not collect_trace
+            and not collect_stage_digests
+            and self._route_tensor_observer is None
+            and self._active_alignment_provider is None
+            and not self._route_capture_registrations
+            and local_rows % blocks == 0
+            and (local_rows // blocks) > 0
+        )
+
+    def _overlap_alignment_for(
+        self, global_rows: int, slot: int, blocks: int, block_global_rows: int
+    ):
+        key = (global_rows, slot, blocks)
+        existing = self._overlap_alignment.get(key)
+        if existing is not None:
+            return existing
+        cfg = self.config
+        block_size_m = _marlin_block_size_m(
+            rows=block_global_rows,
+            topk=cfg.topk,
+            experts=cfg.experts,
+            input_dtype=self._marlin_input_dtype,
+        )
+        template = torch.empty(
+            block_global_rows, cfg.topk, dtype=torch.int32, device=self.device
+        )
+        alignment = allocate_deterministic_moe_alignment(
+            template, block_size=block_size_m, num_experts=cfg.experts
+        )
+        self._overlap_alignment[key] = (alignment, block_size_m)
+        return self._overlap_alignment[key]
+
+    def _compute_block(
+        self,
+        gathered_block: torch.Tensor,
+        combined_block: torch.Tensor,
+        buffers: _MarlinBuffers,
+        alignment,
+        block_size_m: int,
+    ) -> None:
+        """Gate + Marlin + shared + combine for one row block (in place)."""
+
+        cfg = self.config
+        rows = gathered_block.shape[0]
+        bias = self.gate.bias
+        if bias is None:
+            raise AssertionError("validated learned gate lost bias")
+        gate = gate_forward_with_boundary(
+            gathered_block,
+            self.gate.weight,
+            bias,
+            topk=cfg.topk,
+            route_scale=cfg.route_scale,
+        )
+        route_weights = gate.routing_weights.contiguous()
+        route_ids = gate.routing_ids.contiguous()
+        deterministic_moe_align_block_size(
+            route_ids,
+            block_size=block_size_m,
+            num_experts=cfg.experts,
+            output=alignment,
+        )
+        cache13_rows = rows * cfg.topk * max(
+            2 * cfg.local_intermediate, cfg.hidden_size
+        )
+        cache2_rows = rows * cfg.topk * cfg.local_intermediate
+        contributions = self._fused(
+            hidden_states=gathered_block,
+            w1=self.resident.routed.w13_q,
+            w2=self.resident.routed.w2_q,
+            bias1=None,
+            bias2=None,
+            w1_scale=self.resident.routed.w13_s,
+            w2_scale=self.resident.routed.w2_s,
+            topk_weights=route_weights,
+            num_topk=cfg.topk,
+            quant_type=self._quant_type,
+            apply_router_weight_on_input=False,
+            expert_map=None,
+            block_size_m=block_size_m,
+            sorted_token_ids=alignment.sorted_token_ids,
+            expert_ids=alignment.expert_ids,
+            num_tokens_post_padded=alignment.num_tokens_post_padded,
+            activation=self._activation,
+            workspace=buffers.workspace,
+            intermediate_cache13=buffers.cache13[:cache13_rows],
+            intermediate_cache2=buffers.cache2[:cache2_rows],
+            output=None,
+            input_dtype=self._marlin_input_dtype,
+            is_k_full=True,
+            clamp_limit=cfg.clamp_limit,
+        ).view(rows, cfg.topk, cfg.hidden_size)
+        routed = torch.sum(contributions, dim=1, out=buffers.output[:rows])
+        shared = shared_bf16_partial(
+            gathered_block, self.shared, clamp_limit=cfg.clamp_limit
+        )
+        torch.add(routed, shared, out=combined_block)
+
+    def _call_overlapped(
+        self,
+        local_flat: torch.Tensor,
+        buffers: _MarlinBuffers,
+        blocks: int,
+        original_shape: tuple[int, ...],
+        stage_marker: Callable[[str], None] | None,
+    ) -> torch.Tensor:
+        cfg = self.config
+        local_rows = local_flat.shape[0]
+        block_rows = local_rows // blocks
+        block_global_rows = block_rows * cfg.world_size
+        alignment, block_size_m = self._overlap_alignment_for(
+            local_rows * cfg.world_size, 0, blocks, block_global_rows
+        )
+
+        if stage_marker is not None:
+            stage_marker("moe_inputs_ready")
+
+        # Issue every all_gather up front: they queue on the NCCL stream and
+        # drain while the compute stream works through the earlier blocks.
+        gather_works = []
+        for index in range(blocks):
+            gather_works.append(
+                dist.all_gather_into_tensor(
+                    buffers.gathered[
+                        index * block_global_rows : (index + 1) * block_global_rows
+                    ],
+                    local_flat[index * block_rows : (index + 1) * block_rows],
+                    group=self.group,
+                    async_op=True,
+                )
+            )
+        if stage_marker is not None:
+            stage_marker("moe_all_gather_issued")
+
+        scatter_works = []
+        for index in range(blocks):
+            gather_works[index].wait()
+            begin = index * block_global_rows
+            end = begin + block_global_rows
+            combined_block = buffers.combined[begin:end]
+            self._compute_block(
+                buffers.gathered[begin:end],
+                combined_block,
+                buffers,
+                alignment,
+                block_size_m,
+            )
+            # Issued while block index+1 is still to be computed, so the
+            # reduce-scatter overlaps that compute rather than trailing it.
+            scatter_works.append(
+                dist.reduce_scatter_tensor(
+                    buffers.reduced[
+                        index * block_rows : (index + 1) * block_rows
+                    ],
+                    combined_block,
+                    op=dist.ReduceOp.SUM,
+                    group=self.group,
+                    async_op=True,
+                )
+            )
+            if stage_marker is not None:
+                stage_marker(f"moe_block{index}_computed")
+        for work in scatter_works:
+            work.wait()
+        if stage_marker is not None:
+            stage_marker("moe_reduce_scatter_done")
+        return buffers.reduced.reshape(original_shape).clone()
+
     def __call__(
         self,
         hidden_local: torch.Tensor,
@@ -1425,6 +1658,28 @@ class TP4MoE:
         if buffers.has_completion_event:
             torch.cuda.current_stream(self.device).wait_event(buffers.ready_event)
         try:
+            if self._overlap_supported(
+                local_rows=local_flat.shape[0],
+                blocks=self._overlap_blocks,
+                slot=slot,
+                global_rows=local_flat.shape[0] * cfg.world_size,
+                collect_trace=collect_trace,
+                collect_stage_digests=collect_stage_digests,
+                route_override=route_override,
+            ):
+                local_output = self._call_overlapped(
+                    local_flat,
+                    buffers,
+                    self._overlap_blocks,
+                    original_shape,
+                    stage_marker,
+                )
+                buffers.ready_event.record(torch.cuda.current_stream(self.device))
+                buffers.has_completion_event = True
+                buffers.state = "free"
+                if stage_marker is not None:
+                    stage_marker("moe_finalize_done")
+                return local_output, None
             if stage_marker is not None:
                 stage_marker("moe_inputs_ready")
             dist.all_gather_into_tensor(buffers.gathered, local_flat, group=self.group)

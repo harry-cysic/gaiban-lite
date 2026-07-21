@@ -89,17 +89,105 @@ class EagerHCBoundaryBackend:
 
 
 class FusedTilelangHCBoundaryBackend:
-    """vLLM TileLang fused hc_post+hc_pre boundary with a separate RMSNorm."""
+    """vLLM TileLang fused hc_post+hc_pre boundary with a separate RMSNorm.
+
+    Row ceiling (C2F 23rd vertical, lever A).  vLLM's
+    ``_tilelang_hc_prenorm_gemm`` dispatches to a *different* kernel,
+    ``hc_prenorm_gemm_block_m_tilelang``, at exactly ``num_tokens >= 1024``::
+
+        if n_splits == 1 and use_default_config and x.shape[0] >= 1024:
+            hc_prenorm_gemm_block_m_tilelang(...)
+
+    and ``mhc_fused_post_pre_tilelang`` calls it without forwarding ``tile_n``
+    or ``n_splits``, so ``use_default_config`` is always True and the branch
+    cannot be avoided through the public arguments.  On this sm_89 stack that
+    kernel is **numerically wrong**, not merely lower precision: measured
+    against the verified eager composition on real layer-11 HC weights,
+    ``rel_fro`` jumps from ~2.3e-4 at <= 896 rows to ~1.1e-1 at >= 1024 rows
+    (``post`` and ``comb`` effectively decorrelate).  This is a *second*,
+    higher threshold than the already-recorded ``with_norm`` >= 128 token
+    problem, and it lands on every prefill chunk (1024/2048/4096/8192).
+
+    The boundary is row-independent -- ``mhc_post``, the pre-norm GEMM (a
+    per-row 16384->24 contraction plus that row's own sum of squares) and the
+    per-row sigmoid/sinkhorn all touch exactly one token -- so the call is
+    split into row blocks that stay on the validated branch.  Decode shapes
+    (largest recorded ``local_batch`` is 192) never reach the ceiling, so they
+    take the single-call path and are bitwise unchanged.
+    """
 
     name = "fused"
 
-    def __init__(self) -> None:
+    # Largest row count verified equivalent to the eager composition.
+    MAX_ROWS = 896
+
+    def __init__(self, max_rows: int | None = MAX_ROWS) -> None:
         # Import at construction so eager-only processes never touch vLLM.
         from vllm.model_executor.kernels.mhc.tilelang import (
             mhc_fused_post_pre_tilelang,
         )
 
+        if max_rows is not None and max_rows < 1:
+            raise ValueError("max_rows must be positive or None")
         self._kernel = mhc_fused_post_pre_tilelang
+        self.max_rows = max_rows
+
+    def _call_kernel(self, branch_output, residual, post, comb, packed):
+        *kernel_args, kernel_kwargs = packed
+        return self._kernel(
+            branch_output.contiguous(),
+            residual.contiguous(),
+            post.contiguous(),
+            comb.contiguous(),
+            *kernel_args,
+            **kernel_kwargs,
+        )
+
+    def _call_split(self, branch_output, residual, post, comb, packed, rows):
+        """Row-blocked kernel call; outputs are written into one buffer set."""
+
+        hc_mult = residual.shape[-2]
+        hidden_size = residual.shape[-1]
+        outer_shape = residual.shape[:-2]
+        branch_flat = branch_output.reshape(rows, hidden_size)
+        residual_flat = residual.reshape(rows, hc_mult, hidden_size)
+        post_flat = post.reshape(rows, hc_mult)
+        comb_flat = comb.reshape(rows, hc_mult, hc_mult)
+
+        # Even blocks: fewer, larger launches than a fixed-stride split, with
+        # no short tail.
+        blocks = -(-rows // self.max_rows)
+        block = -(-rows // blocks)
+
+        residual_new = torch.empty_like(residual_flat)
+        hidden = torch.empty(
+            rows, hidden_size, dtype=branch_output.dtype, device=residual.device
+        )
+        post_new = torch.empty(
+            rows, hc_mult, 1, dtype=post.dtype, device=residual.device
+        )
+        comb_new = torch.empty(
+            rows, hc_mult, hc_mult, dtype=comb.dtype, device=residual.device
+        )
+        for begin in range(0, rows, block):
+            end = min(begin + block, rows)
+            part = self._call_kernel(
+                branch_flat[begin:end],
+                residual_flat[begin:end],
+                post_flat[begin:end],
+                comb_flat[begin:end],
+                packed,
+            )
+            residual_new[begin:end].copy_(part[0])
+            post_new[begin:end].copy_(part[1])
+            comb_new[begin:end].copy_(part[2])
+            hidden[begin:end].copy_(part[3])
+        return (
+            residual_new.view(*outer_shape, hc_mult, hidden_size),
+            post_new.view(*outer_shape, hc_mult, 1),
+            comb_new.view(*outer_shape, hc_mult, hc_mult),
+            hidden.view(*outer_shape, hidden_size),
+        )
 
     def post_pre_norm(
         self,
@@ -120,11 +208,7 @@ class FusedTilelangHCBoundaryBackend:
             raise TypeError("fused HC boundary requires BF16 branch/residual")
         if post.dtype != torch.float32 or comb.dtype != torch.float32:
             raise TypeError("fused HC boundary requires FP32 post/comb")
-        residual_new, post_new, comb_new, hidden = self._kernel(
-            branch_output.contiguous(),
-            residual.contiguous(),
-            post.contiguous(),
-            comb.contiguous(),
+        kernel_args = (
             hc_fn,
             hc_scale,
             hc_base,
@@ -133,6 +217,8 @@ class FusedTilelangHCBoundaryBackend:
             hc_eps,  # hc_sinkhorn_eps
             HC_POST_MULT,
             sinkhorn_iters,
+        )
+        kernel_kwargs = dict(
             n_splits=1,
             tile_n=1,
             # C2/A5F: the installed with_norm kernel branch is not
@@ -141,6 +227,24 @@ class FusedTilelangHCBoundaryBackend:
             norm_weight=None,
             norm_eps=norm_eps,
         )
+        packed = kernel_args + (kernel_kwargs,)
+
+        rows = 1
+        for dim in branch_output.shape[:-1]:
+            rows *= int(dim)
+        if self.max_rows is None or rows <= self.max_rows:
+            residual_new, post_new, comb_new, hidden = self._kernel(
+                branch_output.contiguous(),
+                residual.contiguous(),
+                post.contiguous(),
+                comb.contiguous(),
+                *kernel_args,
+                **kernel_kwargs,
+            )
+        else:
+            residual_new, post_new, comb_new, hidden = self._call_split(
+                branch_output, residual, post, comb, packed, rows
+            )
         hidden = rms_norm(hidden, norm_weight, eps=norm_eps)
         return residual_new, hidden, post_new.squeeze(-1), comb_new
 
@@ -161,6 +265,11 @@ def resolve_hc_boundary_backend(
         return EagerHCBoundaryBackend()
     if name == "fused":
         return FusedTilelangHCBoundaryBackend()
+    if name == "fused-nosplit":
+        # Diagnostic only: the raw kernel with no row ceiling, i.e. the
+        # >= 1024-row `hc_prenorm_gemm_block_m_tilelang` branch that the C2F
+        # 23rd vertical measured as numerically wrong.  Never ship this.
+        return FusedTilelangHCBoundaryBackend(max_rows=None)
     raise ValueError(f"unknown HC boundary backend {name!r}")
 
 

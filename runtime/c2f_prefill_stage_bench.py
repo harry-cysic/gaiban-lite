@@ -59,6 +59,7 @@ import torch.distributed as dist
 
 from dsv4_direct.attention import rms_norm, torch_sparse_attention
 from dsv4_direct.checkpoint import inspect_stage_checkpoint
+from dsv4_direct.hc_boundary_backend import resolve_hc_boundary_backend
 from dsv4_direct.hyper_connections import hc_post, hc_pre
 from dsv4_direct.moe_runtime import TP4MoE, TP4MoEConfig
 from dsv4_direct.ops.marlin_moe import load_resident_moe_layer
@@ -157,8 +158,10 @@ class PrefillLane:
         fuse_min_seqlen: int,
         sparse_row_block: int | None,
         prefill_sparse_backend: str = "torch",
+        hc_boundary_backend: Any | None = None,
     ) -> None:
         self.device = device
+        self.hc_boundary_backend = hc_boundary_backend
         self.layers: list[tuple[PhysicalLayerMaterial, Any]] = []
         for material in materials:
             if material.kind == "ratio4":
@@ -215,7 +218,11 @@ class PrefillLane:
             )
             return value
 
-        def call_moe(layer_index: int, hidden: torch.Tensor) -> torch.Tensor:
+        def call_moe(
+            layer_index: int,
+            material: PhysicalLayerMaterial,
+            hidden: torch.Tensor,
+        ) -> torch.Tensor:
             if alloc_records is None:
                 return material.moe.forward_tensor(hidden, slot=0)
             torch.cuda.synchronize(device)
@@ -249,6 +256,11 @@ class PrefillLane:
                 record["phases"] = probe.marks
             alloc_records.append(record)
             return value
+
+        if self.hc_boundary_backend is not None:
+            return self._forward_fused_boundary(
+                residual, start_pos=start_pos, timed=timed, call_moe=call_moe
+            )
 
         for layer_index, (material, attention) in enumerate(self.layers):
             hc = material.raw_block.hyper_connection
@@ -297,11 +309,108 @@ class PrefillLane:
             )
             moe_output = timed(
                 "moe",
-                lambda: call_moe(layer_index, hidden),
+                lambda: call_moe(layer_index, material, hidden),
             )
             residual = timed(
                 "hc", lambda: hc_post(moe_output, residual, post, comb)
             )
+        return residual
+
+    def _forward_fused_boundary(
+        self,
+        residual: torch.Tensor,
+        *,
+        start_pos: int,
+        timed: Any,
+        call_moe: Any,
+    ) -> torch.Tensor:
+        """Boundary-fused 11-layer chain (23rd vertical, lever A).
+
+        Same math, restructured: every ``hc_post`` is fused with the
+        ``hc_pre`` + RMSNorm that immediately follows it.  An 11-layer stage
+        has 21 such boundaries (11 intra-layer attn->ffn, 10 inter-layer
+        ffn->next attn); the stage-entry ``hc_pre``+norm and the stage-exit
+        ``hc_post`` have no fusion partner and stay eager.
+
+        The ``hc`` bucket therefore *absorbs* the fused boundaries' RMSNorm --
+        compare ``hc + norm`` across arms, not ``hc`` alone.
+        """
+
+        backend = self.hc_boundary_backend
+        first_material = self.layers[0][0]
+        first_hc = first_material.raw_block.hyper_connection
+        hidden, post, comb = timed(
+            "hc",
+            lambda: hc_pre(
+                residual,
+                first_hc.attn_fn,
+                first_hc.attn_scale,
+                first_hc.attn_base,
+                norm_eps=first_material.norm_eps,
+                sinkhorn_iters=first_material.sinkhorn_iters,
+                hc_eps=first_material.hc_eps,
+            ),
+        )
+        hidden = timed(
+            "norm",
+            lambda: rms_norm(
+                hidden,
+                first_material.raw_block.attn_norm,
+                eps=first_material.norm_eps,
+            ),
+        )
+        for layer_index, (material, attention) in enumerate(self.layers):
+            branch = timed(
+                f"attention_{material.kind}",
+                lambda: self._attention_branch(
+                    material, attention, hidden, start_pos
+                ),
+            )
+            hc = material.raw_block.hyper_connection
+            residual, hidden, post, comb = timed(
+                "hc",
+                lambda: backend.post_pre_norm(
+                    branch,
+                    residual,
+                    post,
+                    comb,
+                    hc_fn=hc.ffn_fn,
+                    hc_scale=hc.ffn_scale,
+                    hc_base=hc.ffn_base,
+                    norm_weight=material.raw_block.ffn_norm,
+                    norm_eps=material.norm_eps,
+                    sinkhorn_iters=material.sinkhorn_iters,
+                    hc_eps=material.hc_eps,
+                ),
+            )
+            moe_output = timed(
+                "moe",
+                lambda: call_moe(layer_index, material, hidden),
+            )
+            if layer_index + 1 < len(self.layers):
+                next_material = self.layers[layer_index + 1][0]
+                next_hc = next_material.raw_block.hyper_connection
+                residual, hidden, post, comb = timed(
+                    "hc",
+                    lambda: backend.post_pre_norm(
+                        moe_output,
+                        residual,
+                        post,
+                        comb,
+                        hc_fn=next_hc.attn_fn,
+                        hc_scale=next_hc.attn_scale,
+                        hc_base=next_hc.attn_base,
+                        norm_weight=next_material.raw_block.attn_norm,
+                        norm_eps=next_material.norm_eps,
+                        sinkhorn_iters=next_material.sinkhorn_iters,
+                        hc_eps=next_material.hc_eps,
+                    ),
+                )
+            else:
+                residual = timed(
+                    "hc",
+                    lambda: hc_post(moe_output, residual, post, comb),
+                )
         return residual
 
     def collect_index_gate_records(self) -> list[dict]:
@@ -453,6 +562,35 @@ def main() -> int:
         "--alloc-probe-passes", type=int, default=2,
         help="how many probe passes to record (the first is cold)",
     )
+    parser.add_argument(
+        "--hc-backend", choices=["default", "fused", "fused-nosplit"],
+        default="default",
+        help="23rd vertical lever A: 'fused' restructures the prefill chain "
+        "around the TileLang hc_post+hc_pre boundary kernel (row-blocked to "
+        "stay off the broken >=1024-row branch); 'default' is the eager "
+        "per-op chain.  'fused-nosplit' is a diagnostic arm only",
+    )
+    parser.add_argument(
+        "--gate-hc", action="store_true",
+        help="23rd vertical lever A gate: run the eager and fused chains on "
+        "the same residual and report per-boundary plus compounded "
+        "stage-output deltas",
+    )
+    parser.add_argument(
+        "--moe-overlap", choices=["off", "on"], default="off",
+        help="23rd vertical lever B: overlap the TP4 MoE all-gather / "
+        "reduce-scatter with the routed-expert compute by row-blocked "
+        "pipelining (prefill only; no CUDA graph)",
+    )
+    parser.add_argument(
+        "--moe-overlap-blocks", type=int, default=4,
+        help="lever B row-block count for the collective/compute pipeline",
+    )
+    parser.add_argument(
+        "--gate-moe-overlap", action="store_true",
+        help="23rd vertical lever B gate: same hidden through the sequential "
+        "and overlapped MoE, reported bitwise plus rel_fro",
+    )
     parser.add_argument("--gate-indexer", action="store_true")
     parser.add_argument("--gate-w4a8", action="store_true")
     parser.add_argument("--progress-every", type=int, default=128)
@@ -516,6 +654,9 @@ def main() -> int:
         "row_block": args.row_block,
         "sparse_backend": args.sparse_backend,
         "sparse_head_chunk": args.sparse_head_chunk,
+        "hc_backend": args.hc_backend,
+        "moe_overlap": args.moe_overlap,
+        "moe_overlap_blocks": args.moe_overlap_blocks,
         "iters": args.iters,
         "warmup": args.warmup,
         "seed": args.seed,
@@ -658,9 +799,33 @@ def main() -> int:
 
         materials = list(stage.materials)
         row_block = args.row_block if args.row_block > 0 else None
+        if args.moe_overlap == "on":
+            for material in materials:
+                material.moe.enable_collective_overlap(args.moe_overlap_blocks)
+            result["moe_overlap_active"] = [
+                material.moe.collective_overlap_blocks for material in materials
+            ]
+        hc_boundary_backend = resolve_hc_boundary_backend(
+            None if args.hc_backend == "default" else args.hc_backend
+        )
+        if hc_boundary_backend is not None:
+            result["hc_backend_max_rows"] = hc_boundary_backend.max_rows
+            # The 21 fused boundaries must all share the chain's HC
+            # hyper-parameters: the backend takes one norm_eps/sinkhorn/hc_eps
+            # per call, and the inter-layer boundary mixes layer i's residual
+            # with layer i+1's hc_pre parameters.
+            for field in ("norm_eps", "sinkhorn_iters", "hc_eps"):
+                values = {getattr(m, field) for m in materials}
+                if len(values) != 1:
+                    raise ValueError(
+                        f"fused HC boundary requires a uniform {field} across "
+                        f"the stage, got {sorted(values)}"
+                    )
 
         def make_lane(
-            index_score_mode: str, sparse_backend: str | None = None
+            index_score_mode: str,
+            sparse_backend: str | None = None,
+            hc_backend: Any | None = "default",
         ) -> PrefillLane:
             return PrefillLane(
                 materials,
@@ -669,6 +834,9 @@ def main() -> int:
                 fuse_min_seqlen=args.fuse_min_seqlen,
                 sparse_row_block=row_block,
                 prefill_sparse_backend=sparse_backend or args.sparse_backend,
+                hc_boundary_backend=(
+                    hc_boundary_backend if hc_backend == "default" else hc_backend
+                ),
             )
 
         def make_residual(iteration: int) -> torch.Tensor:
@@ -868,6 +1036,212 @@ def main() -> int:
             }
             del control, candidate_lane, residual
             torch.cuda.empty_cache()
+
+        # ---------------- HC boundary chain gate (optional) --------------
+        # 23rd vertical lever A.  The prefill chain has no single-layer HC
+        # oracle, so this is its gate: one residual through both chains, the
+        # per-boundary delta measured *locked* (both backends see the same
+        # inputs, so each delta is the local kernel error), plus the freely
+        # compounded 11-layer stage output, which is what the E2E golden gate
+        # actually consumes.
+        if args.gate_hc:
+
+            def hc_delta(reference: torch.Tensor, candidate: torch.Tensor) -> dict:
+                reference = reference.float()
+                candidate = candidate.float()
+                difference = candidate - reference
+                return {
+                    "rel_fro": float(
+                        difference.norm()
+                        / torch.linalg.norm(reference).clamp_min(1e-30)
+                    ),
+                    "max_abs": float(difference.abs().max()),
+                    "reference_max_abs": float(reference.abs().max()),
+                    "bitwise_equal": bool(torch.equal(reference, candidate)),
+                    "nonfinite": int((~torch.isfinite(candidate)).sum()),
+                }
+
+            gate_backend = resolve_hc_boundary_backend("fused")
+            eager_backend = resolve_hc_boundary_backend("eager")
+            gate_lane = make_lane(args.indexer, hc_backend=None)
+            residual = make_residual(50_000)
+
+            # (a) locked per-boundary A/B on the real chain's tensors.
+            locked: list[dict[str, Any]] = []
+            probe_residual = residual
+            first_material = materials[0]
+            first_hc = first_material.raw_block.hyper_connection
+            hidden, post, comb = hc_pre(
+                probe_residual,
+                first_hc.attn_fn,
+                first_hc.attn_scale,
+                first_hc.attn_base,
+                norm_eps=first_material.norm_eps,
+                sinkhorn_iters=first_material.sinkhorn_iters,
+                hc_eps=first_material.hc_eps,
+            )
+            hidden = rms_norm(
+                hidden,
+                first_material.raw_block.attn_norm,
+                eps=first_material.norm_eps,
+            )
+            for index, (material, attention) in enumerate(gate_lane.layers):
+                branch = PrefillLane._attention_branch(
+                    material, attention, hidden, 0
+                )
+                hcw = material.raw_block.hyper_connection
+                boundary_kwargs = dict(
+                    hc_fn=hcw.ffn_fn,
+                    hc_scale=hcw.ffn_scale,
+                    hc_base=hcw.ffn_base,
+                    norm_weight=material.raw_block.ffn_norm,
+                    norm_eps=material.norm_eps,
+                    sinkhorn_iters=material.sinkhorn_iters,
+                    hc_eps=material.hc_eps,
+                )
+                reference = eager_backend.post_pre_norm(
+                    branch, probe_residual, post, comb, **boundary_kwargs
+                )
+                candidate = gate_backend.post_pre_norm(
+                    branch, probe_residual, post, comb, **boundary_kwargs
+                )
+                torch.cuda.synchronize(device)
+                entry = {
+                    "boundary": f"L{index}-intra-attn2ffn",
+                    "kind": material.kind,
+                }
+                for name, position in (
+                    ("residual", 0), ("hidden", 1), ("post", 2), ("comb", 3),
+                ):
+                    entry[name] = hc_delta(reference[position], candidate[position])
+                locked.append(entry)
+                del candidate
+                # advance the chain on the eager branch so both stay on one
+                # trajectory
+                probe_residual, hidden, post, comb = reference
+                moe_output = material.moe.forward_tensor(hidden, slot=0)
+                if index + 1 < len(gate_lane.layers):
+                    next_material = materials[index + 1]
+                    nhc = next_material.raw_block.hyper_connection
+                    inter_kwargs = dict(
+                        hc_fn=nhc.attn_fn,
+                        hc_scale=nhc.attn_scale,
+                        hc_base=nhc.attn_base,
+                        norm_weight=next_material.raw_block.attn_norm,
+                        norm_eps=next_material.norm_eps,
+                        sinkhorn_iters=next_material.sinkhorn_iters,
+                        hc_eps=next_material.hc_eps,
+                    )
+                    reference = eager_backend.post_pre_norm(
+                        moe_output, probe_residual, post, comb, **inter_kwargs
+                    )
+                    candidate = gate_backend.post_pre_norm(
+                        moe_output, probe_residual, post, comb, **inter_kwargs
+                    )
+                    torch.cuda.synchronize(device)
+                    entry = {
+                        "boundary": f"L{index}-inter-ffn2attn",
+                        "kind": material.kind,
+                    }
+                    for name, position in (
+                        ("residual", 0), ("hidden", 1), ("post", 2), ("comb", 3),
+                    ):
+                        entry[name] = hc_delta(
+                            reference[position], candidate[position]
+                        )
+                    locked.append(entry)
+                    del candidate
+                    probe_residual, hidden, post, comb = reference
+                else:
+                    probe_residual = hc_post(
+                        moe_output, probe_residual, post, comb
+                    )
+                del branch, moe_output
+            del gate_lane
+            torch.cuda.empty_cache()
+
+            # (b) compounded stage output: two independent full chains.
+            eager_lane = make_lane(args.indexer, hc_backend=None)
+            eager_out = eager_lane.forward(residual, start_pos=0)
+            del eager_lane
+            torch.cuda.empty_cache()
+            fused_lane = make_lane(args.indexer, hc_backend=gate_backend)
+            fused_out = fused_lane.forward(residual, start_pos=0)
+            del fused_lane
+            torch.cuda.synchronize(device)
+            result["hc_gate"] = {
+                "form": "locked per-boundary A/B (both backends on identical "
+                "inputs, chain advanced on eager) + compounded 11-layer stage "
+                "output from two independent chains",
+                "boundaries": len(locked),
+                "per_boundary": locked,
+                "worst_by_tensor": {
+                    name: max(entry[name]["rel_fro"] for entry in locked)
+                    for name in ("residual", "hidden", "post", "comb")
+                },
+                "stage_output": hc_delta(eager_out, fused_out),
+            }
+            del eager_out, fused_out, residual
+            torch.cuda.empty_cache()
+
+        # ---------------- MoE overlap gate (optional) --------------------
+        # 23rd vertical lever B.  The pipelined path permutes the gathered row
+        # order (block-major instead of rank-major), which changes which
+        # Marlin M-block a row lands in.  Everything between the collectives is
+        # row-local, so per-row bitwise identity is expected; this measures it
+        # on the real layer rather than assuming it.
+        if args.gate_moe_overlap:
+            gate_layer = materials[0]
+            generator = torch.Generator(device=device)
+            generator.manual_seed(args.seed + 4242 + rank)
+            gate_hidden = (
+                torch.randn(
+                    LOCAL_BATCH, chunk, HIDDEN,
+                    dtype=torch.bfloat16, device=device, generator=generator,
+                )
+                * args.input_scale
+            ).contiguous()
+            gate_hidden = rms_norm(
+                gate_hidden,
+                gate_layer.raw_block.ffn_norm,
+                eps=gate_layer.norm_eps,
+            )
+            before = gate_layer.moe.collective_overlap_blocks
+            gate_layer.moe.enable_collective_overlap(0)
+            sequential = gate_layer.moe.forward_tensor(gate_hidden, slot=0)
+            per_blocks = {}
+            for blocks in (2, 4, 8):
+                if (LOCAL_BATCH * chunk) % blocks:
+                    continue
+                gate_layer.moe.enable_collective_overlap(blocks)
+                overlapped = gate_layer.moe.forward_tensor(gate_hidden, slot=0)
+                torch.cuda.synchronize(device)
+                difference = (overlapped.float() - sequential.float())
+                per_blocks[str(blocks)] = {
+                    "bitwise_equal": bool(torch.equal(sequential, overlapped)),
+                    "rel_fro": float(
+                        difference.norm()
+                        / sequential.float().norm().clamp_min(1e-30)
+                    ),
+                    "max_abs": float(difference.abs().max()),
+                    "mismatched_elements": int(
+                        (sequential != overlapped).sum()
+                    ),
+                    "finite": bool(torch.isfinite(overlapped).all()),
+                }
+                del overlapped
+            gate_layer.moe.enable_collective_overlap(before)
+            result["moe_overlap_gate"] = {
+                "form": "same hidden through the sequential and the "
+                "row-blocked pipelined MoE on the first stage layer",
+                "layer_id": gate_layer.layer_id,
+                "rows_local": LOCAL_BATCH * chunk,
+                "sequential_rms": float(
+                    sequential.float().square().mean().sqrt()
+                ),
+                "per_blocks": per_blocks,
+            }
+            del sequential, gate_hidden
 
         # ---------------- paired indexer gate (optional) -----------------
         if args.gate_indexer:

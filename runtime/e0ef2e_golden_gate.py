@@ -206,9 +206,19 @@ class StageLane:
         device: torch.device,
         ratio4_index_mode: str = "ref",
         fuse_min_seqlen: int = 1024,
+        fused_scope: str = "decode",
     ) -> None:
         self.device = device
         self.backend = backend
+        # C2F 23rd vertical lever A: the fused boundary was previously gated to
+        # decode shapes (A5F's quantified regime).  With the >=1024-row kernel
+        # branch avoided (see FusedTilelangHCBoundaryBackend.MAX_ROWS) the same
+        # chain is valid at prefill shapes.  The scope is explicit so a prefill
+        # arm can be compared against the frozen eager-everywhere golden with
+        # decode held fixed.
+        if fused_scope not in ("decode", "prefill", "both"):
+            raise ValueError(f"unknown fused scope {fused_scope!r}")
+        self.fused_scope = fused_scope
         self.layers: list[tuple[PhysicalLayerMaterial, Any]] = []
         for material in materials:
             if material.kind == "ratio4":
@@ -348,9 +358,15 @@ class StageLane:
         start_pos: int,
         input_ids: torch.Tensor | None,
     ) -> torch.Tensor:
-        # Fused boundary is applied on decode shapes only (E0hf's quantified
-        # regime); prefill always runs the eager composition.
-        if self.backend is not None and residual.shape[1] == 1:
+        # Fused boundary is applied on decode shapes by default (A5F's
+        # quantified regime); --fused-scope extends or moves it (C2F 23rd
+        # vertical lever A).
+        is_decode = residual.shape[1] == 1
+        scope = self.fused_scope
+        if self.backend is not None and (
+            (is_decode and scope in ("decode", "both"))
+            or (not is_decode and scope in ("prefill", "both"))
+        ):
             return self._forward_fused_chain(
                 residual, start_pos=start_pos, input_ids=input_ids
             )
@@ -529,6 +545,18 @@ def main() -> int:
         type=str,
         default="eager,fused",
         help="comma list of HC boundary modes to run (eager|fused)",
+    )
+    parser.add_argument(
+        "--moe-overlap-blocks", type=int, default=0,
+        help="C2F 23rd vertical lever B: row-block count for the pipelined "
+        "TP4 MoE collectives (0/1 = the sequential path)",
+    )
+    parser.add_argument(
+        "--fused-scope", choices=["decode", "prefill", "both"], default="decode",
+        help="C2F 23rd vertical lever A: which shapes the fused HC boundary "
+        "chain covers.  'decode' is the frozen behaviour; 'prefill' is the "
+        "lever-A arm (decode held eager so the only delta vs the frozen "
+        "golden is prefill HC)",
     )
     parser.add_argument(
         "--max-prompts", type=int, default=0, help="0 = all golden prompts"
@@ -753,6 +781,16 @@ def main() -> int:
                 else None
             ),
         )
+        # C2F 23rd vertical lever B: row-blocked MoE collective/compute
+        # overlap.  The pipelined path only engages on prefill row counts --
+        # the decode call has local_rows == local_batch, which is not divisible
+        # by the block count in this gate's B=1 form, so decode falls back to
+        # the sequential path automatically.
+        if args.moe_overlap_blocks > 1:
+            for material in stage_material.materials:
+                material.moe.enable_collective_overlap(args.moe_overlap_blocks)
+            result["moe_overlap_blocks"] = args.moe_overlap_blocks
+
         embed_material = None
         head_material = None
         if stage == 0:
@@ -806,6 +844,7 @@ def main() -> int:
                     device=device,
                     ratio4_index_mode=args.ratio4_index_mode,
                     fuse_min_seqlen=args.fuse_min_seqlen,
+                    fused_scope=args.fused_scope,
                 )
                 record = run_prompt(
                     prompt_index=prompt_index,
