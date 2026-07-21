@@ -1,0 +1,3690 @@
+{
+  "accepted": true,
+  "check_mode": "bitwise",
+  "experiment": "E1F-full-decode-throughput",
+  "local_batch": 1,
+  "stage_representatives": [
+    {
+      "accepted": true,
+      "argv": [
+        "e1f_full_decode_bench.py",
+        "--stage-root",
+        "/home/cysic/Workspace/DeepSeek-V4-Flash",
+        "--out-dir",
+        "e1f-bl1-sharded2",
+        "--local-batch",
+        "1",
+        "--check-mode",
+        "bitwise",
+        "--rounds",
+        "3",
+        "--steps",
+        "300",
+        "--start-position",
+        "2048",
+        "--config-tag",
+        "nogdr",
+        "--attention-tp-shard"
+      ],
+      "attention_modes": {
+        "0": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "1": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "10": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "2": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "3": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "4": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "5": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "6": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "7": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "8": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "9": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        }
+      },
+      "attention_tp": {
+        "0": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "1": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "10": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "2": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "3": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "4": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "5": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "6": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "7": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "8": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "9": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        }
+      },
+      "b_semantics": "replicated",
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "bitwise",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.22739850403741002,
+        "load": 12.942394214915112,
+        "process": 73.90750061604194,
+        "settle": 11.10486305411905,
+        "warmup": 24.340384016977623
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 1,
+      "handoff_records": {
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan064",
+      "initial_tokens_first8": [
+        121569
+      ],
+      "local_batch": 1,
+      "local_rank": 0,
+      "max_seq_len": 3328,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 10689052672,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 10733092864,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 10919739392,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 10919739392,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 10919739392,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 10919739392,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 11056054272,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 10991042560,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 172264,
+      "rank": 0,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 153.75317548815494,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 7.80612830305472,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.438293872038734,
+          "throughput_tok_s_p50": 39.3182917583555,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.11943001300096512,
+              "mean_ms": 0.08820109923059742,
+              "min_ms": 0.08032401092350483,
+              "p50_ms": 0.08718809112906456,
+              "p95_ms": 0.10149506852030754
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.416078889742494,
+              "mean_ms": 5.580103334505111,
+              "min_ms": 5.391421029344201,
+              "p50_ms": 5.441395798698068,
+              "p95_ms": 6.00534095428884
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.17235102131962776,
+              "mean_ms": 0.1412084597783784,
+              "min_ms": 0.11253613047301769,
+              "p50_ms": 0.14121085405349731,
+              "p95_ms": 0.15048915520310402
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 29.865484219044447,
+              "mean_ms": 26.01572284474969,
+              "min_ms": 25.082852924242616,
+              "p50_ms": 25.43345489539206,
+              "p95_ms": 27.93081197887659
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 23.238458205014467,
+              "mean_ms": 20.206209951235603,
+              "min_ms": 19.42202402278781,
+              "p50_ms": 19.770734012126923,
+              "p95_ms": 21.69807511381805
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 153.49099444494297,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 7.819508130894974,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.37274861123574,
+          "throughput_tok_s_p50": 39.21620477417238,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.22370903752744198,
+              "mean_ms": 0.08861172090594967,
+              "min_ms": 0.08041411638259888,
+              "p50_ms": 0.08786888793110847,
+              "p95_ms": 0.09800796397030354
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.413412978872657,
+              "mean_ms": 5.592368193902075,
+              "min_ms": 5.402941023930907,
+              "p50_ms": 5.453078076243401,
+              "p95_ms": 6.0253378469496965
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.18488499335944653,
+              "mean_ms": 0.14181490832318863,
+              "min_ms": 0.11090305633842945,
+              "p50_ms": 0.14094100333750248,
+              "p95_ms": 0.15178113244473934
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 30.30679002404213,
+              "mean_ms": 26.060160822235048,
+              "min_ms": 25.030204094946384,
+              "p50_ms": 25.49966285005212,
+              "p95_ms": 27.90868515148759
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 23.66308495402336,
+              "mean_ms": 20.237365999103833,
+              "min_ms": 19.383464008569717,
+              "p50_ms": 19.809973891824484,
+              "p95_ms": 21.67127118445933
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 153.41131220752644,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 7.823517671087757,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.35282805188161,
+          "throughput_tok_s_p50": 39.231168254170946,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.18745986744761467,
+              "mean_ms": 0.08889022671307127,
+              "min_ms": 0.08050422184169292,
+              "p50_ms": 0.08747796528041363,
+              "p95_ms": 0.10063406080007553
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.434753071516752,
+              "mean_ms": 5.5928356138368445,
+              "min_ms": 5.409312201663852,
+              "p50_ms": 5.454238038510084,
+              "p95_ms": 6.026787916198373
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.26728305965662,
+              "mean_ms": 0.1426643691956997,
+              "min_ms": 0.11988985352218151,
+              "p50_ms": 0.14084111899137497,
+              "p95_ms": 0.1535050105303526
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 30.164266005158424,
+              "mean_ms": 26.07369653802986,
+              "min_ms": 25.16212686896324,
+              "p50_ms": 25.489936815574765,
+              "p95_ms": 27.947010938078165
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 23.519461043179035,
+              "mean_ms": 20.249306328284245,
+              "min_ms": 19.457347923889756,
+              "p50_ms": 19.817730877548456,
+              "p95_ms": 21.690011955797672
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 132,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "eager_kv_digests": "checked_then_freed",
+        "eager_terminal": {
+          "accepted": true,
+          "device_position": 2180,
+          "dispatch_error": 0,
+          "expected_position": 2180,
+          "host_position": 2180,
+          "stop_position": 3080
+        },
+        "final_state_digests_equal": true,
+        "judgment": "graph_vs_eager_output bitwise (E1a27/E0sf), fused-vs-fused, pipeline-fed inputs",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": true,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 0,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 2048,
+      "steps_per_round": 300,
+      "stop_position": 3080,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 2130,
+        "global_rows": 4,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 3080,
+        "dispatch_error": 0,
+        "expected_position": 3080,
+        "host_position": 3080,
+        "stop_position": 3080
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 0,
+        "global_ranks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "argv": [
+        "e1f_full_decode_bench.py",
+        "--stage-root",
+        "/home/cysic/Workspace/DeepSeek-V4-Flash",
+        "--out-dir",
+        "e1f-bl1-sharded2",
+        "--local-batch",
+        "1",
+        "--check-mode",
+        "bitwise",
+        "--rounds",
+        "3",
+        "--steps",
+        "300",
+        "--start-position",
+        "2048",
+        "--config-tag",
+        "nogdr",
+        "--attention-tp-shard"
+      ],
+      "attention_modes": {
+        "11": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "12": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "13": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "14": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "15": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "16": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "17": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "18": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "19": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "20": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "21": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        }
+      },
+      "attention_tp": {
+        "11": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "12": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "13": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "14": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "15": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "16": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "17": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "18": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "19": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "20": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "21": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        }
+      },
+      "b_semantics": "replicated",
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "bitwise",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.5652940960135311,
+        "load": 12.590142597211525,
+        "process": 73.90961520397104,
+        "settle": 11.096411330858245,
+        "warmup": 24.340308672050014
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 1,
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        },
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan064",
+      "local_batch": 1,
+      "local_rank": 4,
+      "max_seq_len": 3328,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 11582439424,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 11626479616,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 11808931840,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 11808931840,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 11808931840,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 11808931840,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 11947343872,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 11880235008,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 172840,
+      "rank": 4,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 154.05153279149613,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 7.7912495920900255,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.51288319787403,
+          "throughput_tok_s_p50": 38.41979268253651,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 21.689500892534852,
+              "mean_ms": 19.782092105597258,
+              "min_ms": 5.6145701091736555,
+              "p50_ms": 19.808037905022502,
+              "p95_ms": 20.706040086224675
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.720215082168579,
+              "mean_ms": 5.696465504200508,
+              "min_ms": 5.512482952326536,
+              "p50_ms": 5.556659074500203,
+              "p95_ms": 6.129298126325011
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.9655649773776531,
+              "mean_ms": 0.48677962195749086,
+              "min_ms": 0.14817481860518456,
+              "p50_ms": 0.5014839116483927,
+              "p95_ms": 0.6474838592112064
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 27.628874871879816,
+              "mean_ms": 25.965337231755257,
+              "min_ms": 11.813513934612274,
+              "p50_ms": 26.0282508097589,
+              "p95_ms": 26.784064015373588
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 153.7850864888341,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 7.804594487883151,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.44627162220853,
+          "throughput_tok_s_p50": 37.94187645430244,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 22.061157040297985,
+              "mean_ms": 19.824148040885728,
+              "min_ms": 5.664274096488953,
+              "p50_ms": 19.847135059535503,
+              "p95_ms": 20.771007984876633
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.80119707249105,
+              "mean_ms": 5.7022800599224865,
+              "min_ms": 5.513082956895232,
+              "p50_ms": 5.559712881222367,
+              "p95_ms": 6.136551033705473
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 1.0155020281672478,
+              "mean_ms": 0.48389638075605035,
+              "min_ms": 0.155959976837039,
+              "p50_ms": 0.4975867923349142,
+              "p95_ms": 0.6285379640758038
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 28.04580586962402,
+              "mean_ms": 26.010324481564265,
+              "min_ms": 11.911329114809632,
+              "p50_ms": 26.356102898716927,
+              "p95_ms": 26.92934381775558
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 153.70285859475362,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 7.808630721876398,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.425714648688405,
+          "throughput_tok_s_p50": 38.13044156728122,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 21.9823291990906,
+              "mean_ms": 19.846987493801862,
+              "min_ms": 5.670394981279969,
+              "p50_ms": 19.832730060443282,
+              "p95_ms": 20.773809170350432
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.827014964073896,
+              "mean_ms": 5.699754210654646,
+              "min_ms": 5.513612879440188,
+              "p50_ms": 5.561053985729814,
+              "p95_ms": 6.141769932582974
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.8091139607131481,
+              "mean_ms": 0.47749777014056843,
+              "min_ms": 0.15136110596358776,
+              "p50_ms": 0.48635387793183327,
+              "p95_ms": 0.619289930909872
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 27.988409157842398,
+              "mean_ms": 26.024239474597078,
+              "min_ms": 11.688957922160625,
+              "p50_ms": 26.22576500289142,
+              "p95_ms": 26.894586160779
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 132,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "eager_kv_digests": "checked_then_freed",
+        "eager_terminal": {
+          "accepted": true,
+          "device_position": 2180,
+          "dispatch_error": 0,
+          "expected_position": 2180,
+          "host_position": 2180,
+          "stop_position": 3080
+        },
+        "final_state_digests_equal": true,
+        "judgment": "graph_vs_eager_output bitwise (E1a27/E0sf), fused-vs-fused, pipeline-fed inputs",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": true,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 1,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 2048,
+      "steps_per_round": 300,
+      "stop_position": 3080,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3366,
+        "global_rows": 4,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 3080,
+        "dispatch_error": 0,
+        "expected_position": 3080,
+        "host_position": 3080,
+        "stop_position": 3080
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 4,
+        "global_ranks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "argv": [
+        "e1f_full_decode_bench.py",
+        "--stage-root",
+        "/home/cysic/Workspace/DeepSeek-V4-Flash",
+        "--out-dir",
+        "e1f-bl1-sharded2",
+        "--local-batch",
+        "1",
+        "--check-mode",
+        "bitwise",
+        "--rounds",
+        "3",
+        "--steps",
+        "300",
+        "--start-position",
+        "2048",
+        "--config-tag",
+        "nogdr",
+        "--attention-tp-shard"
+      ],
+      "attention_modes": {
+        "22": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "23": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "24": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "25": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "26": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "27": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "28": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "29": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "30": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "31": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "32": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        }
+      },
+      "attention_tp": {
+        "22": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "23": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "24": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "25": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "26": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "27": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "28": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "29": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "30": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "31": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "32": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        }
+      },
+      "b_semantics": "replicated",
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "bitwise",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.5639440529048443,
+        "load": 12.59033725806512,
+        "process": 73.90448811789975,
+        "settle": 11.113249663030729,
+        "warmup": 24.339283796958625
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 1,
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        },
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan065",
+      "local_batch": 1,
+      "local_rank": 0,
+      "max_seq_len": 3328,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 11569856512,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 11618091008,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 11792154624,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 11792154624,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 11792154624,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 11792154624,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 11934760960,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 11863457792,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 186904,
+      "rank": 8,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 153.92424075713433,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 7.79742446099408,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.48106018928358,
+          "throughput_tok_s_p50": 38.76188642749387,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 21.727646002545953,
+              "mean_ms": 20.000110041194905,
+              "min_ms": 11.83584495447576,
+              "p50_ms": 19.995274022221565,
+              "p95_ms": 20.7885738927871
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.950062932446599,
+              "mean_ms": 5.851230517340203,
+              "min_ms": 5.60085684992373,
+              "p50_ms": 5.672840867191553,
+              "p95_ms": 6.441623903810978
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.3011610824614763,
+              "mean_ms": 0.13546944828704,
+              "min_ms": 0.11939206160604954,
+              "p50_ms": 0.13442989438772202,
+              "p95_ms": 0.14306697994470596
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 28.77799514681101,
+              "mean_ms": 25.98681000682215,
+              "min_ms": 17.627066001296043,
+              "p50_ms": 25.7985380012542,
+              "p95_ms": 27.336747152730823
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 153.66015989369038,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 7.810787871014327,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.415039973422594,
+          "throughput_tok_s_p50": 38.68153219625334,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 21.81069110520184,
+              "mean_ms": 20.02660253085196,
+              "min_ms": 11.939678806811571,
+              "p50_ms": 20.02791501581669,
+              "p95_ms": 20.817247917875648
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 7.204127032309771,
+              "mean_ms": 5.868942590119938,
+              "min_ms": 5.608109990134835,
+              "p50_ms": 5.7011127937585115,
+              "p95_ms": 6.445772014558315
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.14832592569291592,
+              "mean_ms": 0.13592590422679982,
+              "min_ms": 0.12027495540678501,
+              "p50_ms": 0.1351118553429842,
+              "p95_ms": 0.14310679398477077
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 29.15437798947096,
+              "mean_ms": 26.031471025198698,
+              "min_ms": 17.99667696468532,
+              "p50_ms": 25.852130027487874,
+              "p95_ms": 27.34305988997221
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 153.58035652248088,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 7.8147877438459545,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.39508913062022,
+          "throughput_tok_s_p50": 38.763931608134804,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 21.7547370120883,
+              "mean_ms": 20.027769079897553,
+              "min_ms": 11.709491023793817,
+              "p50_ms": 19.947255961596966,
+              "p95_ms": 20.834289956837893
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 7.121113128960133,
+              "mean_ms": 5.880754745254914,
+              "min_ms": 5.611506989225745,
+              "p50_ms": 5.718335974961519,
+              "p95_ms": 6.454670103266835
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.20888913422822952,
+              "mean_ms": 0.13647366392736635,
+              "min_ms": 0.112209003418684,
+              "p50_ms": 0.1353430561721325,
+              "p95_ms": 0.14548096805810928
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 29.014849103987217,
+              "mean_ms": 26.044997489079833,
+              "min_ms": 17.830847995355725,
+              "p50_ms": 25.7971768733114,
+              "p95_ms": 27.381181018427014
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 132,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "eager_kv_digests": "checked_then_freed",
+        "eager_terminal": {
+          "accepted": true,
+          "device_position": 2180,
+          "dispatch_error": 0,
+          "expected_position": 2180,
+          "host_position": 2180,
+          "stop_position": 3080
+        },
+        "final_state_digests_equal": true,
+        "judgment": "graph_vs_eager_output bitwise (E1a27/E0sf), fused-vs-fused, pipeline-fed inputs",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": true,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 2,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 2048,
+      "steps_per_round": 300,
+      "stop_position": 3080,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 331,
+        "global_rows": 4,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 3080,
+        "dispatch_error": 0,
+        "expected_position": 3080,
+        "host_position": 3080,
+        "stop_position": 3080
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 8,
+        "global_ranks": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "argv": [
+        "e1f_full_decode_bench.py",
+        "--stage-root",
+        "/home/cysic/Workspace/DeepSeek-V4-Flash",
+        "--out-dir",
+        "e1f-bl1-sharded2",
+        "--local-batch",
+        "1",
+        "--check-mode",
+        "bitwise",
+        "--rounds",
+        "3",
+        "--steps",
+        "300",
+        "--start-position",
+        "2048",
+        "--config-tag",
+        "nogdr",
+        "--attention-tp-shard"
+      ],
+      "attention_modes": {
+        "33": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "34": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "35": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "36": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "37": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "38": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "39": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "40": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "41": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "42": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        }
+      },
+      "attention_tp": {
+        "33": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "34": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "35": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "36": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "37": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "38": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "39": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "40": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "41": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        },
+        "42": {
+          "local_num_heads": 16,
+          "tp_rank": 0,
+          "tp_size": 4,
+          "wo_b_shape": [
+            4096,
+            2048
+          ]
+        }
+      },
+      "b_semantics": "replicated",
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "bitwise",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.33145328098908067,
+        "load": 12.82533363206312,
+        "process": 73.90472527989186,
+        "settle": 11.102048069937155,
+        "warmup": 24.339336114004254
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 1,
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan065",
+      "local_batch": 1,
+      "local_rank": 4,
+      "max_seq_len": 3328,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 9615310848,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 9659351040,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 10768744448,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 10768744448,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 10768744448,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 10768744448,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 10905059328,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 10842144768,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 169480,
+      "rank": 12,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 153.77755972262747,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 7.805808559991419,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.44438993065687,
+          "throughput_tok_s_p50": 39.320876293319934,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 2.7733230963349342,
+              "mean_ms": 2.6041606782625117,
+              "min_ms": 2.585862996056676,
+              "p50_ms": 2.6018228381872177,
+              "p95_ms": 2.61922599747777
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 20.985851995646954,
+              "mean_ms": 18.03617471596226,
+              "min_ms": 17.28530996479094,
+              "p50_ms": 17.600186867639422,
+              "p95_ms": 19.518265035003424
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.127077853307128,
+              "mean_ms": 5.22529750984783,
+              "min_ms": 5.044147837907076,
+              "p50_ms": 5.082349991425872,
+              "p95_ms": 5.662811920046806
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 29.858199879527092,
+              "mean_ms": 26.0115975777929,
+              "min_ms": 25.08034883067012,
+              "p50_ms": 25.431783171370625,
+              "p95_ms": 27.925345115363598
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.2641130704432726,
+              "mean_ms": 0.1459646737203002,
+              "min_ms": 0.1360238529741764,
+              "p50_ms": 0.1434478908777237,
+              "p95_ms": 0.1584962010383606
+            }
+          },
+          "tokens_first8": [
+            300
+          ]
+        },
+        {
+          "dp_equivalent_tok_s_mean": 153.51516895021075,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 7.819184242049232,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.37879223755269,
+          "throughput_tok_s_p50": 39.220752467234696,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 2.7995118871331215,
+              "mean_ms": 2.6055391714908183,
+              "min_ms": 2.586904913187027,
+              "p50_ms": 2.603465924039483,
+              "p95_ms": 2.6222611777484417
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 21.3121110573411,
+              "mean_ms": 18.07206097136562,
+              "min_ms": 17.202245071530342,
+              "p50_ms": 17.64317788183689,
+              "p95_ms": 19.48709785938263
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.245678989216685,
+              "mean_ms": 5.232009549314777,
+              "min_ms": 5.048135994002223,
+              "p50_ms": 5.092137027531862,
+              "p95_ms": 5.6773091200739145
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 30.3024600725621,
+              "mean_ms": 26.05605704865108,
+              "min_ms": 25.028581963852048,
+              "p50_ms": 25.496706133708358,
+              "p95_ms": 27.90261385962367
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.24250219576060772,
+              "mean_ms": 0.14644735647986332,
+              "min_ms": 0.13773702085018158,
+              "p50_ms": 0.1438278704881668,
+              "p95_ms": 0.15990901738405228
+            }
+          },
+          "tokens_first8": [
+            300
+          ]
+        },
+        {
+          "dp_equivalent_tok_s_mean": 153.4350330053308,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 7.823176510166377,
+          "steps": 300,
+          "throughput_tok_s_mean": 38.3587582513327,
+          "throughput_tok_s_p50": 39.2417519924683,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 2.6558039244264364,
+              "mean_ms": 2.604628750899186,
+              "min_ms": 2.5864741764962673,
+              "p50_ms": 2.602685010060668,
+              "p95_ms": 2.6213289238512516
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 21.194824017584324,
+              "mean_ms": 18.08010034961626,
+              "min_ms": 17.34707597643137,
+              "p50_ms": 17.64990109950304,
+              "p95_ms": 19.52136098407209
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 6.723610917106271,
+              "mean_ms": 5.239559344481677,
+              "min_ms": 5.0443189684301615,
+              "p50_ms": 5.094882799312472,
+              "p95_ms": 5.682819988578558
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 30.159424990415573,
+              "mean_ms": 26.06966558843851,
+              "min_ms": 25.15882719308138,
+              "p50_ms": 25.483062025159597,
+              "p95_ms": 27.94020506553352
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.1867481041699648,
+              "mean_ms": 0.145377143441389,
+              "min_ms": 0.1336890272796154,
+              "p50_ms": 0.14394894242286682,
+              "p95_ms": 0.15658186748623848
+            }
+          },
+          "tokens_first8": [
+            300
+          ]
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 132,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "eager_kv_digests": "checked_then_freed",
+        "eager_terminal": {
+          "accepted": true,
+          "device_position": 2180,
+          "dispatch_error": 0,
+          "expected_position": 2180,
+          "host_position": 2180,
+          "stop_position": 3080
+        },
+        "final_state_digests_equal": true,
+        "judgment": "graph_vs_eager_output bitwise (E1a27/E0sf), fused-vs-fused, pipeline-fed inputs",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": true,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 3,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 2048,
+      "steps_per_round": 300,
+      "stop_position": 3080,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3348,
+        "global_rows": 4,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 3080,
+        "dispatch_error": 0,
+        "expected_position": 3080,
+        "host_position": 3080,
+        "stop_position": 3080
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 12,
+        "global_ranks": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    }
+  ]
+}

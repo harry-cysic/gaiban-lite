@@ -4,9 +4,9 @@
 [`docs/design-attention-tp4-sharding.md`](../../docs/design-attention-tp4-sharding.md)。
 本目录记实验步骤；已完成 **step 1（o-path 代数等价）**、**step 2（切片精确性）**、
 **step 3（4 rank 真实 all-reduce 接线）** 与 **step 4（三种层型全部落地）**；
-`tp_size=1` 时全部恒等。**尚未做**：stage 级集成（`physical_stage` 需要
-把 tp_group 与切片接进 `new_attention`）、CUDA graph 捕图下的 all-reduce、
-D0L 软门。
+`tp_size=1` 时全部恒等。**已完成到 step 6（16 卡闭环 +34.5%）**；
+**step 7 发现阻塞**：分片破坏 ratio-4 的 prefill 路径，D0L 软门跑不了，
+故**整条改动不可发布**。
 
 ---
 
@@ -242,6 +242,84 @@ ratio-4 之所以没事，是因为它的 `wo_a` 块是我单独替换的。
 另：`specdec.py` / `verify2.py` / `ratio4_fullpos.py` 里还有同形状的全局
 reshape，它们拿的是**未切**权重所以现在是对的；但若把已切 stage 接给 MTP，
 会以同样的 shape 错误**响亮地失败**（不是静默出错）——可接受，但已记在此。
+
+## step 6：16 卡闭环 —— **28.98 → 38.99 tok/s（+34.5%）**
+
+专业版口径（一套 16 卡系统）单路 decode，E1F 冻结脚本 + `--attention-tp-shard`：
+
+| 项 | 未分片 | 分片（变体 A） | 差 |
+|---|---:|---:|---:|
+| **单路 decode（专业版整系统）** | 28.992 tok/s | **38.990** | **+34.5%** |
+| 四级 replay 合计 | 31.388 ms | **21.806** | −9.58 |
+| 每 stage | 7.99/8.00/8.14/7.26 | 5.45/5.56/5.70/5.09 | — |
+| 见证 | — | `tp_size:4, local_num_heads:16, wo_b [4096,2048]` | — |
+
+本 session 的累计：27.740（复跑基线）→ 28.402（E4F）→ 28.992（E5F）
+→ **38.990（E6F）**，**+40.6%**。
+
+⚠️ 但 **E6F 不是逐位改动**，在过 D0L 软门之前**不得进入 headline 实测列**。
+
+### 第四次"静默失效"，这次是位置参数
+
+第一次跑 16 卡分片读到 29.04 tok/s、每 stage 7.76 ms——**与"分片在 16 卡上
+毫无效果"完全同形**。原因不是无效：`run_e1f_dual.sh` 只取 5 个位置参数、
+**没有 `"$@"` 透传**，`--attention-tp-shard` 被直接丢掉。
+
+**而我为此专门加的"自动发现见证"也没抓到它**——分片状态存在
+`tp_size`/`tp_rank` 里，不符合 `*_mode` / `*_backend` 的命名约定。
+
+**教训升级（TARGET §9.11）**：命名约定只是一个更窄的手维护列表。
+见证要按**"两条臂之间可能不同的东西"**定，而最通用的做法是**两侧都记**：
+把 `sys.argv`（要求侧）与实际解析出的配置（解析侧）一起写进结果 JSON，
+两者不一致时"没生效"一眼可见，而不是伪装成"没效果"。
+E1F 现在同时记 `argv` 与 `attention_tp`。
+
+## step 7：**D0L 软门跑不了——分片破坏了 ratio-4 的 prefill 路径**
+
+这是本竖条目前的**阻塞点**，也是设计里没预见到的一处。
+
+### 现象与误判
+
+D0L 软门跑起来后 8 分钟无任何 prompt 输出、16 卡全部 100% 占用。
+我判断为疑似 NCCL 忙等并**把它 kill 了——这毁掉了证据**，
+事后只能从我自己的 SIGTERM 回溯，两个 node 日志里除此之外没有任何报错。
+**更好的做法是让它跑到自己报错或超时。**
+
+### 用更便宜的仪器复现
+
+改用单机 4 卡的 C2F prefill bench（同样会触发那条交互），一次就复现了：
+
+```
+ratio4_fullpos.py:660, in __call__
+    query = F.linear(query_lora, weights.wq_b).reshape(
+RuntimeError: shape '[1, 1024, 64, 512]' is invalid ...
+```
+
+**根因**：`build_physical_stage(attention_tp_shard=True)` 把
+`material.prepared` 换成了**已切片**的权重，而 ratio-4 的 **prefill** 类
+`Ratio4FullPositionAttention` 从同一个 `material.prepared` 取权重、
+却按**全局 64 head** reshape。它没有分片支持。
+
+这同时解释了 D0L 的"卡住"：出错的 rank 死掉，其余 rank 在集合通信里空转，
+表现为 100% 占用而无输出。
+
+> ⚠️ 我早先在 step 4 的 commit 里写过"ratio-4 的 prefill 走另一个类，
+> 本竖条没有动它"——**那句话当时是对的，但结论下反了**：正因为它是另一个类、
+> 没跟着改，共享的权重被切之后它就坏了。**"没动它"不等于"不受影响"。**
+
+### 三条出路（未决，取决于模式矩阵）
+
+| 方案 | 代价 |
+|---|---|
+| A. 给 `Ratio4FullPositionAttention` 同样的分片改造 | prefill 也要 all-reduce，而 **chunk 8192 时每层 134 MB（FP32 上采样后）、43 层合计 5.77 GB/次前向**——decode 的 8 KB 与它差四个数量级。**设计note 的通信代价核算只算了 decode。** |
+| B. prefill 与 decode 各留一份权重 | attention 驻留翻倍，直接抵消分片的容量收益 |
+| C. 只在 decode-only 的模式里分片 | 与 §2 模式矩阵自洽（每行本就是各自冻结的模式），但一套 8 卡系统就不能用同一份常驻同时服务 prefill 与低延迟 decode |
+
+**选哪条取决于标准版五行是否要求 prefill 与 decode 共存于同一常驻配置**
+（TARGET §7.7）。在此之前不宜硬上其中任何一条。
+
+**因此：E6F 的 +34.5% 是 decode 口径的真实测量，但整条改动尚未过软门、
+不可发布**；D0L 需要先解决本节的交互。
 
 ## 已落地的 runtime 改动（默认不改变行为）
 

@@ -1,0 +1,3215 @@
+{
+  "accepted": true,
+  "check_mode": "bitwise",
+  "experiment": "E1F-full-decode-throughput",
+  "local_batch": 1,
+  "stage_representatives": [
+    {
+      "accepted": true,
+      "attention_modes": {
+        "0": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "1": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "10": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "2": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "3": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "4": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "5": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "6": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "7": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "8": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "9": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        }
+      },
+      "b_semantics": "replicated",
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "bitwise",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.18316173111088574,
+        "load": 12.829691306920722,
+        "process": 82.09628703305498,
+        "settle": 12.079513408010826,
+        "warmup": 23.798656621016562
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 1,
+      "handoff_records": {
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan064",
+      "initial_tokens_first8": [
+        121569
+      ],
+      "local_batch": 1,
+      "local_rank": 0,
+      "max_seq_len": 3328,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 9212657664,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 9256697856,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 9313320960,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 9313320960,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 9313320960,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 9313320960,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 9445441536,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 9384624128,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 172264,
+      "rank": 0,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 114.82931569743546,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 10.451903921086341,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.707328924358865,
+          "throughput_tok_s_p50": 29.16143001816272,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.2455629874020815,
+              "mean_ms": 0.08801850257441401,
+              "min_ms": 0.07936288602650166,
+              "p50_ms": 0.08675712160766125,
+              "p95_ms": 0.09960192255675793
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 9.116887813434005,
+              "mean_ms": 7.889213357896854,
+              "min_ms": 7.610682863742113,
+              "p50_ms": 7.761754095554352,
+              "p95_ms": 8.316464954987168
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.2697110176086426,
+              "mean_ms": 0.1425672407882909,
+              "min_ms": 0.1134991180151701,
+              "p50_ms": 0.1416429877281189,
+              "p95_ms": 0.15472900122404099
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 38.760548923164606,
+              "mean_ms": 34.83431017336746,
+              "min_ms": 33.710582880303264,
+              "p50_ms": 34.291871124878526,
+              "p95_ms": 36.67653491720557
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 29.813577886670828,
+              "mean_ms": 26.7145110721079,
+              "min_ms": 25.74462187476456,
+              "p50_ms": 26.308842934668064,
+              "p95_ms": 28.15714618191123
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 114.79322193316342,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 10.455082015134394,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.698305483290856,
+          "throughput_tok_s_p50": 29.15381092150936,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.3581000491976738,
+              "mean_ms": 0.088442696724087,
+              "min_ms": 0.0792420469224453,
+              "p50_ms": 0.08632591925561428,
+              "p95_ms": 0.10235700756311417
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 8.75112903304398,
+              "mean_ms": 7.88951122124369,
+              "min_ms": 7.5878959614783525,
+              "p50_ms": 7.7643669210374355,
+              "p95_ms": 8.338070940226316
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.26242597959935665,
+              "mean_ms": 0.14309207908809185,
+              "min_ms": 0.12511108070611954,
+              "p50_ms": 0.14238501898944378,
+              "p95_ms": 0.15460792928934097
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 38.691790075972676,
+              "mean_ms": 34.845262922657035,
+              "min_ms": 33.88092597015202,
+              "p50_ms": 34.30083300918341,
+              "p95_ms": 36.70273604802787
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 29.715648153796792,
+              "mean_ms": 26.724216925601166,
+              "min_ms": 25.923748034983873,
+              "p50_ms": 26.310437126085162,
+              "p95_ms": 28.12871802598238
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 114.73239861872645,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 10.460544281173497,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.683099654681612,
+          "throughput_tok_s_p50": 29.14266647576435,
+          "timing_ms": {
+            "embed": {
+              "count": 300.0,
+              "max_ms": 0.11974992230534554,
+              "mean_ms": 0.08806516183540225,
+              "min_ms": 0.07920293137431145,
+              "p50_ms": 0.0869380310177803,
+              "p95_ms": 0.1009239349514246
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 8.757235016673803,
+              "mean_ms": 7.898706632355849,
+              "min_ms": 7.603134028613567,
+              "p50_ms": 7.776997983455658,
+              "p95_ms": 8.342497050762177
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.19125896506011486,
+              "mean_ms": 0.1433291519060731,
+              "min_ms": 0.11171610094606876,
+              "p50_ms": 0.14257500879466534,
+              "p95_ms": 0.1559210941195488
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 38.59918797388673,
+              "mean_ms": 34.86373551112289,
+              "min_ms": 33.912901068106294,
+              "p50_ms": 34.313949989154935,
+              "p95_ms": 36.68862604536116
+            },
+            "token_wait": {
+              "count": 300.0,
+              "max_ms": 29.65608797967434,
+              "mean_ms": 26.733634565025568,
+              "min_ms": 26.0209571570158,
+              "p50_ms": 26.315639028325677,
+              "p95_ms": 28.15462206490338
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 132,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "eager_kv_digests": "checked_then_freed",
+        "eager_terminal": {
+          "accepted": true,
+          "device_position": 2180,
+          "dispatch_error": 0,
+          "expected_position": 2180,
+          "host_position": 2180,
+          "stop_position": 3080
+        },
+        "final_state_digests_equal": true,
+        "judgment": "graph_vs_eager_output bitwise (E1a27/E0sf), fused-vs-fused, pipeline-fed inputs",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": true,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 0,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 2048,
+      "steps_per_round": 300,
+      "stop_position": 3080,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 2130,
+        "global_rows": 4,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "0": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "1": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "10": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "2": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "3": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "4": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "5": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "6": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "7": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "8": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "9": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 3080,
+        "dispatch_error": 0,
+        "expected_position": 3080,
+        "host_position": 3080,
+        "stop_position": 3080
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 0,
+        "global_ranks": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "attention_modes": {
+        "11": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "12": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "13": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "14": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "15": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "16": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "17": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "18": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "19": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "20": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "21": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        }
+      },
+      "b_semantics": "replicated",
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "bitwise",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.5547866141423583,
+        "load": 12.443920530145988,
+        "process": 82.09734414401464,
+        "settle": 12.044759148033336,
+        "warmup": 23.798651381162927
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 1,
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        },
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan064",
+      "local_batch": 1,
+      "local_rank": 4,
+      "max_seq_len": 3328,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 10106044416,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 10150084608,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 10202513408,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 10202513408,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 10202513408,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 10202513408,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 10336731136,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 10273816576,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 172840,
+      "rank": 4,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 115.03969910217177,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 10.432659439975396,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.75992477554294,
+          "throughput_tok_s_p50": 28.493278842093325,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 28.62598211504519,
+              "mean_ms": 26.344287262763828,
+              "min_ms": 8.0315878149122,
+              "p50_ms": 26.33603592403233,
+              "p95_ms": 27.219834038987756
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 8.96926294080913,
+              "mean_ms": 7.934305195230991,
+              "min_ms": 7.657815935090184,
+              "p50_ms": 7.808504858985543,
+              "p95_ms": 8.386491099372506
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.9909400250762701,
+              "mean_ms": 0.4920130913766722,
+              "min_ms": 0.14269491657614708,
+              "p50_ms": 0.4854761064052582,
+              "p95_ms": 0.6463159807026386
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 37.01672703027725,
+              "mean_ms": 34.77060554937149,
+              "min_ms": 16.27392298541963,
+              "p50_ms": 35.09599599055946,
+              "p95_ms": 35.593653097748756
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 115.00200963001319,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 10.436006729956716,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.750502407503298,
+          "throughput_tok_s_p50": 28.48652233336811,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 28.247938957065344,
+              "mean_ms": 26.365479807524633,
+              "min_ms": 8.016554871574044,
+              "p50_ms": 26.35282394476235,
+              "p95_ms": 27.255574939772487
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 8.962297113612294,
+              "mean_ms": 7.939399664755911,
+              "min_ms": 7.649857085198164,
+              "p50_ms": 7.810789160430431,
+              "p95_ms": 8.386605186387897
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.8650380186736584,
+              "mean_ms": 0.47712140639002126,
+              "min_ms": 0.12301700189709663,
+              "p50_ms": 0.47102803364396095,
+              "p95_ms": 0.6425990723073483
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 36.592063028365374,
+              "mean_ms": 34.782000878670566,
+              "min_ms": 16.361943911761045,
+              "p50_ms": 35.10432015173137,
+              "p95_ms": 35.60947207733989
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 114.94196591883262,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 10.441428194986656,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.735491479708156,
+          "throughput_tok_s_p50": 28.738756292514026,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 28.264787048101425,
+              "mean_ms": 26.37250714469701,
+              "min_ms": 8.029266027733684,
+              "p50_ms": 26.24841104261577,
+              "p95_ms": 27.248618891462684
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 8.94800410605967,
+              "mean_ms": 7.945078992440055,
+              "min_ms": 7.679157890379429,
+              "p50_ms": 7.813608972355723,
+              "p95_ms": 8.381824009120464
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 1.081574009731412,
+              "mean_ms": 0.48258426211153466,
+              "min_ms": 0.16851513646543026,
+              "p50_ms": 0.47925394028425217,
+              "p95_ms": 0.6300339009612799
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 36.472809966653585,
+              "mean_ms": 34.8001703992486,
+              "min_ms": 16.208100132644176,
+              "p50_ms": 34.79621699079871,
+              "p95_ms": 35.62794392928481
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 132,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "eager_kv_digests": "checked_then_freed",
+        "eager_terminal": {
+          "accepted": true,
+          "device_position": 2180,
+          "dispatch_error": 0,
+          "expected_position": 2180,
+          "host_position": 2180,
+          "stop_position": 3080
+        },
+        "final_state_digests_equal": true,
+        "judgment": "graph_vs_eager_output bitwise (E1a27/E0sf), fused-vs-fused, pipeline-fed inputs",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": true,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 1,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 2048,
+      "steps_per_round": 300,
+      "stop_position": 3080,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3366,
+        "global_rows": 4,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "11": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "12": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "13": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "14": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "15": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "16": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "17": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "18": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "19": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "20": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "21": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 3080,
+        "dispatch_error": 0,
+        "expected_position": 3080,
+        "host_position": 3080,
+        "stop_position": 3080
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 4,
+        "global_ranks": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "attention_modes": {
+        "22": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "23": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "24": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "25": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "26": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "27": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "28": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "29": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "30": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "31": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "32": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        }
+      },
+      "b_semantics": "replicated",
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "bitwise",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.5543786310590804,
+        "load": 12.442553820088506,
+        "process": 82.09465175890364,
+        "settle": 12.073195860954002,
+        "warmup": 23.797398227034137
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 1,
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        },
+        "out": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "send",
+          "stage_id": 0,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan065",
+      "local_batch": 1,
+      "local_rank": 0,
+      "max_seq_len": 3328,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 10093461504,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 10141696000,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 10187833344,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 10187833344,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 10187833344,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 10187833344,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 10324148224,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 10259136512,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 186904,
+      "rank": 8,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 114.94787908884892,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 10.440988478017971,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.73696977221223,
+          "throughput_tok_s_p50": 28.933214464858104,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 28.372082859277725,
+              "mean_ms": 26.53561247512698,
+              "min_ms": 16.281032003462315,
+              "p50_ms": 26.500904001295567,
+              "p95_ms": 27.389601105824113
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 9.424950927495956,
+              "mean_ms": 8.126061811732749,
+              "min_ms": 7.823243970051408,
+              "p50_ms": 7.969316793605685,
+              "p95_ms": 8.650938048958778
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.2479518298059702,
+              "mean_ms": 0.13670591559881964,
+              "min_ms": 0.10714004747569561,
+              "p50_ms": 0.13577286154031754,
+              "p95_ms": 0.14558108523488045
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 37.67140000127256,
+              "mean_ms": 34.79838020245855,
+              "min_ms": 24.329535895958543,
+              "p50_ms": 34.56235397607088,
+              "p95_ms": 36.138152005150914
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 114.91170160611476,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 10.444222406949848,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.72792540152869,
+          "throughput_tok_s_p50": 28.89244172879884,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 28.339002979919314,
+              "mean_ms": 26.544532233383507,
+              "min_ms": 16.386640025302768,
+              "p50_ms": 26.501919142901897,
+              "p95_ms": 27.365878922864795
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 9.14804614149034,
+              "mean_ms": 8.127968742046505,
+              "min_ms": 7.849683985114098,
+              "p50_ms": 7.972664199769497,
+              "p95_ms": 8.652050979435444
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.15415786765515804,
+              "mean_ms": 0.13683475010717908,
+              "min_ms": 0.11000479571521282,
+              "p50_ms": 0.13666506856679916,
+              "p95_ms": 0.14579109847545624
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 37.61657094582915,
+              "mean_ms": 34.80933572553719,
+              "min_ms": 24.507479975000024,
+              "p50_ms": 34.611128037795424,
+              "p95_ms": 36.141431191936135
+            }
+          },
+          "tokens_first8": null
+        },
+        {
+          "dp_equivalent_tok_s_mean": 114.84973233357783,
+          "logits_finite": null,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 10.449700153898448,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.71243308339446,
+          "throughput_tok_s_p50": 28.86841521558142,
+          "timing_ms": {
+            "recv": {
+              "count": 300.0,
+              "max_ms": 28.333726106211543,
+              "mean_ms": 26.559717902758468,
+              "min_ms": 16.229619039222598,
+              "p50_ms": 26.540794176980853,
+              "p95_ms": 27.366572059690952
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 9.14187403395772,
+              "mean_ms": 8.132629749986032,
+              "min_ms": 7.850245805457234,
+              "p50_ms": 7.979386951774359,
+              "p95_ms": 8.662962121888995
+            },
+            "send": {
+              "count": 300.0,
+              "max_ms": 0.1571429893374443,
+              "mean_ms": 0.13577008619904518,
+              "min_ms": 0.1052559819072485,
+              "p50_ms": 0.13494095765054226,
+              "p95_ms": 0.14481018297374249
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 37.585766054689884,
+              "mean_ms": 34.82811773894355,
+              "min_ms": 24.371097097173333,
+              "p50_ms": 34.639934077858925,
+              "p95_ms": 36.14994790405035
+            }
+          },
+          "tokens_first8": null
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 132,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "eager_kv_digests": "checked_then_freed",
+        "eager_terminal": {
+          "accepted": true,
+          "device_position": 2180,
+          "dispatch_error": 0,
+          "expected_position": 2180,
+          "host_position": 2180,
+          "stop_position": 3080
+        },
+        "final_state_digests_equal": true,
+        "judgment": "graph_vs_eager_output bitwise (E1a27/E0sf), fused-vs-fused, pipeline-fed inputs",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": true,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 2,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 2048,
+      "steps_per_round": 300,
+      "stop_position": 3080,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 3336,
+        "global_rows": 4,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "22": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "23": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "24": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "25": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "26": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "27": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "28": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "29": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "30": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "31": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "32": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 3080,
+        "dispatch_error": 0,
+        "expected_position": 3080,
+        "host_position": 3080,
+        "stop_position": 3080
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 8,
+        "global_ranks": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    },
+    {
+      "accepted": true,
+      "attention_modes": {
+        "33": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "34": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "35": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "36": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "37": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "38": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "39": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "40": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        },
+        "41": {
+          "kv_qat_mode": "fused",
+          "nope_quant_mode": "qat_intended_e4m3"
+        },
+        "42": {
+          "indexer_qat_mode": "fused",
+          "kv_qat_mode": "fused"
+        }
+      },
+      "b_semantics": "replicated",
+      "caliber": {
+        "b_semantics": "full replication: identical B sequences on all 4 TP ranks per stage; bl per GPU = B; distinct global batch = B; MoE runs 4B gathered rows (4 identical copies); NOT comparable with C1F or DP-attention numbers",
+        "dp_equivalent_note": "per-rank compute at replicated bl=B equals a DP-attention deployment at global batch 4B; the dp_equivalent_tok_s field is 4x the measured replicated throughput (model-derived)",
+        "hc_backend": "fused",
+        "kv": "seeded decode residency at position 2048 (deterministic-seeded-KV-not-real-prefix, E1a27); max_seq_len=3328",
+        "microbatches": 1,
+        "pipeline_form": "serial closed-loop, one token batch in flight",
+        "timing": "host walls around torch.cuda.synchronize per component (E0qf serial decomposition caliber)",
+        "transport": "NCCL P2P fixed endpoints, no-GDR"
+      },
+      "check_mode": "bitwise",
+      "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+      "config_tag": "nogdr",
+      "device": "NVIDIA GeForce RTX 4090",
+      "diagnostic_seconds": {
+        "build": 0.23633190197870135,
+        "load": 12.763395809102803,
+        "process": 82.09612315194681,
+        "settle": 12.05573418806307,
+        "warmup": 23.797536483965814
+      },
+      "errors": [],
+      "experiment": "E1F-full-decode-throughput",
+      "family_counts": {
+        "normal": 774,
+        "ratio4_boundary": 250,
+        "ratio4_ratio128_boundary": 8
+      },
+      "global_batch": 1,
+      "handoff_records": {
+        "in": {
+          "accepted": true,
+          "endpoint_dtype": "torch.bfloat16",
+          "endpoint_pointer_stable": true,
+          "endpoint_shape": [
+            1,
+            1,
+            4,
+            4096
+          ],
+          "expected_steps": 1032,
+          "payload_nbytes": 32768,
+          "role": "receive",
+          "stage_id": 1,
+          "steps_transferred": 1032
+        }
+      },
+      "host": "titan065",
+      "local_batch": 1,
+      "local_rank": 4,
+      "max_seq_len": 3328,
+      "measurement_class": "closed_loop_decode_throughput",
+      "memory": {
+        "after_build": {
+          "free_bytes": 8273133568,
+          "total_bytes": 25252724736
+        },
+        "after_load": {
+          "free_bytes": 8317173760,
+          "total_bytes": 25252724736
+        },
+        "after_round_0": {
+          "free_bytes": 9428664320,
+          "total_bytes": 25252724736
+        },
+        "after_round_1": {
+          "free_bytes": 9428664320,
+          "total_bytes": 25252724736
+        },
+        "after_round_2": {
+          "free_bytes": 9428664320,
+          "total_bytes": 25252724736
+        },
+        "after_settle": {
+          "free_bytes": 9428664320,
+          "total_bytes": 25252724736
+        },
+        "after_warmup": {
+          "free_bytes": 9562882048,
+          "total_bytes": 25252724736
+        },
+        "at_end": {
+          "free_bytes": 9502064640,
+          "total_bytes": 25252724736
+        }
+      },
+      "nccl_env": {
+        "NCCL_IB_DISABLE": "0",
+        "NCCL_NET_GDR_LEVEL": null,
+        "NCCL_P2P_LEVEL": "SYS",
+        "NCCL_SOCKET_IFNAME": "enp33s0f0"
+      },
+      "placement": {
+        "accepted": true,
+        "stage_hosts": {
+          "0": [
+            "titan064"
+          ],
+          "1": [
+            "titan064"
+          ],
+          "2": [
+            "titan065"
+          ],
+          "3": [
+            "titan065"
+          ]
+        }
+      },
+      "plan_resident_bytes": 169480,
+      "rank": 12,
+      "round_results": [
+        {
+          "dp_equivalent_tok_s_mean": 114.84427455922913,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 0,
+          "round_wall_s": 10.451363540021703,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.711068639807284,
+          "throughput_tok_s_p50": 29.16640751261754,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 2.6839729398489,
+              "mean_ms": 2.595091136948516,
+              "min_ms": 2.5755621027201414,
+              "p50_ms": 2.593244891613722,
+              "p95_ms": 2.6110070757567883
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 27.847646037116647,
+              "mean_ms": 24.872051804171253,
+              "min_ms": 23.937875870615244,
+              "p50_ms": 24.46548081934452,
+              "p95_ms": 26.297155069187284
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 8.171123918145895,
+              "mean_ms": 7.217532733920962,
+              "min_ms": 6.999459117650986,
+              "p50_ms": 7.087773876264691,
+              "p95_ms": 7.64890993013978
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 38.75840688124299,
+              "mean_ms": 34.82977288464705,
+              "min_ms": 33.705074805766344,
+              "p50_ms": 34.286018926650286,
+              "p95_ms": 36.67095513083041
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.22745411843061447,
+              "mean_ms": 0.14509720960631967,
+              "min_ms": 0.13652397319674492,
+              "p50_ms": 0.14317710883915424,
+              "p95_ms": 0.15590107068419456
+            }
+          },
+          "tokens_first8": [
+            223
+          ]
+        },
+        {
+          "dp_equivalent_tok_s_mean": 114.80839672023369,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 1,
+          "round_wall_s": 10.454562254948542,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.702099180058422,
+          "throughput_tok_s_p50": 29.160124684890036,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 3.309390041977167,
+              "mean_ms": 2.5990893963413932,
+              "min_ms": 2.5746298488229513,
+              "p50_ms": 2.5945869274437428,
+              "p95_ms": 2.6174900121986866
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 27.776556089520454,
+              "mean_ms": 24.864317365766812,
+              "min_ms": 24.114638101309538,
+              "p50_ms": 24.44788906723261,
+              "p95_ms": 26.29872993566096
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 8.180971955880523,
+              "mean_ms": 7.229498949988435,
+              "min_ms": 6.994711002334952,
+              "p50_ms": 7.099195849150419,
+              "p95_ms": 7.665982004255056
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 38.686796091496944,
+              "mean_ms": 34.84065725390489,
+              "min_ms": 33.87502511031926,
+              "p50_ms": 34.293406177312136,
+              "p95_ms": 36.69404098764062
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.30863494612276554,
+              "mean_ms": 0.14775154180824757,
+              "min_ms": 0.13622408732771873,
+              "p50_ms": 0.14521111734211445,
+              "p95_ms": 0.16068993136286736
+            }
+          },
+          "tokens_first8": [
+            223
+          ]
+        },
+        {
+          "dp_equivalent_tok_s_mean": 114.74645836857849,
+          "logits_finite": true,
+          "output_lanes_bitwise": false,
+          "round": 2,
+          "round_wall_s": 10.460027198074386,
+          "steps": 300,
+          "throughput_tok_s_mean": 28.686614592144622,
+          "throughput_tok_s_p50": 29.14582792075806,
+          "timing_ms": {
+            "head": {
+              "count": 300.0,
+              "max_ms": 2.6487489230930805,
+              "mean_ms": 2.595808762901773,
+              "min_ms": 2.5741090066730976,
+              "p50_ms": 2.594177145510912,
+              "p95_ms": 2.6139530818909407
+            },
+            "recv": {
+              "count": 300.0,
+              "max_ms": 27.728589018806815,
+              "mean_ms": 24.886871380731463,
+              "min_ms": 24.13201192393899,
+              "p50_ms": 24.472977966070175,
+              "p95_ms": 26.30068501457572
+            },
+            "replay": {
+              "count": 300.0,
+              "max_ms": 8.16025398671627,
+              "mean_ms": 7.23110738908872,
+              "min_ms": 7.006183033809066,
+              "p50_ms": 7.101600058376789,
+              "p95_ms": 7.659591035917401
+            },
+            "step_wall": {
+              "count": 300.0,
+              "max_ms": 38.60057890415192,
+              "mean_ms": 34.859463698230684,
+              "min_ms": 33.906395081430674,
+              "p50_ms": 34.310227958485484,
+              "p95_ms": 36.68931499123573
+            },
+            "token_send": {
+              "count": 300.0,
+              "max_ms": 0.2473320346325636,
+              "mean_ms": 0.14567616550872722,
+              "min_ms": 0.136303948238492,
+              "p50_ms": 0.1428169198334217,
+              "p95_ms": 0.15758397057652473
+            }
+          },
+          "tokens_first8": [
+            223
+          ]
+        }
+      ],
+      "rounds": 3,
+      "schema_version": 1,
+      "seed": 20260720,
+      "settle": {
+        "accepted": true,
+        "bitwise_steps": 132,
+        "capture_order": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "eager_kv_digests": "checked_then_freed",
+        "eager_terminal": {
+          "accepted": true,
+          "device_position": 2180,
+          "dispatch_error": 0,
+          "expected_position": 2180,
+          "host_position": 2180,
+          "stop_position": 3080
+        },
+        "final_state_digests_equal": true,
+        "judgment": "graph_vs_eager_output bitwise (E1a27/E0sf), fused-vs-fused, pipeline-fed inputs",
+        "max_abs_over_steps": 0.0,
+        "mismatched_positions": [],
+        "output_lanes_bitwise": false,
+        "output_lanes_bitwise_expected": true,
+        "steps": 132
+      },
+      "settle_steps": 132,
+      "stage": 3,
+      "stage_layer_ids": {
+        "0": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "1": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "2": [
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "3": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ]
+      },
+      "start_position": 2048,
+      "steps_per_round": 300,
+      "stop_position": 3080,
+      "teardown": {
+        "accepted": true,
+        "empty_cache_called": true,
+        "errors": [],
+        "families": [
+          "normal",
+          "ratio4_boundary",
+          "ratio4_ratio128_boundary"
+        ],
+        "gc_collected": true,
+        "gc_unreachable": 2108,
+        "global_rows": 4,
+        "graph_moe_slots": [
+          1,
+          2,
+          3
+        ],
+        "graph_pool_objects_distinct": true,
+        "graph_registry": {
+          "bindings": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "bindings_exact": true,
+          "bindings_released": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset": {
+            "normal": true,
+            "ratio4_boundary": true,
+            "ratio4_ratio128_boundary": true
+          },
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "graph_slot_layer_ids": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "pool_registry": {
+          "families_exact": true,
+          "observed_families": [
+            "normal",
+            "ratio4_boundary",
+            "ratio4_ratio128_boundary"
+          ],
+          "registry_cleared": true,
+          "reset_capable": true,
+          "values_distinct": true,
+          "values_present": true,
+          "values_valid": true
+        },
+        "registry_objects_distinct": true,
+        "schema": "dsv4-stateful-graph-teardown-v1",
+        "semantic_layer_ids": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "slot_cleanup": {
+          "normal": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 1
+          },
+          "ratio4_boundary": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 2
+          },
+          "ratio4_ratio128_boundary": {
+            "accepted": true,
+            "layers": {
+              "33": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "34": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "35": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "36": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "37": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "38": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "39": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "40": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "41": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              },
+              "42": {
+                "accepted": true,
+                "reset": true,
+                "status": {
+                  "has_completion_event": false,
+                  "state": "free"
+                }
+              }
+            },
+            "slot": 3
+          }
+        },
+        "slot_cleanup_accepted": true,
+        "synchronization": {
+          "after_reset": true,
+          "before_reset": true,
+          "final": true
+        }
+      },
+      "terminals": {
+        "accepted": true,
+        "device_position": 3080,
+        "dispatch_error": 0,
+        "expected_position": 3080,
+        "host_position": 3080,
+        "stop_position": 3080
+      },
+      "torch": "2.11.0+cu130",
+      "tp_group_binding": {
+        "backend": "nccl",
+        "global_rank": 12,
+        "global_ranks": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "local_rank": 0,
+        "validated_live": true,
+        "world_size": 4
+      },
+      "tp_rank": 0,
+      "world": 16
+    }
+  ]
+}

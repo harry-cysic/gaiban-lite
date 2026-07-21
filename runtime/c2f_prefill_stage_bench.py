@@ -51,6 +51,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 import platform
 import statistics
 import time
@@ -559,6 +560,11 @@ def main() -> int:
         "only to bound the torch core's FP32 gather workspace",
     )
     parser.add_argument(
+        "--attention-tp-shard",
+        action="store_true",
+        help="E6F variant A: shard the attention o-path across TP4",
+    )
+    parser.add_argument(
         "--sparse-head-chunk", type=int, default=16,
         help="tilelang head-loop width (16 is the sm89 maximum)",
     )
@@ -718,6 +724,8 @@ def main() -> int:
         # The MoE bimodality was NCCL transport selection, not the allocator:
         # without NCCL_P2P_LEVEL=SYS the TP4 collectives fall back to SHM.
         "nccl_p2p_level": os.environ.get("NCCL_P2P_LEVEL", ""),
+        "argv": list(sys.argv),
+        "attention_tp_shard": bool("--attention-tp-shard" in sys.argv),
         # E5F: same lesson as the allocator line above, one vertical later --
         # an env-gated variant that fails to reach the process is
         # indistinguishable from one that does nothing.  Record both what was
@@ -866,6 +874,7 @@ def main() -> int:
             progress=(lambda m: print(m, flush=True)) if rank == 0 else None,
             moe_marlin_input_dtype=marlin_input_dtype,
             share_moe_buffers=True,
+            attention_tp_shard=args.attention_tp_shard,
         )
         torch.cuda.synchronize(device)
         dist.barrier()
