@@ -236,6 +236,19 @@ closed-loop（serial 单 microbatch）最高 920 tok/s@bl=192；真 DP-attention
 
 **吞吐-容量前沿与模型二次修正（E1IF/前沿扫描，同日追加）**：4-microbatch 交织流水（无串扰逐位 gate，瓶颈 stage busy 93.7%）实测前沿：ctx 2048 时 bl_mb 32/48/64 → 5885/7368/8570 tok/s（bl 96 OOM）；ctx 8192 时 bl_mb 32/40 → 5693/6392 tok/s（bl 48 OOM）。**8K/bf16-KV decode-only 实测天花板 ≈6.4k output tok/s（B_total=640，容量限而非算力限）**。§5.2 预估带 15–25k 依赖的两个假设被实测证伪：(1) t_stage 随 B 线性缩放（实测强次线性：bl=32 的 replay 20.3 ms 为 bl=128 的 36.6 ms 的 55% 而非 25%，权重流固定成本主导）；(2) KV 容量核算未计满流水需 4 个 microbatch 的 KV 同驻（B_global=512 吞吐点实际需 2048 条在飞，8K bf16 KV 不可行）。证据链：E1F（t_stage–bl 曲线）→ E1IF（交织无串扰、busy 占比）→ 前沿扫描（OOM 判界），均 3 轮重复、绑定 checkpoint/环境/拓扑。回收杠杆（§4.4/§5.4 自列，待 Flash 几何验证）：FP8 KV（×2 行数）投影 8K ≈10–11k；MTP（~1.5×）→ **~15–16k，原带下沿在两杠杆齐备时可及**；短 ctx 运营另有余量（2K 实测 8.6k）。详细数据：experiments/E1F-full-decode-throughput/README.md。
 
+**prefill 侧修订（2026-07-21）**：§5.3 的两处判断需更新。(1) C2F 首轮报告的
+prefill 基线偏低，原因是其 4 个 launcher 漏设 `NCCL_P2P_LEVEL=SYS`（见附录 B.1
+新增条），MoE 的两个 DP 集合走了 SHM；修正并接入 reference tilelang `sparse_attn`
+到 prefill 后，同口径（11 层、chunk 8192、iters 5/warmup 2、各 3 轮）实测：
+**torch attention 臂 17,022 input tok/s（轮间 0.26%）、tilelang attention 臂
+25,308（轮间 0.03%）**。(2) C2F 的"Marlin 大 M MFU 仅 11.5%"归因有误：routed
+Marlin GEMM 在 prefill 实测 135 TFLOPS ≈ RTX 4090 BF16 峰值的 82%，dequant→BF16
+dense 替代路线实测慢 4–17×，已判死。修正后的 prefill 归因（tilelang 臂）：MoE
+33.4%（其中 17.7 ms/层为 P2P 集合的下界）、attention 23.2%、HC 与其余为剩余项；
+下一杠杆是集合/计算重叠与 prefill HC 融合，不再是 MoE GEMM 或 attention。单池
+投影 T = 1/(1/8733 + 8/25308) = **2,322 tok/s**（目标带 3.2–4.2k），即该带需
+prefill 与 decode 两侧同时接近各自上限。
+
 ## 6. 风险清单
 
 | 风险 | 等级 | 缓解 |
@@ -300,6 +313,14 @@ PP stage 落位时 IB 边界 stage 优先排 socket1。
 - 开发工作站（外网）的 ssh 访问 titan 均经 **ProxyJump earth** 中转；已配置别名
   `titan064`/`titan065`（与 IP 形式等价、共享 ControlMaster 复用连接，
   复用后单命令延迟 ~0.27s vs 首连 ~2.7s）。
+- **NCCL 传输选择必须显式设 `NCCL_P2P_LEVEL=SYS`**（2026-07-21 实证）：titan 上
+  GPU0-3 处于 `NODE` 距离（跨 PCIe host bridge），NCCL 默认 P2P level 不含该距离，
+  会静默回退到主机中转 SHM（实测 4.12 GB/s），设 `SYS` 后 `isAllDirectP2p 0→1`、
+  实测 23.79 GB/s（all-gather 48.84→8.46 ms、reduce-scatter 46.99→8.65 ms，
+  prefill MoE 真实形状）。**重要：`nvidia-smi topo -p2p r/w` 与
+  `cudaDeviceCanAccessPeer` 在 NCCL 实际走 SHM 时仍全报 OK，对传输选择没有诊断力**；
+  唯一可靠判据是 NCCL 日志的 `isAllDirectP2p` 与实测带宽。凡以 topo/canAccessPeer
+  为据的"P2P 已生效"结论都需用带宽复核。
 
 ### B.2 软件栈（venv `~/Workspace/venvs/sglang`，两台一致，导入全套验证通过）
 

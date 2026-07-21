@@ -109,12 +109,20 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
   上限——32 亦超限):attention 桶 **1.147→0.520 s(2.205×,省 626.6 ms,
   与预测 611 差 2.6%)**,全部数值门通过未放宽容差,E2E **472/482**(基线
   468/482)不劣化。
-- **新头号瓶颈 = prefill MoE 的分配器双模**:MoE 桶在快分支 0.483 s 与慢分支
-  1.36–1.38 s 间双模(2.8×,用未改动 launcher 可复现,线索 max_memory_reserved
-  20.50 vs 23.98 GiB)。代入快分支 MoE:torch 折算 16,575(与冻结 16,602 差
-  0.2%,自洽)、**tilelang 折算 24,268 ≈ 预测 24k**。attention 已降到 prefill
-  的 23.2%。下一步:修分配器双模(值 +32%,把 24k 折算变实测)→ prefill HC
-  融合 → chunked prefill 交错 / serving。
+- **prefill MoE 双模已归因并修复:根因是 NCCL 静默回退 SHM,不是分配器**
+  (22 次慢分支调用的分配器计数器全为 0;`max_memory_reserved` 线索被反例证伪)。
+  titan 的 GPU0-3 处于 `NODE` 距离,NCCL 默认 P2P level 不含该距离 → 主机中转
+  4.12 GB/s;设 `NCCL_P2P_LEVEL=SYS` 后 23.79 GB/s(集合 48.8→8.5 ms)。
+  C2F 的 4 个 launcher 是全仓唯一漏设者;**已审计确认 decode 侧全部头条数字
+  均在 P2P 生效下测得,无需重估**。⚠️ `nvidia-smi topo -p2p` 与
+  `cudaDeviceCanAccessPeer` 在 NCCL 实走 SHM 时仍报 OK,**对传输选择无诊断力**
+  (已写入附录 B.1)。另修:MoE combine 改 `torch.add(out=)`,穷举 2³² 对 BF16
+  证明逐位等价,省 4.1 ms/层与 1.61 GiB 瞬时量。
+- **prefill 实测(各 3 轮,轮间 ≤0.26%)**:torch attention 臂 **17,022**、
+  tilelang 臂 **25,308** input tok/s——此前的 24.3k 折算已变实测;单池 T
+  **2,322**。归因:MoE 33.4%(其中 17.7 ms/层是 P2P 集合下界)、attention
+  23.2%。下一步:集合/计算重叠、prefill HC 融合 → chunked prefill 交错 /
+  serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
 - **Prefill 基线与杠杆已实测**
