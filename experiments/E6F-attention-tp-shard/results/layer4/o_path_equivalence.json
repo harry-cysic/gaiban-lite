@@ -1,0 +1,114 @@
+{
+  "accepted": true,
+  "algebra_verified": true,
+  "bf16reduce_ratio_vs_full": 2.0781036133151627,
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "E6F-attention-tp-shard",
+  "fp32gemm_floor_ratio_vs_full": 1.0,
+  "fp32reduce_ratio_vs_full": 1.494014574891309,
+  "geometry": {
+    "head_dim": 512,
+    "num_heads": 64,
+    "o_groups": 8,
+    "o_lora_rank": 1024,
+    "tp": 4
+  },
+  "host": "titan065",
+  "layer": 4,
+  "layout": {
+    "groups_per_rank": 2,
+    "heads_per_rank": 16,
+    "lora_cols_per_rank": 2048
+  },
+  "scope": "index algebra + reordering magnitude only; the model-level verdict is the D0L soft gate (TARGET 1.3), never this number",
+  "shipping_choice": "upcast partials to fp32 before all-reduce",
+  "shipping_cost_ratio": 1.494014574891309,
+  "step": "o_path_algebra_equivalence",
+  "trials": [
+    {
+      "bitwise_equal": false,
+      "max_abs_diff_full_vs_shard": 0.03125,
+      "output_absmax": 7.319314360866419,
+      "rel_err_full_vs_fp64": 0.0027816536276543923,
+      "rel_err_shard_bf16reduce_vs_fp64": 0.00455627261911347,
+      "rel_err_shard_fp32gemm_floor_vs_fp64": 0.0027816536276543923,
+      "rel_err_shard_upcast_reduce_vs_fp64": 0.0032466627815846577,
+      "trial": 0
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff_full_vs_shard": 0.03125,
+      "output_absmax": 6.09792191199661,
+      "rel_err_full_vs_fp64": 0.003029749525454221,
+      "rel_err_shard_bf16reduce_vs_fp64": 0.0064374068499746025,
+      "rel_err_shard_fp32gemm_floor_vs_fp64": 0.003029749525454221,
+      "rel_err_shard_upcast_reduce_vs_fp64": 0.003282885927072946,
+      "trial": 1
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff_full_vs_shard": 0.03125,
+      "output_absmax": 7.131292555346883,
+      "rel_err_full_vs_fp64": 0.002902771389375498,
+      "rel_err_shard_bf16reduce_vs_fp64": 0.00392426178347769,
+      "rel_err_shard_fp32gemm_floor_vs_fp64": 0.002902771389375498,
+      "rel_err_shard_upcast_reduce_vs_fp64": 0.0035847543407583494,
+      "trial": 2
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff_full_vs_shard": 0.03125,
+      "output_absmax": 7.018692990626752,
+      "rel_err_full_vs_fp64": 0.002492582569189579,
+      "rel_err_shard_bf16reduce_vs_fp64": 0.004378202248021827,
+      "rel_err_shard_fp32gemm_floor_vs_fp64": 0.002492582569189579,
+      "rel_err_shard_upcast_reduce_vs_fp64": 0.002919516350363684,
+      "trial": 3
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff_full_vs_shard": 0.03125,
+      "output_absmax": 6.235246806783005,
+      "rel_err_full_vs_fp64": 0.003097731416628028,
+      "rel_err_shard_bf16reduce_vs_fp64": 0.006204799399996652,
+      "rel_err_shard_fp32gemm_floor_vs_fp64": 0.003097731416628028,
+      "rel_err_shard_upcast_reduce_vs_fp64": 0.0046280558855409755,
+      "trial": 4
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff_full_vs_shard": 0.03125,
+      "output_absmax": 6.721759834428373,
+      "rel_err_full_vs_fp64": 0.002751627138909764,
+      "rel_err_shard_bf16reduce_vs_fp64": 0.004840773494753265,
+      "rel_err_shard_fp32gemm_floor_vs_fp64": 0.002751627138909764,
+      "rel_err_shard_upcast_reduce_vs_fp64": 0.0039227775938457,
+      "trial": 5
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff_full_vs_shard": 0.03125,
+      "output_absmax": 6.124857008700503,
+      "rel_err_full_vs_fp64": 0.00308276788018447,
+      "rel_err_shard_bf16reduce_vs_fp64": 0.0055650186189864625,
+      "rel_err_shard_fp32gemm_floor_vs_fp64": 0.00308276788018447,
+      "rel_err_shard_upcast_reduce_vs_fp64": 0.003955541071263755,
+      "trial": 6
+    },
+    {
+      "bitwise_equal": false,
+      "max_abs_diff_full_vs_shard": 0.03125,
+      "output_absmax": 6.038439626412043,
+      "rel_err_full_vs_fp64": 0.0029033640505935366,
+      "rel_err_shard_bf16reduce_vs_fp64": 0.0058097682245225,
+      "rel_err_shard_fp32gemm_floor_vs_fp64": 0.0029033640505935366,
+      "rel_err_shard_upcast_reduce_vs_fp64": 0.0035598124018595078,
+      "trial": 7
+    }
+  ],
+  "worst_rel_err_full": 0.003097731416628028,
+  "worst_rel_err_shard_bf16reduce": 0.0064374068499746025,
+  "worst_rel_err_shard_fp32gemm_floor": 0.003097731416628028,
+  "worst_rel_err_shard_fp32reduce": 0.0046280558855409755
+}
