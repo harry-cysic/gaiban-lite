@@ -36,7 +36,9 @@ eager 5.2 ms vs graph 4.0 ms(B=512)——全层 graph 刚需再确认。
 
 组件实测 roofline(B=512,8K,不含 PP handoff):
 11 层 × 3712 µs ≈ **40.8 ms/stage** → decode ≈ 512/0.0408/…= **~12.5k output
-tok/s(16 卡聚合)**,即 ~785 tok/s/GPU。低于可行性预估带 15–25k 的下沿约 20%。
+tok/s(16 卡聚合)**,即 ~~~785 tok/s/GPU~~。低于可行性预估带 15–25k 的下沿约 20%。
+
+> ⚠️ **无效折算**（TARGET §9.13：headline tok/s 只按部署档位整系统计；per-card / 跨档位折算不作为性能口径）。保留原文以便追溯曾引用它的结论。本行的 16 卡聚合数是合法口径；被划掉的 per-GPU 折算不是。
 
 差异归因(vs §5.2 分解表):
 - MoE 权重流:routed 12.1 ms/stage ≈ 模型 10.8 ✓;

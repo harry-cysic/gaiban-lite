@@ -72,7 +72,8 @@ sparse_output [b,1,64,512]
 > NCCL 只出现在 MoE 区（attention 区 none）。所以分片是**新增**一次 all-reduce，
 > 不是顶替。已按此重算。
 
-按 E2F 就地标定的 806 GB/s 与实测 NCCL 单次 ~10.3 µs（B=1），16 卡 stage（11 层）：
+按 E2F 就地标定的 806 GB/s 与实测 NCCL 单次 ~10.3 µs（B=1），16 卡 stage（11 层）。
+⚠️ 下表是 **per-stage 诊断量**（TARGET §9.13 允许，用于归因），**不是 headline 性能数字**；headline 必须按部署档位整系统给出。
 
 | 方案 | 省带宽 | 加通信 | **净** |
 |---|---:|---:|---:|

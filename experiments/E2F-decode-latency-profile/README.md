@@ -267,6 +267,9 @@ MoE 那 1.404 GB 确实分片了，attention 那 10.784 GB 没有。
 
 ### 3.6 36.3 ms/token 的完整收支
 
+⚠️ 本节的 per-stage / per-layer 分项是**诊断量**（TARGET §9.13 允许）；
+本竖条的 headline 口径是**一套 16 卡系统的单路 decode**，即 27.5→29.1 tok/s。
+
 用 §3.3 的份额乘未插桩 wall（7.652 ms，titan064）：
 
 | 项 | ms/token | 来源 |
