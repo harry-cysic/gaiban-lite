@@ -1,0 +1,295 @@
+W0721 14:54:10.812000 194613 torch/distributed/run.py:851] 
+W0721 14:54:10.812000 194613 torch/distributed/run.py:851] *****************************************
+W0721 14:54:10.812000 194613 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 14:54:10.812000 194613 torch/distributed/run.py:851] *****************************************
+[E0e2e] layer=22 rank=0 experts=64/256
+[E0e2e] layer=33 rank=0 experts=64/256
+[E0e2e] layer=22 rank=0 experts=128/256
+[E0e2e] layer=33 rank=0 experts=128/256
+[E0e2e] layer=22 rank=0 experts=192/256
+[E0e2e] layer=33 rank=0 experts=192/256
+[E0e2e] layer=22 rank=0 experts=256/256
+[E0e2e] stage 2 layer 22 material loaded
+[E0e2e] layer=33 rank=0 experts=256/256
+[E0e2e] stage 3 layer 33 material loaded
+[E0e2e] layer=23 rank=0 experts=64/256
+[E0e2e] layer=23 rank=0 experts=128/256
+[E0e2e] layer=34 rank=0 experts=64/256
+[E0e2e] layer=23 rank=0 experts=192/256
+[E0e2e] layer=34 rank=0 experts=128/256
+[E0e2e] layer=23 rank=0 experts=256/256
+[E0e2e] layer=34 rank=0 experts=192/256
+[E0e2e] stage 2 layer 23 material loaded
+[E0e2e] layer=34 rank=0 experts=256/256
+[E0e2e] stage 3 layer 34 material loaded
+[E0e2e] layer=24 rank=0 experts=64/256
+[E0e2e] layer=24 rank=0 experts=128/256
+[E0e2e] layer=35 rank=0 experts=64/256
+[E0e2e] layer=24 rank=0 experts=192/256
+[E0e2e] layer=35 rank=0 experts=128/256
+[E0e2e] layer=24 rank=0 experts=256/256
+[E0e2e] stage 2 layer 24 material loaded
+[E0e2e] layer=35 rank=0 experts=192/256
+[E0e2e] layer=35 rank=0 experts=256/256
+[E0e2e] stage 3 layer 35 material loaded
+[E0e2e] layer=25 rank=0 experts=64/256
+[E0e2e] layer=25 rank=0 experts=128/256
+[E0e2e] layer=36 rank=0 experts=64/256
+[E0e2e] layer=25 rank=0 experts=192/256
+[E0e2e] layer=36 rank=0 experts=128/256
+[E0e2e] layer=25 rank=0 experts=256/256
+[E0e2e] stage 2 layer 25 material loaded
+[E0e2e] layer=36 rank=0 experts=192/256
+[E0e2e] layer=36 rank=0 experts=256/256
+[E0e2e] layer=26 rank=0 experts=64/256
+[E0e2e] stage 3 layer 36 material loaded
+[E0e2e] layer=26 rank=0 experts=128/256
+[E0e2e] layer=26 rank=0 experts=192/256
+[E0e2e] layer=37 rank=0 experts=64/256
+[E0e2e] layer=26 rank=0 experts=256/256
+[E0e2e] layer=37 rank=0 experts=128/256
+[E0e2e] stage 2 layer 26 material loaded
+[E0e2e] layer=37 rank=0 experts=192/256
+[E0e2e] layer=37 rank=0 experts=256/256
+[E0e2e] layer=27 rank=0 experts=64/256
+[E0e2e] stage 3 layer 37 material loaded
+[E0e2e] layer=27 rank=0 experts=128/256
+[E0e2e] layer=27 rank=0 experts=192/256
+[E0e2e] layer=38 rank=0 experts=64/256
+[E0e2e] layer=27 rank=0 experts=256/256
+[E0e2e] stage 2 layer 27 material loaded
+[E0e2e] layer=38 rank=0 experts=128/256
+[E0e2e] layer=38 rank=0 experts=192/256
+[E0e2e] layer=28 rank=0 experts=64/256
+[E0e2e] layer=38 rank=0 experts=256/256
+[E0e2e] stage 3 layer 38 material loaded
+[E0e2e] layer=28 rank=0 experts=128/256
+[E0e2e] layer=28 rank=0 experts=192/256
+[E0e2e] layer=39 rank=0 experts=64/256
+[E0e2e] layer=28 rank=0 experts=256/256
+[E0e2e] stage 2 layer 28 material loaded
+[E0e2e] layer=39 rank=0 experts=128/256
+[E0e2e] layer=39 rank=0 experts=192/256
+[E0e2e] layer=29 rank=0 experts=64/256
+[E0e2e] layer=39 rank=0 experts=256/256
+[E0e2e] layer=29 rank=0 experts=128/256
+[E0e2e] stage 3 layer 39 material loaded
+[E0e2e] layer=29 rank=0 experts=192/256
+[E0e2e] layer=29 rank=0 experts=256/256
+[E0e2e] layer=40 rank=0 experts=64/256
+[E0e2e] stage 2 layer 29 material loaded
+[E0e2e] layer=40 rank=0 experts=128/256
+[E0e2e] layer=30 rank=0 experts=64/256
+[E0e2e] layer=40 rank=0 experts=192/256
+[E0e2e] layer=30 rank=0 experts=128/256
+[E0e2e] layer=40 rank=0 experts=256/256
+[E0e2e] stage 3 layer 40 material loaded
+[E0e2e] layer=30 rank=0 experts=192/256
+[E0e2e] layer=30 rank=0 experts=256/256
+[E0e2e] stage 2 layer 30 material loaded
+[E0e2e] layer=41 rank=0 experts=64/256
+[E0e2e] layer=41 rank=0 experts=128/256
+[E0e2e] layer=31 rank=0 experts=64/256
+[E0e2e] layer=41 rank=0 experts=192/256
+[E0e2e] layer=31 rank=0 experts=128/256
+[E0e2e] layer=41 rank=0 experts=256/256
+[E0e2e] layer=31 rank=0 experts=192/256
+[E0e2e] stage 3 layer 41 material loaded
+[E0e2e] layer=31 rank=0 experts=256/256
+[E0e2e] stage 2 layer 31 material loaded
+[E0e2e] layer=42 rank=0 experts=64/256
+[E0e2e] layer=42 rank=0 experts=128/256
+[E0e2e] layer=32 rank=0 experts=64/256
+[E0e2e] layer=42 rank=0 experts=192/256
+[E0e2e] layer=32 rank=0 experts=128/256
+[E0e2e] layer=32 rank=0 experts=192/256
+[E0e2e] layer=42 rank=0 experts=256/256
+[E0e2e] stage 3 layer 42 material loaded
+[E0e2e] layer=32 rank=0 experts=256/256
+[E0e2e] stage 2 layer 32 material loaded
+[E0e2e] stage 2 loaded (11 layers, free 4.82 GiB, 12s)
+[E0e2e] stage 3 loaded (10 layers, free 3.11 GiB, 12s)
+[rank11]:[E721 15:24:29.433695588 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 11] Observed flight recorder dump signal from another rank via TCPStore.
+[rank11]:[E721 15:24:29.434267726 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 11] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 5, last completed NCCL work: 4.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank11]:[E721 15:24:29.434972473 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 11] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank13]:[E721 15:24:29.525124987 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 13] Observed flight recorder dump signal from another rank via TCPStore.
+[rank13]:[E721 15:24:29.525696613 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 13] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 5, last completed NCCL work: 4.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank13]:[E721 15:24:29.526993876 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 13] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank8]:[E721 15:24:29.668065954 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 8] Observed flight recorder dump signal from another rank via TCPStore.
+[rank8]:[E721 15:24:29.668537001 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 8] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 5, last completed NCCL work: 4.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank8]:[E721 15:24:29.669246407 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 8] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank14]:[E721 15:24:29.758710074 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 14] Observed flight recorder dump signal from another rank via TCPStore.
+[rank14]:[E721 15:24:29.759337475 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 14] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 5, last completed NCCL work: 4.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank14]:[E721 15:24:29.760510224 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 14] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank9]:[E721 15:24:29.783663458 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 9] Observed flight recorder dump signal from another rank via TCPStore.
+[rank9]:[E721 15:24:29.784353247 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 9] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 5, last completed NCCL work: 4.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank9]:[E721 15:24:29.784838510 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 9] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank12]:[E721 15:24:29.789999197 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 12] Observed flight recorder dump signal from another rank via TCPStore.
+[rank15]:[E721 15:24:29.789992104 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 15] Observed flight recorder dump signal from another rank via TCPStore.
+[rank15]:[E721 15:24:29.790444646 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 15] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 5, last completed NCCL work: 4.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank12]:[E721 15:24:29.790551848 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 12] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 5, last completed NCCL work: 4.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank15]:[E721 15:24:29.791261945 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 15] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank12]:[E721 15:24:29.793407314 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 12] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank10]:[E721 15:24:30.832141745 ProcessGroupNCCL.cpp:1849] [PG ID 0 PG GUID 0(default_pg) Rank 10] Observed flight recorder dump signal from another rank via TCPStore.
+[rank10]:[E721 15:24:30.832633421 ProcessGroupNCCL.cpp:1914] [PG ID 0 PG GUID 0(default_pg) Rank 10] Received a dump signal due to a collective timeout from  rank 0 and we will try our best to dump the debug info. Last enqueued NCCL work: 5, last completed NCCL work: 4.This is most likely caused by incorrect usages of collectives, e.g., wrong sizes used across ranks, the order of collectives is not same for all ranks or the scheduled collective, for some reason, didn't run. Additionally, this can be caused by GIL deadlock or other reasons such as network errors or bugs in the communications library (e.g. NCCL), etc. 
+[rank10]:[E721 15:24:30.833208223 ProcessGroupNCCL.cpp:1628] [PG ID 0 PG GUID 0(default_pg) Rank 10] ProcessGroupNCCL preparing to dump debug info. Include stack trace: 1, only active collectives: 0
+[rank10]:[E721 15:24:30.585056684 ProcessGroupNCCL.cpp:689] [Rank 10] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=5, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=1800000) ran for 1800049 milliseconds before timing out.
+[rank10]:[E721 15:24:30.585222987 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 10]  failure detected by watchdog at work sequence id: 5 PG status: last enqueued work: 5, last completed work: 4
+[rank10]:[E721 15:24:30.585609805 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 barrier from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:5030
+#1 wrapper from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 main from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1036
+#3 <module> from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1293
+
+[rank11]:[E721 15:24:30.586327306 ProcessGroupNCCL.cpp:689] [Rank 11] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=5, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=1800000) ran for 1800053 milliseconds before timing out.
+[rank11]:[E721 15:24:30.586496284 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 11]  failure detected by watchdog at work sequence id: 5 PG status: last enqueued work: 5, last completed work: 4
+[rank11]:[E721 15:24:30.586890597 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 barrier from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:5030
+#1 wrapper from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 main from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1036
+#3 <module> from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1293
+
+[rank13]:[E721 15:24:30.626946516 ProcessGroupNCCL.cpp:689] [Rank 13] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=5, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=1800000) ran for 1800031 milliseconds before timing out.
+[rank13]:[E721 15:24:30.627200384 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 13]  failure detected by watchdog at work sequence id: 5 PG status: last enqueued work: 5, last completed work: 4
+[rank13]:[E721 15:24:30.627717547 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 barrier from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:5030
+#1 wrapper from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 main from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1036
+#3 <module> from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1293
+
+[rank8]:[E721 15:24:30.688159560 ProcessGroupNCCL.cpp:689] [Rank 8] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=5, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=1800000) ran for 1800092 milliseconds before timing out.
+[rank8]:[E721 15:24:30.688296367 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 8]  failure detected by watchdog at work sequence id: 5 PG status: last enqueued work: 5, last completed work: 4
+[rank8]:[E721 15:24:30.688670953 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 barrier from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:5030
+#1 wrapper from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 main from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1036
+#3 <module> from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1293
+
+[rank15]:[E721 15:24:30.709313980 ProcessGroupNCCL.cpp:689] [Rank 15] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=5, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=1800000) ran for 1800037 milliseconds before timing out.
+[rank15]:[E721 15:24:30.709457661 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 15]  failure detected by watchdog at work sequence id: 5 PG status: last enqueued work: 5, last completed work: 4
+[rank15]:[E721 15:24:30.709883132 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 barrier from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:5030
+#1 wrapper from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 main from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1036
+#3 <module> from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1293
+
+[rank12]:[E721 15:24:31.809318423 ProcessGroupNCCL.cpp:689] [Rank 12] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=5, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=1800000) ran for 1800052 milliseconds before timing out.
+[rank12]:[E721 15:24:31.809409063 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 12]  failure detected by watchdog at work sequence id: 5 PG status: last enqueued work: 5, last completed work: 4
+[rank12]:[E721 15:24:31.809764723 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 barrier from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:5030
+#1 wrapper from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 main from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1036
+#3 <module> from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1293
+
+[rank9]:[E721 15:24:31.924448472 ProcessGroupNCCL.cpp:689] [Rank 9] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=5, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=1800000) ran for 1800091 milliseconds before timing out.
+[rank9]:[E721 15:24:31.924670971 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 9]  failure detected by watchdog at work sequence id: 5 PG status: last enqueued work: 5, last completed work: 4
+[rank9]:[E721 15:24:31.925250332 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 barrier from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:5030
+#1 wrapper from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 main from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1036
+#3 <module> from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1293
+
+[rank14]:[E721 15:24:31.092283917 ProcessGroupNCCL.cpp:689] [Rank 14] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=5, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=1800000) ran for 1800082 milliseconds before timing out.
+[rank14]:[E721 15:24:31.092425183 ProcessGroupNCCL.cpp:2303] [PG ID 0 PG GUID 0(default_pg) Rank 14]  failure detected by watchdog at work sequence id: 5 PG status: last enqueued work: 5, last completed work: 4
+[rank14]:[E721 15:24:31.092913172 ProcessGroupNCCL.cpp:733] Stack trace of the failed collective: 
+#0 barrier from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/distributed_c10d.py:5030
+#1 wrapper from /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83
+#2 main from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1036
+#3 <module> from /home/cysic/e0f-runtime/e0ef2e_golden_gate.py:1293
+
+[rank11]:[F721 15:32:29.436816790 ProcessGroupNCCL.cpp:1653] [PG ID 0 PG GUID 0(default_pg) Rank 11] [PG ID 0 PG GUID 0(default_pg) Rank 11] Terminating the process after attempting to dump debug info, due to collective timeout or exception.
+[rank13]:[F721 15:32:29.530109560 ProcessGroupNCCL.cpp:1653] [PG ID 0 PG GUID 0(default_pg) Rank 13] [PG ID 0 PG GUID 0(default_pg) Rank 13] Terminating the process after attempting to dump debug info, due to collective timeout or exception.
+[rank8]:[F721 15:32:29.671040558 ProcessGroupNCCL.cpp:1653] [PG ID 0 PG GUID 0(default_pg) Rank 8] [PG ID 0 PG GUID 0(default_pg) Rank 8] Terminating the process after attempting to dump debug info, due to collective timeout or exception.
+[rank14]:[F721 15:32:29.762300942 ProcessGroupNCCL.cpp:1653] [PG ID 0 PG GUID 0(default_pg) Rank 14] [PG ID 0 PG GUID 0(default_pg) Rank 14] Terminating the process after attempting to dump debug info, due to collective timeout or exception.
+[rank9]:[F721 15:32:29.786433169 ProcessGroupNCCL.cpp:1653] [PG ID 0 PG GUID 0(default_pg) Rank 9] [PG ID 0 PG GUID 0(default_pg) Rank 9] Terminating the process after attempting to dump debug info, due to collective timeout or exception.
+[rank15]:[F721 15:32:29.793703572 ProcessGroupNCCL.cpp:1653] [PG ID 0 PG GUID 0(default_pg) Rank 15] [PG ID 0 PG GUID 0(default_pg) Rank 15] Terminating the process after attempting to dump debug info, due to collective timeout or exception.
+[rank12]:[F721 15:32:29.794715792 ProcessGroupNCCL.cpp:1653] [PG ID 0 PG GUID 0(default_pg) Rank 12] [PG ID 0 PG GUID 0(default_pg) Rank 12] Terminating the process after attempting to dump debug info, due to collective timeout or exception.
+[rank10]:[F721 15:32:30.834569392 ProcessGroupNCCL.cpp:1653] [PG ID 0 PG GUID 0(default_pg) Rank 10] [PG ID 0 PG GUID 0(default_pg) Rank 10] Terminating the process after attempting to dump debug info, due to collective timeout or exception.
+W0721 15:33:00.073000 194613 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 194702 closing signal SIGTERM
+W0721 15:33:00.077000 194613 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 194703 closing signal SIGTERM
+W0721 15:33:00.077000 194613 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 194704 closing signal SIGTERM
+W0721 15:33:00.077000 194613 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 194705 closing signal SIGTERM
+W0721 15:33:00.077000 194613 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 194706 closing signal SIGTERM
+W0721 15:33:00.077000 194613 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 194708 closing signal SIGTERM
+W0721 15:33:00.077000 194613 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 194709 closing signal SIGTERM
+E0721 15:33:21.986000 194613 torch/distributed/elastic/multiprocessing/api.py:986] failed (exitcode: -6) local_rank: 5 (pid: 194707) of binary: /home/cysic/Workspace/venvs/sglang/bin/python3
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 317, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+=======================================================
+e0ef2e_golden_gate.py FAILED
+-------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-07-21_15:33:21
+  host      : titan065
+  rank      : 8 (local_rank: 0)
+  exitcode  : -6 (pid: 194702)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 194702
+[2]:
+  time      : 2026-07-21_15:33:21
+  host      : titan065
+  rank      : 9 (local_rank: 1)
+  exitcode  : -6 (pid: 194703)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 194703
+[3]:
+  time      : 2026-07-21_15:33:21
+  host      : titan065
+  rank      : 10 (local_rank: 2)
+  exitcode  : -6 (pid: 194704)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 194704
+[4]:
+  time      : 2026-07-21_15:33:21
+  host      : titan065
+  rank      : 11 (local_rank: 3)
+  exitcode  : -6 (pid: 194705)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 194705
+[5]:
+  time      : 2026-07-21_15:33:21
+  host      : titan065
+  rank      : 12 (local_rank: 4)
+  exitcode  : -6 (pid: 194706)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 194706
+[6]:
+  time      : 2026-07-21_15:33:21
+  host      : titan065
+  rank      : 14 (local_rank: 6)
+  exitcode  : -6 (pid: 194708)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 194708
+[7]:
+  time      : 2026-07-21_15:33:21
+  host      : titan065
+  rank      : 15 (local_rank: 7)
+  exitcode  : -6 (pid: 194709)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 194709
+-------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-21_15:33:00
+  host      : titan065
+  rank      : 13 (local_rank: 5)
+  exitcode  : -6 (pid: 194707)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 194707
+=======================================================
