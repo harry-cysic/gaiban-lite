@@ -1,0 +1,243 @@
+{
+  "accepted": false,
+  "checkpoint_id": "0f57df0e1512f16f1788fb80389e4f3131706acf03c30bbce166879e97f8db0d",
+  "device": "NVIDIA GeForce RTX 4090",
+  "diagnostic_seconds": {
+    "process": 4.215085920877755
+  },
+  "errors": [
+    "Traceback (most recent call last):\n  File \"/home/cysic/e0f-runtime/e0ef2e_golden_gate.py\", line 946, in main\n    raise ValueError(\nValueError: --max-seq-len 4224 too small: longest prompt + compared decode steps needs 8255\n"
+  ],
+  "experiment": "E0e2e-tp4-pp4-golden-token-gate",
+  "fuse_min_seqlen": 1024,
+  "global_row_shapes": [
+    4,
+    4096,
+    8192,
+    16384,
+    32768
+  ],
+  "host": "titan064",
+  "indexer_kv_dtype": "bf16",
+  "kv_dtype": "bf16",
+  "local_rank": 5,
+  "max_seq_len": 4224,
+  "measurement_class": "semantic_e2e_golden_token_gate",
+  "modes": [
+    "eager"
+  ],
+  "moe_input_dtype": "bf16",
+  "nccl_env": {
+    "NCCL_IB_DISABLE": "0",
+    "NCCL_NET_GDR_LEVEL": null,
+    "NCCL_P2P_LEVEL": "SYS",
+    "NCCL_SOCKET_IFNAME": "enp33s0f0"
+  },
+  "placement": {
+    "accepted": true,
+    "ranks": [
+      {
+        "host": "titan064",
+        "local_rank": 0,
+        "rank": 0,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 1,
+        "rank": 1,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 2,
+        "rank": 2,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 3,
+        "rank": 3,
+        "stage": 0
+      },
+      {
+        "host": "titan064",
+        "local_rank": 4,
+        "rank": 4,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 5,
+        "rank": 5,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 6,
+        "rank": 6,
+        "stage": 1
+      },
+      {
+        "host": "titan064",
+        "local_rank": 7,
+        "rank": 7,
+        "stage": 1
+      },
+      {
+        "host": "titan065",
+        "local_rank": 0,
+        "rank": 8,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 1,
+        "rank": 9,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 2,
+        "rank": 10,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 3,
+        "rank": 11,
+        "stage": 2
+      },
+      {
+        "host": "titan065",
+        "local_rank": 4,
+        "rank": 12,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 5,
+        "rank": 13,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 6,
+        "rank": 14,
+        "stage": 3
+      },
+      {
+        "host": "titan065",
+        "local_rank": 7,
+        "rank": 15,
+        "stage": 3
+      }
+    ],
+    "stage_hosts": {
+      "0": [
+        "titan064"
+      ],
+      "1": [
+        "titan064"
+      ],
+      "2": [
+        "titan065"
+      ],
+      "3": [
+        "titan065"
+      ]
+    }
+  },
+  "prefill_chunk": 0,
+  "prompt_lengths": [
+    1024,
+    1024,
+    1024,
+    2048,
+    2048,
+    2048,
+    4096,
+    4096,
+    8192,
+    8192
+  ],
+  "prompt_results": {},
+  "rank": 5,
+  "ratio4_index_mode": "ref",
+  "schema_version": 1,
+  "share_moe_buffers": true,
+  "stage": 1,
+  "stage_layer_ids": {
+    "0": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "1": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "2": [
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "3": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42
+    ]
+  },
+  "tokenizer_preflight": {
+    "accepted": true,
+    "eos_token_id": 1
+  },
+  "torch": "2.11.0+cu130",
+  "tp_group_binding": {
+    "backend": "nccl",
+    "global_rank": 5,
+    "global_ranks": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "local_rank": 1,
+    "validated_live": true,
+    "world_size": 4
+  },
+  "tp_rank": 1,
+  "world": 16
+}

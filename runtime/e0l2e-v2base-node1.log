@@ -1,0 +1,236 @@
+W0721 13:54:15.941000 190392 torch/distributed/run.py:851] 
+W0721 13:54:15.941000 190392 torch/distributed/run.py:851] *****************************************
+W0721 13:54:15.941000 190392 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 13:54:15.941000 190392 torch/distributed/run.py:851] *****************************************
+[E0e2e] layer=22 rank=0 experts=64/256
+[E0e2e] layer=22 rank=0 experts=128/256
+[E0e2e] layer=33 rank=0 experts=64/256
+[E0e2e] layer=22 rank=0 experts=192/256
+[E0e2e] layer=33 rank=0 experts=128/256
+[E0e2e] layer=22 rank=0 experts=256/256
+[E0e2e] layer=33 rank=0 experts=192/256
+[E0e2e] stage 2 layer 22 material loaded
+[E0e2e] layer=33 rank=0 experts=256/256
+[E0e2e] stage 3 layer 33 material loaded
+[E0e2e] layer=23 rank=0 experts=64/256
+[E0e2e] layer=23 rank=0 experts=128/256
+[E0e2e] layer=34 rank=0 experts=64/256
+[E0e2e] layer=23 rank=0 experts=192/256
+[E0e2e] layer=34 rank=0 experts=128/256
+[E0e2e] layer=23 rank=0 experts=256/256
+[E0e2e] stage 2 layer 23 material loaded
+[E0e2e] layer=34 rank=0 experts=192/256
+[E0e2e] layer=34 rank=0 experts=256/256
+[E0e2e] stage 3 layer 34 material loaded
+[E0e2e] layer=24 rank=0 experts=64/256
+[E0e2e] layer=24 rank=0 experts=128/256
+[E0e2e] layer=35 rank=0 experts=64/256
+[E0e2e] layer=24 rank=0 experts=192/256
+[E0e2e] layer=35 rank=0 experts=128/256
+[E0e2e] layer=24 rank=0 experts=256/256
+[E0e2e] stage 2 layer 24 material loaded
+[E0e2e] layer=35 rank=0 experts=192/256
+[E0e2e] layer=35 rank=0 experts=256/256
+[E0e2e] layer=25 rank=0 experts=64/256
+[E0e2e] stage 3 layer 35 material loaded
+[E0e2e] layer=25 rank=0 experts=128/256
+[E0e2e] layer=25 rank=0 experts=192/256
+[E0e2e] layer=36 rank=0 experts=64/256
+[E0e2e] layer=25 rank=0 experts=256/256
+[E0e2e] stage 2 layer 25 material loaded
+[E0e2e] layer=36 rank=0 experts=128/256
+[E0e2e] layer=36 rank=0 experts=192/256
+[E0e2e] layer=26 rank=0 experts=64/256
+[E0e2e] layer=36 rank=0 experts=256/256
+[E0e2e] stage 3 layer 36 material loaded
+[E0e2e] layer=26 rank=0 experts=128/256
+[E0e2e] layer=26 rank=0 experts=192/256
+[E0e2e] layer=37 rank=0 experts=64/256
+[E0e2e] layer=26 rank=0 experts=256/256
+[E0e2e] stage 2 layer 26 material loaded
+[E0e2e] layer=37 rank=0 experts=128/256
+[E0e2e] layer=37 rank=0 experts=192/256
+[E0e2e] layer=27 rank=0 experts=64/256
+[E0e2e] layer=37 rank=0 experts=256/256
+[E0e2e] layer=27 rank=0 experts=128/256
+[E0e2e] stage 3 layer 37 material loaded
+[E0e2e] layer=27 rank=0 experts=192/256
+[E0e2e] layer=27 rank=0 experts=256/256
+[E0e2e] stage 2 layer 27 material loaded
+[E0e2e] layer=38 rank=0 experts=64/256
+[E0e2e] layer=38 rank=0 experts=128/256
+[E0e2e] layer=28 rank=0 experts=64/256
+[E0e2e] layer=38 rank=0 experts=192/256
+[E0e2e] layer=28 rank=0 experts=128/256
+[E0e2e] layer=38 rank=0 experts=256/256
+[E0e2e] stage 3 layer 38 material loaded
+[E0e2e] layer=28 rank=0 experts=192/256
+[E0e2e] layer=28 rank=0 experts=256/256
+[E0e2e] stage 2 layer 28 material loaded
+[E0e2e] layer=39 rank=0 experts=64/256
+[E0e2e] layer=39 rank=0 experts=128/256
+[E0e2e] layer=29 rank=0 experts=64/256
+[E0e2e] layer=39 rank=0 experts=192/256
+[E0e2e] layer=29 rank=0 experts=128/256
+[E0e2e] layer=39 rank=0 experts=256/256
+[E0e2e] layer=29 rank=0 experts=192/256
+[E0e2e] stage 3 layer 39 material loaded
+[E0e2e] layer=29 rank=0 experts=256/256
+[E0e2e] stage 2 layer 29 material loaded
+[E0e2e] layer=40 rank=0 experts=64/256
+[E0e2e] layer=30 rank=0 experts=64/256
+[E0e2e] layer=40 rank=0 experts=128/256
+[E0e2e] layer=30 rank=0 experts=128/256
+[E0e2e] layer=40 rank=0 experts=192/256
+[E0e2e] layer=30 rank=0 experts=192/256
+[E0e2e] layer=40 rank=0 experts=256/256
+[E0e2e] layer=30 rank=0 experts=256/256
+[E0e2e] stage 3 layer 40 material loaded
+[E0e2e] stage 2 layer 30 material loaded
+[E0e2e] layer=41 rank=0 experts=64/256
+[E0e2e] layer=31 rank=0 experts=64/256
+[E0e2e] layer=41 rank=0 experts=128/256
+[E0e2e] layer=31 rank=0 experts=128/256
+[E0e2e] layer=31 rank=0 experts=192/256
+[E0e2e] layer=41 rank=0 experts=192/256
+[E0e2e] layer=31 rank=0 experts=256/256
+[E0e2e] layer=41 rank=0 experts=256/256
+[E0e2e] stage 2 layer 31 material loaded
+[E0e2e] stage 3 layer 41 material loaded
+[E0e2e] layer=32 rank=0 experts=64/256
+[E0e2e] layer=42 rank=0 experts=64/256
+[E0e2e] layer=32 rank=0 experts=128/256
+[E0e2e] layer=42 rank=0 experts=128/256
+[E0e2e] layer=32 rank=0 experts=192/256
+[E0e2e] layer=42 rank=0 experts=192/256
+[E0e2e] layer=32 rank=0 experts=256/256
+[E0e2e] stage 2 layer 32 material loaded
+[E0e2e] stage 2 loaded (11 layers, free 4.82 GiB, 12s)
+[E0e2e] layer=42 rank=0 experts=256/256
+[E0e2e] stage 3 layer 42 material loaded
+[E0e2e] stage 3 loaded (10 layers, free 3.11 GiB, 12s)
+[rank14]:[W721 14:16:05.846223929 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=94, addr=[titan065]:45634, remote=[::ffff:10.234.1.64]:29659): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x79a33277305d in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x6a914bd (0x79a29b8914bd in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x273 (0x79a29b88f413 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x4a5 (0x79a27deff8c5 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x79a302aecdb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x79a333e9caa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x79a333f29c6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank14]:[W721 14:16:05.268839447 ProcessGroupNCCL.cpp:1826] [PG ID 0 PG GUID 0(default_pg) Rank 14] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+[rank15]:[W721 14:16:05.896451455 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=94, addr=[titan065]:45682, remote=[::ffff:10.234.1.64]:29659): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7be35757305d in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x6a914bd (0x7be2c02914bd in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x273 (0x7be2c028f413 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x4a5 (0x7be2a28ff8c5 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x7be3274ecdb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x7be358a9caa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x7be358b29c6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank13]:[W721 14:16:05.847304006 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=94, addr=[titan065]:45656, remote=[::ffff:10.234.1.64]:29659): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x703a4617305d in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x6a914bd (0x7039af2914bd in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x273 (0x7039af28f413 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x4a5 (0x7039918ff8c5 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x703a164ecdb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x703a4789caa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x703a47929c6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank11]:[W721 14:16:05.843665277 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=94, addr=[titan065]:45646, remote=[::ffff:10.234.1.64]:29659): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x79389df7305d in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x6a914bd (0x793806c914bd in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x273 (0x793806c8f413 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x4a5 (0x7937e92ff8c5 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x79386deecdb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x79389f49caa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x79389f529c6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank8]:[W721 14:16:05.896505934 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=94, addr=[titan065]:45672, remote=[::ffff:10.234.1.64]:29659): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7c33c3b7305d in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x6a914bd (0x7c332c8914bd in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x273 (0x7c332c88f413 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x4a5 (0x7c330eeff8c5 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x7c3393aecdb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x7c33c509caa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x7c33c5129c6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank15]:[W721 14:16:05.269368866 ProcessGroupNCCL.cpp:1826] [PG ID 0 PG GUID 0(default_pg) Rank 15] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+[rank13]:[W721 14:16:05.269372382 ProcessGroupNCCL.cpp:1826] [PG ID 0 PG GUID 0(default_pg) Rank 13] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+[rank8]:[W721 14:16:05.269477274 ProcessGroupNCCL.cpp:1826] [PG ID 0 PG GUID 0(default_pg) Rank 8] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+[rank11]:[W721 14:16:05.269529911 ProcessGroupNCCL.cpp:1826] [PG ID 0 PG GUID 0(default_pg) Rank 11] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+[rank9]:[W721 14:16:04.423908612 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=94, addr=[titan065]:45626, remote=[::ffff:10.234.1.64]:29659): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x7dba0857305d in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x6a914bd (0x7db9716914bd in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x273 (0x7db97168f413 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x4a5 (0x7db953cff8c5 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x7db9d88ecdb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x7dba09c9caa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x7dba09d29c6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank9]:[W721 14:16:05.269657704 ProcessGroupNCCL.cpp:1826] [PG ID 0 PG GUID 0(default_pg) Rank 9] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+[rank12]:[W721 14:16:05.923615304 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=94, addr=[titan065]:45684, remote=[::ffff:10.234.1.64]:29659): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x795ac397305d in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x6a914bd (0x795a2c6914bd in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x273 (0x795a2c68f413 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x4a5 (0x795a0ecff8c5 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x795a938ecdb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x795ac4e9caa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x795ac4f29c6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank12]:[W721 14:16:05.269812357 ProcessGroupNCCL.cpp:1826] [PG ID 0 PG GUID 0(default_pg) Rank 12] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+[rank10]:[W721 14:16:05.961748587 TCPStore.cpp:125] [c10d] recvValue failed on SocketImpl(fd=94, addr=[titan065]:45674, remote=[::ffff:10.234.1.64]:29659): Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+Exception raised from recvBytes at /pytorch/torch/csrc/distributed/c10d/Utils.hpp:682 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) + 0x9d (0x75f96577305d in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0x6a914bd (0x75f8ce4914bd in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #2: c10d::TCPStore::check(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) + 0x273 (0x75f8ce48f413 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so)
+frame #3: c10d::ProcessGroupNCCL::HeartbeatMonitor::runLoop() + 0x4a5 (0x75f8b0aff8c5 in /home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0xecdb4 (0x75f9356ecdb4 in /lib/x86_64-linux-gnu/libstdc++.so.6)
+frame #5: <unknown function> + 0x9caa4 (0x75f966c9caa4 in /lib/x86_64-linux-gnu/libc.so.6)
+frame #6: <unknown function> + 0x129c6c (0x75f966d29c6c in /lib/x86_64-linux-gnu/libc.so.6)
+
+[rank10]:[W721 14:16:05.270031398 ProcessGroupNCCL.cpp:1826] [PG ID 0 PG GUID 0(default_pg) Rank 10] Failed to check the "should dump" flag on TCPStore, (maybe TCPStore server has shut down too early), with error: Failed to recv, got 0 bytes. Connection was likely closed. Did the remote server shutdown or crash?
+W0721 14:16:05.734000 190392 torch/distributed/elastic/agent/server/api.py:739] Received 15 death signal, shutting down workers
+W0721 14:16:05.738000 190392 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 190481 closing signal SIGTERM
+W0721 14:16:05.740000 190392 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 190482 closing signal SIGTERM
+W0721 14:16:05.740000 190392 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 190483 closing signal SIGTERM
+W0721 14:16:05.740000 190392 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 190484 closing signal SIGTERM
+W0721 14:16:05.740000 190392 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 190485 closing signal SIGTERM
+W0721 14:16:05.740000 190392 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 190486 closing signal SIGTERM
+W0721 14:16:05.740000 190392 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 190487 closing signal SIGTERM
+W0721 14:16:05.740000 190392 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 190488 closing signal SIGTERM
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 308, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/metrics/api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 731, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 908, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 86, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 190392 got signal: 15

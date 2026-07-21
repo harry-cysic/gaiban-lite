@@ -1,0 +1,255 @@
+W0721 14:20:48.793000 243690 torch/distributed/run.py:851] 
+W0721 14:20:48.793000 243690 torch/distributed/run.py:851] *****************************************
+W0721 14:20:48.793000 243690 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 14:20:48.793000 243690 torch/distributed/run.py:851] *****************************************
+[E0e2e] placement {0: ['titan064'], 1: ['titan064'], 2: ['titan065'], 3: ['titan065']}
+[transformers] Unrecognized keys in `rope_parameters` for 'rope_type'='default': {'attention_factor'}
+[E0e2e] layer=0 rank=0 experts=64/256
+[E0e2e] layer=0 rank=0 experts=128/256
+[E0e2e] layer=0 rank=0 experts=192/256
+[E0e2e] layer=0 rank=0 experts=256/256
+[E0e2e] stage 0 layer 0 material loaded
+[E0e2e] layer=1 rank=0 experts=64/256
+[E0e2e] layer=1 rank=0 experts=128/256
+[E0e2e] layer=1 rank=0 experts=192/256
+[E0e2e] layer=1 rank=0 experts=256/256
+[E0e2e] stage 0 layer 1 material loaded
+[E0e2e] layer=11 rank=0 experts=64/256
+[E0e2e] layer=2 rank=0 experts=64/256
+[E0e2e] layer=11 rank=0 experts=128/256
+[E0e2e] layer=2 rank=0 experts=128/256
+[E0e2e] layer=11 rank=0 experts=192/256
+[E0e2e] layer=2 rank=0 experts=192/256
+[E0e2e] layer=2 rank=0 experts=256/256
+[E0e2e] layer=11 rank=0 experts=256/256
+[E0e2e] stage 0 layer 2 material loaded
+[E0e2e] stage 1 layer 11 material loaded
+[E0e2e] layer=3 rank=0 experts=64/256
+[E0e2e] layer=12 rank=0 experts=64/256
+[E0e2e] layer=3 rank=0 experts=128/256
+[E0e2e] layer=12 rank=0 experts=128/256
+[E0e2e] layer=3 rank=0 experts=192/256
+[E0e2e] layer=12 rank=0 experts=192/256
+[E0e2e] layer=3 rank=0 experts=256/256
+[E0e2e] layer=12 rank=0 experts=256/256
+[E0e2e] stage 0 layer 3 material loaded
+[E0e2e] stage 1 layer 12 material loaded
+[E0e2e] layer=4 rank=0 experts=64/256
+[E0e2e] layer=13 rank=0 experts=64/256
+[E0e2e] layer=4 rank=0 experts=128/256
+[E0e2e] layer=13 rank=0 experts=128/256
+[E0e2e] layer=4 rank=0 experts=192/256
+[E0e2e] layer=13 rank=0 experts=192/256
+[E0e2e] layer=4 rank=0 experts=256/256
+[E0e2e] stage 0 layer 4 material loaded
+[E0e2e] layer=13 rank=0 experts=256/256
+[E0e2e] stage 1 layer 13 material loaded
+[E0e2e] layer=5 rank=0 experts=64/256
+[E0e2e] layer=14 rank=0 experts=64/256
+[E0e2e] layer=5 rank=0 experts=128/256
+[E0e2e] layer=14 rank=0 experts=128/256
+[E0e2e] layer=5 rank=0 experts=192/256
+[E0e2e] layer=14 rank=0 experts=192/256
+[E0e2e] layer=5 rank=0 experts=256/256
+[E0e2e] stage 0 layer 5 material loaded
+[E0e2e] layer=14 rank=0 experts=256/256
+[E0e2e] stage 1 layer 14 material loaded
+[E0e2e] layer=6 rank=0 experts=64/256
+[E0e2e] layer=15 rank=0 experts=64/256
+[E0e2e] layer=6 rank=0 experts=128/256
+[E0e2e] layer=15 rank=0 experts=128/256
+[E0e2e] layer=6 rank=0 experts=192/256
+[E0e2e] layer=15 rank=0 experts=192/256
+[E0e2e] layer=6 rank=0 experts=256/256
+[E0e2e] stage 0 layer 6 material loaded
+[E0e2e] layer=15 rank=0 experts=256/256
+[E0e2e] stage 1 layer 15 material loaded
+[E0e2e] layer=7 rank=0 experts=64/256
+[E0e2e] layer=16 rank=0 experts=64/256
+[E0e2e] layer=7 rank=0 experts=128/256
+[E0e2e] layer=16 rank=0 experts=128/256
+[E0e2e] layer=7 rank=0 experts=192/256
+[E0e2e] layer=7 rank=0 experts=256/256
+[E0e2e] layer=16 rank=0 experts=192/256
+[E0e2e] stage 0 layer 7 material loaded
+[E0e2e] layer=16 rank=0 experts=256/256
+[E0e2e] stage 1 layer 16 material loaded
+[E0e2e] layer=8 rank=0 experts=64/256
+[E0e2e] layer=8 rank=0 experts=128/256
+[E0e2e] layer=17 rank=0 experts=64/256
+[E0e2e] layer=8 rank=0 experts=192/256
+[E0e2e] layer=17 rank=0 experts=128/256
+[E0e2e] layer=8 rank=0 experts=256/256
+[E0e2e] layer=17 rank=0 experts=192/256
+[E0e2e] stage 0 layer 8 material loaded
+[E0e2e] layer=17 rank=0 experts=256/256
+[E0e2e] stage 1 layer 17 material loaded
+[E0e2e] layer=9 rank=0 experts=64/256
+[E0e2e] layer=9 rank=0 experts=128/256
+[E0e2e] layer=18 rank=0 experts=64/256
+[E0e2e] layer=9 rank=0 experts=192/256
+[E0e2e] layer=18 rank=0 experts=128/256
+[E0e2e] layer=9 rank=0 experts=256/256
+[E0e2e] layer=18 rank=0 experts=192/256
+[E0e2e] stage 0 layer 9 material loaded
+[E0e2e] layer=18 rank=0 experts=256/256
+[E0e2e] stage 1 layer 18 material loaded
+[E0e2e] layer=10 rank=0 experts=64/256
+[E0e2e] layer=10 rank=0 experts=128/256
+[E0e2e] layer=19 rank=0 experts=64/256
+[E0e2e] layer=10 rank=0 experts=192/256
+[E0e2e] layer=19 rank=0 experts=128/256
+[E0e2e] layer=10 rank=0 experts=256/256
+[E0e2e] stage 0 layer 10 material loaded
+[E0e2e] layer=19 rank=0 experts=192/256
+[E0e2e] stage 0 loaded (11 layers, free 0.21 GiB, 11s)
+[E0e2e] layer=19 rank=0 experts=256/256
+[E0e2e] stage 1 layer 19 material loaded
+[E0e2e] layer=20 rank=0 experts=64/256
+[E0e2e] layer=20 rank=0 experts=128/256
+[E0e2e] layer=20 rank=0 experts=192/256
+[E0e2e] layer=20 rank=0 experts=256/256
+[E0e2e] stage 1 layer 20 material loaded
+[E0e2e] layer=21 rank=0 experts=64/256
+[E0e2e] layer=21 rank=0 experts=128/256
+[E0e2e] layer=21 rank=0 experts=192/256
+[E0e2e] layer=21 rank=0 experts=256/256
+[E0e2e] stage 1 layer 21 material loaded
+[E0e2e] stage 1 loaded (11 layers, free 4.80 GiB, 12s)
+[E0e2e][rank 0] FAILED (run will now deadlock on the next collective -- kill it):
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 1059, in main
+    record = run_prompt(
+             ^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 507, in run_prompt
+    residual = lane.forward(
+               ^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 379, in forward
+    residual = self._layer_eager(
+               ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 276, in _layer_eager
+    branch = self._attention_branch(material, attention, hidden, start_pos)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 250, in _attention_branch
+    return attention(hidden, start_pos=start_pos)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_fullpos.py", line 949, in __call__
+    index_query = fp4_quant_dequant(hadamard_transform(index_query))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_attention.py", line 421, in fp4_quant_dequant
+    torch.full_like(magnitude, 2.0),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 32.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 19.88 MiB is free. Including non-PyTorch memory, this process has 23.49 GiB memory in use. Of the allocated memory 22.70 GiB is allocated by PyTorch, and 17.95 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E0e2e][rank 1] FAILED (run will now deadlock on the next collective -- kill it):
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 1059, in main
+    record = run_prompt(
+             ^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 507, in run_prompt
+    residual = lane.forward(
+               ^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 379, in forward
+    residual = self._layer_eager(
+               ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 276, in _layer_eager
+    branch = self._attention_branch(material, attention, hidden, start_pos)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 250, in _attention_branch
+    return attention(hidden, start_pos=start_pos)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_fullpos.py", line 949, in __call__
+    index_query = fp4_quant_dequant(hadamard_transform(index_query))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_attention.py", line 421, in fp4_quant_dequant
+    torch.full_like(magnitude, 2.0),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 32.00 MiB. GPU 1 has a total capacity of 23.52 GiB of which 19.88 MiB is free. Including non-PyTorch memory, this process has 23.49 GiB memory in use. Of the allocated memory 22.70 GiB is allocated by PyTorch, and 17.95 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E0e2e][rank 2] FAILED (run will now deadlock on the next collective -- kill it):
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 1059, in main
+    record = run_prompt(
+             ^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 507, in run_prompt
+    residual = lane.forward(
+               ^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 379, in forward
+    residual = self._layer_eager(
+               ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 276, in _layer_eager
+    branch = self._attention_branch(material, attention, hidden, start_pos)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 250, in _attention_branch
+    return attention(hidden, start_pos=start_pos)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_fullpos.py", line 949, in __call__
+    index_query = fp4_quant_dequant(hadamard_transform(index_query))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_attention.py", line 421, in fp4_quant_dequant
+    torch.full_like(magnitude, 2.0),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 32.00 MiB. GPU 2 has a total capacity of 23.52 GiB of which 19.88 MiB is free. Including non-PyTorch memory, this process has 23.49 GiB memory in use. Of the allocated memory 22.70 GiB is allocated by PyTorch, and 17.95 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+[E0e2e][rank 3] FAILED (run will now deadlock on the next collective -- kill it):
+Traceback (most recent call last):
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 1059, in main
+    record = run_prompt(
+             ^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 507, in run_prompt
+    residual = lane.forward(
+               ^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 379, in forward
+    residual = self._layer_eager(
+               ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 276, in _layer_eager
+    branch = self._attention_branch(material, attention, hidden, start_pos)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 250, in _attention_branch
+    return attention(hidden, start_pos=start_pos)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_fullpos.py", line 949, in __call__
+    index_query = fp4_quant_dequant(hadamard_transform(index_query))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/e0f-runtime/dsv4_direct/ratio4_attention.py", line 424, in fp4_quant_dequant
+    torch.full_like(magnitude, 3.0),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 32.00 MiB. GPU 3 has a total capacity of 23.52 GiB of which 7.88 MiB is free. Including non-PyTorch memory, this process has 23.50 GiB memory in use. Of the allocated memory 22.74 GiB is allocated by PyTorch, and 9.95 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+W0721 14:21:44.450000 243690 torch/distributed/elastic/agent/server/api.py:739] Received 15 death signal, shutting down workers
+W0721 14:21:44.455000 243690 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 243780 closing signal SIGTERM
+W0721 14:21:44.458000 243690 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 243781 closing signal SIGTERM
+W0721 14:21:44.462000 243690 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 243782 closing signal SIGTERM
+W0721 14:21:44.462000 243690 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 243783 closing signal SIGTERM
+W0721 14:21:44.462000 243690 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 243784 closing signal SIGTERM
+W0721 14:21:44.462000 243690 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 243785 closing signal SIGTERM
+W0721 14:21:44.462000 243690 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 243786 closing signal SIGTERM
+W0721 14:21:44.462000 243690 torch/distributed/elastic/multiprocessing/api.py:1012] Sending process 243787 closing signal SIGTERM
+Traceback (most recent call last):
+  File "/home/cysic/Workspace/venvs/sglang/bin/torchrun", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 990, in main
+    run(args)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/run.py", line 981, in run
+    elastic_launch(
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 308, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/metrics/api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 731, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 908, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/home/cysic/Workspace/venvs/sglang/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 86, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 243690 got signal: 15

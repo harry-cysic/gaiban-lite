@@ -1,0 +1,53 @@
+W0721 14:35:56.767000 245924 torch/distributed/run.py:851] 
+W0721 14:35:56.767000 245924 torch/distributed/run.py:851] *****************************************
+W0721 14:35:56.767000 245924 torch/distributed/run.py:851] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0721 14:35:56.767000 245924 torch/distributed/run.py:851] *****************************************
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+/home/cysic/d0l-gen/oracle_long_generate.py:121: FutureWarning: torch.cuda._set_allocator_settings is deprecated. Use torch._C._accelerator_setAllocatorSettings instead.
+  torch.cuda.memory._set_allocator_settings("expandable_segments:True")
+[D0L] 15/15 prompts, longest 4096 tokens, max_seq_len 4224, max_new_tokens 64
+[D0L] loaded: free 2.21 GiB / 23.52 GiB
+[D0L] prompt 0: 1024 prompt tokens -> 55 completion tokens in 17.8s (peak alloc 21.32 GiB, reserved 21.40 GiB, free 1.49 GiB)
+      上文讨论的是工程优化中针对“杠杆A”和“杠杆B”两个性能改进点的量化评估与决策建议，同时记录了多个意外发现，包括数值错误、边界敏感度被遮蔽、测试覆盖不足以及通信计算并发上限等关键问题。<｜end▁of▁sentence｜>
+[D0L] prompt 1: 1024 prompt tokens -> 65 completion tokens in 17.3s (peak alloc 21.32 GiB, reserved 21.40 GiB, free 1.49 GiB)
+      Based on the text, the main subject is the integration of **tilelang `sparse_attn`** into the **direct runtime's prefill path** for a deep learning model (likel
+[D0L] prompt 2: 1024 prompt tokens -> 65 completion tokens in 17.2s (peak alloc 21.32 GiB, reserved 21.40 GiB, free 1.49 GiB)
+      根据上文材料，主要困难可以归纳为以下三点：  1. **数值稳定性问题（边缘情况处理）**      - 全 padding 行会导致 raw kernel 输出 **32768 个非有限值**（NaN/Inf），而 torch 输出全 0。      - `-<｜end▁of▁sentence｜>
+[D0L] prompt 3: 1024 prompt tokens -> 40 completion tokens in 11.4s (peak alloc 21.32 GiB, reserved 21.40 GiB, free 1.49 GiB)
+      Based on the excerpt, one concrete number reported is:  **4.88e-4** (the max_abs value across all 11 test configurations in the single-operator gate test).<｜end
+[D0L] prompt 4: 1024 prompt tokens -> 65 completion tokens in 17.2s (peak alloc 21.32 GiB, reserved 21.40 GiB, free 1.49 GiB)
+      根据上文，可以得出的一个明确结论是：  **`sparse_control` 是唯一被显著推高的指标（从 1e-5 量级提升至 1.7e-3 量级），消耗了约 57–60% 的冻结预算，但仍留有约<｜end▁of▁sentence｜>
+[D0L] prompt 5: 1024 prompt tokens -> 65 completion tokens in 17.2s (peak alloc 21.32 GiB, reserved 21.40 GiB, free 1.49 GiB)
+      根据提供的技术文档摘录，描述的问题主要集中在 **tilelang kernel 在 ratio-128 层上的实现错误**，具体如下：  ## 核心问题  **首版 gate 实现中，ratio-128 / 滑窗层从进程级环境变量读取 backend 的方式存在错误**，<｜end▁of▁sentence｜>
+[D0L] prompt 6: 2048 prompt tokens -> 65 completion tokens in 17.7s (peak alloc 21.45 GiB, reserved 21.59 GiB, free 1.30 GiB)
+      根据上述实验记录节选，测量结果可概括如下：  ### 1. 核心性能对比（端到端） - **吞吐量提升**：tilelang 臂达到 **14,630 tok/s**，相比 torch 臂的 **11,424 tok/s**，提升 **1.<｜end▁of▁sentence｜>
+[D0L] prompt 7: 2048 prompt tokens -> 65 completion tokens in 17.7s (peak alloc 21.45 GiB, reserved 21.59 GiB, free 1.30 GiB)
+      Based on the engineering notes, the following was measured:  **1. Sparse Attention Kernel Performance (Layer-Level Savings)** - **ratio-4**: Predicted ~90 ms/la
+[D0L] prompt 8: 2048 prompt tokens -> 65 completion tokens in 17.7s (peak alloc 21.45 GiB, reserved 21.59 GiB, free 1.30 GiB)
+      基于上文内容，一个明确的**取舍**是：  **在诊断 MoE 性能问题时，作者放弃了“显存分配量（`max_memory_reserved`）”作为性能瓶颈的线索，转而聚焦于 NCCL 集合通信的 P2P 传输模式。**  具体来说：  - **放弃<｜end▁of▁sentence｜>
+[D0L] prompt 9: 2048 prompt tokens -> 65 completion tokens in 17.7s (peak alloc 21.45 GiB, reserved 21.59 GiB, free 1.30 GiB)
+      Based on the text, one trade-off discussed is between **numerical precision/performance** and **memory usage** in the `combine` operation of `TP4MoE.__call__`. 
+[D0L] prompt 10: 2048 prompt tokens -> 65 completion tokens in 17.6s (peak alloc 21.45 GiB, reserved 21.59 GiB, free 1.30 GiB)
+      根据您提供的工程文档，上文的主要发现可以总结为以下几点：  1.  **MoE 内存分配优化收益有限**：     -   被删除的 1.61 GiB 是 MoE 调用内的**瞬时**分配，不影响进程峰值内存（峰值由 stage load 和 attention<｜end▁of▁sentence｜>
+[D0L] prompt 11: 2048 prompt tokens -> 65 completion tokens in 17.7s (peak alloc 21.45 GiB, reserved 21.59 GiB, free 1.30 GiB)
+      Based on the provided text, the conclusion is that the **original capacity model was overly optimistic and has been corrected by empirical testing.**  The key f
+[D0L] prompt 12: 4096 prompt tokens -> 65 completion tokens in 18.6s (peak alloc 21.78 GiB, reserved 22.30 GiB, free 0.59 GiB)
+      这份工程文档节选主要汇报了在双机16卡环境下，针对MTP（Multi-Token Prediction）投机解码方案进行的多轮验证与性能测试结果。文档详细比较了“chained”（链式双pass）与“fused”（融合seqlen-2）两种验证形态，<｜end▁of▁sentence｜>
+[D0L] prompt 13: 4096 prompt tokens -> 65 completion tokens in 18.6s (peak alloc 21.78 GiB, reserved 22.30 GiB, free 0.59 GiB)
+      The technical notes describe experiments on speculative decoding (MTP) and FP8 KV cache optimization for large language model inference. Key findings include: c
+[D0L] prompt 14: 4096 prompt tokens -> 65 completion tokens in 18.6s (peak alloc 21.78 GiB, reserved 22.30 GiB, free 0.59 GiB)
+      上文最重要的一项结论是：  **12.5k tok/s 是 reference-op 未优化基线，不构成对 15–25k 目标区间的证伪；预估带能否回收取决于 fused MHC、fused Triton indexer、W8A16 attention 投影等三项资产在 Flash<｜end▁of▁sentence｜>
+WROTE oracle-indep.json
