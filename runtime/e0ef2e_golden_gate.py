@@ -231,6 +231,11 @@ class StageLane:
                     indexer_dtype=material.indexer_kv_dtype,
                     index_score_mode=ratio4_index_mode,
                     fuse_min_seqlen=fuse_min_seqlen,
+                    tp_group=(
+                        material.moe.group
+                        if getattr(material.attention_config, "tp_size", 1) > 1
+                        else None
+                    ),
                 )
             else:
                 state = material.new_state(num_local_sequences=LOCAL_BATCH)

@@ -183,6 +183,11 @@ class PrefillLane:
                     fuse_min_seqlen=fuse_min_seqlen,
                     sparse_row_block=sparse_row_block,
                     prefill_sparse_backend=prefill_sparse_backend,
+                    tp_group=(
+                        material.moe.group
+                        if getattr(material.attention_config, "tp_size", 1) > 1
+                        else None
+                    ),
                 )
             else:
                 state = material.new_state(num_local_sequences=LOCAL_BATCH)

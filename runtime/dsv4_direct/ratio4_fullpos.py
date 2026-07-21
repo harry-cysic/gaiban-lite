@@ -60,6 +60,7 @@ from __future__ import annotations
 import os
 
 import torch
+import torch.distributed as dist
 import torch.nn.functional as F
 
 from .attention import (
@@ -120,6 +121,7 @@ class Ratio4FullPositionAttention:
         prefill_sparse_backend: str | None = None,
         indexer_qat_mode: str | None = None,
         compressor_cast_mode: str | None = None,
+        tp_group: Any = None,
     ) -> None:
         config.validate()
         if index_score_mode not in ("ref", "fused", "paired_gate"):
@@ -181,6 +183,15 @@ class Ratio4FullPositionAttention:
         self.sparse_row_block = sparse_row_block
         self.prefill_sparse_backend = resolved_backend
         self.indexer_qat_mode = resolved_qat
+        # E6F variant A: prefill reads the same sharded o-path weights the
+        # decode classes do, so it needs the same reduce.  Refuse to run
+        # sharded without a group rather than returning a quarter of the answer.
+        if config.tp_size > 1 and tp_group is None:
+            raise ValueError(
+                f"tp_size={config.tp_size} requires a tp_group for the o-path "
+                "all-reduce"
+            )
+        self.tp_group = tp_group
         self.compressor_cast_mode = resolved_cast
         self.index_gate_records: list[dict] = []
         self.device = torch.device(device)
@@ -620,6 +631,22 @@ class Ratio4FullPositionAttention:
 
     phase_recorder = None
 
+    def _tp_reduce_output(self, output: torch.Tensor) -> torch.Tensor:
+        """Sum the per-rank o-path partials (E6F variant A, prefill).
+
+        ⚠️ The payload here is nothing like decode's.  At B=1 the reduce moves
+        8 KB; at a 8192-row prefill chunk it is 8192x4096 FP32 = 134 MB per
+        layer, 5.77 GB per forward across 43 layers.  The design note's
+        collective budget only ever costed decode, so the prefill cost is a
+        measurement this vertical still owes.
+        """
+
+        if self.config.tp_size == 1:
+            return output
+        buffer = output.float()
+        dist.all_reduce(buffer, op=dist.ReduceOp.SUM, group=self.tp_group)
+        return buffer.to(output.dtype)
+
     def _mark(self, name: str) -> None:
         recorder = self.phase_recorder
         if recorder is not None:
@@ -658,7 +685,7 @@ class Ratio4FullPositionAttention:
         )
         self._mark("q_wq_a_norm")
         query = F.linear(query_lora, weights.wq_b).reshape(
-            batch, seqlen, cfg.num_heads, cfg.head_dim
+            batch, seqlen, cfg.local_num_heads, cfg.head_dim
         )
         self._mark("q_wq_b")
         query *= torch.rsqrt(
@@ -1053,17 +1080,18 @@ class Ratio4FullPositionAttention:
         grouped = output.reshape(
             batch,
             seqlen,
-            cfg.o_groups,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.local_o_groups,
+            cfg.group_width,
         )
         wo_a = weights.wo_a.reshape(
-            cfg.o_groups,
+            cfg.local_o_groups,
             cfg.o_lora_rank,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.group_width,
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
         self._mark("wo_a_einsum")
         branch = F.linear(projected.flatten(2), weights.wo_b)
+        branch = self._tp_reduce_output(branch)
         self._mark("wo_b")
 
         self.next_position = start_pos + seqlen

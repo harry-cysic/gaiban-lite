@@ -1,0 +1,224 @@
+{
+  "allocator_backend": "native",
+  "argv": [
+    "c2f_prefill_stage_bench.py",
+    "--stage-root",
+    "/home/cysic/Workspace/DeepSeek-V4-Flash",
+    "--out-dir",
+    "out-e6f-pf-base",
+    "--chunk",
+    "1024",
+    "--moe-mode",
+    "w4a16",
+    "--indexer",
+    "fused"
+  ],
+  "attention_tp_shard": false,
+  "checkpoint_id": "49db58c5ed4cf8fcbb3493c52980595ba2b3ba881b4805a3679dca441974eb31",
+  "chunk": 1024,
+  "component_walls_s": {
+    "attention_ratio128": 0.041089003439992666,
+    "attention_ratio4": 0.07417231984436512,
+    "hc": 0.05704145575873554,
+    "moe": 0.071875368244946,
+    "norm": 0.0027237983886152506,
+    "total_instrumented": 0.24777606595307589
+  },
+  "cuda": "13.0",
+  "device": "NVIDIA GeForce RTX 4090",
+  "driver_free_bytes_end": 8281587712,
+  "driver_total_bytes": 25252724736,
+  "dsv4_indexer_qat_decode_env": "",
+  "dsv4_kv_fp8_qat_env": "",
+  "errors": [],
+  "experiment": "C2F-prefill-stage-bench",
+  "fuse_min_seqlen": 1024,
+  "global_row_shapes": [
+    4096
+  ],
+  "global_rows": 4096,
+  "hc_backend": "default",
+  "host": "titan064",
+  "indexer": "fused",
+  "input_scale": 0.02,
+  "input_tok_s_per_lane": 4568.472196879716,
+  "input_tok_s_per_stage_dp4": 18273.888787518863,
+  "iters": 5,
+  "koujing": "prefill of a --chunk-long sequence, B=1/lane, 4 DP lanes with distinct sequences; --prefill-chunk 0 does it in one start_pos=0 forward (the frozen arm), >0 splits it into consecutive start_pos>0 forwards; input tok/s/stage = 4*chunk / wall of the *whole* prefill either way; host walls around torch.cuda.synchronize; eager, no CUDA graph, no PP handoff",
+  "layers": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "load_seconds": 13.106885925866663,
+  "max_memory_allocated_bytes": 16006414336,
+  "max_memory_reserved_bytes": 16177430528,
+  "measurement_class": "open_loop_single_stage_prefill",
+  "memory_allocated_bytes_after_load": 14151501312,
+  "memory_allocated_bytes_end": 14151501312,
+  "memory_reserved_bytes_end": 16177430528,
+  "moe_collective_selfcheck": {
+    "all_gather_bus_gbps": 22.718698909468543,
+    "all_gather_p50_ms": 1.1077141389250755,
+    "note": "SHM fallback lands near 4 GB/s; direct P2P near 24 GB/s",
+    "payload_bytes": 33554432,
+    "reduce_scatter_bus_gbps": 22.295617927705226,
+    "reduce_scatter_p50_ms": 1.1287340894341469,
+    "rows_global": 4096
+  },
+  "moe_mode": "w4a16",
+  "moe_overlap": "off",
+  "moe_overlap_blocks": 4,
+  "moe_registered_global_rows": [
+    4096
+  ],
+  "moe_resident_bytes_layer0": 861931008,
+  "moe_shape_buffer_bytes": 335711732,
+  "nccl_p2p_level": "SYS",
+  "nccl_version": "2.28.9",
+  "ok": true,
+  "per_rank_driver_free_bytes_end": [
+    8281587712,
+    8281587712,
+    8281587712,
+    8281587712
+  ],
+  "per_rank_errors": [
+    [],
+    [],
+    [],
+    []
+  ],
+  "per_rank_max_memory_allocated_bytes": [
+    16006414336,
+    16006414336,
+    16006414336,
+    16006414336
+  ],
+  "per_rank_ok": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "per_rank_prefill_peak_allocated_bytes": [
+    16006414336,
+    16006414336,
+    16006414336,
+    16006414336
+  ],
+  "pipeline16_projection_tok_s": 18273.888787518863,
+  "prefill_activation_peak_bytes": 1854913024,
+  "prefill_chunk": 0,
+  "prefill_forwards": 1,
+  "prefill_peak_allocated_bytes": 16006414336,
+  "prefill_peak_reserved_bytes": 16177430528,
+  "pytorch_cuda_alloc_conf": "expandable_segments:True",
+  "rank": 0,
+  "ref_score_row_block_unit_check": {
+    "bitwise_equal": true
+  },
+  "resolved_attention_modes": {
+    "11": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    },
+    "12": {
+      "compressor_cast_mode": "ref",
+      "index_score_mode": "fused",
+      "indexer_qat_mode": "ref",
+      "prefill_sparse_backend": "torch"
+    },
+    "13": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    },
+    "14": {
+      "compressor_cast_mode": "ref",
+      "index_score_mode": "fused",
+      "indexer_qat_mode": "ref",
+      "prefill_sparse_backend": "torch"
+    },
+    "15": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    },
+    "16": {
+      "compressor_cast_mode": "ref",
+      "index_score_mode": "fused",
+      "indexer_qat_mode": "ref",
+      "prefill_sparse_backend": "torch"
+    },
+    "17": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    },
+    "18": {
+      "compressor_cast_mode": "ref",
+      "index_score_mode": "fused",
+      "indexer_qat_mode": "ref",
+      "prefill_sparse_backend": "torch"
+    },
+    "19": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    },
+    "20": {
+      "compressor_cast_mode": "ref",
+      "index_score_mode": "fused",
+      "indexer_qat_mode": "ref",
+      "prefill_sparse_backend": "torch"
+    },
+    "21": {
+      "kv_qat_mode": "fused",
+      "nope_quant_mode": "qat_intended_e4m3"
+    }
+  },
+  "ring_wrap_unit_check": {
+    "1031": true,
+    "128": true,
+    "130": true,
+    "2048": true,
+    "96": true,
+    "pass": true
+  },
+  "row_block": 1024,
+  "schema_version": 1,
+  "seed": 20260721,
+  "segment_lengths": [
+    1024
+  ],
+  "segment_start_positions": [
+    0
+  ],
+  "segment_walls_s": [
+    0.24774898402392864
+  ],
+  "sliced_sparse_unit_check": {
+    "bitwise_equal": true
+  },
+  "sparse_backend": "torch",
+  "sparse_head_chunk": 16,
+  "stage_pass_wall_mean_s": 0.22419739002361894,
+  "stage_pass_wall_p50_s": 0.2241449560970068,
+  "stage_pass_walls_s": [
+    0.22435236303135753,
+    0.224339707987383,
+    0.2241449560970068,
+    0.2240536310710013,
+    0.22409629193134606
+  ],
+  "torch": "2.11.0+cu130",
+  "triton": "3.6.0",
+  "vllm": "0.22.1",
+  "warmup": 2,
+  "world": 4
+}
