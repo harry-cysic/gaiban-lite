@@ -22,10 +22,11 @@ This is a semantic control path, not a performance path.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Literal, Mapping, MutableMapping
 
 import torch
+import torch.distributed as dist
 import torch.nn.functional as F
 
 from .attention import (
@@ -75,6 +76,24 @@ class WindowAttentionConfig:
     original_seq_len: int
     max_seq_len: int
     layer_id: int = 0
+
+    tp_size: int = 1
+    tp_rank: int = 0
+
+    @property
+    def local_num_heads(self) -> int:
+        return self.num_heads // self.tp_size
+
+    @property
+    def local_o_groups(self) -> int:
+        return self.o_groups // self.tp_size
+
+    @property
+    def group_width(self) -> int:
+        """Values per o_group -- a **global** quantity: sharding takes whole
+        groups, it never narrows one."""
+
+        return self.num_heads * self.head_dim // self.o_groups
 
     @classmethod
     def from_model_config(
@@ -177,6 +196,20 @@ class WindowAttentionConfig:
             )
         if self.num_heads % self.o_groups:
             raise ValueError("num_heads must divide output groups")
+        if (
+            not isinstance(self.tp_size, int)
+            or isinstance(self.tp_size, bool)
+            or self.tp_size < 1
+            or not isinstance(self.tp_rank, int)
+            or isinstance(self.tp_rank, bool)
+            or self.tp_rank not in range(self.tp_size)
+        ):
+            raise ValueError("tp_rank must be in range(tp_size) and tp_size >= 1")
+        if self.num_heads % self.tp_size or self.o_groups % self.tp_size:
+            raise ValueError(
+                f"attention TP split must be exact: {self.num_heads} heads and "
+                f"{self.o_groups} groups over tp_size {self.tp_size}"
+            )
         if not math.isfinite(self.norm_eps) or not math.isfinite(self.rope_theta):
             raise ValueError("attention numerical constants must be finite")
         if (
@@ -329,6 +362,49 @@ class WindowAttentionTrace:
     path: str = "torch_window_diagnostic_control"
 
 
+def shard_window_attention_weights(
+    prepared: PreparedWindowAttentionWeights,
+    *,
+    tp_rank: int,
+    tp_size: int,
+    config: WindowAttentionConfig,
+) -> PreparedWindowAttentionWeights:
+    """Slice the o-path tensors for one TP rank (E6F variant A).
+
+    Identical treatment to ``shard_ratio4_attention_weights``: ``wq_b`` by head
+    rows, ``wo_a`` by o_group, ``wo_b`` by the matching input columns,
+    ``attn_sink`` by head.  The three o-path tensors have the **same shapes on
+    all three layer types** (67.109 MB each, E2F per-tensor measurement), so
+    the split is the same one E6F step 1 and 2 verified on ratio-4.
+    """
+
+    if tp_size == 1:
+        return prepared
+    heads = config.num_heads // tp_size
+    groups = config.o_groups // tp_size
+    head_rows = heads * config.head_dim
+    lora_cols = groups * config.o_lora_rank
+
+    wq_b = prepared.wq_b[tp_rank * head_rows : (tp_rank + 1) * head_rows].contiguous()
+    wo_a3 = prepared.wo_a.reshape(
+        config.o_groups, config.o_lora_rank, config.group_width
+    )
+    wo_a = (
+        wo_a3[tp_rank * groups : (tp_rank + 1) * groups]
+        .reshape(lora_cols, config.group_width)
+        .contiguous()
+    )
+    wo_b = prepared.wo_b[
+        :, tp_rank * lora_cols : (tp_rank + 1) * lora_cols
+    ].contiguous()
+    attn_sink = prepared.attn_sink[
+        tp_rank * heads : (tp_rank + 1) * heads
+    ].contiguous()
+    return replace(
+        prepared, wq_b=wq_b, wo_a=wo_a, wo_b=wo_b, attn_sink=attn_sink
+    )
+
+
 def prepare_window_attention_weights(
     weights: ResidentAttentionWeights,
     *,
@@ -420,6 +496,7 @@ class WindowTorchAttention:
         ] = "qat_intended_e4m3",
         *,
         kv_qat_mode: str | None = None,
+        tp_group: Any = None,
     ) -> None:
         config.validate()
         layer_identity = (config.layer_id, weights.layer_id, state.layer_id)
@@ -467,6 +544,14 @@ class WindowTorchAttention:
         self.nope_quant_mode = nope_quant_mode
         # E5F: KV-latent FP8 QAT implementation; default "ref" until gated.
         self.kv_qat_mode = resolve_kv_qat_mode(kv_qat_mode)
+        # E6F variant A: refuse to run sharded without a group rather than
+        # silently returning this rank's quarter of the answer.
+        if config.tp_size > 1 and tp_group is None:
+            raise ValueError(
+                f"tp_size={config.tp_size} requires a tp_group for the o-path "
+                "all-reduce"
+            )
+        self.tp_group = tp_group
         # No-YaRN table: with original_seq_len == 0 the correction branch of
         # precompute_freqs_cis is skipped (attention.py:455, mirroring the
         # reference model.py:221 guard), so this is the plain base-10000
@@ -481,6 +566,21 @@ class WindowTorchAttention:
             beta_slow=config.beta_slow,
             device=weights.wq_a.device,
         )
+
+    def _tp_reduce_output(self, output: torch.Tensor) -> torch.Tensor:
+        """Sum the per-rank o-path partials (E6F variant A).
+
+        Upcast to FP32 before the all-reduce: E6F step 1 measured BF16
+        reduction at 1.68-2.08x the unsharded path's own error against 1.25-1.49x
+        when upcast, for 8 KB/layer more traffic that is invisible against
+        ~10 us of latency-bound NCCL.
+        """
+
+        if self.config.tp_size == 1:
+            return output
+        buffer = output.float()
+        dist.all_reduce(buffer, op=dist.ReduceOp.SUM, group=self.tp_group)
+        return buffer.to(output.dtype)
 
     def _nope_control(self, value: torch.Tensor) -> torch.Tensor:
         if self.nope_quant_mode == "reference_executable_bf16":
@@ -597,7 +697,7 @@ class WindowTorchAttention:
             eps=cfg.norm_eps,
         )
         query = F.linear(query_lora, self.weights.wq_b).reshape(
-            plan.batch_size, 1, cfg.num_heads, cfg.head_dim
+            plan.batch_size, 1, cfg.local_num_heads, cfg.head_dim
         )
         query *= torch.rsqrt(
             query.square().mean(dim=-1, keepdim=True) + cfg.norm_eps
@@ -635,8 +735,8 @@ class WindowTorchAttention:
         grouped = output.reshape(
             plan.batch_size,
             1,
-            cfg.o_groups,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.local_o_groups,
+            cfg.group_width,
         )
         wo_a = self.weights.wo_a.reshape(
             cfg.o_groups,
@@ -644,7 +744,9 @@ class WindowTorchAttention:
             cfg.num_heads * cfg.head_dim // cfg.o_groups,
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
-        return F.linear(projected.flatten(2), self.weights.wo_b)
+        return self._tp_reduce_output(
+            F.linear(projected.flatten(2), self.weights.wo_b)
+        )
 
     def prepare_stateful_decode_plan(
         self,
@@ -803,7 +905,7 @@ class WindowTorchAttention:
             eps=cfg.norm_eps,
         )
         query = F.linear(query_lora, self.weights.wq_b).reshape(
-            plan.batch_size, 1, cfg.num_heads, cfg.head_dim
+            plan.batch_size, 1, cfg.local_num_heads, cfg.head_dim
         )
         query *= torch.rsqrt(
             query.square().mean(dim=-1, keepdim=True) + cfg.norm_eps
@@ -858,8 +960,8 @@ class WindowTorchAttention:
         grouped = output.reshape(
             plan.batch_size,
             1,
-            cfg.o_groups,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.local_o_groups,
+            cfg.group_width,
         )
         wo_a = self.weights.wo_a.reshape(
             cfg.o_groups,
@@ -867,7 +969,9 @@ class WindowTorchAttention:
             cfg.num_heads * cfg.head_dim // cfg.o_groups,
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
-        final_output = F.linear(projected.flatten(2), self.weights.wo_b)
+        final_output = self._tp_reduce_output(
+            F.linear(projected.flatten(2), self.weights.wo_b)
+        )
         if stage_marker is not None:
             stage_marker("output_done")
         return final_output
@@ -917,7 +1021,7 @@ class WindowTorchAttention:
         )
         record("query_lora", query_lora)
         query = F.linear(query_lora, self.weights.wq_b).reshape(
-            batch, seqlen, cfg.num_heads, cfg.head_dim
+            batch, seqlen, cfg.local_num_heads, cfg.head_dim
         )
         query *= torch.rsqrt(
             query.square().mean(dim=-1, keepdim=True) + cfg.norm_eps
@@ -1020,8 +1124,8 @@ class WindowTorchAttention:
         grouped = output.reshape(
             batch,
             seqlen,
-            cfg.o_groups,
-            cfg.num_heads * cfg.head_dim // cfg.o_groups,
+            cfg.local_o_groups,
+            cfg.group_width,
         )
         wo_a = self.weights.wo_a.reshape(
             cfg.o_groups,
@@ -1030,7 +1134,9 @@ class WindowTorchAttention:
         )
         projected = torch.einsum("bsgd,grd->bsgr", grouped, wo_a)
         record("output_lora", projected)
-        branch = F.linear(projected.flatten(2), self.weights.wo_b)
+        branch = self._tp_reduce_output(
+            F.linear(projected.flatten(2), self.weights.wo_b)
+        )
         record("branch", branch)
         valid = topk[topk >= 0]
         trace = WindowAttentionTrace(

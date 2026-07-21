@@ -2,10 +2,11 @@
 
 第三十二竖条，**进行中**。设计分析见
 [`docs/design-attention-tp4-sharding.md`](../../docs/design-attention-tp4-sharding.md)。
-本目录记实验步骤；已完成 **step 1（o-path 代数等价）**、**step 2（切片精确性）** 与
-**step 3（4 rank 真实 all-reduce 接线）**；ratio-4 的 runtime 改动已落地且
-`tp_size=1` 时恒等。**尚未做**：ratio-128 与滑窗层的同样改造、stage 级集成
-（含 CUDA graph 捕图）、D0L 软门。
+本目录记实验步骤；已完成 **step 1（o-path 代数等价）**、**step 2（切片精确性）**、
+**step 3（4 rank 真实 all-reduce 接线）** 与 **step 4（三种层型全部落地）**；
+`tp_size=1` 时全部恒等。**尚未做**：stage 级集成（`physical_stage` 需要
+把 tp_group 与切片接进 `new_attention`）、CUDA graph 捕图下的 all-reduce、
+D0L 软门。
 
 ---
 
@@ -144,6 +145,25 @@ titan065，4 rank，layer 4，B=1，8 步：
 （第一次遇到这个报错时误以为是 seeding 不对——实测 seeding 在 2048 处
 给出的 `[2044,2045,2046,2047]` 与期望完全一致，问题在推进而非播种。）
 
+## step 4：三种层型全部落地（ratio-128 与滑窗层）
+
+一个 stage 有三种层型，只改 ratio-4 无法做 stage 级集成。ratio-128 与滑窗层
+用的是**同一套 o-path**（`wq_b`/`wo_a`/`wo_b` 在三种层型上形状完全相同，
+E2F 逐张量实测各 67.109 MB），所以改法一字不差地照搬：
+
+| 文件 | 改动 |
+|---|---|
+| `attention.py`（ratio-128） | 配置 `tp_size/tp_rank` + 三个派生属性、`shard_ratio128_attention_weights()`、`_tp_reduce_output()`、3 处 o-path reshape + 3 处 query reshape 改 local、4 处输出接 reduce |
+| `window_attention.py`（滑窗） | 同上；3 处 o-path、3 处 query、3 处输出 |
+
+**注意这两个类的 prefill 也走同一份权重**（`__call__` 与 decode 方法共用
+`self.weights`），所以两条路径必须一起改——只改 decode 会让 prefill 拿着
+16 head 的权重按 64 head reshape。ratio-4 不同：它的 prefill 用的是另一个类
+（`Ratio4FullPositionAttention`），本竖条没有动它。
+
+顺带一个省事的地方：这两个文件的 sink 视图用的是 `query.shape[2]` 而不是
+`cfg.num_heads`，所以自动跟随局部 head 数，不用改。
+
 ## 已落地的 runtime 改动（默认不改变行为）
 
 | 改动 | 说明 |
@@ -157,10 +177,10 @@ titan065，4 rank，layer 4，B=1，8 步：
 
 ## 下一步
 
-1. ~~权重切片 + 前向改造 + 分布式接线~~ **ratio-4 已落地并验证**（step 3）。
-   剩下：**ratio-128 与滑窗层的同样改造**（o-path 三个张量在三种层型上形状
-   完全相同，改法一致）——一个 stage 三种层型都有，不做完无法做 stage 级集成；
-   以及 **CUDA graph 捕图下的 all-reduce**（MoE 已有先例，但需实测）；
+1. ~~权重切片 + 前向改造 + 分布式接线 + 三种层型~~ **全部已落地**
+   （step 3/4）。剩下：**stage 级集成**——`physical_stage.new_attention()`
+   要接受并传下 `tp_group` 与分片配置；以及 **CUDA graph 捕图下的 all-reduce**
+   （MoE 已有先例，但需实测）；
 2. 单 stage 数值见证 + 速度 A/B（**注意：E2F 探针的逐步逐位对拍不适用**，
    见设计note §4——本次不是逐位改动）；
 3. D0L 软门——本项目第一次用软门放行形态改动；
