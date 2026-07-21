@@ -121,8 +121,24 @@ DeepSeek-V4-Flash（284B/13B）在 2×8×RTX 4090 上的推理系统。官方推
 - **prefill 实测(各 3 轮,轮间 ≤0.26%)**:torch attention 臂 **17,022**、
   tilelang 臂 **25,308** input tok/s——此前的 24.3k 折算已变实测;单池 T
   **2,322**。归因:MoE 33.4%(其中 17.7 ms/层是 P2P 集合下界)、attention
-  23.2%。下一步:集合/计算重叠、prefill HC 融合 → chunked prefill 交错 /
-  serving。
+  23.2%。
+- **两个 prefill 增益杠杆经长门重判后均不放行**:prefill HC 融合(+19.9% →
+  30,345)与 MoE 集合重叠(+1.5%)在**补齐覆盖的长 prompt 门**上分别得
+  489/512 与 491/512(基线 494/512),HC 臂还出现 top2_gap 1.492 越出基线近平局
+  包络。**未放宽容差,prefill 保持 25,308**。附带量化:集合重叠的天花板仅
+  51.8% 重叠率(NCCL P2P 在 NODE 距离 PCIe 上是 SM 驱动,与 Marlin 抢 SM),
+  零开销实现也只到 +4%,判为不值得继续投入;HC 融合的阻碍是 **vLLM kernel 在
+  ≥1024 行数值错误**(rel_fro 2.3e-4→1.07e-1,公有 API 无法绕开),已用
+  MAX_ROWS=896 规避但精度仍不足——**正确实现(自研或上游修复)仍可取回 +19.9%**。
+- **质量门覆盖已补齐**([`D0L`](experiments/D0L-long-prompt-oracle/README.md)):
+  原 golden prompt 仅 10–22 token,E2E 门从不进入 prefill 大行数路径;新建 8 条
+  × 64 token = 512 位的长门(prompt 精确 1024/2048/4096,reference 侧上限
+  4096 已归因到 `model.py:685` 的 256 KiB/token 广播)。**这是本轮最重要的
+  方法论修复——两个杠杆的"通过"此前都不具判定力。**
+- 能力缺口记录:runtime **没有增量 chunked prefill**
+  (`Ratio4FullPositionAttention` 对多 token 输入强制 `start_pos == 0`),
+  §7 Phase 4 的 chunked 交错需先补该能力。下一步:ratio-4 attention 深挖
+  (现最大非 MoE 项)、增量 chunked prefill 能力、serving。
   12.5k 为 reference-op 基线，暂不构成对 15–25k 的证伪，但若 Phase 2 集成后仍
   显著低于 15k，须按目标文档修正容量模型。
 - **Prefill 基线与杠杆已实测**
