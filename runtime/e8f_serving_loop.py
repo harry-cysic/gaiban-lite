@@ -518,12 +518,14 @@ def main() -> int:
         traceback.print_exc()
 
     write_json(out_dir / f"rank{rank}.json", result)
-    try:
-        dist.barrier()
-    except Exception:
-        pass
-    dist.destroy_process_group()
-    return 0 if result["accepted"] else 1
+    # The resident-loop teardown hangs on destroy_process_group with this
+    # topology's ~19 custom groups (GPUs idle, not spinning), which would stall
+    # the launcher's done sentinel for the full deadline.  The data is already
+    # on disk, so force-exit instead of blocking: torchrun collects each
+    # worker's exit code and the launcher's `echo $? > done` fires promptly.
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(0 if result["accepted"] else 1)
 
 
 if __name__ == "__main__":
