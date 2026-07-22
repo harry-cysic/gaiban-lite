@@ -1,6 +1,12 @@
 # E7F — 单路 serving 骨架（TARGET §10 Phase 1）
 
-**状态**：进行中。本文件随竖条推进更新；结论未落盘前不得被引用。
+**状态**：进行中。设计与 A/B 判断以 [`../../docs/design-e7f-single-path-serving.md`](../../docs/design-e7f-single-path-serving.md) 为准。
+
+**进度（2026-07-22）**：步 1/2/2.5 完成（交接逐位、捕图精确、ctx≥2047 约束、
+stateful≠非stateful 定位到 ratio-128）；步 3 卡在 Blocker B（引擎/缓冲，**已更正为
+操作点约束非普适**）；**Blocker A 已实现并验证**（sub-2047 padded 定形 top-k，
+未饱和路径可捕图、饱和零回归、非逐位仅 §9.6 求和序、golden 质量签字等 B）。
+下一步：Blocker B——单路操作点上实测独立 decode 缓冲能否与共享 prefill 缓冲共存。
 
 ## 动机
 
