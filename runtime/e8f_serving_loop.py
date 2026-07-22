@@ -165,7 +165,7 @@ def main() -> int:
     parser.add_argument("--rounds", type=int, default=3)
     parser.add_argument("--seed", type=int, default=20260722)
     parser.add_argument("--progress-every", type=int, default=64)
-    parser.add_argument("--hc-backend", type=str, default="default")
+    parser.add_argument("--hc-backend", type=str, default="fused")
     args = parser.parse_args()
 
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
