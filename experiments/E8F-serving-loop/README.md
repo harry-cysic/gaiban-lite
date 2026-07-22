@@ -67,7 +67,11 @@ detokenize = **"DeepSeek-V4系列包含两款"**——**切题、连贯的真实
   §1.2 的最终折扣数应绑定**目标操作点的典型 (prompt_len, gen_len)**，而非单点。
 - **✅ teardown 挂起已修**：write_json 后 `os._exit`（数据已落盘；destroy_process_group
   在本拓扑 ~19 个自定义 group 下会挂）。运行现在干净收尾、done 哨兵及时触发。
-- **EOS**：当前定长（测折扣用）；交互版需 EOS，其 per-token host-read 成本单列。
+- **✅ EOS 已加（`--stop-on-eos`）**：真变长生成实测（1024-prompt，上限 128）——
+  各 prompt 自然停在 **58 / 90 / 128** token（前两个 hit_eos，第三个撞上限），
+  跨 round 确定（req2 两 round 都 58）。**成本仅 ~0.29 ms/tok**（25.09 vs 24.80，+1.2%）——
+  per-step 1-elem stop-flag **tensor 广播 + host read** 很便宜（首版误用 object broadcast 曾 +11ms/tok）。
+  即 serving 现在是**满速的真变长生成器**。artifact `results/b1024-eos-rank0.json`。
 - **HTTP**：后置（JSONL 已够测折扣）。
 - **✅ back-to-back 自检已过**（从现有 artifact）：同一 prompt 在 round 1（前面已跑 5 个
   请求）与 round 0 的 token **逐字节相同**（1024 与 2048 bucket 各 3 prompt 全过）——
