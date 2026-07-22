@@ -43,9 +43,15 @@ decode，能折掉 44.5 µs 的尾巴。
 - **index_topk_done 要 decode 专调核**：只融 elementwise 尾（relu+mul+sum+mask，
   E2F 的 44.5 µs 是**减掉 einsum 之后**的非 GEMV 部分），保持逐位（保 h 求和序）——
   这是**新核 authoring**（比接现成核大），量级同 C4F 的融合核。
-- **或先挑 `raw_kv_done`（30.1 µs，rms_norm/rope）**：可能比 index-score 链更易融，
-  且 rms_norm/rope 的 elementwise 融合更标准。E2F §5b 排序：index_topk_done(44.5) >
-  sparse_done(32.2) > raw_kv_done(30.1)。
+- **先挑 `raw_kv_done`（30.1 µs，rms_norm/rope）——更可能是 tractable 的下一个 micro**
+  （已查代码）：`rms_norm`（`attention.py:450`）是纯 eager（float/square/mean/rsqrt/
+  mul/mul/cast ≈ 6–7 个 launch-bound 核），`apply_rotary_emb` 用 complex/polar 也是数核，
+  **无现成融合版**。**RMSNorm 的 Triton 融合是标准套路**（比 index-score 那种带头维
+  reduction 的定制核好写），且 KV FP8 QAT 那半 E5F 已融，剩的正是 rms_norm+rope。
+  下一步：**author/adopt 一个 decode 版 fused RMSNorm(+rope) 核 → micro 判活/判死**
+  （vllm 有 RMSNorm 核可参考，但须核对 eps/accum 与 reference 一致，否则走软门）。
+  E2F §5b 排序：index_topk_done(44.5) > sparse_done(32.2) > raw_kv_done(30.1)——
+  index 更大但要定制核（E9F 判死复用路），raw_kv 略小但更标准，**先攻 raw_kv**。
 - ⚠️ 沿用 E4F/E5F 纪律：micro 判活/判死 → 层内 A/B 实测收益 → D0L 门（逐位则硬门，
   改求和序则软门不越包络）→ 闭环。**引用收益前必层内 A/B。**
 
