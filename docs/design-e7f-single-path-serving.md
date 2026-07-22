@@ -180,14 +180,21 @@ gate=pm.gate, global_row_shapes=(4,), slots_per_shape=4)`），只新分配 deco
 stateful 图族 decode → golden token 的完整路径跑通了。** 这是 §10 Phase 1 的目标那一步。
 artifact：`experiments/E7F-single-path-serving/results/step3-smoke/`。
 
-**质量（stateful serving 路径 vs eager 非 stateful 基线，同 6 prompt）**：
+**质量（全集 10 prompt / 640 位，stateful serving 路径 vs eager 非 stateful 基线）**：
 
 | | 分数 | 近平局包络（自身失配最大 gap） |
 |---|---|---|
-| eager（非 stateful，基线） | **370/384** | 0.885635 |
-| **stateful（serving 路径）** | **366/384** | **1.127426** |
+| eager（非 stateful，基线） | **614/640** | **0.955883** |
+| **stateful（serving 路径）** | **610/640** | **1.127426** |
 
-**字面按 §1.3：两条都"FAIL"**（366 < 370；1.127 > 包络常数 0.959503）。
+⚠️ **eager 臂逐字复现冻结 v2 基线**（614/640、包络 0.955883 逐位相同）——
+证明脚手架与 A/B 改动**不扰动非 stateful 路径**，reuse-before-cite 满足。
+
+**逐 prompt（eager→stateful）**：1024: 62→61, 62→61, 63→63；
+2048: 63→62, 60→61(+), 60→58；4096: 58→58, 63→63；**8192: 61→61, 62→62**。
+**4096/8192 完全不变**；漂移集中在 1024/2048 短 prompt（那里恰有更多近平局）。
+
+**字面按 §1.3：两条都"FAIL"**（610 < 614；1.127 > 包络常数 0.959503）。
 **但要看清是什么性质的失配**（否则会误判）：
 1. **包络那个 1.127 是共享失配**：在 (prompt2 len1024 step36)，
    **eager 与 stateful 预测同一个错 token 8842**（都漏了 golden 59819），
@@ -198,14 +205,17 @@ artifact：`experiments/E7F-single-path-serving/results/step3-smoke/`。
    的 ULP 翻转类。saturated(2048) 与 unsaturated(1024,A 路径) 各有份额，
    即 §7.9 的 ratio-128 ULP 与 A 的 padding 求和序都会翻近平局。
 
-**⟹ 与 E6F 的 −3 同性质**：字面 FAIL，但失配是 ULP 近平局翻转 + 一个 gap 被加宽的
-共享失配，**不是系统性质量回归**。**定性判断（噪声 vs 回归）需**：
-(a) 全集（含 8192）跑完拿完整分数/包络；(b) E6F 方法学（独立重抽集 + 符号检验）；
+**⟹ 与 E6F 的 −3 定量同性质**（E6F 是 614→611 判抽样噪声；此处 614→610）：
+字面 FAIL，但失配是 ULP 近平局翻转 + 一个 gap 被加宽的共享失配，
+**不是系统性质量回归**。**定性判断与放行需**：
+(a) ~~全集~~ **已跑（本表）**；(b) E6F 方法学（独立重抽集 + 符号检验）**未做**；
 (c) 与 E6F 同构，**最终放行是人的门基准迁移决定**，不在无人值守下作。
 
-⚠️ **诚实边界**：步 3 的**路径**已达成（跑通、出 golden）；步 3 的**质量签字**
-（serving 路径过 D0L）**未过字面门**，需上面 (a)(b)(c)。这与"E6F 已放行"是同一类
-待人裁定的迁移，不是自动 PASS。
+⚠️ **诚实边界**：步 3 的**路径**已达成（跑通、出 golden、eager 复现 614）；
+步 3 的**质量签字**（serving 路径过 D0L）**未过字面门**（610<614、包络越界），
+需 (b) 独立集判噪声 + (c) 人的门基准迁移。这与"E6F 已放行"是同一类待人裁定的迁移，
+**不是自动 PASS**。下一 session：跑独立重抽集（`oracle-indep.json` 现成）
+的 stateful 臂，符号检验判噪声 vs 回归；判噪声则迁门放行 serving 路径。
 
 ### 明确 out-of-scope（现在不做）
 
