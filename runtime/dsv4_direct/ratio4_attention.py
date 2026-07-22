@@ -953,14 +953,37 @@ class Ratio4TorchAttention:
 
         # Reuse the fixed-plan setup audit for every existing state invariant.
         self.prepare_decode_plan(start_position, advance_overlap_state=True)
-        minimum_candidates = (start_position + 1) // COMPRESS_RATIO
-        if minimum_candidates < cfg.index_topk:
+        # E7F Blocker A: below index saturation ((start+1)//4 < index_topk) the
+        # fixed top-k has fewer real candidates than index_topk.  Rather than
+        # refuse (the old assert), keep the fixed width and pad: the index-score
+        # mask already drives topk to fill the missing slots with padding
+        # columns, and forward_stateful_decode_tensor masks those padding rows
+        # out of the attention softmax, so the result matches the non-stateful
+        # min(index_topk, compressed_after) path -- the reference's -1-sentinel
+        # semantics (model.py:429/528) done in the inline decode path.  The
+        # window is full because start_position >= WINDOW_SIZE (checked above),
+        # so only the compressed candidates ever need padding.  candidate_width
+        # is padded up to index_topk so topk has at least index_topk columns to
+        # choose from; the extra columns are always masked (never visible), and
+        # they read zero-initialised latent rows, so they are inert.
+        unsaturated = (start_position + 1) // COMPRESS_RATIO < cfg.index_topk
+        if unsaturated and getattr(self, "_sparse_attention_backend", None) is not None:
+            # The padding mask lives in the inline decode path.  A sparse kernel
+            # backend would need reference-style -1 sentinel indices instead
+            # (model.py:429), which is not wired here.  Decode uses the inline
+            # path (backend None), so this only guards a misconfiguration.
             raise ValueError(
-                "stateful ratio-4 decode requires a saturated fixed index top-k"
+                "unsaturated stateful ratio-4 decode requires the inline sparse "
+                "path; a sparse-attention backend is not supported below index "
+                "saturation"
             )
-        candidate_width = stop_position // COMPRESS_RATIO
+        candidate_width = max(stop_position // COMPRESS_RATIO, cfg.index_topk)
         if candidate_width > self.state.compressed_capacity:
-            raise ValueError("stateful ratio-4 candidate width exceeds state capacity")
+            raise ValueError(
+                "stateful ratio-4 candidate width exceeds state capacity: this "
+                "mode's max_seq_len must be >= index_topk * COMPRESS_RATIO so the "
+                "fixed-shape top-k has enough columns to pad from"
+            )
 
         batch = self.state.num_local_sequences
         total_topk = WINDOW_SIZE + cfg.index_topk
@@ -1316,6 +1339,14 @@ class Ratio4TorchAttention:
         compressed_indices = scores.topk(
             plan.index_topk_count, dim=-1
         ).indices
+        # E7F Blocker A: when the index set is unsaturated, topk fills the slots
+        # it could not satisfy with visible candidates using padding columns
+        # (column >= compressed_after, whose index score was -inf).  These must
+        # not enter the attention softmax.  This mask is data-driven and fixed
+        # shape (compressed_after is a device scalar), so it captures cleanly;
+        # when saturated every column is < compressed_after, so the mask is
+        # all-False and the saturated path is byte-for-byte unchanged.
+        compressed_is_padding = compressed_indices >= compressed_after
         window = (
             plan.window_columns + position.remainder(WINDOW_SIZE) + 1
         ).remainder(WINDOW_SIZE)
@@ -1356,6 +1387,15 @@ class Ratio4TorchAttention:
                 attention_scores = torch.einsum(
                     "bshd,bskd->bshk", query.float(), selected
                 ) * (cfg.head_dim**-0.5)
+            # E7F Blocker A: drop padding candidates before the softmax.  The
+            # compressed slots start at WINDOW_SIZE; padding rows (set to -inf)
+            # give exp(-inf)=0 and, being at the tail, add nothing to the bf16
+            # sums -- so an unsaturated step attends over exactly the visible
+            # set, matching the non-stateful path.  All-False when saturated, so
+            # that path is unchanged.
+            attention_scores[..., WINDOW_SIZE:].masked_fill_(
+                compressed_is_padding.unsqueeze(2), float("-inf")
+            )
             sink = weights.attn_sink.float().view(1, 1, cfg.local_num_heads, 1)
             maximum = torch.maximum(
                 attention_scores.amax(dim=-1, keepdim=True), sink

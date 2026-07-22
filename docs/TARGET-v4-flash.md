@@ -596,12 +596,18 @@ Flash 的 `index_topk = 512`、`COMPRESS_RATIO = 4` ⟹ **start_position ≥ 204
    而 §4.3 的冻结事实是 B=1 eager **210 ms/步**（graph 36.3 ms）。
    一个 200 token prompt 生成 100 token **全程落在未饱和区**。
 3. 故 **§10 Phase 1 的工作项表少了一项前置**：未饱和区的快路径。
-   **已定为 Blocker A**，设计判断见 [`design-e7f-single-path-serving.md`](design-e7f-single-path-serving.md)：
-   把定形 top-k **pad 到 index_topk 并掩 padding**（reference 用 -1 哨兵 + sparse_attn
-   掩码表达同一语义，已核对 `model.py:427-430/528`），保持定形、可捕图、
-   **无新 kernel group**（decode 走 inline torch 路径）；层型隔离已证**只需改 ratio-4**
-   （ratio-128/window 在 128 即饱和）。释放走单卡 decode-mirror oracle（128–2047 未饱和位，
-   padded-stateful ≡ 非 stateful，软门不越包络）。
+   **已实现（Blocker A，2026-07-22）**，设计与实测见
+   [`design-e7f-single-path-serving.md`](design-e7f-single-path-serving.md)：
+   定形 top-k **pad 到 index_topk 并在 attention softmax 掩 padding**
+   （reference 同语义：`model.py:427-430/528` 用 -1 哨兵 + sparse_attn 掩码），
+   保持定形、**可捕图**、**无新 kernel group**（decode 走 inline torch 路径）；
+   层型隔离已证**只需改 ratio-4**。**实测**（oracle，单 ratio-4 层 TP4）：
+   未饱和路径现在跑得起来且捕图精确（arm G==arm S 0/16）；饱和档零回归（0/16 逐位）；
+   **A 语义正确但非逐位** vs 非 stateful——差异随 padding 数单调增长、0 padding 逐位、
+   ~1 bf16 ULP，是 §9.6 定形-reduction 求和序类，**非 bug**。
+   ⚠️ **1.17e-2 会不会翻近平局 golden token** 是 D0L golden 判据，
+   需 16 卡 golden gate 的 stateful 臂 → **卡在 Blocker B**。即 A"正确且可捕图"，
+   质量签字等 B。
 
 ### 7.9 stateful 与非 stateful decode 不逐位（E7F，2026-07-22）
 

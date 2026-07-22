@@ -1,0 +1,548 @@
+{
+  "accepted": true,
+  "argv": [
+    "e7f_handoff_gate.py",
+    "--stage-root",
+    "/home/cysic/Workspace/DeepSeek-V4-Flash",
+    "--out-dir",
+    "out-e7f-pad12",
+    "--layers",
+    "2",
+    "--prefill-len",
+    "2000",
+    "--max-seq-len",
+    "3072"
+  ],
+  "attention_modes": {
+    "2": {
+      "compressor_cast_mode": "ref",
+      "index_score_mode": "ref",
+      "indexer_qat_mode": "ref",
+      "prefill_sparse_backend": "torch"
+    }
+  },
+  "attention_tp": {
+    "2": {
+      "local_num_heads": 16,
+      "local_o_groups": 2,
+      "tp_rank": 0,
+      "tp_size": 4,
+      "wo_b_shape": [
+        4096,
+        2048
+      ]
+    }
+  },
+  "checkpoint_id": "b3d44d9f14e59b1be0f108fd91e4a9a171650795e03a48dc8c47957cf40d22d9",
+  "device": "NVIDIA GeForce RTX 4090",
+  "errors": [],
+  "experiment": "E7F-prefill-decode-state-handoff",
+  "global_row_shapes": [
+    4,
+    8000
+  ],
+  "graph_capture_order": [
+    "normal",
+    "ratio4_boundary"
+  ],
+  "graph_families": [
+    "normal",
+    "normal",
+    "normal",
+    "ratio4_boundary",
+    "normal",
+    "normal",
+    "normal",
+    "ratio4_boundary",
+    "normal",
+    "normal",
+    "normal",
+    "ratio4_boundary",
+    "normal",
+    "normal",
+    "normal",
+    "ratio4_boundary"
+  ],
+  "graph_mismatched_positions": [],
+  "graph_steps": [
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2000,
+      "step": 0,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0003980659239459783,
+      "position": 2001,
+      "step": 1,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2002,
+      "step": 2,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "ratio4_boundary",
+      "max_abs": 0.005859375,
+      "mean_abs": 0.0002462073462083936,
+      "position": 2003,
+      "step": 3,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0002736015594564378,
+      "position": 2004,
+      "step": 4,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0005513576325029135,
+      "position": 2005,
+      "step": 5,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.00040266697760671377,
+      "position": 2006,
+      "step": 6,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0007401633774861693,
+      "position": 2007,
+      "step": 7,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0006712241447530687,
+      "position": 2008,
+      "step": 8,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.00390625,
+      "mean_abs": 0.00025668623857200146,
+      "position": 2009,
+      "step": 9,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.005859375,
+      "mean_abs": 0.0006826812168583274,
+      "position": 2010,
+      "step": 10,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "ratio4_boundary",
+      "max_abs": 0.00341796875,
+      "mean_abs": 0.00022811112285126,
+      "position": 2011,
+      "step": 11,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.00390625,
+      "mean_abs": 0.00012077092833351344,
+      "position": 2012,
+      "step": 12,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0029296875,
+      "mean_abs": 0.00017229648074135184,
+      "position": 2013,
+      "step": 13,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.009765625,
+      "mean_abs": 0.0008029519231058657,
+      "position": 2014,
+      "step": 14,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    },
+    {
+      "bitwise": false,
+      "family": "ratio4_boundary",
+      "max_abs": 0.00390625,
+      "mean_abs": 0.00024025296443141997,
+      "position": 2015,
+      "step": 15,
+      "vs_stateful_eager": {
+        "bitwise": true,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    }
+  ],
+  "host": "titan065",
+  "layer_kinds": {
+    "2": "ratio4"
+  },
+  "load_seconds": 5.7052080139983445,
+  "mismatched_positions": [],
+  "prefill_end_positions": {
+    "2": 2000
+  },
+  "prefill_seconds": 2.3745771730318666,
+  "rank": 0,
+  "requested": {
+    "attention_tp_shard": true,
+    "break_handoff": "none",
+    "decode_steps": 16,
+    "graph_arm": true,
+    "indexer_kv_dtype": "bf16",
+    "kv_dtype": "bf16",
+    "layers": [
+      2
+    ],
+    "max_seq_len": 3072,
+    "prefill_len": 2000
+  },
+  "schema_version": 1,
+  "stateful_eager_steps": [
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2000,
+      "step": 0
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0003980659239459783,
+      "position": 2001,
+      "step": 1
+    },
+    {
+      "bitwise": true,
+      "family": "normal",
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2002,
+      "step": 2
+    },
+    {
+      "bitwise": false,
+      "family": "ratio4_boundary",
+      "max_abs": 0.005859375,
+      "mean_abs": 0.0002462073462083936,
+      "position": 2003,
+      "step": 3
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0002736015594564378,
+      "position": 2004,
+      "step": 4
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0005513576325029135,
+      "position": 2005,
+      "step": 5
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.00040266697760671377,
+      "position": 2006,
+      "step": 6
+    },
+    {
+      "bitwise": false,
+      "family": "ratio4_boundary",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0007401633774861693,
+      "position": 2007,
+      "step": 7
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0006712241447530687,
+      "position": 2008,
+      "step": 8
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.00390625,
+      "mean_abs": 0.00025668623857200146,
+      "position": 2009,
+      "step": 9
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.005859375,
+      "mean_abs": 0.0006826812168583274,
+      "position": 2010,
+      "step": 10
+    },
+    {
+      "bitwise": false,
+      "family": "ratio4_boundary",
+      "max_abs": 0.00341796875,
+      "mean_abs": 0.00022811112285126,
+      "position": 2011,
+      "step": 11
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.00390625,
+      "mean_abs": 0.00012077092833351344,
+      "position": 2012,
+      "step": 12
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.0029296875,
+      "mean_abs": 0.00017229648074135184,
+      "position": 2013,
+      "step": 13
+    },
+    {
+      "bitwise": false,
+      "family": "normal",
+      "max_abs": 0.009765625,
+      "mean_abs": 0.0008029519231058657,
+      "position": 2014,
+      "step": 14
+    },
+    {
+      "bitwise": false,
+      "family": "ratio4_boundary",
+      "max_abs": 0.00390625,
+      "mean_abs": 0.00024025296443141997,
+      "position": 2015,
+      "step": 15
+    }
+  ],
+  "steps": [
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2000,
+      "step": 0
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2001,
+      "step": 1
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2002,
+      "step": 2
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2003,
+      "step": 3
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2004,
+      "step": 4
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2005,
+      "step": 5
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2006,
+      "step": 6
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2007,
+      "step": 7
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2008,
+      "step": 8
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2009,
+      "step": 9
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2010,
+      "step": 10
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2011,
+      "step": 11
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2012,
+      "step": 12
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2013,
+      "step": 13
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2014,
+      "step": 14
+    },
+    {
+      "bitwise": true,
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "position": 2015,
+      "step": 15
+    }
+  ],
+  "torch": "2.11.0+cu130",
+  "world": 4
+}

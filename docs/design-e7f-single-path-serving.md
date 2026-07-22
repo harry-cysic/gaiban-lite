@@ -69,6 +69,36 @@ runtime 的 inline decode 路径**没有**这一步——A 要补上等价的 so
    **无 kernel 改动**：decode 走 inline torch 路径（`_sparse_attention_backend` 为 None），
    A 只改该 inline 路径与 plan。**不是新 kernel group**（符合 framing 要求）。
 
+### A 的实测结果（2026-07-22，measured）
+
+已实现（`ratio4_attention.py`：放松饱和断言 + candidate_width pad 到 index_topk +
+attention softmax 掩 padding + backend 护栏）。oracle = E7F handoff gate 在
+**单 ratio-4 层（`--layers 2`）、TP4** 上跑（A 前会因饱和断言直接报错）。
+artifact：`experiments/E7F-single-path-serving/results/e7f-{sat2048,unsat1024,pad12,pad1}/`。
+
+**padding-count 扫描（arm-S 掩码-stateful vs arm-R 参考 fullpos）**：
+
+| prefill | padding 数 | 失配 | max_abs |
+|---:|---:|---:|---:|
+| 2048（**饱和**） | 0 | **0/16** | **0.0** |
+| 2044 | 1 | 3/16 | 7.81e-3 |
+| 2000 | 12 | 14/16 | 9.77e-3 |
+| 1024 | 256 | 16/16 | 1.17e-2 |
+
+**结论（measured）**：
+1. **A 让未饱和路径跑起来了**（A 前直接报饱和错），且**可捕图**——
+   同跑 arm G（capture）vs arm S（stateful eager）**0/16 逐位**，padded 路径捕图精确。
+2. **A 语义正确**：饱和档（0 padding）**逐位**，且差异**随 padding 数单调增长**——
+   这正是"定形 reduction 加零 padding 改变 bf16 求和舍入"的 §9.6 类，
+   **不是 bug**（掩码错会给大且与 padding 数无关的错，且 0 padding 不会逐位）。
+   量级 1.17e-2 在 latent 分支幅值（~1–2）上约 **1 bf16 ULP**。
+3. **A 非逐位** vs 非 stateful（变形 reduction）——如 §9.6 预期，释放走软门。
+4. **饱和路径零回归**（0/16，与 §7.9 隔离的 attrib-L2 一致）。
+
+⚠️ **仍待 B 解锁的一件事**：这 1.17e-2 会不会翻一个近平局 golden token，
+是 **D0L golden 判据**（需 16 卡 golden gate 的 stateful 臂，卡在 Blocker B）。
+即 **A 已"正确且可捕图"，其质量签字（golden token 不翻）等 B**。这是诚实边界。
+
 ### A 的释放（derived → 用 oracle 实测）
 
 A 改的是 **stateful** 路径（golden gate 现用 **非 stateful**，故 D0L 现状不测它）。
