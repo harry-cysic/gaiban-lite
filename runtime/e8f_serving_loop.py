@@ -166,6 +166,16 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=20260722)
     parser.add_argument("--progress-every", type=int, default=64)
     parser.add_argument("--hc-backend", type=str, default="fused")
+    parser.add_argument(
+        "--stop-on-eos",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="real variable-length generation: stop when the sampled token is "
+        "EOS.  Costs a per-step 1-element stop-flag broadcast + host read (the "
+        "loop otherwise runs a fixed max_new_tokens with no per-step host sync); "
+        "the decode ms/tok delta vs --no-stop-on-eos is the EOS coordination "
+        "overhead.  Off by default so the discount measurement stays tight.",
+    )
     args = parser.parse_args()
 
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
@@ -432,6 +442,9 @@ def main() -> int:
                 pair_transfer(token_buffer, send=False, group=topo["loop_pair"], peer=1)
             gen_idx = 1
 
+            stop_flag = torch.zeros(1, dtype=torch.int32, device=device)
+            hit_eos = False
+            produced = gen_idx  # tokens generated so far (1: the first token)
             torch.cuda.synchronize(device)
             t_decode0 = time.perf_counter()
             for step in range(n_gen - 1):
@@ -458,19 +471,36 @@ def main() -> int:
                         pair_transfer(token_buffer, send=True, group=topo["loop_pair"], peer=0)
                 cursor.advance_host(family)
                 gen_idx += 1
+                produced = gen_idx
+                if args.stop_on_eos:
+                    # authoritative token is on stage 3; broadcast a stop flag
+                    # (fast 1-elem tensor) and host-read it so all ranks stop
+                    # together.  The host read is the per-step EOS cost.
+                    if stage == STAGE_COUNT - 1:
+                        stop_flag.copy_(
+                            (token_buffer.view(-1)[0] == eos_token_id)
+                            .to(torch.int32).reshape(1)
+                        )
+                    dist.broadcast(stop_flag, src=12)
+                    if bool(stop_flag.item()):
+                        hit_eos = True
+                        break
             torch.cuda.synchronize(device)
             t_decode1 = time.perf_counter()
 
             if capture_here:
                 serving_state["graphs"] = graphs
-            # read tokens once (stage 3), broadcast to rank 0 for the record
-            tok_holder = [gen_tokens.cpu().tolist() if stage == STAGE_COUNT - 1 else None]
+            # read tokens once (stage 3), broadcast to rank 0 for the record.
+            # slice to what was actually produced (EOS may have stopped early).
+            tok_holder = [
+                gen_tokens[:produced].cpu().tolist() if stage == STAGE_COUNT - 1 else None
+            ]
             dist.broadcast_object_list(tok_holder, src=12)
             new_tokens = tok_holder[0]
             decode_ms = []  # per-step timing removed; use decode_wall / n
 
             n_new = len(new_tokens)
-            n_loop = max(n_gen - 1, 1)
+            n_loop = max(produced - 1, 1)   # actual decode steps (EOS may stop early)
             prefill_ms = (t_prefill1 - t_prefill0) * 1e3          # prefill lane + install
             first_token_ms = (t_decode0 - t_prefill0) * 1e3       # prefill + plan + first-token head
             decode_wall_ms = (t_decode1 - t_decode0) * 1e3        # the n_gen-1 loop steps
@@ -488,6 +518,7 @@ def main() -> int:
                 "framework_tok_s": (n_new / framework_ms * 1e3) if framework_ms > 0 else None,
                 "decode_only_tok_s": (1e3 / decode_ms_per_token) if decode_ms_per_token > 0 else None,
                 "captured": capture_here,
+                "hit_eos": bool(hit_eos),
                 "first_tokens": new_tokens[:8],
             }
             return rec
