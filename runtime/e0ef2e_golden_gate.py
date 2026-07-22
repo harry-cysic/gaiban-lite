@@ -470,9 +470,19 @@ def _build_stateful_decode_stage(
         snapshot_ratio4,
     )
     from e1f_full_decode_bench import GRAPH_MOE_SLOT_TUPLE  # noqa: PLC0415
+    from dsv4_direct.block import DirectDecodeBlock  # noqa: PLC0415
+    from dsv4_direct.moe_runtime import TP4MoE  # noqa: PLC0415
     from dsv4_direct.stateful_decode import StatefulDecodeCursor  # noqa: PLC0415
     from dsv4_direct.superstage import TP4DecodeStage  # noqa: PLC0415
 
+    # E7F Blocker B: the prefill lane runs --share-moe-buffers (aliased MoE slot
+    # buffers so the 8192 prefill fits), but TP4DecodeStage requires per-layer-
+    # distinct buffers.  Rather than a second weight copy (11.5 GiB, the 7.10
+    # phantom), give each decode block its own decode-only MoE that SHARES the
+    # prefill MoE's resident weights (no reload) and owns a fresh, tiny
+    # decode-shape buffer set (~KB-MB/layer; derived ~18 MB/stage).  Uniqueness
+    # then holds legitimately, no frozen safety check relaxed.
+    decode_rows = EXPECTED_TP_SIZE * LOCAL_BATCH
     blocks = []
     for material, attention in lane.layers:
         state = material.new_state(num_local_sequences=LOCAL_BATCH)
@@ -480,7 +490,28 @@ def _build_stateful_decode_stage(
             install_ratio4(state, snapshot_ratio4(attention))
         else:
             restore_static_state(state, clone_static_state(attention.state))
-        blocks.append(material.new_block(state, hc_boundary_backend=None))
+        pm = material.moe
+        decode_moe = TP4MoE(
+            config=pm.config,
+            resident=pm.resident,
+            gate=pm.gate,
+            rank=material.tp_rank,
+            device=material.device,
+            global_row_shapes=(decode_rows,),
+            group=pm.group,
+            slots_per_shape=4,
+            marlin_input_dtype=pm._marlin_input_dtype,
+        )
+        block = DirectDecodeBlock(
+            weights=material.raw_block,
+            attention=material.new_attention(state),
+            moe=decode_moe,
+            norm_eps=material.norm_eps,
+            sinkhorn_iters=material.sinkhorn_iters,
+            hc_eps=material.hc_eps,
+            hc_boundary_backend=None,
+        )
+        blocks.append(block)
     stage = TP4DecodeStage(blocks, hc_boundary_backend=None)
     cursor = StatefulDecodeCursor(start_position=start_position, device=device)
     plan = stage.prepare_stateful_decode_plan(
@@ -867,23 +898,13 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    # E7F: the stateful (serving) decode arm builds a TP4DecodeStage, which
-    # requires per-layer-distinct MoE slot buffers (so a captured graph cannot
-    # race).  --share-moe-buffers aliases those buffers across layers to fit
-    # the 8192 prefill -- the two are mutually exclusive in one material set.
-    # This is not a bug to route around: it is serving's real structure, where
-    # prefill and decode are separate engines sharing weights (see E7F README
-    # and TARGET 7.10).  Refuse *before* any collective so the mismatch is a
-    # clean symmetric exit on every rank, never the pipeline deadlock the first
-    # attempt produced.
-    if args.with_stateful and args.share_moe_buffers:
-        raise SystemExit(
-            "--with-stateful is incompatible with --share-moe-buffers: the "
-            "stateful decode stage needs per-layer-distinct MoE slot buffers, "
-            "which sharing aliases.  Serving needs prefill and decode as "
-            "separate weight-sharing engines; the single-material gate cannot "
-            "express that.  See E7F README / TARGET 7.10."
-        )
+    # E7F Blocker B (resolved): --with-stateful now coexists with
+    # --share-moe-buffers.  The stateful decode blocks build their own
+    # decode-only MoEs sharing the prefill resident weights (see
+    # _build_stateful_decode_stage), so the prefill lane keeps its shared 8192
+    # buffers while the decode stage gets distinct decode buffers -- one
+    # material set, no second weight copy.  (The earlier SystemExit guard, from
+    # when 7.10 read the exclusion as universal, is gone.)
 
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
     torch.cuda.set_device(local_rank)
@@ -1192,11 +1213,14 @@ def main() -> int:
             for prompt_index, entry in enumerate(prompts):
                 prompt_tokens = [int(t) for t in entry["prompt_tokens"]]
                 golden_tokens = [int(t) for t in entry["completion_tokens"]]
-                # The stateful/graph path only exists once the ratio-4 index
-                # top-k saturates: (start_pos + 1)//4 >= index_topk(512), i.e.
-                # start_pos >= 2047 (E7F 7.8).  Shorter prompts have no stateful
-                # path, so the stateful arm skips them rather than crash.
-                if decode_path == "stateful" and len(prompt_tokens) < 2047:
+                # E7F Blocker A gave ratio-4 an unsaturated fixed-shape top-k,
+                # so the stateful path now runs for any prompt whose start
+                # position has a full window (>= WINDOW_SIZE = 128).  It still
+                # needs max_seq_len >= index_topk * COMPRESS_RATIO (2048) so the
+                # padded top-k has columns to draw from -- the gate's --max-seq-len
+                # already exceeds that.  Prompts shorter than the window are the
+                # only ones with no stateful path.
+                if decode_path == "stateful" and len(prompt_tokens) < 128:
                     continue
                 compare_steps = min(
                     len(golden_tokens), MAX_COMPARE_STEPS, args.max_steps

@@ -72,7 +72,7 @@ echo "== E7F golden stateful gate '$TAG' ($ARM_ARGS) =="
 # file and, on exit, an exit-code sentinel.  We then poll the sentinel -- a
 # *product*, not process liveness (section 9.12) -- with a bounded deadline
 # that kills any survivor rather than leaving it spinning at 95 W.
-GATE_ARGS="--stage-root ~/Workspace/DeepSeek-V4-Flash --oracle-json oracle-long-v2.json --out-dir $OUT --hc-backends eager --max-seq-len $MAX_SEQ_LEN --max-steps $MAX_STEPS --prefill-chunk 4096 --share-moe-buffers --prompt-min-tokens 2047 --with-stateful $ARM_ARGS"
+GATE_ARGS="--stage-root ~/Workspace/DeepSeek-V4-Flash --oracle-json oracle-long-v2.json --out-dir $OUT --hc-backends eager --max-seq-len $MAX_SEQ_LEN --max-steps $MAX_STEPS --prefill-chunk 4096 --share-moe-buffers --prompt-min-tokens 128 --with-stateful $ARM_ARGS"
 launch_detached() {  # node_rank host
   local r=$1 h=$2
   ssh "$h" "cd ~/e0f-runtime && $ENV_BASE; rm -f ${OUT}.done.${r} e7f-golden-${TAG}-node${r}.log; setsid bash -c '$TR --nnodes 2 --node-rank $r --nproc-per-node 8 --master-addr $MASTER --master-port $PORT e0ef2e_golden_gate.py $GATE_ARGS > e7f-golden-${TAG}-node${r}.log 2>&1; echo \$? > ${OUT}.done.${r}' >/dev/null 2>&1 < /dev/null & echo LAUNCHED_${r}"

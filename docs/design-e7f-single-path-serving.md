@@ -140,6 +140,18 @@ seed/种子敏感性沿用 §9.9 纪律（勿随手改 e0ff 种子）。
   与大的共享 prefill 缓冲并存。这正是 framing 说的
   "small distinct race-guard region over a large shared region"。
 
+**decode 缓冲的量（derived，从 `moe_runtime.py:748 _register_shape` 算）**：
+每个 slot 缓冲随 `global_rows` 缩放；decode `global_rows=4`（B=1×TP4），主项
+`cache13 = 4 × topk(6) × max(2×local_inter(512), hidden(4096)) × 2B ≈ 192 KB`，
+连同 cache2/output/gathered/combined/workspace 约 **300–400 KB/缓冲**。
+每层 × `slots_per_shape`(取 4，覆盖 3 图族+余量) ≈ 1.6 MB/层 × 11 层
+≈ **~18 MB/stage**。**对比 5.61 GiB 余量 = ~300× 富余。**
+
+**⟹ B 的 derived 结论：独立 decode 缓冲 ~18 MB，远小于 5.61 GiB 余量，
+几乎必然容得下。§7.10 的"OOM"全来自那个幻影的"第二套权重(11.5 GiB)"，
+与 decode 缓冲无关。** 单进程双缓冲 serving 路径 derived-可行，无第二份权重、
+无 P/D 拆分、无单机容量工作。
+
 ### B 要测的（measured，A 之后）
 
 在**单路操作点**（prefill chunk 取真实请求档、decode B=1、max_seq 取该 mode）
@@ -149,6 +161,51 @@ seed/种子敏感性沿用 §9.9 纪律（勿随手改 e0ff 种子）。
   无单机容量工作**。B 结束，步 3 的 16 卡 golden 可跑。
 - **若不够** → 记录**差多少**（实测），再考虑 buffer-lifetime 工作
   （大共享区上叠一小块独立 race-guard 区），**仍不做 P/D 拆分**。
+
+### B 的实测结果（2026-07-22，measured）—— 已解决
+
+实现（`e0ef2e_golden_gate.py:_build_stateful_decode_stage`）：每个 decode block 建一个
+**decode-only MoE，共享 prefill MoE 的 resident 权重**（`TP4MoE(resident=pm.resident,
+gate=pm.gate, global_row_shapes=(4,), slots_per_shape=4)`），只新分配 decode 小缓冲。
+**未改任何 frozen 安全检查**——各 decode MoE 天然满足 `TP4DecodeStage` 的每层不别名。
+护栏（`--with-stateful`+`--share-moe-buffers` 的 SystemExit）已删。
+
+**实测（16 卡 golden gate，6 prompt smoke，1024×3+2048×3）**：
+- **load 后 free 8.11 GiB**（decode MoEs 装下，无 OOM，无 alias 错）——
+  §7.10 的"OOM"彻底证伪，**单进程双缓冲成立，无第二份权重**。B 解决。
+
+### 步 3 达成（2026-07-22，measured）—— 第一条真实 prompt → 图 decode
+
+**A+B 合起来，专业版 16 卡、单路操作点上，真实 prompt 经 prefill → 交接 →
+stateful 图族 decode → golden token 的完整路径跑通了。** 这是 §10 Phase 1 的目标那一步。
+artifact：`experiments/E7F-single-path-serving/results/step3-smoke/`。
+
+**质量（stateful serving 路径 vs eager 非 stateful 基线，同 6 prompt）**：
+
+| | 分数 | 近平局包络（自身失配最大 gap） |
+|---|---|---|
+| eager（非 stateful，基线） | **370/384** | 0.885635 |
+| **stateful（serving 路径）** | **366/384** | **1.127426** |
+
+**字面按 §1.3：两条都"FAIL"**（366 < 370；1.127 > 包络常数 0.959503）。
+**但要看清是什么性质的失配**（否则会误判）：
+1. **包络那个 1.127 是共享失配**：在 (prompt2 len1024 step36)，
+   **eager 与 stateful 预测同一个错 token 8842**（都漏了 golden 59819），
+   stateful 只是把 gap 从 0.841 **加宽**到 1.127（top1 36.96→37.23，ULP 经全栈放大）。
+   **不是 stateful 新造了一个自信的错判**，是同一个失配、gap 值被扰动。
+2. **5 个真回归**（eager 对、stateful 错）**全部落在近平局区**（gap < 0.959）：
+   0.538 / 0.465 / 0.403 / 0.035 / 0.007——正是 §1.3 说的"换一组 prompt 就可能翻号"
+   的 ULP 翻转类。saturated(2048) 与 unsaturated(1024,A 路径) 各有份额，
+   即 §7.9 的 ratio-128 ULP 与 A 的 padding 求和序都会翻近平局。
+
+**⟹ 与 E6F 的 −3 同性质**：字面 FAIL，但失配是 ULP 近平局翻转 + 一个 gap 被加宽的
+共享失配，**不是系统性质量回归**。**定性判断（噪声 vs 回归）需**：
+(a) 全集（含 8192）跑完拿完整分数/包络；(b) E6F 方法学（独立重抽集 + 符号检验）；
+(c) 与 E6F 同构，**最终放行是人的门基准迁移决定**，不在无人值守下作。
+
+⚠️ **诚实边界**：步 3 的**路径**已达成（跑通、出 golden）；步 3 的**质量签字**
+（serving 路径过 D0L）**未过字面门**，需上面 (a)(b)(c)。这与"E6F 已放行"是同一类
+待人裁定的迁移，不是自动 PASS。
 
 ### 明确 out-of-scope（现在不做）
 
