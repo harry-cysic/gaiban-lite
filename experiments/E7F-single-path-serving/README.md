@@ -251,7 +251,91 @@ prefill lane 的状态、decode 侧的状态、以及两份快照。
    语义一致）；为未饱和区单独立一个图族；或接受短 prompt 走 eager（按上面的算术，
    这等于放弃短 prompt 的单路指标）。
 
-**下一步是步 3**：16 卡、真实 D0L prompt、prefill → 交接 → **捕图** → decode，
-判据是生成 token 与冻结 golden 一致。它同时了结前面第 1、2、3 条限制。
-⚠️ 步 3 的 prompt 必须 ≥ 2047 才走得上图路径；D0L v2 里有 2×8192 与若干 4096 档，
-可用。**短 prompt 那一格要等上面第 3 条解决**。
+## 步 3 尝试：撞上 prefill/decode 引擎分离，一个物理约束
+
+**目标**：16 卡、真实 D0L prompt（≥2047）、prefill → 交接 → stateful decode，
+判据是 D0L（分数不降 + 近平局包络不越）。做法是给 `e0ef2e_golden_gate.py` 加一个
+默认关闭的 `--with-stateful` 臂（复用 eager 臂的 prefill，交接后跑 serving 的 decode
+路径）。**基线已备**：eligible 子集（≥2047，7 条）冻结非 stateful = **427/448**，
+近平局包络 **0.9558830261**（≤ §1.3 常数 0.959503）。
+
+**结果：跑不起来，撞上一个真实的架构约束，不是 bug。**
+
+`--with-stateful` 的 decode 臂要建 `TP4DecodeStage`，其构造器强制
+**每层的 MoE slot 缓冲互不别名**（`superstage.py:330 _require_unique`），
+这样捕图时各层 MoE 状态独立、不会 race。**而 golden gate 必须带
+`--share-moe-buffers`**——8192 档 prefill 的 MoE 缓冲若不跨层共享就装不下
+（v2chunk 冻结口径 load 后只剩 **5.61 GiB**，且每个冻结档都开了 share）。
+共享让各层 MoE 缓冲**别名**，正好违反 decode stage 的唯一性要求。
+
+**两者在一套 material 里互斥**：
+- prefill 要 `share_moe_buffers=True`（大缓冲跨层共享才装得下）；
+- stateful decode 要 `share_moe_buffers=False`（各层缓冲独立，图不 race）。
+
+想建两套 material（prefill 一套 + decode 一套）共享权重也不行——
+`build_physical_stage` 每次重载权重（11.5 GiB/卡），第二套装不进剩下的 5.61 GiB。
+
+⚠️ **这不是可以绕过去的工程细节，是 serving 的真实结构**：
+**prefill 与 decode 是两个共享权重的独立引擎**。当前 runtime 在**一个进程里
+只支持一套 material**，无法同时表达"prefill 引擎（大共享缓冲）"与
+"decode 引擎（小独立缓冲）"。这正是 §10 Phase 1 工作项"prefill → 图 decode 交接"
+底下没写出来的那一层：交接的两端是两个**引擎**，不是两个 material。
+
+### 第一次尝试怎么暴露的（操作记录）
+
+第一跑：earth ProxyJump 在 load 后掉线，远端 torchrun 被孤儿化并在 collective 里
+自旋（100% util / **~95 W @2700 MHz** = §3.8 的"自旋非计算"）。**教训**：
+`ssh | tee` 前台管道一断，远端作业就孤儿化挂死。已把 launcher 改成
+**setsid 脱离 + 远端日志文件 + DONE 哨兵轮询**（`run_e7f_golden_stateful.sh`），
+掉线不再孤儿化，轮询按**产物**（哨兵文件）而非进程存活（§9.12）。
+
+第二跑（robust launcher，earth 稳定）：真错误浮现——
+`ValueError: super-stage MoE slot buffers must not alias across layers`，
+即上面的约束。**但它以 pipeline 死锁的形式出现**：stage 0 在 `lane.forward`
+之前就 raise（我的 dispatch 把 `_build_stateful_decode_stage` 放在 forward 前），
+没 send，下游 stage 卡在 `pair_transfer` recv → 死锁自旋。
+已加**早退护栏**（`e0ef2e_golden_gate.py`，arg 解析后、任何 collective 之前）：
+`--with-stateful` 与 `--share-moe-buffers` 同开即 `SystemExit`，
+四路对称退出，**再不会死锁**。
+
+### 步 3 的正确设计（下一个 session）
+
+需要 runtime 支持**两套共享权重的 material**（prefill 引擎 + decode 引擎），
+二选一：
+
+1. **`build_physical_stage` 支持权重复用**：先建 prefill material（share=True，
+   大缓冲），再建 decode material 时**传入已加载的 resident 权重**、只新分配
+   decode 的小独立缓冲（share=False，仅 decode row-shape、`slots_per_shape≥4`）。
+   这是 serving 的真实形态，也是最干净的。
+2. **`TP4DecodeStage` 加 `eager_only` 模式**：跳过 MoE-slot 唯一性检查
+   （eager 顺序 decode 用共享缓冲是安全的——eager StageLane 就是这么跑的），
+   并让 stateful plan 用 `moe_slot=0`（`graph_moe_slots=(0,0,0)`）。
+   更小，但改了两处 frozen 安全检查，**且步 3 的 golden 结论会依赖这两处放松
+   本身正确**——一旦放松有 subtle 错，golden 结论就不可信。故**不在无人值守下做**。
+
+⚠️ 两条都触碰 runtime；在有人复核前不改。**`--with-stateful` 的脚手架保留**
+（arg、handoff 复用、per-prompt skip、护栏都在），换上任一支持后即可直接跑，
+基线 427/448 与包络 0.9558830261 已备好。
+
+### 一个顺带落地的正结果：eager 臂逐字复现冻结基线
+
+死在 stateful 臂之前，**eager（非 stateful）臂已在 smoke 子集上逐字复现冻结基线**
+（artifact：`results/step3-blocked/`）：
+
+| prompt | 长度 | 本次 eager | 冻结基线 |
+|---|---|---|---|
+| 0（原 p3） | 2048 | **63/64** | 63 ✓ |
+| 1（原 p4） | 2048 | **60/64** | 60 ✓ |
+| 2（原 p5） | 2048 | **60/64** | 60 ✓ |
+
+183/192，逐字节相同。这**证明两件事**：(1) `--with-stateful` 脚手架**没有扰动
+冻结路径**（改动对默认臂安全）；(2) 配置（分片默认、chunk 4096、share-moe-buffers、
+tilelang prefill）是对的。所以步 3 卡住**只**卡在引擎分离，不在我的接线或配置。
+这也满足了 goal 文档的"引用他人结论前先复跑"——冻结的 427/448 里的这 3 条已复跑对上。
+
+### 仍然成立的（步 1/2/2.5 不受影响）
+
+交接**逐位**（步 2）、捕图对 prefill 来的状态**精确**（步 2.5）、
+图路径**只在 ctx ≥ 2047 存在**（§7.8）、stateful 与非 stateful **不逐位**（§7.9）——
+这些都在 4 卡上独立成立，不依赖 16 卡 golden。步 3 卡住的是"把 golden 判据搬到
+stateful 路径上"这**一件**事，而它卡在 runtime 的引擎分离，不在语义。

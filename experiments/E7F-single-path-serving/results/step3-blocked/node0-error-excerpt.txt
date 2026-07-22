@@ -1,0 +1,12 @@
+[E0e2e][eager] prompt 0: 63/64 golden tokens matched; first mismatch step 45 pred 430 vs golden 10227 top2_gap 0.2832 golden_deficit 0.2832 (decode 78 ms/step)
+[E0e2e][eager] prompt 1: 60/64 golden tokens matched; first mismatch step 12 pred 979 vs golden 412 top2_gap 0.2206 golden_deficit 0.2206 (decode 82 ms/step)
+[E0e2e][eager] prompt 2: 60/64 golden tokens matched; first mismatch step 5 pred 83633 vs golden 46967 top2_gap 0.2866 golden_deficit 0.2866 (decode 82 ms/step)
+    stateful_pack = _build_stateful_decode_stage(
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 484, in _build_stateful_decode_stage
+    raise ValueError(f"super-stage {label} must not alias across layers")
+ValueError: super-stage MoE slot buffers must not alias across layers
+    stateful_pack = _build_stateful_decode_stage(
+  File "/home/cysic/e0f-runtime/e0ef2e_golden_gate.py", line 484, in _build_stateful_decode_stage
+    raise ValueError(f"super-stage {label} must not alias across layers")
+ValueError: super-stage MoE slot buffers must not alias across layers
+    stateful_pack = _build_stateful_decode_stage(

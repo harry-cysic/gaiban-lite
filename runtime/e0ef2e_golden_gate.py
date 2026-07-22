@@ -433,6 +433,66 @@ def collect_path_evidence(lane: StageLane) -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------
+# stateful (serving) decode arm
+#
+# E7F (single-path serving): D0L's quality evidence runs on the non-stateful
+# full-position decode, but serving runs the stateful CUDA-graph decode, and
+# E7F step 2.5 measured those two implementations as *not* bitwise (4/16
+# positions, ~1 ULP).  This arm reruns the same real prompts through the
+# stateful path -- the exact implementation serving uses -- so the D0L
+# criterion (score not below the non-stateful baseline; near-tie gap not over
+# the envelope) can be checked on it directly.
+#
+# We run the stateful *eager* path, not a captured graph: e0sf and the E1F
+# release (bitwise 132/132) already establish graph == stateful-eager, and E7F
+# step 2.5 extended that equality to a handed-off (real-prefill) state.  So a
+# golden-token result on the stateful-eager path transfers to the graph path,
+# and skipping capture removes the warmup/slot machinery that would only add
+# risk without changing the answer.
+#
+# The handoff itself (prefill lane state -> decode-side StaticRatio4KV, other
+# kinds already decode from their Static*KV) is E7F step 2, proven bitwise
+# under the shard default.  Lazy imports keep this out of the frozen import
+# graph and avoid the e7f_handoff_gate <-> this-module cycle.
+
+
+def _build_stateful_decode_stage(
+    lane: "StageLane",
+    *,
+    start_position: int,
+    stop_position: int,
+    device: torch.device,
+) -> tuple[Any, Any]:
+    from e7f_handoff_gate import (  # noqa: PLC0415
+        clone_static_state,
+        install_ratio4,
+        restore_static_state,
+        snapshot_ratio4,
+    )
+    from e1f_full_decode_bench import GRAPH_MOE_SLOT_TUPLE  # noqa: PLC0415
+    from dsv4_direct.stateful_decode import StatefulDecodeCursor  # noqa: PLC0415
+    from dsv4_direct.superstage import TP4DecodeStage  # noqa: PLC0415
+
+    blocks = []
+    for material, attention in lane.layers:
+        state = material.new_state(num_local_sequences=LOCAL_BATCH)
+        if material.kind == "ratio4":
+            install_ratio4(state, snapshot_ratio4(attention))
+        else:
+            restore_static_state(state, clone_static_state(attention.state))
+        blocks.append(material.new_block(state, hc_boundary_backend=None))
+    stage = TP4DecodeStage(blocks, hc_boundary_backend=None)
+    cursor = StatefulDecodeCursor(start_position=start_position, device=device)
+    plan = stage.prepare_stateful_decode_plan(
+        cursor,
+        start_position=start_position,
+        stop_position=stop_position,
+        graph_moe_slots=GRAPH_MOE_SLOT_TUPLE,
+    )
+    return stage, plan
+
+
+# --------------------------------------------------------------------------
 # per-prompt pipeline run
 
 
@@ -449,7 +509,16 @@ def run_prompt(
     device: torch.device,
     mode: str,
     prefill_chunk: int = 0,
+    decode_path: str = "nonstateful",
 ) -> dict[str, Any]:
+    if decode_path == "stateful":
+        from e1f_full_decode_bench import (  # noqa: PLC0415
+            EAGER_MOE_SLOT,
+            forward_eager_prevalidated,
+        )
+        from dsv4_direct.stateful_decode import (  # noqa: PLC0415
+            build_decode_schedule,
+        )
     stage = topo["stage"]
     prompt_len = len(prompt_tokens)
     steps: list[dict[str, Any]] = []
@@ -485,6 +554,11 @@ def run_prompt(
         plan.append((prompt_len + step - 1, [golden_tokens[step - 1]]))
 
     prefill_wall_ms = 0.0
+    # Stateful arm: built lazily at the first decode step, once the prefill
+    # forwards have left the lane state at position prompt_len.
+    stateful_pack: tuple[Any, Any] | None = None
+    stateful_schedule: tuple[Any, ...] = ()
+    zero_ids = torch.zeros((LOCAL_BATCH, 1), dtype=torch.int64, device=device)
     for plan_index, (position, step_tokens) in enumerate(plan):
         # Comparison steps start at the *last* prefill forward.
         step = plan_index - (prefill_forwards - 1)
@@ -504,9 +578,35 @@ def run_prompt(
                 device=device,
             )
             pair_transfer(residual, send=False, group=topo["prev_pair"])
-        residual = lane.forward(
-            residual, start_pos=position, input_ids=input_ids
-        )
+        if decode_path == "stateful" and step >= 1:
+            # Decode steps run the serving path; prefill forwards (step <= 0)
+            # always run the lane so the handed-off state matches the
+            # non-stateful arm's exactly.
+            if stateful_pack is None:
+                stateful_pack = _build_stateful_decode_stage(
+                    lane,
+                    start_position=prompt_len,
+                    stop_position=prompt_len + compare_steps,
+                    device=device,
+                )
+                stateful_schedule = build_decode_schedule(
+                    prompt_len, compare_steps - 1
+                )
+            s_stage, s_plan = stateful_pack
+            s_plan.input_residual_buffer.copy_(residual)
+            s_plan.input_ids_buffer.copy_(
+                input_ids if input_ids is not None else zero_ids
+            )
+            residual = forward_eager_prevalidated(
+                s_stage,
+                s_plan,
+                graph_family=stateful_schedule[step - 1].family,
+                moe_slot=EAGER_MOE_SLOT,
+            ).clone()
+        else:
+            residual = lane.forward(
+                residual, start_pos=position, input_ids=input_ids
+            )
         if stage < STAGE_COUNT - 1:
             pair_transfer(
                 residual.contiguous(), send=True, group=topo["next_pair"]
@@ -580,6 +680,7 @@ def run_prompt(
     result: dict[str, Any] = {
         "prompt_index": prompt_index,
         "mode": mode,
+        "decode_path": decode_path,
         "stage": stage,
         "prompt_len": prompt_len,
         "compare_steps": compare_steps,
@@ -651,6 +752,16 @@ def main() -> int:
         type=str,
         default="eager,fused",
         help="comma list of HC boundary modes to run (eager|fused)",
+    )
+    parser.add_argument(
+        "--with-stateful",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="E7F: append a stateful (serving) decode arm.  Default off keeps "
+        "every frozen arm byte-identical.  It reuses the eager arm's prefill, "
+        "hands the state off to the decode-side stateful path, and teacher-"
+        "forces the same golden steps -- only prompts >= 2047 tokens (where the "
+        "stateful path exists, section 7.8) are covered",
     )
     parser.add_argument(
         "--moe-overlap-blocks", type=int, default=0,
@@ -755,6 +866,24 @@ def main() -> int:
         "applies to every MoE call in this gate)",
     )
     args = parser.parse_args()
+
+    # E7F: the stateful (serving) decode arm builds a TP4DecodeStage, which
+    # requires per-layer-distinct MoE slot buffers (so a captured graph cannot
+    # race).  --share-moe-buffers aliases those buffers across layers to fit
+    # the 8192 prefill -- the two are mutually exclusive in one material set.
+    # This is not a bug to route around: it is serving's real structure, where
+    # prefill and decode are separate engines sharing weights (see E7F README
+    # and TARGET 7.10).  Refuse *before* any collective so the mismatch is a
+    # clean symmetric exit on every rank, never the pipeline deadlock the first
+    # attempt produced.
+    if args.with_stateful and args.share_moe_buffers:
+        raise SystemExit(
+            "--with-stateful is incompatible with --share-moe-buffers: the "
+            "stateful decode stage needs per-layer-distinct MoE slot buffers, "
+            "which sharing aliases.  Serving needs prefill and decode as "
+            "separate weight-sharing engines; the single-material gate cannot "
+            "express that.  See E7F README / TARGET 7.10."
+        )
 
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
     torch.cuda.set_device(local_rank)
@@ -1044,14 +1173,31 @@ def main() -> int:
 
         # ------------------------------------------------------------------
         # golden-token runs
-        for mode in modes:
-            backend = resolve_hc_boundary_backend(
-                None if mode == "eager" else "fused"
-            )
+        #
+        # Each arm is (label, hc_backend, decode_path).  The frozen arms are
+        # the hc-backend modes on the non-stateful path -- unchanged.  E7F
+        # appends a stateful arm (the serving decode path) on the same prompts;
+        # it uses backend=None so its *prefill* is identical to the eager arm's,
+        # isolating the decode implementation as the only difference.
+        arms: list[tuple[str, Any, str]] = [
+            (m, resolve_hc_boundary_backend(None if m == "eager" else "fused"),
+             "nonstateful")
+            for m in modes
+        ]
+        if args.with_stateful:
+            arms.append(("stateful", None, "stateful"))
+        result["arms"] = [[label, path] for label, _, path in arms]
+        for mode, backend, decode_path in arms:
             mode_started = time.perf_counter()
             for prompt_index, entry in enumerate(prompts):
                 prompt_tokens = [int(t) for t in entry["prompt_tokens"]]
                 golden_tokens = [int(t) for t in entry["completion_tokens"]]
+                # The stateful/graph path only exists once the ratio-4 index
+                # top-k saturates: (start_pos + 1)//4 >= index_topk(512), i.e.
+                # start_pos >= 2047 (E7F 7.8).  Shorter prompts have no stateful
+                # path, so the stateful arm skips them rather than crash.
+                if decode_path == "stateful" and len(prompt_tokens) < 2047:
+                    continue
                 compare_steps = min(
                     len(golden_tokens), MAX_COMPARE_STEPS, args.max_steps
                 )
@@ -1075,6 +1221,7 @@ def main() -> int:
                     device=device,
                     mode=mode,
                     prefill_chunk=args.prefill_chunk,
+                    decode_path=decode_path,
                 )
                 del lane
                 # tail-stage record travels to every rank for logging and the
