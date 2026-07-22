@@ -829,11 +829,13 @@ def main() -> int:
         "--with-stateful",
         action=argparse.BooleanOptionalAction,
         default=False,
-        help="E7F: append a stateful (serving) decode arm.  Default off keeps "
-        "every frozen arm byte-identical.  It reuses the eager arm's prefill, "
-        "hands the state off to the decode-side stateful path, and teacher-"
-        "forces the same golden steps -- only prompts >= 2047 tokens (where the "
-        "stateful path exists, section 7.8) are covered",
+        help="E7F: the stateful (serving) decode arm.  The serving path is "
+        "RELEASED (2026-07-22 ruling, section 1.3 non-bitwise-path gate), but "
+        "this flag stays default-off so the frozen bitwise-path gates "
+        "(run_c3f_long_arm, run_c4f_long_gate, run_e0e2e_*) are unchanged.  The "
+        "serving-path gate is run_e7f_golden_stateful.sh, which enables it.  It "
+        "reuses the eager arm's prefill, hands off to the stateful decode path, "
+        "and teacher-forces the same golden steps (prompts >= 128 tokens).",
     )
     parser.add_argument(
         "--with-perturbed",

@@ -55,8 +55,12 @@ attention 权重在每个 TP rank 上是完整副本（DP-attention），占 12.
   attention TP4 分片 + FP8 常驻后模型装得下（余 1.13 GiB），
   故客户口径的标准版五行须**逐行**重算容量，见 TARGET §7.7。
 - **Phase 1 进行中（TARGET §10 交付路线）**:专业版单路 serving 做实。
-  E7F 已证 prefill 出来的状态是合法 decode 状态（分片默认下逐位），
-  正在把真实 prompt 接到图路径上。
+  **E7F 已把真实 prompt 接到图 decode 路径（16 卡跑通、出 golden），
+  serving 路径已放行、默认开**（2026-07-22 人裁定，§1.3 非逐位路径门定义：
+  判据 1 = 无统计显著回归、判据 2 包络不变按"零 stateful-引入越界"）。
+  含 Blocker A（sub-2047 padded top-k，短交互轮次可捕图，无条件默认）
+  与 B（decode-only MoE 共享 prefill 权重，单进程双缓冲）。
+  下一步：HTTP/tokenizer 外壳测框架口径单路折扣。
 - **最大空白**（按 TARGET §2 优先级）:elementwise 尾巴折叠（decode 侧最大单一
   可攻项，39.5%，每步固定成本；E4F+E5F 已取下两块共 +4.74%，其余按链未拆解）、
   M5 长上下文（零覆盖）、serving 折扣验证（Phase 1 的产出）。
@@ -69,5 +73,5 @@ B1·B2 标定 | A0 契约 | D0·D0L golden oracle | A3F·A4F·A5F·A6F kernel |
 C1F 集成 block | E1F 吞吐与容量前沿 | C2F·C3F·C4F prefill |
 E2F B=1 decode 延迟 profile | E3F 8 卡容量判决 |
 E4F·E5F decode 融合 QAT 核（indexer / KV latent） |
-E6F attention TP4 分片（已放行、已默认） | E7F 单路 serving 骨架（进行中） |
+E6F attention TP4 分片（已放行、已默认） | E7F 单路 serving（路径已放行·默认开） |
 `runtime/` 是 direct runtime 与全部门脚本（非安装包，靠 rsync 到 titan 运行）。
