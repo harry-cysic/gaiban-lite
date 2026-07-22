@@ -523,6 +523,39 @@ def _build_stateful_decode_stage(
     return stage, plan
 
 
+def _perturb_lane_1ulp(lane: "StageLane") -> int:
+    """Move every bf16 KV-state element one ULP away from zero (E0hf control).
+
+    The intrinsic-sensitivity control for the stateful arm: if the stateful
+    serving path (which differs from the non-stateful path by a ~1-ULP sum-order
+    reorder, 9.6) flips no more near-tie golden tokens than this deliberate
+    1-ULP state perturbation does, its flips are within sum-order expectation
+    rather than a new error.  Applied once, at the prefill->decode boundary, to
+    the same state the non-stateful decode reads; the arm is otherwise the plain
+    non-stateful decode.
+    """
+
+    def bump(tensor: torch.Tensor | None) -> bool:
+        if not isinstance(tensor, torch.Tensor) or tensor.dtype != torch.bfloat16:
+            return False
+        bits = tensor.view(torch.int16)
+        bits.add_(
+            torch.where(tensor == 0, torch.zeros_like(bits), torch.ones_like(bits))
+        )
+        return True
+
+    bumped = 0
+    for material, attention in lane.layers:
+        if material.kind == "ratio4":
+            for name in ("raw", "compressed", "indexer_kv"):
+                bumped += bump(getattr(attention, name, None))
+        else:
+            state = getattr(attention, "state", None)
+            bumped += bump(getattr(state, "latent", None))
+            bumped += bump(getattr(state, "latent_rope", None))
+    return bumped
+
+
 # --------------------------------------------------------------------------
 # per-prompt pipeline run
 
@@ -589,6 +622,8 @@ def run_prompt(
     # forwards have left the lane state at position prompt_len.
     stateful_pack: tuple[Any, Any] | None = None
     stateful_schedule: tuple[Any, ...] = ()
+    perturbed_done = False
+    perturbed_bumped = 0
     zero_ids = torch.zeros((LOCAL_BATCH, 1), dtype=torch.int64, device=device)
     for plan_index, (position, step_tokens) in enumerate(plan):
         # Comparison steps start at the *last* prefill forward.
@@ -609,6 +644,11 @@ def run_prompt(
                 device=device,
             )
             pair_transfer(residual, send=False, group=topo["prev_pair"])
+        if decode_path == "perturbed" and step == 1 and not perturbed_done:
+            # 1-ULP intrinsic-sensitivity control: perturb the post-prefill
+            # state once, then decode with the plain non-stateful path.
+            perturbed_bumped = _perturb_lane_1ulp(lane)
+            perturbed_done = True
         if decode_path == "stateful" and step >= 1:
             # Decode steps run the serving path; prefill forwards (step <= 0)
             # always run the lane so the handed-off state matches the
@@ -712,6 +752,7 @@ def run_prompt(
         "prompt_index": prompt_index,
         "mode": mode,
         "decode_path": decode_path,
+        "perturbed_tensors": perturbed_bumped,
         "stage": stage,
         "prompt_len": prompt_len,
         "compare_steps": compare_steps,
@@ -793,6 +834,15 @@ def main() -> int:
         "hands the state off to the decode-side stateful path, and teacher-"
         "forces the same golden steps -- only prompts >= 2047 tokens (where the "
         "stateful path exists, section 7.8) are covered",
+    )
+    parser.add_argument(
+        "--with-perturbed",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="E7F evidence: append a 1-ULP intrinsic-sensitivity control arm "
+        "(E0hf).  Non-stateful decode on a post-prefill state moved one bf16 "
+        "ULP away from zero; the near-tie flip count bounds what a sum-order "
+        "reorder should cost, for comparison against the stateful arm.",
     )
     parser.add_argument(
         "--moe-overlap-blocks", type=int, default=0,
@@ -1207,6 +1257,8 @@ def main() -> int:
         ]
         if args.with_stateful:
             arms.append(("stateful", None, "stateful"))
+        if args.with_perturbed:
+            arms.append(("perturbed", None, "perturbed"))
         result["arms"] = [[label, path] for label, _, path in arms]
         for mode, backend, decode_path in arms:
             mode_started = time.perf_counter()
