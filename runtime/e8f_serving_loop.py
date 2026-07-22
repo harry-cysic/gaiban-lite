@@ -396,113 +396,97 @@ def main() -> int:
             plan.expected_position.fill_(plen)
             plan.stop_position_tensor.fill_(plan.stop_position)
 
-            # first decode token id: last prefill logit (stage 3), looped to stage 0
-            # step 0 produces the first generated token from the prefill output.
-            new_tokens: list[int] = []
-            decode_ms: list[float] = []
+            # Tight closed loop (e1f pipeline_step form): no per-step host sync
+            # or object broadcast -- those inflated the first run's 36.5 ms/tok.
+            # Fixed length (max_new_tokens) for a clean discount measurement; EOS
+            # is a serving feature with its own small cost, deferred.  Stage 3
+            # accumulates the argmax tokens in a device tensor and they are read
+            # once at the end.
             graphs = serving_state["graphs"]
             capture_here = graphs is None
             if capture_here:
                 graphs = {}
+            capture_stream = torch.cuda.Stream(device=device)
+            n_gen = int(args.max_new_tokens)
+            gen_tokens = (
+                torch.zeros(n_gen, dtype=torch.int64, device=device)
+                if stage == STAGE_COUNT - 1 else None
+            )
 
-            def stage0_first_input():
-                # stage 0's step-0 input is the prefill's final hidden re-embedded
-                # via the fed token; but the fed token for step 0 is the argmax of
-                # the prefill's final logits, which stage 3 computed.  We obtain it
-                # through the loopback below, so step 0 stage-0 feeds token_buffer.
-                pass
+            def ensure_capture(family):
+                if capture_here and family not in graphs:
+                    torch.cuda.synchronize(device)
+                    graphs[family] = capture_stateful_graph(
+                        decode_stage, plan, graph_family=family,
+                        capture_stream=capture_stream, pool=torch.cuda.graph_pool_handle(),
+                    )
 
-            # We drive the closed loop.  At step k, stage 0 embeds token_buffer
-            # (the previous step's argmax, looped back from stage 3), replays,
-            # transfers forward; stage 3 heads -> argmax -> loops back.
-            # For step 0, token_buffer must hold the first fed token = argmax of
-            # the prefill's last position.  Compute it: stage 3 already holds the
-            # prefill residual; head it once here (outside the graph) to seed.
+            # first token: stage 3 heads the prefill residual, loops it to stage 0.
+            gen_idx = 0
             if stage == STAGE_COUNT - 1:
                 logits = head_logits(head_material, prefill_residual)
-                first_tok = int(logits.argmax(dim=-1).view(-1)[0].item())
-                token_buffer.fill_(first_tok)
+                token_buffer.copy_(logits.argmax(dim=-1, keepdim=True))
+                gen_tokens[gen_idx].copy_(token_buffer.view(-1)[0])
                 pair_transfer(token_buffer, send=True, group=topo["loop_pair"], peer=0)
             if stage == 0:
                 pair_transfer(token_buffer, send=False, group=topo["loop_pair"], peer=1)
-            # broadcast the first token to all ranks for eos/record bookkeeping
-            first_holder = [int(token_buffer.view(-1)[0].item()) if stage in (0, STAGE_COUNT - 1) else 0]
-            dist.broadcast_object_list(first_holder, src=12)
-            first_tok = int(first_holder[0])
-            new_tokens.append(first_tok)
+            gen_idx = 1
 
+            torch.cuda.synchronize(device)
             t_decode0 = time.perf_counter()
-            done = first_tok == eos_token_id
-            step = 0
-            while not done and len(new_tokens) < args.max_new_tokens:
-                position = plen + step
-                family = classify_decode_position(position)
-                ts = time.perf_counter()
+            for step in range(n_gen - 1):
+                family = classify_decode_position(plen + step)
                 if stage == 0:
                     hidden = torch.nn.functional.embedding(token_buffer, embed_material.embed_weight)
                     plan.input_residual_buffer.copy_(hidden.unsqueeze(2).expand(-1, -1, HC_MULT, -1))
                     plan.input_ids_buffer.copy_(token_buffer)
-                    if capture_here and family not in graphs:
-                        torch.cuda.synchronize(device)
-                        graphs[family] = capture_stateful_graph(
-                            decode_stage, plan, graph_family=family,
-                            capture_stream=torch.cuda.Stream(device=device),
-                            pool=torch.cuda.graph_pool_handle(),
-                        )
+                    ensure_capture(family)
                     replay_stateful_graph(graphs[family], plan, graph_family=family)
                     pair_transfer(plan.output_buffer.contiguous(), send=True, group=topo["next_pair"], peer=1)
                     pair_transfer(token_buffer, send=False, group=topo["loop_pair"], peer=1)
                 else:
                     pair_transfer(staging, send=False, group=topo["prev_pair"], peer=0)
                     plan.input_residual_buffer.copy_(staging)
-                    if capture_here and family not in graphs:
-                        torch.cuda.synchronize(device)
-                        graphs[family] = capture_stateful_graph(
-                            decode_stage, plan, graph_family=family,
-                            capture_stream=torch.cuda.Stream(device=device),
-                            pool=torch.cuda.graph_pool_handle(),
-                        )
+                    ensure_capture(family)
                     replay_stateful_graph(graphs[family], plan, graph_family=family)
                     if stage < STAGE_COUNT - 1:
                         pair_transfer(plan.output_buffer.contiguous(), send=True, group=topo["next_pair"], peer=1)
                     else:
                         logits = head_logits(head_material, plan.output_buffer)
                         token_buffer.copy_(logits.argmax(dim=-1, keepdim=True))
+                        gen_tokens[gen_idx].copy_(token_buffer.view(-1)[0])
                         pair_transfer(token_buffer, send=True, group=topo["loop_pair"], peer=0)
                 cursor.advance_host(family)
-                torch.cuda.synchronize(device)
-                decode_ms.append((time.perf_counter() - ts) * 1e3)
-                # broadcast the new token for eos/bookkeeping
-                th = [int(token_buffer.view(-1)[0].item()) if stage in (0, STAGE_COUNT - 1) else 0]
-                dist.broadcast_object_list(th, src=12)
-                tok = int(th[0])
-                new_tokens.append(tok)
-                done = tok == eos_token_id
-                step += 1
+                gen_idx += 1
             torch.cuda.synchronize(device)
             t_decode1 = time.perf_counter()
 
             if capture_here:
                 serving_state["graphs"] = graphs
+            # read tokens once (stage 3), broadcast to rank 0 for the record
+            tok_holder = [gen_tokens.cpu().tolist() if stage == STAGE_COUNT - 1 else None]
+            dist.broadcast_object_list(tok_holder, src=12)
+            new_tokens = tok_holder[0]
+            decode_ms = []  # per-step timing removed; use decode_wall / n
 
             n_new = len(new_tokens)
-            prefill_ms = (t_prefill1 - t_prefill0) * 1e3
-            first_token_ms = (t_decode0 - t_prefill0) * 1e3   # prefill + head + loopback
-            decode_wall_ms = (t_decode1 - t_decode0) * 1e3
-            # framework caliber: whole request, prefill through last token.
-            framework_ms = (t_decode1 - t_prefill0) * 1e3
+            n_loop = max(n_gen - 1, 1)
+            prefill_ms = (t_prefill1 - t_prefill0) * 1e3          # prefill lane + install
+            first_token_ms = (t_decode0 - t_prefill0) * 1e3       # prefill + plan + first-token head
+            decode_wall_ms = (t_decode1 - t_decode0) * 1e3        # the n_gen-1 loop steps
+            decode_ms_per_token = decode_wall_ms / n_loop
+            framework_ms = (t_decode1 - t_prefill0) * 1e3         # whole request
             rec = {
                 "request": req_index,
                 "prompt_len": plen,
                 "new_tokens": n_new,
-                "eos": bool(done),
                 "prefill_ms": prefill_ms,
                 "first_token_ms": first_token_ms,
                 "decode_wall_ms": decode_wall_ms,
-                "decode_ms_per_token_p50": (statistics.median(decode_ms) if decode_ms else None),
+                "decode_ms_per_token": decode_ms_per_token,
                 "framework_ms": framework_ms,
                 "framework_tok_s": (n_new / framework_ms * 1e3) if framework_ms > 0 else None,
-                "decode_only_tok_s": (len(decode_ms) / (sum(decode_ms) / 1e3)) if decode_ms else None,
+                "decode_only_tok_s": (1e3 / decode_ms_per_token) if decode_ms_per_token > 0 else None,
                 "captured": capture_here,
                 "first_tokens": new_tokens[:8],
             }
@@ -519,7 +503,7 @@ def main() -> int:
                     print(
                         f"[E8F] r{rnd} req{i} len{rec['prompt_len']} "
                         f"+{rec['new_tokens']}tok framework {rec['framework_tok_s']:.1f} tok/s "
-                        f"(prefill {rec['prefill_ms']:.0f}ms, decode {rec['decode_ms_per_token_p50']:.1f}ms/tok)",
+                        f"(prefill {rec['prefill_ms']:.0f}ms, decode {rec['decode_ms_per_token']:.1f}ms/tok)",
                         flush=True,
                     )
 
