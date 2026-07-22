@@ -15,17 +15,24 @@ launcher `run_e8f_serving.sh`）：
 - 新增：真实 prefill、free-running（定长 max_new_tokens，EOS 后置）、请求循环、
   device 侧 token 累加（无逐步 host read/object broadcast）、per-request 框架计时。
 
-## 首个实测（1024-prompt / 48-new-token，fused HC，5 个测量请求，round-0 捕获排除）
+## 实测（fused HC，每形状 5 个测量请求，round-0 捕获排除）
 
-artifact：`results/b1024-fused-rank0.json`。
+artifact：`results/b1024-fused-rank0.json`、`results/b2048-fused-rank0.json`。
 
-| 量 | 值 | 对比裸引擎（E1F 39.2 tok/s @ctx2048） |
-|---|---:|---|
-| **decode** | **24.80 ms/tok（40.33 tok/s）** | **打平/略优** 裸 25.49 ms/tok —— serving 图 decode 路径**满速** |
-| prefill（stage0 视角） | 182.7 ms | 1024-token prefill + 交接安装 |
-| **首 token 延迟** | **686.6 ms** | 整条 prefill 流水（4 stage）+ head + loopback |
-| **框架口径** | **25.92 tok/s** | 端到端 48 token；= 裸 39.2 的 **66%** |
-| **⟹ 单路 serving 折扣** | **34%**（此形状） | §1.2 推断 20%，**此短生成形状实测更大** |
+| 形状 | decode ms/tok | decode tok/s | prefill ms | **首 token ms** | **框架 tok/s** | **折扣** |
+|---|---:|---:|---:|---:|---:|---:|
+| 1024-prompt / 48-tok | **24.80** | 40.33 | 183 | **687** | **25.92** | **34%** |
+| 2048-prompt / 48-tok | **24.81** | 40.30 | 342 | **1336** | **19.18** | **51%** |
+
+裸引擎参照：**39.2 tok/s = 25.49 ms/tok**（E1F @ctx2048）。
+
+**两点合起来说清了三件事**：
+- **decode 在两个 ctx 完全一致**（24.80 / 24.81 ms/tok = 40.3 tok/s），
+  **与裸引擎打平/略优**——serving 图 decode 路径**满速、与 ctx 无关**。
+- **首 token 延迟随 prompt 长度缩放**（687 → 1336 ms，≈2×，与 prefill 工作量一致）——
+  这是框架开销的**唯一大项**（decode 无损）。
+- **折扣随 prompt 长度增大**（34% → 51%，固定 48 生成 token）：首 token 延迟越大、
+  摊到同样 48 个 token 上折扣越深。**折扣 = f(prompt_len, gen_len)，不是单一常数。**
 
 **关键读法**：
 1. **serving 图 decode 与裸引擎同速**（24.8 vs 25.49 ms/tok）——A（未饱和 padded）+
@@ -39,16 +46,18 @@ artifact：`results/b1024-fused-rank0.json`。
 
 ## 待办（下一步）
 
-- **⚠️ 口径对齐**：本测在 ctx **1024**（未饱和，A 路径），裸 39.2 在 ctx **2048**。
-  decode 打平已说明路径满速，但**折扣要按 bucket 分列**（1024/2048/4096 各测），
-  且**扫生成长度**（首 token 延迟摊薄曲线）。本表只是**一个形状的一个点**。
-- **teardown 挂起**：请求循环跑完后，最终 `dist.barrier`/`destroy_process_group`
-  挂住（GPU idle 非自旋），需 `pkill` 清理。结果在循环内已写盘（rank JSON），
-  不影响数据，但要修（可能是某 rank 的 barrier 不匹配）。
+- **✅ 已对齐**：ctx 1024（未饱和/A 路径）与 2048（饱和）**decode 都打平裸引擎**。
+  4096 bucket 可补，但两点已定性（decode 满速、折扣随 prefill 缩放）。
+- **剩一条轴：生成长度扫描**（16 / 48 / 128 / 256 new-token），画出折扣随 gen_len
+  的摊薄曲线——首 token 延迟固定，gen_len 越大折扣越浅，趋近 decode 的 40 tok/s。
+  §1.2 的最终折扣数应绑定**目标操作点的典型 (prompt_len, gen_len)**，而非单点。
+- **✅ teardown 挂起已修**：write_json 后 `os._exit`（数据已落盘；destroy_process_group
+  在本拓扑 ~19 个自定义 group 下会挂）。运行现在干净收尾、done 哨兵及时触发。
 - **EOS**：当前定长（测折扣用）；交互版需 EOS，其 per-token host-read 成本单列。
 - **HTTP**：后置（JSONL 已够测折扣）。
-- **首 token 延迟优化**：prefill 是 eager chunked；单路操作点是短交互轮次，
-  prefill 短，但 686 ms 仍是折扣主项，值得单独 profile（prefill 流水的 stage 摊薄）。
+- **back-to-back 自检**：两请求连跑 = 各自单跑，token 一致（验证状态重装无残留）。
+- **首 token 延迟优化**：prefill 是 eager chunked；单路操作点是短交互轮次 prefill 短，
+  但仍是折扣主项，值得单独 profile。
 
 ⚠️ **本数字是"一个形状的首测"，不是 §1.2 的最终折扣**。写入 §1.2 前需按 bucket +
 生成长度补齐（上"待办"第一条）。裸引擎 39.2 的口径见 E1F/E6F。
