@@ -624,15 +624,27 @@ Flash 的 `index_topk = 512`、`COMPRESS_RATIO = 4` ⟹ **start_position ≥ 204
 | normal 位内部 | **间歇失配**（8 个 normal 里 4 个失配） |
 | 幅值 | 9.77e-4 ~ 1.46e-3（bf16 ULP 尺度） |
 
-**即：ratio-4 的压缩/finalize 步（求和序确定）逐位吻合，漂移只在 normal 位、
-且数据相关地间歇出现。** 这与 §9.6"改变行集合/行序不可能逐位"的类别相符
-（每位稀疏 attention 累加的求和序在两条实现间可不同）——
-**指向良性求和序差异而非系统性偏差**。
-⚠️ **仍是推断**：上述是失配位的 family 分布（实测），
-"求和序在稀疏 attention 累加处不同"是**与之相符的假设**，
-**未定位到具体层/算子**——那需要 per-layer trace（4 卡可做，见 E7F 后续）。
-故对步 3 的意义是：该差异**表现得像 ULP 求和序**，
-它会不会翻一个近平局 golden token，正是步 3 的 D0L 判据要测的那件事。
+**已定位（层型隔离实测，2026-07-22）**：单层型各跑一遍 arm-S vs 参考——
+
+| 隔离配置 | 失配 |
+|---|---|
+| 单 **ratio-4** 层（`--layers 2`） | **0 / 16 逐位** |
+| 单 **window** 层（`--layers 0`） | **0 / 16 逐位** |
+| 单 **ratio-128** 层（`--layers 3`） | **11 / 16**，`max_abs` 1.95e-3 ~ 3.91e-3 |
+
+**结论：整栈的 stateful≠非 stateful 差异全部来自 ratio-128 层**
+（`Ratio128TorchAttention` 的 `forward_stateful_decode_tensor` vs
+`forward_decode_tensor`），ratio-4 与 window 的两条实现逐位一致。
+artifact：`experiments/E7F-single-path-serving/results/attrib-L{2,3,0}/`。
+
+⚠️ **这更正了上一版的推断**：先前按"失配位 family 全是 normal、ratio4_boundary
+逐位相等"猜是 ratio-4 稀疏 attention 的求和序——**猜错了**（family 标签是**调度**里
+ratio-4 的压缩节拍，与"哪层出错"正交）。层型隔离把它钉在 **ratio-128**。
+这正是 §9.6 类（sparse 层的每位选择/累加求和序在两实现间可不同，非逐位、非 bug）；
+**是"先断言后被隔离实验更正"的又一例**（§5.3 的显存归因同理）。
+⚠️ 仍未到**算子级**（ratio-128 层内 attention-branch vs moe / 哪个 reduce），
+但层型已确定。对步 3 的意义不变：它是 ratio-128 的 ULP 求和序，
+会不会翻近平局 golden token 由步 3 的 D0L 判据裁定。
 
 **为什么这条要紧**：**D0L 的全部质量证据跑在非 stateful 路径上**（`e0ef2e`），
 **而 serving 要跑 stateful 图路径**，两者已实测不逐位。

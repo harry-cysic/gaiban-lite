@@ -201,11 +201,29 @@ arm G 和 arm S 逐位相同，说明捕图对一个 **prefill 来的**状态与
 **读法**：ratio-4 的压缩/finalize（求和序确定）两条实现吻合，
 漂移只在 normal 位、数据相关地间歇出现——**符合** §9.6"改变行序不可能逐位"
 （每位稀疏 attention 累加序在两实现间可不同）。
-⚠️ family 分布是**实测**；"差在稀疏 attention 累加序"是**相符的假设，未定位到层/算子**。
-定位需 per-layer trace（4 卡：同一 decode step 走 `forward_decode_tensors`
-逐块 vs 逐块 `forward_stateful_decode_tensor`，diff 每块输出找首个分叉层，
-再拆 attention-branch vs moe-output）。**这是一个 4 卡可做的 bounded 后续，不依赖
-步 3 的引擎分离。**
+⚠️ family 分布是**实测**；"差在稀疏 attention 累加序"当时是**相符的假设**。
+
+### 层型隔离：差异全在 ratio-128（实测，更正了上面的假设）
+
+用现成的 `--layers` 单层型各跑一遍（无新代码，`results/attrib-L{2,3,0}/`）：
+
+| 隔离 | arm-S vs 参考 |
+|---|---|
+| 单 ratio-4（`--layers 2`） | **0/16 逐位** |
+| 单 window（`--layers 0`） | **0/16 逐位** |
+| **单 ratio-128（`--layers 3`）** | **11/16 失配**，`max_abs` 1.95e-3~3.91e-3 |
+
+**整栈的 stateful≠非 stateful 全部来自 ratio-128 层**——
+ratio-4 与 window 的 stateful/非 stateful 两条实现逐位一致。
+⚠️ **这更正了上面按 family 做的猜测**：先前"ratio4_boundary 逐位、normal 间歇"
+被读成 ratio-4 稀疏 attention 的求和序；其实 family 是**调度节拍**（ratio-4 的压缩
+周期），与"哪层出错"正交。隔离把它钉在 **ratio-128**。
+**又一次"先断言后被实验更正"**——正是 goal 文档要求归因在主会话做、
+用隔离实验而非 family 花样去定位的理由。
+
+⚠️ 仍未到**算子级**（ratio-128 层内是 attention-branch 还是 moe / 哪个 reduce），
+但层型已定。机制属 §9.6（sparse 层每位选择/累加求和序在两实现间可不同，非 bug）。
+对步 3 的意义不变。
 
 ### 一个此前没人比过的对子
 
