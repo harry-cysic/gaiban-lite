@@ -195,6 +195,18 @@ arm G 和 arm S 逐位相同，说明捕图对一个 **prefill 来的**状态与
 量级 1.46e-3 在 bf16 上约 1 ULP（幅值 ~0.2–0.4 处），与"同数学、异求和序"相容，
 但**相容不等于已证**。
 
+**从 artifact 重读出的 family 模式（实测，纯分析、无新跑）**：4 个失配位
+2052/2058/2060/2062 **全是 `normal` family**；而全部 4 个 `ratio4_boundary` 位
+（2051/2055/2059/2063）**逐位相等（0.0）**；normal 位内部**间歇失配**（8 中 4）。
+**读法**：ratio-4 的压缩/finalize（求和序确定）两条实现吻合，
+漂移只在 normal 位、数据相关地间歇出现——**符合** §9.6"改变行序不可能逐位"
+（每位稀疏 attention 累加序在两实现间可不同）。
+⚠️ family 分布是**实测**；"差在稀疏 attention 累加序"是**相符的假设，未定位到层/算子**。
+定位需 per-layer trace（4 卡：同一 decode step 走 `forward_decode_tensors`
+逐块 vs 逐块 `forward_stateful_decode_tensor`，diff 每块输出找首个分叉层，
+再拆 attention-branch vs moe-output）。**这是一个 4 卡可做的 bounded 后续，不依赖
+步 3 的引擎分离。**
+
 ### 一个此前没人比过的对子
 
 据我检索，**stateful 与非 stateful decode 从未被直接对拍过**。逐个核对过的近邻：

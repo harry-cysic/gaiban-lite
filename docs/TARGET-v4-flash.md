@@ -612,9 +612,27 @@ Flash 的 `index_topk = 512`、`COMPRESS_RATIO = 4` ⟹ **start_position ≥ 204
 
 **归因**：差异全在 stateful 与非 stateful 两条 decode 实现之间，
 **与捕图无关、与 prefill→decode 状态交接无关**。
-⚠️ **具体是哪个算子的求和序造成的，尚未定位**——最初"融合 HC 边界"的猜测
-已被证伪（该跑 `--hc-backend default`，`resolve_hc_boundary_backend` 返回 `None`，
-两臂都没有融合链）。**未归因，勿据此推导。**
+⚠️ **最初"融合 HC 边界"的猜测已被证伪**（该跑 `--hc-backend default`，
+`resolve_hc_boundary_backend` 返回 `None`，两臂都没有融合链）。
+
+**从 artifact 重读出的模式（实测，非推断）**——`results/graph-attrib/rank0.json`：
+
+| 观察 | 事实 |
+|---|---|
+| 4 个失配位 2052/2058/2060/2062 的 family | **全是 `normal`** |
+| 全部 4 个 `ratio4_boundary` 位（2051/2055/2059/2063） | **全部逐位相等（0.0）** |
+| normal 位内部 | **间歇失配**（8 个 normal 里 4 个失配） |
+| 幅值 | 9.77e-4 ~ 1.46e-3（bf16 ULP 尺度） |
+
+**即：ratio-4 的压缩/finalize 步（求和序确定）逐位吻合，漂移只在 normal 位、
+且数据相关地间歇出现。** 这与 §9.6"改变行集合/行序不可能逐位"的类别相符
+（每位稀疏 attention 累加的求和序在两条实现间可不同）——
+**指向良性求和序差异而非系统性偏差**。
+⚠️ **仍是推断**：上述是失配位的 family 分布（实测），
+"求和序在稀疏 attention 累加处不同"是**与之相符的假设**，
+**未定位到具体层/算子**——那需要 per-layer trace（4 卡可做，见 E7F 后续）。
+故对步 3 的意义是：该差异**表现得像 ULP 求和序**，
+它会不会翻一个近平局 golden token，正是步 3 的 D0L 判据要测的那件事。
 
 **为什么这条要紧**：**D0L 的全部质量证据跑在非 stateful 路径上**（`e0ef2e`），
 **而 serving 要跑 stateful 图路径**，两者已实测不逐位。
